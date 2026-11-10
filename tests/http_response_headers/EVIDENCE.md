@@ -3,7 +3,7 @@
 Area: response parsing and `HttpQueryInfoA/W` (wininet.dll 11.0.19041.2193 on Windows 10 22H2 19045.2965).
 Files: `rh.h`/`rh_util.c` (helpers + the known-header table), `hqi_args.c`, `hqi_buffer.c`, `hqi_levels.c`,
 `hqi_index.c`, `hqi_numdate.c`, `rsp_status.c`, `rsp_headers.c`, and from the second pass `rsp_segments.c`,
-`rsp_lifecycle.c`, `hqi_generated.c`, `hqi_reqside.c`, `rsp_values.c` (173 TESTs, about 36000 CHECKs on the VM). Every test runs its own raw-byte loopback server
+`rsp_lifecycle.c`, `hqi_generated.c`, `hqi_reqside.c`, `rsp_values.c` (173 TESTs, about 43000 CHECKs on the VM). Every test runs its own raw-byte loopback server
 (`common/srv.h`) on 127.0.0.1. No internet is used, no proxy, cache or zone settings are touched, and cookies are never
 stored (`INTERNET_FLAG_NO_COOKIES`).
 
@@ -106,7 +106,8 @@ disagreement is listed below.
   turns out to be flaky.
 
 ## Second pass (rsp_segments, rsp_lifecycle, hqi_generated, hqi_reqside, rsp_values)
-Win10 boots `rh-20261110-051251-b1` (171 tests, 6 failing, triaged below) and the follow-up boot after the fixes.
+Win10 boots `rh-20261110-051251-b1` (171 tests, 6 failures, triaged below) and `rh-20261110-063749-b1`
+(173 tests, 42874 checks, 1 failure from a wrong probe, the REQ+COMMA pair, corrected and re-run).
 
 ### Decomp-grounded [D] (and confirmed on the VM)
 - `HTTP_REQUEST_HANDLE_OBJECT::ReuseObject@0x3ade8` runs on a resend: it clears the response flags (+0x142c) and calls
@@ -145,7 +146,8 @@ Win10 boots `rh-20261110-051251-b1` (171 tests, 6 failing, triaged below) and th
   the end. REPLACE of an absent name adds it. ADD_IF_NEW on an existing name gives 12155. Headers passed to
   HttpSendRequest stay in the request and are sent once on a resend.
 - W quirk on the request side too: a W buffer that holds the A copy but not the W one gives 122 with the index
-  already advanced. CUSTOM with `*len == 0` gives 87 with `*len` 0.
+  already advanced. `CUSTOM|REQ|COALESCE_WITH_COMMA` gives 87 for any buffer size (*len untouched): the
+  REQ+COMMA pair is illegal [D].
 - Reason phrases are stored verbatim: tabs, colons, UTF-8 bytes, and 4096 bytes. A second status line among the
   headers is dropped as a colon-less line. Headers named Status-Code/Version/Status do not affect the synthetic levels.
   Known-name look-alikes (`Server-Timing`, `Content-Types`, ...) are custom headers only.

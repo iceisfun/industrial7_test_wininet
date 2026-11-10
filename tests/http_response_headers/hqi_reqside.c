@@ -211,11 +211,14 @@ TEST(hqi_req_buffer_protocol) {
     lstrcpyW(w, L"X-Buf"); CHECK(rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 22, &idx)); CHECK(!lstrcmpW(w, L"ab")); EXPECT_EQ(rh_len, 4); EXPECT_EQ(idx, 2);
     idx = 0;
     lstrcpyW(w, L"X-Buf"); CHECK(rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 22, &idx)); CHECK(!lstrcmpW(w, L"0123456789")); EXPECT_EQ(rh_len, 20); EXPECT_EQ(idx, 1);
-    /* [W10] CUSTOM with a zero length: 87, *len 0 */
+    /* REQUEST_HEADERS + COALESCE_WITH_COMMA is an illegal modifier pair: 87 before any lookup, *len untouched
+     * [D HttpQueryInfoA pair table, W10] */
     { DWORD l = 0; lstrcpyA(b, "X-Buf"); SetLastError(0);
       CHECK(!U(HttpQueryInfoA)(c.hr, HTTP_QUERY_CUSTOM | REQF | HTTP_QUERY_FLAG_COALESCE_WITH_COMMA, b, &l, NULL)); EXPECT_ERR(ERROR_INVALID_PARAMETER); EXPECT_EQ(l, 0); }
     { DWORD l = 6; lstrcpyA(b, "X-Buf"); SetLastError(0);
-      CHECK(!U(HttpQueryInfoA)(c.hr, HTTP_QUERY_CUSTOM | REQF | HTTP_QUERY_FLAG_COALESCE_WITH_COMMA, b, &l, NULL)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER); EXPECT_EQ(l, 15); }
+      CHECK(!U(HttpQueryInfoA)(c.hr, HTTP_QUERY_CUSTOM | REQF | HTTP_QUERY_FLAG_COALESCE_WITH_COMMA, b, &l, NULL)); EXPECT_ERR(ERROR_INVALID_PARAMETER); EXPECT_EQ(l, 6); }
+    { DWORD l = sizeof b; lstrcpyA(b, "X-Buf"); SetLastError(0);
+      CHECK(!U(HttpQueryInfoA)(c.hr, HTTP_QUERY_CUSTOM | REQF | HTTP_QUERY_FLAG_COALESCE_WITH_COMMA, b, &l, NULL)); EXPECT_ERR(ERROR_INVALID_PARAMETER); EXPECT_EQ(l, sizeof b); }
     rh_close(&c);
 }
 
