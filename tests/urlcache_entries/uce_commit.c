@@ -254,6 +254,10 @@ TEST(uce_commit_types_roundtrip) {
             free(i);
         }
         CHECKF(uce_del(url), "%s del err %lu", g_types[k].name, GetLastError());
+        /* delete removes the owned file, except for EDITED entries [D CContainerProps::DeleteEntryFile (type & 8)] */
+        if (g_types[k].type & EDITED_CACHE_ENTRY) CHECKF(uce_file_exists(path), "%s file gone", g_types[k].name);
+        else CHECKF(!uce_file_exists(path), "%s file left", g_types[k].name);
+        DeleteFileA(path);
     }
 }
 TEST(uce_commit_sticky_exempt_delta) {

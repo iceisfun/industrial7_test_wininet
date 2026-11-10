@@ -218,7 +218,7 @@ TEST(uce_key_idn_host_w) {
     /* the host goes through IdnToAscii [D] */
     WCHAR u[300]; swprintf(u, 300, L"http://b\x00fc" L"cher%lu.i7test.example/i.txt", GetCurrentProcessId());
     WCHAR puny[300]; swprintf(puny, 300, L"http://xn--bcher%lu-", GetCurrentProcessId());
-    t_cache_track(uce_a(u));
+    { char u8[300]; WideCharToMultiByte(CP_UTF8, 0, u, -1, u8, sizeof u8, NULL, NULL); t_cache_track(u8); }   /* A keys are UTF-8 */
     BOOL r = U(CommitUrlCacheEntryW)(u, NULL, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, NULL, NULL);
     CHECK(r);
     if (!r) return;

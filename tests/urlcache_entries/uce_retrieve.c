@@ -569,7 +569,11 @@ TEST(uce_delete_sticky_and_edited) {
         CHECK(uce_make_ex(url, "txt", "x", 1, types[k], NULL, uce_zero_ft, uce_zero_ft, p, &err));
         SET_ERR(0xdeadbeef);
         CHECKF(uce_del(url), "type 0x%lx err %lu", types[k], GetLastError());
-        CHECK(!uce_exists(url));
+        SET_ERR(0xdeadbeef);
+        CHECKF(!uce_del(url) && GetLastError() == ERROR_FILE_NOT_FOUND, "type 0x%lx second delete", types[k]);   /* really gone (SPARSE is hidden from Get) */
+        /* EDITED entries keep their file [D CContainerProps::DeleteEntryFile (type & 8)] */
+        if (types[k] & EDITED_CACHE_ENTRY) CHECK(uce_file_exists(p)); else CHECK(!uce_file_exists(p));
+        DeleteFileA(p);
     }
 }
 TEST(uce_delete_stream_locked) {

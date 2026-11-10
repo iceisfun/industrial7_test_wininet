@@ -436,7 +436,7 @@ static DWORD WINAPI thr_entries(LPVOID pv) {
 }
 TEST(uce_life_threads_independent_entries) {
     REQUIRE(U(CommitUrlCacheEntryA));
-    HANDLE th[4]; thr_arg args[4];
+    HANDLE th[4]; static thr_arg args[4];   /* static: a thread that outlives a timeout must not write into a dead frame */
     for (int k = 0; k < 4; k++) { memset(&args[k], 0, sizeof args[k]); args[k].idx = k; th[k] = CreateThread(NULL, 0, thr_entries, &args[k], 0, NULL); }
     DWORD w = WaitForMultipleObjects(4, th, TRUE, 30000);
     CHECK(w != WAIT_TIMEOUT);
@@ -459,7 +459,7 @@ TEST(uce_life_threads_shared_locks) {
     REQUIRE(U(RetrieveUrlCacheEntryFileA));
     const char *url = uce_url("lthl"); char p[MAX_PATH]; DWORD err;
     CHECK(lmk(url, p));
-    HANDLE th[4]; thr_lock_arg args[4];
+    HANDLE th[4]; static thr_lock_arg args[4];
     for (int k = 0; k < 4; k++) { args[k].url = url; args[k].ok = 0; th[k] = CreateThread(NULL, 0, thr_lock, &args[k], 0, NULL); }
     CHECK(WaitForMultipleObjects(4, th, TRUE, 30000) != WAIT_TIMEOUT);
     int total = 0;
