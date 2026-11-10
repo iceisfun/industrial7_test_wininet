@@ -117,7 +117,7 @@ TEST(ck_more_max_age_forms_table) {
         ck_cleanup();
     }
 }
-TEST(ck_more_max_age_odd_forms_observed) {
+TEST(ck_more_max_age_odd_forms_ignored) {
     REQUIRE(UN(InternetGetCookieEx2)); REQUIRE(U(InternetSetCookieA));
     static const char *t[] = { "max-age=+60", "max-age=60abc", "max-age=60.5", "max-age=0x10", "max-age=99999999999",
                                "max-age=2147483648", "max-age=4294967296", "max-age=-0", "max-age=\"60\"", "max-age= -5" };
@@ -128,8 +128,11 @@ TEST(ck_more_max_age_odd_forms_observed) {
         BOOL r = ck_set(u, NULL, d);
         BOOL es; ULONGLONG ex; DWORD fl; DWORD n = e2first(u, &es, &ex, &fl);
         long long secs = n && es ? (long long)((LONGLONG)ex - (LONGLONG)now64()) / 10000000LL : 0;
-        t_note("'%s': set=%d n=%lu expset=%d secs=%lld get='%s'", t[i], r, n, es, secs, ck_gets(u, NULL, 0));
+        t_note("'%s': set=%d n=%lu expset=%d secs=%lld", t[i], r, n, es, secs);
         CHECK(r == TRUE);
+        /* VM boot 3: every odd form is ignored (session cookie replaced) except "= -5", which still deletes */
+        if (strstr(t[i], "-5")) CHECKF(n == 0, "'%s' n=%lu", t[i], n);
+        else CHECKF(n == 1 && !es && !strcmp(ck_gets(u, NULL, 0), "mo=new"), "'%s' n=%lu expset=%d", t[i], n, es);
         ck_cleanup();
     }
 }
@@ -221,7 +224,7 @@ TEST(ck_more_setex_w_httponly_without_flag_rejected) {
     DWORD r = U(InternetSetCookieExW)(ck_w(u), NULL, L"whr=1; HttpOnly", 0, 0);
     DWORD e = GetLastError();
     EXPECT_EQ(r, COOKIE_STATE_REJECT);
-    EXPECT_EQ(e, ERROR_INVALID_OPERATION);
+    EXPECT_EQ(e, 0);   /* D (InternetSetCookieExW keeps GLE only when the state is 0) + VM: REJECT with GLE 0 */
     ck_cleanup();
 }
 TEST(ck_more_setex_non_script_accepts_httponly) {
@@ -252,8 +255,8 @@ TEST(ck_more_evaluate_p3p_with_header) {
     SetLastError(0xdeadbeef);
     DWORD r = U(InternetSetCookieExA)(u, NULL, "p3=1", INTERNET_COOKIE_EVALUATE_P3P, (DWORD_PTR)"CP=\"NOI DSP COR NID CUR OUR NOR\"");
     DWORD e = GetLastError();
-    t_note("EVALUATE_P3P first-party: state=%lu gle=%lu get='%s'", r, e, ck_gets(u, NULL, 0));
     EXPECT_EQ(r, COOKIE_STATE_ACCEPT);
+    EXPECT_EQ(e, 0);
     EXPECT_STR(ck_gets(u, NULL, 0), "p3=1");
     ck_cleanup();
 }
@@ -276,8 +279,10 @@ TEST(ck_more_file_url_cookie) {
     BOOL r = ck_set(url, NULL, "fc=1");
     DWORD e = GetLastError();
     const char *g = ck_gets(url, NULL, 0);
-    t_note("file URL cookie: set=%d gle=%lu get='%s' dir-get='%s'", r, e, g, ck_gets(dir, NULL, 0));
-    if (r) EXPECT_STR(g, "fc=1");
+    t_note("file URL cookie: set=%d gle=%lu", r, e);
+    EXPECT_EQ(r, TRUE);                                            /* VM boot 3 */
+    EXPECT_STR(g, "fc=1");
+    EXPECT_STR(ck_gets(dir, NULL, 0), "fc=1");
     ck_cleanup();
 }
 TEST(ck_more_url_trailing_dot_host) {
@@ -286,7 +291,9 @@ TEST(ck_more_url_trailing_dot_host) {
     char dot[300]; snprintf(dot, sizeof dot, "%s.", h);
     SetLastError(0xdeadbeef);
     BOOL r = ck_set(ck_url(dot, "/"), NULL, "td=1");
-    t_note("trailing-dot host: set=%d gle=%lu plain-host get='%s' dot get='%s'", r, GetLastError(), ck_gets(ck_url(h, "/"), NULL, 0), ck_gets(ck_url(dot, "/"), NULL, 0));
+    EXPECT_EQ(r, TRUE);                                            /* VM boot 3: "h." is its own jar entry */
+    EXPECT_STR(ck_gets(ck_url(dot, "/"), NULL, 0), "td=1");
+    EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
     ck_cleanup();
 }
 TEST(ck_more_percent_encoded_path_not_decoded) {
@@ -351,13 +358,14 @@ typedef BOOL (WINAPI *import_a_fn)(LPCSTR file);
 typedef BOOL (WINAPI *export_a_fn)(LPCSTR file, BOOL append);
 static FARPROC ordp(unsigned n) { return t_is_wine() ? NULL : t_proc_ord("wininet.dll", n); }
 static unsigned long long unix_now(void) { return now64() / 10000000ULL - 11644473600ULL; }
+#define SKEW 363543LL   /* cookie-file epoch skew, see ck_extra.c */
 static int wfile(const char *path, const char *data) {
     HANDLE f = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
     if (f == INVALID_HANDLE_VALUE) return 0;
     DWORD w = 0; WriteFile(f, data, (DWORD)strlen(data), &w, NULL); CloseHandle(f);
     return w == strlen(data);
 }
-TEST(ck_more_import_expiry_probe) {
+TEST(ck_more_import_expiry_skew) {
     import_a_fn im = (import_a_fn)ordp(108);
     REQUIRE(im);
     static const int days[] = { 1, 2, 7, 30, 365 };
@@ -374,11 +382,18 @@ TEST(ck_more_import_expiry_probe) {
         BOOL es; ULONGLONG ex; DWORD fl; DWORD n = e2first(ck_url(h, "/"), &es, &ex, &fl);
         t_note("import +%dd: r=%d get='%s' httponly-get='%s' ex2 n=%lu flags=0x%lx expset=%d", days[i], r, a, b, n, fl, es);
         CHECK(r == TRUE);
+        /* VM boot 3: the column is read SKEW seconds early, so lines less than ~4.2 days ahead arrive expired */
+        BOOL vis = (long long)days[i] * 86400 > SKEW;
+        CHECKF(vis ? (n == 1 && es && !strcmp(a, "ix=iv")) : (n == 0 && !strcmp(a, "")), "+%dd: n=%lu get='%s'", days[i], n, a);
+        if (n == 1) {
+            long long d = (long long)(ex / 10000000ULL - 11644473600ULL) - (long long)(unix_now() + (unsigned long long)days[i] * 86400) + SKEW;
+            CHECKF(d >= -30 && d <= 5, "+%dd: stored expiry off by %lld s from column-SKEW", days[i], d);
+        }
         DeleteFileA(fn);
         ck_cleanup();
     }
 }
-TEST(ck_more_export_expiry_probe) {
+TEST(ck_more_export_expiry_skew) {
     export_a_fn ex = (export_a_fn)ordp(109);
     REQUIRE(ex); REQUIRE(U(InternetSetCookieA));
     static const int days[] = { 1, 2, 30 };
@@ -404,7 +419,8 @@ TEST(ck_more_export_expiry_probe) {
         unsigned long long v = l ? strtoull(l + strlen(pre), NULL, 10) : 0;
         t_note("export %s: line=%d value=%llu delta=%lld s", i < 3 ? (i == 0 ? "+1d" : i == 1 ? "+2d" : "+30d") : "max-age 3600", l != NULL, v, (long long)(v - now));
         CHECK(l != NULL);
-        CHECK(v > now);
+        long long want = (long long)now + (i < 3 ? days[i] * 86400LL : 3600LL) + SKEW;
+        CHECKF((long long)v >= want - 5 && (long long)v <= want + 1, "value %llu want ~%lld", v, want);
     }
     DeleteFileA(fn);
     ck_cleanup();

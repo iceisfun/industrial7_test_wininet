@@ -202,6 +202,9 @@ static int write_file(const char *path, const char *data) {
     DWORD w = 0; WriteFile(f, data, (DWORD)strlen(data), &w, NULL); CloseHandle(f);
     return w == strlen(data);
 }
+/* D (ExportCookieFileW subtracts 0x19dae9064bafa80, ImportCookieFileW adds 0x2b60b04e9 seconds) + VM: the file
+ * column is the Unix time of the expiry plus 363543 s (an epoch about 4.2 days early); import undoes it. */
+#define CK_FILE_EPOCH_SKEW 363543ULL
 static unsigned long long unix_now(void) {
     FILETIME ft; GetSystemTimeAsFileTime(&ft);
     ULARGE_INTEGER u; u.LowPart = ft.dwLowDateTime; u.HighPart = ft.dwHighDateTime;
@@ -228,9 +231,8 @@ TEST(ck_file_export_contains_persistent_cookie) {
         if (line) {
             char *num = line + strlen(pre), *end = NULL;
             unsigned long long ex_t = strtoull(num, &end, 10), now = unix_now();
-            /* VM boot 2: a 2-day cookie exported as now+6.2 days; the column is not the Expires we set */
-            t_note("exported expiry column %llu (now %llu, delta %lld s, cookie set for +2 days)", ex_t, now, (long long)(ex_t - now));
-            CHECKF(ex_t > now, "exported expiry %llu, now %llu", ex_t, now);
+            long long skew = (long long)ex_t - (long long)(now + 2 * 86400);
+            CHECKF(skew >= (long long)CK_FILE_EPOCH_SKEW - 5 && skew <= (long long)CK_FILE_EPOCH_SKEW + 1, "exported expiry %llu, now+2d %llu, skew %lld", ex_t, now + 2 * 86400, skew);
             CHECKF(end && !strncmp(end, "\texn\texv\r\n", 10), "line tail '%.20s'", end ? end : "");
         }
         char sess[300]; snprintf(sess, sizeof sess, "%s\tTRUE\t/ex/\tFALSE", h);
@@ -276,15 +278,14 @@ TEST(ck_file_import_creates_cookie) {
     ck_track(ck_url(h, "/imp/"), "imn", "path=/imp/", 0);
     char dom[300]; snprintf(dom, sizeof dom, "path=/imp/; domain=%s", h);
     ck_track(ck_url(h, "/imp/"), "imn", dom, 0);
-    char line[600]; snprintf(line, sizeof line, "# comment\r\n\r\n%s\tTRUE\t/imp/\tFALSE\t%llu\timn\timv\r\n", h, unix_now() + 2 * 86400);
+    char line[600]; snprintf(line, sizeof line, "# comment\r\n\r\n%s\tTRUE\t/imp/\tFALSE\t%llu\timn\timv\r\n", h, unix_now() + CK_FILE_EPOCH_SKEW + 2 * 86400);
     char fn[MAX_PATH]; t_tmpfile(fn, sizeof fn, "import.txt");
     CHECK(write_file(fn, line));
     SetLastError(0xdeadbeef);
     BOOL r = im(fn);
     t_note("ImportCookieFileA: r=%d gle=%lu", r, GetLastError());
     EXPECT_EQ(r, TRUE);
-    /* VM boot 2: a +2 day line imported (r=1) but was not visible afterwards; see ck_more_import_expiry_probe */
-    t_note("after import: /imp/ '%s', / '%s'", ck_gets(ck_url(h, "/imp/"), NULL, 0), ck_gets(ck_url(h, "/"), NULL, 0));
+    EXPECT_STR(ck_gets(ck_url(h, "/imp/"), NULL, 0), "imn=imv");
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
     const char *sub = ck_gets(ck_url(ck_host("x"), "/imp/"), NULL, 0);
     char subh[300]; snprintf(subh, sizeof subh, "www.%s", h);
@@ -300,12 +301,12 @@ TEST(ck_file_import_secure_column) {
     const char *h = ck_host("imps");
     char dom[300]; snprintf(dom, sizeof dom, "path=/; domain=%s", h);
     ck_track(ck_surl(h, "/"), "isn", dom, 0); ck_track(ck_surl(h, "/"), "isn", "path=/", 0);
-    char line[600]; snprintf(line, sizeof line, "%s\tTRUE\t/\tTRUE\t%llu\tisn\tisv\r\n", h, unix_now() + 2 * 86400);
+    char line[600]; snprintf(line, sizeof line, "%s\tTRUE\t/\tTRUE\t%llu\tisn\tisv\r\n", h, unix_now() + CK_FILE_EPOCH_SKEW + 2 * 86400);
     char fn[MAX_PATH]; t_tmpfile(fn, sizeof fn, "import_s.txt");
     write_file(fn, line);
     EXPECT_EQ(im(fn), TRUE);
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
-    t_note("secure import over https: '%s'", ck_gets(ck_surl(h, "/"), NULL, 0));   /* VM boot 2: '' */
+    EXPECT_STR(ck_gets(ck_surl(h, "/"), NULL, 0), "isn=isv");
     DeleteFileA(fn);
     ck_cleanup();
 }
@@ -316,7 +317,7 @@ TEST(ck_file_import_does_not_overwrite) {
     ck_set(ck_url(h, "/"), NULL, "keep=old; path=/");
     char dom[300]; snprintf(dom, sizeof dom, "path=/; domain=%s", h);
     ck_track(ck_url(h, "/"), "keep", dom, 0);
-    char line[600]; snprintf(line, sizeof line, "%s\tTRUE\t/\tFALSE\t%llu\tkeep\tnew\r\n", h, unix_now() + 2 * 86400);
+    char line[600]; snprintf(line, sizeof line, "%s\tTRUE\t/\tFALSE\t%llu\tkeep\tnew\r\n", h, unix_now() + CK_FILE_EPOCH_SKEW + 2 * 86400);
     char fn[MAX_PATH]; t_tmpfile(fn, sizeof fn, "import_no.txt");
     write_file(fn, line);
     BOOL r = im(fn);
@@ -329,7 +330,7 @@ TEST(ck_file_import_short_line_ignored) {
     import_a_fn im = ORD(import_a_fn, 108);
     REQUIRE(im);
     const char *h = ck_host("impshort");
-    char line[600]; snprintf(line, sizeof line, "%s\tTRUE\t/\tFALSE\t%llu\tonlyname\r\n", h, unix_now() + 2 * 86400);
+    char line[600]; snprintf(line, sizeof line, "%s\tTRUE\t/\tFALSE\t%llu\tonlyname\r\n", h, unix_now() + CK_FILE_EPOCH_SKEW + 2 * 86400);
     char fn[MAX_PATH]; t_tmpfile(fn, sizeof fn, "import_short.txt");
     write_file(fn, line);
     BOOL r = im(fn);

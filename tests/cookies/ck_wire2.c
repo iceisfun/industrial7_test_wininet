@@ -4,7 +4,7 @@
  * the position of the Cookie header in the request, INTERNET_FLAG_NO_COOKIES on one request of a session,
  * and network cookies seen through InternetGetCookieEx2. Every server is the in-process loopback server.
  * Decomp: HTTP_REQUEST_HANDLE_OBJECT::CreateCookieHeaderIfNeeded@0x68f50, ::ExtractSetCookieHeaders@0x2f058.
- * VM_TIMEOUT: 150 */
+ * VM_TIMEOUT: 240 */
 #include "ck.h"
 
 typedef struct { srv *s; srv_step st[4]; char path[300]; char api[400]; } w2;
@@ -108,28 +108,8 @@ TEST(ck_wire2_keepalive_second_request_carries_new_cookie) {
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();
 }
-TEST(ck_wire2_resend_same_request_handle) {
-    REQ_W2();
-    w2 w; W2_OR_SKIP(&w, 200, "Set-Cookie: rs=1; path=%R\r\n", 0);
-    ck_track(w.api, "rs", NULL, 0);
-    HINTERNET hi = t_inet_open("ck-wire2");
-    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(w.s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
-    HINTERNET hr = hc ? U(HttpOpenRequestA)(hc, "GET", w.path, NULL, NULL, NULL, CK_WIRE_BASE, 0) : NULL;
-    CHECK(hr != NULL);
-    if (hr) {
-        char buf[256]; int ok;
-        EXPECT_EQ(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0), TRUE); t_inet_read_all(hr, buf, sizeof buf, &ok);
-        EXPECT_EQ(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0), TRUE); t_inet_read_all(hr, buf, sizeof buf, &ok);
-        CHECK(srv_wait_requests(w.s, 2, 3000));
-        EXPECT_STR(chdr(w.s, 0), NULL);
-        t_note("resend on the same handle: second Cookie='%s' occurrences=%d", chdr(w.s, 1) ? chdr(w.s, 1) : "(none)", srv_req_header_occurrences(w.s, 1, "Cookie"));
-        EXPECT_STR(chdr(w.s, 1), "rs=1");
-        EXPECT_EQ(srv_req_header_occurrences(w.s, 1, "Cookie"), 1);
-        t_inet_close(hr);
-    }
-    t_inet_close(hc); t_inet_close(hi); srv_stop(w.s);
-    ck_cleanup();
-}
+/* Resending on the same request handle (HttpSendRequest twice) is left out: in VM boot 2 the second send carried
+ * "rs=1" once, but the test then hung until the area timeout (handle close after a re-send on a keep-alive conn). */
 
 /* ------------------------------------------------------------------------------------------ response framing */
 TEST(ck_wire2_set_cookie_chunked_response) {
@@ -244,15 +224,15 @@ TEST(ck_wire2_set_cookie_empty_value) {
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();
 }
-TEST(ck_wire2_set_cookie_empty_header_ignored) {
+TEST(ck_wire2_set_cookie_empty_header_stores_empty_cookie) {
     REQ_W2();
     w2 w; W2_OR_SKIP(&w, 200, "Set-Cookie: \r\nSet-Cookie: real=1; path=%R\r\n", 0);
-    ck_track(w.api, "real", NULL, 0);
+    ck_track(w.api, "real", NULL, 0); ck_track(w.api, "", NULL, 0);
     HINTERNET hi = t_inet_open("ck-wire2");
     EXPECT_EQ(ck_wire_get(hi, w2url(&w, NULL), NULL, 0), 200);
     const char *g = ck_gets(w.api, NULL, 0);
-    t_note("empty Set-Cookie + real: '%s'", g);
-    CHECK(ck_has(g, "real=1"));
+    /* VM boot 2: the empty header stores an empty nameless cookie, listed first as an empty item */
+    EXPECT_STR(g, "; real=1");
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();
 }
@@ -268,7 +248,7 @@ TEST(ck_wire2_set_cookie_samesite_and_secure_flags) {
     if (n == 2 && arr) {
         EXPECT_EQ(arr[0].dwFlags & (INTERNET_COOKIE_SAME_SITE_STRICT | INTERNET_COOKIE_SAME_SITE_LAX), INTERNET_COOKIE_SAME_SITE_STRICT);
         EXPECT_EQ(arr[1].dwFlags & (INTERNET_COOKIE_SAME_SITE_STRICT | INTERNET_COOKIE_SAME_SITE_LAX), INTERNET_COOKIE_SAME_SITE_LAX);
-        t_note("network cookie flags: 0x%lx 0x%lx", arr[0].dwFlags, arr[1].dwFlags);
+        EXPECT_EQ(arr[0].dwFlags, 0x100002); EXPECT_EQ(arr[1].dwFlags, 0x200002);   /* VM boot 3: no IS_RESTRICTED from the network */
     }
     if (arr) UN(InternetFreeCookies)(arr, n);
     t_inet_close(hi); srv_stop(w.s);
@@ -318,6 +298,7 @@ TEST(ck_wire2_cookie_header_position) {
     for (int i = 0; i < n; i++) snprintf(order + strlen(order), sizeof order - strlen(order), "%s%s", i ? "," : "", srv_req_header_name(w.s, 0, i));
     t_note("request header order: %s (Cookie at %d of %d)", order, ci, n);
     CHECK(ci >= 0);
+    EXPECT_EQ(ci, n - 1);                                      /* VM boot 3: User-Agent,Host,Cache-Control,Cookie */
     EXPECT_STR(srv_req_header_name(w.s, 0, ci), "Cookie");
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();

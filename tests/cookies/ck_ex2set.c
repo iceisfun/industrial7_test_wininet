@@ -159,7 +159,7 @@ TEST(ck_ex2set_session_default_fields) {
     EXPECT_STR(l.it[0].name, "sd"); EXPECT_STR(l.it[0].value, "v1");
     EXPECT_STR(l.it[0].path, "/");
     EXPECT_STR(l.it[0].domain, h);
-    t_note("Ex2-set session: flags=0x%lx expset=%d", l.it[0].flags, l.it[0].expset);
+    EXPECT_EQ(l.it[0].flags, 0x202);
     CHECK(l.it[0].flags & INTERNET_COOKIE_IS_SESSION);
     EXPECT_EQ(l.it[0].expset, FALSE);
     EXPECT_STR(ck_gets(u, NULL, 0), "sd=v1");
@@ -194,7 +194,7 @@ TEST(ck_ex2set_persistent_expiry_roundtrip) {
     CHECK(!(l.it[0].flags & INTERNET_COOKIE_IS_SESSION));
     EXPECT_EQ(l.it[0].expset, TRUE);
     ULONGLONG want = ft64(c.ftExpires), got = l.it[0].exp;
-    CHECKF(got + 10000000ULL >= want && got <= want + 10000000ULL, "expiry moved: set %llx got %llx", want, got);
+    CHECKF(got == want, "expiry moved: set %llx got %llx", want, got);   /* VM boot 3: stored verbatim */
     ck_cleanup();
 }
 TEST(ck_ex2set_past_expiry_deletes) {
@@ -246,7 +246,8 @@ TEST(ck_ex2set_nameless_cookie) {
     EXPECT_STR(ck_gets(u, NULL, 0), "barevalue");
     e2list l; e2get(u, NULL, 0, &l);
     EXPECT_EQ(l.n, 1);
-    t_note("Ex2 nameless: name_null=%d name='%s' value='%s'", l.it[0].name_null, l.it[0].name, l.it[0].value);
+    EXPECT_EQ(l.it[0].name_null, 1);                          /* VM boot 3: pwszName NULL for a nameless cookie */
+    EXPECT_STR(l.it[0].value, "barevalue");
     ck_cleanup();
 }
 TEST(ck_ex2set_value_null_is_empty) {
@@ -341,7 +342,7 @@ TEST(ck_ex2set_host_only_flag_and_apply) {
     EXPECT_STR(ck_gets(ck_url(sub, "/"), NULL, 0), "");
     e2list l; e2get(ck_url(h, "/"), NULL, 0, &l);
     EXPECT_EQ(l.n, 1);
-    t_note("Ex2-set APPLY_HOST_ONLY flags=0x%lx", l.it[0].flags);
+    EXPECT_EQ(l.it[0].flags, 0x84202);
     CHECK(l.it[0].flags & INTERNET_COOKIE_HOST_ONLY);
     const char *h2 = ck_host("e2hog");
     char sub2[300]; snprintf(sub2, sizeof sub2, "www.%s", h2);
@@ -383,7 +384,7 @@ TEST(ck_ex2set_domain_unrelated_rejected) {
     s2spec sp = { "du", "1", "unrelated.i7other.example", "/", 0, FALSE, 0 };
     DWORD st; DWORD r = s2(ck_url(h, "/"), &sp, 0, &st);
     EXPECT_EQ(r, ERROR_INVALID_PARAMETER);                   /* D: IsDomainLegal fails -> SetLastError(87), mapped */
-    t_note("unrelated domain: state=%lu", st);
+    EXPECT_EQ(st, 0);
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
     ck_cleanup();
 }
@@ -414,7 +415,7 @@ TEST(ck_ex2set_path_default_from_url) {
     ck_track(ck_url(h, "/dir/"), "pdu", "path=/dir/", 0); ck_track(ck_url(h, "/dir/"), "pdu", "path=/dir", 0);
     e2list l; e2get(ck_url(h, "/dir/"), NULL, 0, &l);
     EXPECT_EQ(l.n, 1);
-    t_note("Ex2 default path: '%s'", l.it[0].path);
+    EXPECT_STR(l.it[0].path, "/dir/");
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
     EXPECT_STR(ck_gets(ck_url(h, "/dir/x"), NULL, 0), "pdu=1");
     ck_cleanup();
@@ -447,8 +448,8 @@ TEST(ck_ex2set_bad_url_errors) {
         DWORD st = 99;
         INTERNET_COOKIE2 c; memset(&c, 0, sizeof c); c.pwszName = (PWSTR)L"bu"; c.pwszValue = (PWSTR)L"1"; c.pwszPath = (PWSTR)L"/";
         DWORD r = UN(InternetSetCookieEx2)(ck_w(urls[i]), &c, NULL, 0, &st);
-        t_note("Ex2 set url '%s': r=%lu state=%lu", urls[i], r, st);
-        CHECKF(r != 0, "url '%s' accepted", urls[i]);
+        static const DWORD want[] = { ERROR_INTERNET_UNRECOGNIZED_SCHEME, ERROR_INVALID_PARAMETER, ERROR_INTERNET_INVALID_URL };
+        CHECKF(r == want[i] && st == 0, "url '%s': r=%lu state=%lu want %lu", urls[i], r, st, want[i]);   /* VM boot 3 */
         (void)sp;
     }
 }
@@ -459,7 +460,7 @@ TEST(ck_ex2set_p3p_header_accepted) {
     ck_track(u, "p3", "path=/", 0);
     DWORD st = 99;
     DWORD r = UN(InternetSetCookieEx2)(ck_w(u), &c, L"CP=\"NOI DSP COR NID\"", 0, &st);
-    t_note("Ex2 set with P3P header: r=%lu state=%lu get='%s'", r, st, ck_gets(u, NULL, 0));
+    EXPECT_EQ(st, COOKIE_STATE_ACCEPT);
     EXPECT_EQ(r, 0);
     EXPECT_STR(ck_gets(u, NULL, 0), "p3=1");
     ck_cleanup();
@@ -513,8 +514,8 @@ TEST(ck_ex2get_third_party_flag_hides) {
     const char *u = ck_url(ck_host("e2tp"), "/");
     ck_set(u, NULL, "tp=1");
     e2list l; e2get(u, NULL, INTERNET_COOKIE_THIRD_PARTY, &l);
-    t_note("Ex2 get THIRD_PARTY: r=%lu n=%lu", l.r, l.n);
     EXPECT_EQ(l.r, 0);
+    EXPECT_EQ(l.n, 0);                                         /* VM boot 3: hidden under default settings */
     e2get(u, NULL, 0, &l);
     EXPECT_EQ(l.n, 1);
     ck_cleanup();
@@ -538,8 +539,8 @@ TEST(ck_ex2get_bad_url_errors) {
     for (size_t i = 0; i < sizeof urls / sizeof urls[0]; i++) {
         INTERNET_COOKIE2 *arr = NULL; DWORD n = 77;
         DWORD r = UN(InternetGetCookieEx2)(ck_w(urls[i]), NULL, 0, &arr, &n);
-        t_note("Ex2 get url '%s': r=%lu n=%lu", urls[i], r, n);
-        CHECKF(r != 0, "url '%s' -> 0", urls[i]);
+        static const DWORD want[] = { ERROR_INTERNET_UNRECOGNIZED_SCHEME, ERROR_INVALID_PARAMETER, ERROR_INTERNET_UNRECOGNIZED_SCHEME };
+        CHECKF(r == want[i] && n == 0, "url '%s': r=%lu n=%lu want %lu", urls[i], r, n, want[i]);   /* VM boot 3 */
         if (r == 0 && arr) UN(InternetFreeCookies)(arr, n);
     }
 }
