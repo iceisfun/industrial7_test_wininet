@@ -132,20 +132,23 @@ TEST(auth_retry_scheme_switch_basic_to_digest) {
     rs_once(&r, &s, "/rt/switch", "su", "sp", 0, &res); SRV_OR_SKIP(s);
     a_dump(s);
     t_note("Basic then Digest challenge: status=%lu requests=%d", res.status, srv_req_count(s));
-    CHECK(srv_req_count(s) <= 4);
-    CHECK(res.status == 200 || res.status == 401);
+    /* Win10 VM: the Digest challenge that answers the Basic retry is not followed */
+    EXPECT_EQ(res.status, 401);
+    EXPECT_EQ(srv_req_count(s), 2);
     if (srv_req_count(s) >= 2) EXPECT_STR(REQ_AUTH(s, 1), a_basic("su", "sp"));
     srv_stop(s);
 }
 
-TEST(auth_retry_digest_stale_forever_bounded) {
+TEST(auth_retry_digest_stale_forever_not_bounded_by_client) {
     REQUIRE(U(HttpSendRequestA));
     rs r = {0}; r.fn = fn_stale_forever; r.cap403 = 10; srv *s; ares res;
     rs_once(&r, &s, "/rt/stale", "su", "sp", 0, &res); SRV_OR_SKIP(s);
     a_dump(s);
     t_note("stale=true forever: status=%lu requests=%d", res.status, srv_req_count(s));
-    CHECK(srv_req_count(s) < 10);
-    EXPECT_EQ(res.status, 401);
+    /* Win10 VM: every stale=true challenge with a fresh nonce is answered again (stale legs are not counted as
+     * failures, digest.c auth_digest_stale_nonce_retry); only the server's 403 after 10 denials ends the loop. */
+    EXPECT_EQ(srv_req_count(s), 11);
+    EXPECT_EQ(res.status, 403);
     srv_stop(s);
 }
 
@@ -195,8 +198,10 @@ TEST(auth_retry_407_from_direct_origin) {
     a_dump(s);
     t_note("407 from a direct origin with PROXY_USERNAME set: status=%lu requests=%d pauth=%s", res.status, srv_req_count(s),
            srv_req_count(s) >= 2 && REQ_PAUTH(s, 1) ? REQ_PAUTH(s, 1) : "(none)");
-    CHECK(srv_req_count(s) <= 3);
-    CHECK(res.status == 200 || res.status == 407);
+    /* Win10 VM: a 407 from a server that is not the configured proxy is returned as is */
+    EXPECT_EQ(res.status, 407);
+    EXPECT_EQ(srv_req_count(s), 1);
+    CHECK(REQ_PAUTH(s, 0) == NULL);
     srv_stop(s);
 }
 
@@ -234,8 +239,7 @@ TEST(auth_retry_many_requests_same_connect_wrong_creds) {
         int now = srv_req_count(s); t_note("request %d used %d legs", i, now - total); total = now;
     }
     /* every HttpSendRequest is bounded; the remembered failed pair may be sent pre-emptively (cache.c) */
-    CHECK(srv_req_count(s) <= 8);
-    CHECK(srv_req_count(s) >= 4);
+    EXPECT_EQ(srv_req_count(s), 8);   /* 2 legs each (Win10 VM) */
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 

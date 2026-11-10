@@ -231,6 +231,8 @@ TEST(auth_vec_digest_algorithm_echo) {
         const char *hv = srv_req_count(s) >= 2 ? REQ_AUTH(s, 1) : NULL;
         char alg[32] = ""; int has = hv ? a_param(hv, "algorithm", alg, sizeof alg) : 0;
         t_note("challenge %d: response algorithm present=%d value=[%s]", i, has, alg);
+        /* Win10 VM: echoed (as "MD5") only when the challenge named an algorithm */
+        if (i == 0) CHECK(!has); else { CHECK(has); EXPECT_STR(alg, "MD5"); }
         srv_stop(s);
     }
 }
@@ -257,7 +259,9 @@ TEST(auth_vec_digest_cnonce_and_nc_shape) {
         CHECK(hv && a_param(hv, "cnonce", cn, sizeof cn));
         size_t cl = strlen(cn); int hex = 1; for (size_t k = 0; k < cl; k++) if (!isxdigit((unsigned char)cn[k])) hex = 0;
         t_note("req %d cnonce=[%s] len=%zu hex=%d same_as_prev=%d", i, cn, cl, hex, !strcmp(cn, prev_cn));
-        CHECK(cl > 0);
+        /* Win10 VM: 32 lowercase-hex cnonce, kept for the pre-emptive requests on the same nonce */
+        EXPECT_EQ(cl, 32); CHECK(hex);
+        if (i > 1) CHECKF(!strcmp(cn, prev_cn), "req %d cnonce changed", i);
         snprintf(prev_cn, sizeof prev_cn, "%s", cn);
         if (hv) digest_check_recorded(s, i, "cn", "i7digest", "cp", 0, "auth");
     }
@@ -274,8 +278,10 @@ TEST(auth_vec_digest_qop_auth_int_only) {
     const char *hv = srv_req_count(s) >= 2 ? REQ_AUTH(s, 1) : NULL;
     char qop[32] = ""; if (hv) a_param(hv, "qop", qop, sizeof qop);
     t_note("qop=auth-int only: status=%lu requests=%d qop sent=[%s]", r.status, srv_req_count(s), qop);
-    CHECK(srv_req_count(s) <= 3);
-    CHECK(r.status == 200 || r.status == 401);
+    /* Win10 VM: like an unsupported algorithm (digest.c): one resend without Authorization, then the 401 */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s), 2);
+    CHECK(hv == NULL);
     srv_stop(s);
 }
 
@@ -288,6 +294,9 @@ TEST(auth_vec_digest_sha256_then_md5) {
     areq q = {0}; q.path = "/dv/sha"; q.cuser = "sh"; q.cpass = "sp"; ares r; a_once(s, &q, &r);
     a_dump(s);
     t_note("SHA-256 + MD5 challenges: status=%lu requests=%d", r.status, srv_req_count(s));
-    CHECK(srv_req_count(s) <= 3);
+    /* Win10 VM: the first Digest challenge (SHA-256, unsupported) decides; no fallback to the MD5 one */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s), 2);
+    CHECK(srv_req_count(s) < 2 || REQ_AUTH(s, 1) == NULL);
     srv_stop(s);
 }

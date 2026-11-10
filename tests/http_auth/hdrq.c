@@ -140,7 +140,7 @@ TEST(auth_hq_proxy_authenticate_absent_on_401) {
     hq_close(hr, hc, hi); srv_stop(s);
 }
 
-TEST(auth_hq_caller_authorization_in_request_view) {
+TEST(auth_hq_caller_authorization_dropped_from_request_view) {
     REQUIRE(U(HttpQueryInfoA));
     gate g = {0}; g.challenge = CH_B; g.accept[0] = "Bearer i7token";
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
@@ -148,20 +148,23 @@ TEST(auth_hq_caller_authorization_in_request_view) {
     EXPECT_EQ(a_status(hr), 200);
     EXPECT_EQ(srv_req_count(s), 1);
     EXPECT_STR(REQ_AUTH(s, 0), "Bearer i7token");
-    char b[128]; DWORD idx = 0;
-    CHECK(a_query(hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, &idx, b, sizeof b)); EXPECT_STR(b, "Bearer i7token");
-    idx = 0; snprintf(b, sizeof b, "authorization"); DWORD l = sizeof b;
-    CHECK(U(HttpQueryInfoA)(hr, HTTP_QUERY_CUSTOM | HTTP_QUERY_FLAG_REQUEST_HEADERS, b, &l, &idx)); EXPECT_STR(b, "Bearer i7token");
+    /* Win10 VM: the Authorization passed to HttpSendRequest is on the wire but not kept in the request-header view
+     * (same as the one wininet adds on a retry, basic.c auth_basic_query_request_authorization_header) */
+    char b[128]; DWORD idx = 0; SET_ERR(0);
+    CHECK(!a_query(hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, &idx, b, sizeof b)); EXPECT_ERR(ERROR_HTTP_HEADER_NOT_FOUND);
+    idx = 0; snprintf(b, sizeof b, "authorization"); DWORD l = sizeof b; SET_ERR(0);
+    CHECK(!U(HttpQueryInfoA)(hr, HTTP_QUERY_CUSTOM | HTTP_QUERY_FLAG_REQUEST_HEADERS, b, &l, &idx)); EXPECT_ERR(ERROR_HTTP_HEADER_NOT_FOUND);
     /* response view has no Authorization */
     idx = 0; SET_ERR(0); CHECK(!a_query(hr, HTTP_QUERY_AUTHORIZATION, &idx, b, sizeof b)); EXPECT_ERR(ERROR_HTTP_HEADER_NOT_FOUND);
     /* raw request headers carry it too */
     char raw[2048]; idx = 0;
     CHECK(a_query(hr, HTTP_QUERY_RAW_HEADERS_CRLF | HTTP_QUERY_FLAG_REQUEST_HEADERS, &idx, raw, sizeof raw));
-    CHECKF(strstr(raw, "\r\nAuthorization: Bearer i7token\r\n") != NULL, "raw=[%s]", raw);
+    CHECKF(strstr(raw, "Authorization") == NULL, "raw=[%s]", raw);
+    CHECKF(!strncmp(raw, "GET /hq/bearer HTTP/1.1\r\n", 25), "raw=[%s]", raw);
     hq_close(hr, hc, hi); srv_stop(s);
 }
 
-TEST(auth_hq_caller_authorization_w_request_view) {
+TEST(auth_hq_caller_authorization_w_dropped_from_request_view) {
     REQUIRE(U(HttpQueryInfoW)); REQUIRE(U(HttpSendRequestW));
     gate g = {0}; g.challenge = CH_B; g.accept[0] = "Bearer wtok";
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
@@ -169,9 +172,10 @@ TEST(auth_hq_caller_authorization_w_request_view) {
     HINTERNET hr = U(HttpOpenRequestW)(hc, L"GET", L"/hq/wbearer", NULL, NULL, NULL, T_INET_FRESH, 0);
     CHECK(U(HttpSendRequestW)(hr, L"Authorization: Bearer wtok\r\n", (DWORD)-1, NULL, 0));
     EXPECT_EQ(a_status(hr), 200);
-    WCHAR b[64]; DWORD l = sizeof b, idx = 0;
-    CHECK(U(HttpQueryInfoW)(hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, b, &l, &idx));
-    EXPECT_WSTR(b, L"Bearer wtok"); EXPECT_EQ(l, 11 * 2);
+    EXPECT_STR(REQ_AUTH(s, 0), "Bearer wtok");
+    WCHAR b[64]; DWORD l = sizeof b, idx = 0; SET_ERR(0);
+    CHECK(!U(HttpQueryInfoW)(hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, b, &l, &idx));
+    EXPECT_ERR(ERROR_HTTP_HEADER_NOT_FOUND);   /* Win10 VM */
     a_close(hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -252,6 +256,8 @@ TEST(auth_hq_add_request_headers_authorization_sent) {
     EXPECT_EQ(srv_req_count(s), 1);
     EXPECT_STR(REQ_AUTH(s, 0), "Basic YWRkZWQ6aGRy");
     EXPECT_EQ(srv_req_header_occurrences(s, 0, "Authorization"), 1);
+    char b[128]; DWORD idx = 0; int kept = a_query(hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, &idx, b, sizeof b);
+    t_note("HttpAddRequestHeaders Authorization in the request view after send: %d [%s]", kept, kept ? b : "");
     a_close(hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -280,7 +286,8 @@ TEST(auth_hq_proxy_authorization_caller_header) {
     a_dump(s);
     EXPECT_EQ(r.status, 200);
     EXPECT_STR(REQ_PAUTH(s, 0), "Basic eHg6eXk=");
-    t_note("caller Proxy-Authorization on retry leg: %s", srv_req_count(s) >= 2 && REQ_PAUTH(s, 1) ? REQ_PAUTH(s, 1) : "(none)");
+    EXPECT_EQ(srv_req_count(s), 2);
+    if (srv_req_count(s) >= 2) EXPECT_STR(REQ_PAUTH(s, 1), "Basic eHg6eXk=");   /* kept on the retry (Win10 VM) */
     srv_stop(s);
 }
 

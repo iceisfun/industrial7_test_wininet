@@ -67,7 +67,7 @@ TEST(auth_ex_basic_connect_creds_force_retry) {
     EXPECT_EQ(x.end_err, ERROR_INTERNET_FORCE_RETRY);
     EXPECT_EQ(srv_req_count(s), 1);
     CHECK(REQ_AUTH(s, 0) == NULL);
-    t_note("status after FORCE_RETRY: %lu", x.status);
+    EXPECT_EQ(x.status, 401);   /* the 401 is the current response until the resend (Win10 VM) */
     /* second round: the application re-sends the body, the client adds the Basic header */
     x_round(hr, "k=v", &x, 0);
     a_dump(s);
@@ -169,6 +169,8 @@ TEST(auth_ex_wrong_creds_bounded) {
     a_dump(s);
     t_note("wrong creds via Ex: rounds=%d force_retries=%d end_ok=%d err=%lu status=%lu requests=%d", rounds, fr, x.end_ok, x.end_err, x.status, srv_req_count(s));
     CHECK(rounds < 4);
+    /* Win10 VM: one FORCE_RETRY, then the second 401 is a normal completion */
+    EXPECT_EQ(rounds, 2); EXPECT_EQ(fr, 1);
     CHECKF(x.end_ok, "end err=%lu", x.end_err);
     EXPECT_EQ(x.status, 401);
     EXPECT_EQ(srv_req_count(s), rounds);
@@ -242,7 +244,10 @@ TEST(auth_ex_status_and_headers_after_force_retry) {
     DWORD qe = have ? 0 : GetLastError();
     t_note("after FORCE_RETRY: status=%lu www-auth query=%d [%s] err=%lu", x.status, have, have ? b : "", qe);
     char rb[32]; DWORD rd = 0; BOOL rok = U(InternetReadFile)(hr, rb, sizeof rb, &rd);
-    t_note("after FORCE_RETRY: InternetReadFile ok=%d read=%lu err=%lu", rok, rd, rok ? 0 : GetLastError());
+    /* Win10 VM: the 401 response stays fully queryable and its body readable before the resend */
+    EXPECT_EQ(x.status, 401);
+    CHECK(have); EXPECT_STR(b, "Basic realm=\"i7ex\"");
+    CHECK(rok); EXPECT_EQ(rd, 6); CHECK(rd == 6 && !memcmp(rb, "denied", 6));
     x_round(hr, "s", &x, 0);
     EXPECT_EQ(x.status, 200);
     idx = 0; SET_ERR(0);
@@ -283,7 +288,8 @@ TEST(auth_ex_ntlm_custom_gate_rounds) {
     EXPECT_EQ(x.status, 200);
     EXPECT_EQ(g.ntlm_v2_ok, 1);
     EXPECT_STR(g.ntlm_user, "exntlm");
-    CHECK(fr >= 1);
+    /* Win10 VM: one FORCE_RETRY per leg (type 1, then type 3) */
+    EXPECT_EQ(rounds, 3); EXPECT_EQ(fr, 2);
     EXPECT_EQ(srv_req_count(s), 3);
     /* the last leg carries the body */
     int last = srv_req_count(s) - 1;
@@ -349,6 +355,7 @@ TEST(auth_ex_end_request_without_send_ex) {
     DWORD e = ok ? 0 : GetLastError();
     t_note("HttpEndRequest before HttpSendRequestEx: ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
     CHECK(!ok);
+    EXPECT_EQ(e, ERROR_INTERNET_OPERATION_CANCELLED);   /* 12017 (Win10 VM) */
     EXPECT_EQ(srv_req_count(s), 0);
     a_close(hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
