@@ -113,7 +113,8 @@ Other observations, hard-checked:
 - After a failed async send, `HTTP_QUERY_STATUS_CODE|FLAG_NUMBER` succeeds and answers 0.
 - A truncated Content-Length body ends with the bytes received (5 of 10) and no read error.
 
-## Second pass (`ac_x_*`, rounds 4-5: boots `wininet-ac4-20261110-050925-b1`, `wininet-ac5-*`)
+## Second pass (`ac_x_*`, rounds 4-6: boots `wininet-ac4-20261110-050925-b1`, `wininet-ac5-20261110-063103-b1`; validation
+boot `wininet-ac6-20261110-081813-b1`: 217 tests, 0 failed, 1946 checks, 455 s)
 
 ### Decomp-grounded [D]
 | Fact | Source | Tests |
