@@ -100,7 +100,51 @@ Legend:
 | InternetGetSecurityInfoByURL(A): both out pointers NULL gives 87. A host never contacted gives 12028. After a connect that used ignore flags it is still 12028: VerifyServerCert persists the chain only when flags & 0x7a13180 == 0. The unadorned export equals the A export | D `FindCertEntryInCache`, `VerifyServerCert`, V |
 | **The URL buffer is written**: FindCertEntryInCache NULs the host end in place and restores it. A read-only literal crashes with 0xC0000005 (boot 2). Tests pass writable arrays | D, V |
 
+## Issued certificate chains, `tls_pki.c` (mini schannel server, area-made root + leaves)
+| Fact | Evidence |
+|---|---|
+| VerifyTrust passes the request's security flags as the SSL policy's fdwChecks (HTTPSPolicyCallbackData, dwAuthType 2), and the connect host name with **one trailing '.' removed**. Revocation checking (WTD_REVOKE_WHOLECHAIN) when `CertificateRevocation` is set (lab: HKCU 1) and bit 0x800000 is clear | D `CSecureSocket::VerifyTrust` |
+| MapInternetError: CRYPT_E_REVOCATION_OFFLINE → 12057, CRYPT_E_REVOKED → 12170, TRUST_E_CERT_SIGNATURE → 12169 (12062 with a weak-signature chain), every other 0x800B.... → 12169 | D `MapInternetError`, `FUN_18010eaca` |
+| The schannel server sends only the leaf (the untrusted issuer in its credential store is not sent): the client chain is **partial**. No flags → 12045. 0x100 covers the partial chain, then **12057** for every issued leaf, CDP or not. 0x180 (or SECURITY_SET_MASK) → 200 | V (tls4, tls5) |
+| Partial chain status: 0x1010040 (PARTIAL_CHAIN, REVOCATION_STATUS_UNKNOWN, OFFLINE_REVOCATION) on the unverified chain after 12057; only 0x10000 after a 0x180 success. One element | V |
+| Security flags after the 0x180 success: 0x20000181. After 12057: 0x100 (no SECURE/strength bits). A resend without changes repeats 12057 | V |
+| Errors surface one at a time, in a fixed order: wrong usage 12169 → validity 12037 → name 12038 → revocation 12057. Each flag only removes its own error (table rows in `tls_pki_error_order_*`) | V |
+| Retry on one handle: 12045 → (0x100) 12037 → (0x2000) 12038 → (0x1000) 12057 → (0x80) 200; one TCP connection per attempt, one request reaches the server | V |
+| Name matching: SAN dns only + IP host → 12038. SAN with only an IP entry: the host name still matches CN (CN fallback). CN-only certificates match by CN (IP literal "127.0.0.1" included). SAN DNS compare is case-insensitive. `*`, `*host`, `local*`, `*.localhost` do not match `localhost`. `localhost.` matches `localhost` | V, D (trailing dot) |
+| Validity: not-yet-valid and expired leaves → 12037, cleared by 0x2000 or INTERNET_FLAG_IGNORE_CERT_DATE_INVALID | V |
+| EKU: serverAuth, serverAuth+clientAuth, none, anyExtendedKeyUsage accepted; clientAuth or codeSigning only → 12169, cleared by 0x200 | V |
+| Hash/key: SHA-1, SHA-384 and RSA-1024 leaves behave like SHA-256 (12057 → 0x180 OK; no 12062 with a partial chain). An MD5-signed leaf fails the handshake: 12157 whatever the flags | V |
+| KEY_BITNESS / dwKeySize with an RSA-4096 leaf: 256 (cipher strength, not modulus size) | V, D |
+| Option 32 W: InternetQueryOptionW forwards 0x1e..0x2c (except 0x21/0x22/0x29) to the A function, so the W struct returns **ANSI** strings; short buffer 12004 with len 64 | D (W dispatch), V |
+| Certificate info for an issued leaf: subject/issuer = CertNameToStrA(SIMPLE\|CRLF\|NO_PLUS) of the leaf, dates = the leaf's | D, V |
+| AIA caIssuers URL: CryptoAPI fetches the issuer (`GET /issuer.crt HTTP/1.1`, `Connection: Keep-Alive`, `Accept: */*`, `User-Agent: Microsoft-CryptoAPI/10.0`, `Host`). The chain is then complete: 2 elements, error 0x20 (UNTRUSTED_ROOT), info 0x100; 0x100 → 12057, 0x180 → 200 | V |
+| An expired issuer fetched through AIA → 12037 with 0x100 and 0x180; 0x2180 → 200 | V |
+| **No CRL is fetched under an untrusted root**, partial or complete chain: CDP to a 404, a closed port, a valid CRL or a CRL revoking the leaf all give 12057 with 0x100 and 200 with 0x180; the CRL server sees no request. 12170 (revoked) needs a trusted root, i.e. a store change (dx_ area) | V |
+
+## Asynchronous mode, `tls_async.c`
+| Fact | Evidence |
+|---|---|
+| HttpSendRequest returns FALSE/ERROR_IO_PENDING; certificate errors (12045, 12038, 12037, 12169), 12044, 12157 (alert, garbage, plaintext) and 12031 arrive as REQUEST_COMPLETE dwResult 0, dwError = the sync error. The retry (set flags, resend) completes with dwResult 1 | V |
+| Status sequence, 12045: 80 20 21 50 51 100 (no SENDING_REQUEST/REQUEST_SENT/RECEIVING). Success: 80 20 21 30 31 40 41 100 | V |
+| InternetOpenUrl (async, https, untrusted): ERROR_IO_PENDING, completion dwResult 0 / dwError 12045, HANDLE_CREATED seen. HttpSendRequestEx async → 12045 | V |
+| Security info options (66, 36, 105) after an async success equal the sync values | V |
+
+## HTTP over TLS, `tls_more.c`
+| Fact | Evidence |
+|---|---|
+| Verb/status table (GET, HEAD, DELETE, OPTIONS, PROPFIND; 200/204/207/299/403/404/410/418/500): status, body (none for HEAD/204), request line and `Host: 127.0.0.1:<port>` identical to plain HTTP | V |
+| 300 KB POST body, chunked HttpSendRequestEx upload (the caller's `Transfer-Encoding: chunked` still gets `Content-Length: 0`), 36 KB of request headers across records, 100 KB read via QueryDataAvailable (12 rounds), ReadFileEx over a chunked body | V |
+| Six concurrent sessions on threads each complete their own handshake and request | V |
+| INTERNET_FLAG_SECURE on InternetConnect (not the request) is ignored: request flags 0x8, URL `http://`, plain HTTP to the TLS port → 12152 | V |
+| INTERNET_OPTION_REQUEST_FLAGS: 0x8 before the send, 0x40 after; URL option `https://127.0.0.1:<port>/f` | V (value N for the bit meanings) |
+| INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP(S) do not change redirects on this path: https→http is followed (200), http→https lands on the new origin with 12045 | V |
+| Setting 0x2000 after a success ORs into the read-back value, the body is unaffected | V |
+
 ## Not covered / environment
-- Revocation errors (12057 SEC_CERT_REV_FAILED, 12170 REVOKED) and 12055 SEC_CERT_ERRORS: the shared certificate profiles are self-signed with no CDP. Producing these needs a CA-issued leaf with a CDP/OCSP URL served on loopback, which needs `common/` changes (foundation role). The mapping is recorded from the decomp only.
+- 12057 is covered (`tls_pki.c`). 12170 (REVOKED) cannot be produced without trusting the test root (no CRL fetch under an
+  untrusted root, VM): needs a dx_ area that adds and removes a root. 12055 SEC_CERT_ERRORS and 12062 WEAK_SIGNATURE come
+  from VerifyTrust's multi-error loop, which only runs with an internal socket flag (`this+0x58 & 2`) that no public option was
+  found to set; recorded from the decomp only (D).
+- Side effects: CryptoAPI may cache the AIA-fetched issuer for the user (URL cache of cryptnet, unique loopback URLs).
 - TLS 1.0/1.1/1.3 client behaviour depends on `SecureProtocols` (0x800 on the lab image, 0xA80 by default). The expectations read it (read only). Changing it belongs in a `dx_` area.
 - SSL2/SSL3/PCT are not testable: schannel on 19041 refuses them server side.

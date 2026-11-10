@@ -119,7 +119,7 @@ TEST(tls_protostr_of_live_connection) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/ps", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     tls_sec_conn_info sci; memset(&sci, 0, sizeof sci); DWORD l = sizeof sci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CONNECTION_INFO, &sci, &l));
     char b[128] = ""; DWORD n = sizeof b;
@@ -155,7 +155,7 @@ TEST(tls_secinfo_by_url_after_connect) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/bu", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[16]; treq_body(&t, b, sizeof b);
     char url[128]; snprintf(url, sizeof url, "https://127.0.0.1:%u/bu", srv_port(s));
     PCCERT_CHAIN_CONTEXT ch = NULL; DWORD f = 0xDEAD; SET_ERR(0);

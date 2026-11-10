@@ -262,7 +262,7 @@ TEST(tls_secflags_after_success_all_ignores) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), 0);
     CHECK(tls_set_secflags(hr, SECURITY_SET_MASK));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     DWORD f = tls_secflags(hr);
     t_note("after success with SECURITY_SET_MASK: 0x%lx", f);
     EXPECT_EQ(f, SECURITY_FLAG_STRENGTH_STRONG | SECURITY_SET_MASK | SECURITY_FLAG_SECURE);
@@ -297,7 +297,7 @@ TEST(tls_secflags_request_flag_after_success) {
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), INTERNET_FLAG_IGNORE_CERT_CN_INVALID);
     EXPECT_EQ(tls_secflags(hr), 0);
     CHECK(tls_set_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     EXPECT_EQ(tls_secflags(hr), SECURITY_FLAG_STRENGTH_STRONG | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_SECURE);
     treq_close(&t); srv_stop(s);
 }
@@ -306,7 +306,7 @@ TEST(tls_secflags_request_date_flag_after_success) {
     srv *s = tls_srv(SRV_CERT_EXPIRED, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
     CHECK(tls_set_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     EXPECT_EQ(tls_secflags(hr), SECURITY_FLAG_STRENGTH_STRONG | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_SECURE);
     treq_close(&t); srv_stop(s);
 }
@@ -340,7 +340,7 @@ TEST(tls_secflags_not_inherited_by_next_request) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), 0);
     CHECK(tls_set_secflags(hr, 0x100));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[32]; treq_body(&t, b, sizeof b);
     HINTERNET hr2 = U(HttpOpenRequestA)(t.hc, "GET", "/second", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
     DWORD f2 = tls_secflags(hr2);

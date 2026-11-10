@@ -8,7 +8,7 @@ TEST(tls_flow_large_body_many_records) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/big", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char *buf = malloc(210000); size_t n = 0; DWORD r;
     for (int guard = 0; guard < 10000; guard++) {
         if (!U(InternetReadFile)(t.hr, buf + n, 7777, &r) || r == 0) break;
@@ -26,7 +26,7 @@ TEST(tls_flow_chunked_body) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/c", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[128] = ""; treq_body(&t, b, sizeof b);
     EXPECT_STR(b, "chunked over tls: 0123456789");
     treq_close(&t); srv_stop(s);
@@ -37,7 +37,7 @@ TEST(tls_flow_close_delimited_body_with_close_notify) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 2); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/cd", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[64] = ""; int ok = 0; t_inet_read_all(t.hr, b, sizeof b, &ok);
     EXPECT_STR(b, "until close");
     CHECK(ok);
@@ -50,7 +50,7 @@ TEST(tls_flow_gzip_body) {
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/gz", T_INET_FRESH | INTERNET_FLAG_SECURE));
     BOOL dec = TRUE; CHECK(U(InternetSetOptionA)(t.hr, INTERNET_OPTION_HTTP_DECODING, &dec, sizeof dec));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[1024] = ""; size_t n = treq_body(&t, b, sizeof b);
     srv_wait_requests(s, 1, 2000);
     const char *ae = srv_req_header(s, 0, "Accept-Encoding");
@@ -441,7 +441,7 @@ TEST(tls_redirect_https_same_server) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 5); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/orig", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     EXPECT_EQ(treq_status(&t), 200);
     char b[32] = ""; treq_body(&t, b, sizeof b); EXPECT_STR(b, "moved-here");
     CHECK(srv_wait_requests(s, 2, 2000));
@@ -489,7 +489,7 @@ TEST(tls_flow_split_records_slow) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/split", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     DWORD avail = 0;
     CHECK(U(InternetQueryDataAvailable)(t.hr, &avail, 0, 0));
     CHECK(avail > 0 && avail <= 20);
@@ -504,7 +504,7 @@ TEST(tls_flow_truncated_body) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 2); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/tr", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[64] = ""; int ok = 0; size_t n = t_inet_read_all(t.hr, b, sizeof b, &ok);
     t_note("truncated over TLS: read %u bytes ok=%d err=%lu", (unsigned)n, ok, ok ? 0 : GetLastError());
     EXPECT_EQ(n, 8);

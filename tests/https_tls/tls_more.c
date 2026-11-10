@@ -47,7 +47,7 @@ TEST(tls_more_status_text_and_version) {
     static const srv_step st[] = { S_HEAD(), S_SEND("HTTP/1.1 201 Made It\r\nContent-Length: 2\r\nX-Tls: yes\r\n\r\nok"), S_END() };
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/t", 0));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char b[128]; DWORD l = sizeof b;
     CHECK(U(HttpQueryInfoA)(t.hr, HTTP_QUERY_STATUS_TEXT, b, &l, NULL)); EXPECT_STR(b, "Made It"); EXPECT_EQ(l, 7);
     l = sizeof b; CHECK(U(HttpQueryInfoA)(t.hr, HTTP_QUERY_VERSION, b, &l, NULL)); EXPECT_STR(b, "HTTP/1.1");
@@ -124,7 +124,7 @@ TEST(tls_more_large_request_headers) {
         strcpy(h + k + 6000, "\r\n");
         CHECK(U(HttpAddRequestHeadersA)(t.hr, h, (DWORD)-1, HTTP_ADDREQ_FLAG_ADD));
     }
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     EXPECT_EQ(treq_status(&t), 200);
     if (srv_req_count(s) == 1) {
         for (int i = 0; i < 6; i++) {
@@ -146,7 +146,7 @@ TEST(tls_more_query_data_available_large) {
     static const srv_step st[] = { S_HEAD(), S_REPLY_PATTERN(200, NULL, 100000, 0), S_END() };
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/big", 0));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     size_t tot = 0; char *buf = malloc(100000 + 65536); int bad = 0, rounds = 0;
     for (; rounds < 2000; rounds++) {
         DWORD av = 0;
@@ -174,7 +174,7 @@ TEST(tls_more_readfileex_chunks) {
     static const srv_step st[] = { S_HEAD(), { SRV_REPLY, NULL, 50000, 200, NULL, SRV_R_CHUNKED, 777 }, S_END() };
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/c", 0));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     char *buf = malloc(50000 + 8192); size_t tot = 0;
     for (int i = 0; i < 1000 && tot < 50000; i++) {
         INTERNET_BUFFERSA ib; memset(&ib, 0, sizeof ib); ib.dwStructSize = sizeof ib;
@@ -254,7 +254,7 @@ TEST(tls_more_request_flags_option_secure_bit) {
     DWORD f = 0, l = sizeof f;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_REQUEST_FLAGS, &f, &l));
     t_note("REQUEST_FLAGS before send 0x%lx", f);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     l = sizeof f; CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_REQUEST_FLAGS, &f, &l));
     t_note("REQUEST_FLAGS after send 0x%lx", f);
     char url[256]; l = sizeof url;
@@ -303,7 +303,7 @@ TEST(tls_more_redirect_no_auto_redirect) {
     srv_step st[] = { S_HEAD(), { SRV_REPLY, "", 0, 302, loc }, S_END() };
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/r", INTERNET_FLAG_NO_AUTO_REDIRECT));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     EXPECT_EQ(treq_status(&t), 302);
     char b[128] = ""; DWORD l = sizeof b;
     CHECK(U(HttpQueryInfoA)(t.hr, HTTP_QUERY_LOCATION, b, &l, NULL));
@@ -316,7 +316,7 @@ TEST(tls_more_secflags_set_after_success_no_effect_on_result) {
     REQUIRE(U(InternetSetOptionA));
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/a", 0));
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     DWORD f0 = tls_secflags(t.hr);
     CHECK(tls_set_secflags(t.hr, 0x2000));
     DWORD f1 = tls_secflags(t.hr);
@@ -331,7 +331,7 @@ TEST(tls_more_head_then_get_new_requests) {
     static const char *verbs[] = { "HEAD", "GET", "HEAD", "GET" };
     for (int i = 0; i < 4; i++) {
         treq t; CHECK(open_ok(&t, s, verbs[i], "/hg", 0));
-        SEND_EQ(&t, 0);
+        SEND_OK(&t);
         EXPECT_EQ(treq_status(&t), 200);
         char b[16]; size_t n = treq_body(&t, b, sizeof b);
         CHECKF(n == (strcmp(verbs[i], "HEAD") ? 5u : 0u), "%s body %zu", verbs[i], n);

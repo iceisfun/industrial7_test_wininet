@@ -212,7 +212,7 @@ TEST(tls_pki_secflags_after_rev_failure_and_success) {
         EXPECT_EQ(tls_secflags(t.hr), 0x100);
         SEND_EQ(&t, E_REVF);                     /* unchanged flags: the same error */
         t_https_secflags(t.hr, 0x80);
-        SEND_EQ(&t, 0);
+        SEND_OK(&t);
     }
     EXPECT_EQ(treq_status(&t), 200);
     DWORD f = tls_secflags(t.hr);
@@ -567,7 +567,7 @@ TEST(tls_pki_retry_sequence_same_handle) {
     SEND_EQ(&t, E_CN);
     t_https_secflags(t.hr, 0x1000);
     SEND_EQ(&t, E_REV_OR_OK);
-    if (revocation_enabled()) { t_https_secflags(t.hr, 0x80); SEND_EQ(&t, 0); }
+    if (revocation_enabled()) { t_https_secflags(t.hr, 0x80); SEND_OK(&t); }
     EXPECT_EQ(treq_status(&t), 200);
     char b[32]; size_t n = treq_body(&t, b, sizeof b); EXPECT_EQ(n, 6);
     DWORD f = tls_secflags(t.hr);

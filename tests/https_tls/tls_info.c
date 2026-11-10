@@ -66,7 +66,7 @@ TEST(tls_info_certstruct_cn_other) {
     srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/i", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x1100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     INTERNET_CERTIFICATE_INFO ci; memset(&ci, 0, sizeof ci); DWORD l = sizeof ci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l));
     EXPECT_STR(ci.lpszSubjectInfo, "i7-other.invalid");
@@ -82,7 +82,7 @@ TEST(tls_info_certstruct_expired_dates) {
     PCCERT_CONTEXT sc = srv_cert_get(SRV_CERT_EXPIRED);
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/i", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x2100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     INTERNET_CERTIFICATE_INFO ci; memset(&ci, 0, sizeof ci); DWORD l = sizeof ci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l));
     CHECK(sc && ft_eq(ci.ftExpiry, sc->pCertInfo->NotAfter));
@@ -155,7 +155,7 @@ TEST(tls_info_plain_http_request_invalid_operation) {
     srv *s = srv_http(st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/p", T_INET_FRESH));
     for (int sent = 0; sent < 2; sent++) {
-        if (sent) { SEND_EQ(&t, 0); char b[16]; treq_body(&t, b, sizeof b); }
+        if (sent) { SEND_OK(&t); char b[16]; treq_body(&t, b, sizeof b); }
         for (size_t i = 0; i < sizeof k_secopts / sizeof k_secopts[0]; i++) {
             char buf[512]; DWORD l = k_secopts[i].len; SET_ERR(0);
             BOOL ok = U(InternetQueryOptionA)(t.hr, k_secopts[i].opt, buf, &l);

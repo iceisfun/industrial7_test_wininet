@@ -80,6 +80,11 @@ DWORD tls_ev_field(const char *data, const char *key);
 
 /* evaluate the send once (EXPECT_EQ evaluates its arguments twice) */
 #define SEND_EQ(tp, want) do { DWORD se_ = treq_send(tp); EXPECT_EQ(se_, (want)); } while (0)
+/* success-path send: one retry on a transient abort/reset of a fresh loopback connection (seen once per boot on the VM,
+ * boots tls5/tls6, in different tests), noted; any other result is checked as is */
+#define SEND_OK(tp) do { DWORD se_ = treq_send(tp); \
+    if (se_ == ERROR_INTERNET_CONNECTION_ABORTED || se_ == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", se_); se_ = treq_send(tp); } \
+    EXPECT_EQ(se_, 0); } while (0)
 #define TLS_SKIP_SRV() do { t_skip("HTTPS server unavailable: %s", srv_strerror(srv_last_error())); return; } while (0)
 
 /* ------------------------------------------------------------------ raw ClientHello observer */

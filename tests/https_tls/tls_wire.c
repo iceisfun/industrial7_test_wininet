@@ -206,7 +206,7 @@ TEST(tls_alpn_offered_server_ignores) {
     DWORD v = HTTP_PROTOCOL_FLAG_HTTP2;
     CHECK(U(InternetSetOptionA)(t.hr, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, &v, sizeof v));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     EXPECT_EQ(treq_status(&t), 200);
     DWORD used = 0xDEAD, l = sizeof used;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_HTTP_PROTOCOL_USED, &used, &l));
@@ -307,7 +307,7 @@ TEST(tls_proto_both_ends_agree) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/v", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    SEND_OK(&t);
     tls_sec_conn_info sci; memset(&sci, 0, sizeof sci); DWORD l = sizeof sci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CONNECTION_INFO, &sci, &l));
     const char *d = tls_done_data(s, 0);
