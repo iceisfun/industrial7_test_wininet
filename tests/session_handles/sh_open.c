@@ -412,6 +412,10 @@ TEST(sh_open_proxy_w_query) {
     if (u.pi.lpszProxy) { lstrcpynA(pa, (const char *)u.pi.lpszProxy, 40); WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)u.pi.lpszProxy, -1, wa, 40, NULL, NULL); }
     if (u.pi.lpszProxyBypass) { lstrcpynA(pb, (const char *)u.pi.lpszProxyBypass, 40); WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)u.pi.lpszProxyBypass, -1, wb, 40, NULL, NULL); }
     t_note("W PROXY query len %lu: proxy as A [%s] as W [%s]; bypass as A [%s] as W [%s]", len, pa, wa, pb, wb);
+    /* Win10 quirk: InternetQueryOptionW(PROXY) on a session returns the A layout (narrow strings), same size as A */
+    EXPECT_EQ(len, 56);
+    EXPECT_STR(pa, "127.0.0.1:9");
+    EXPECT_STR(pb, "127.0.0.1:9 <local>");
     sh_close(h);
 }
 

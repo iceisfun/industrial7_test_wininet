@@ -589,20 +589,22 @@ TEST(sh_conn_openurl_file_handle) {
     snprintf(cand[0], sizeof cand[0], "file:///"); snprintf(cand[1], sizeof cand[1], "file://%s", lp); snprintf(cand[2], sizeof cand[2], "file:///%s", lp);
     for (char *p = lp, *q = cand[0] + 8; ; p++, q++) { *q = *p == '\\' ? '/' : *p; if (!*p) break; }
     HINTERNET s = sh_open("fu"); CHECK(s != NULL); if (!s) return;
-    HINTERNET u = NULL; int which = -1;
-    for (int i = 0; i < 3 && !u; i++) {
-        u = U(InternetOpenUrlA)(s, cand[i], NULL, 0, 0, 0);
-        t_note("InternetOpenUrl(%s): h=%p err=%lu", cand[i], u, u ? 0 : GetLastError());
-        if (u) which = i;
-    }
-    CHECKF(u != NULL, "no file: URL form opened");
-    t_note("file: URL form that opened: %d", which);
+    /* Win10: "file:///C:/dir/x" (forward slashes) fails with 3 ERROR_PATH_NOT_FOUND; "file://C:\\dir\\x" opens */
+    SetLastError(0);
+    HINTERNET u0 = U(InternetOpenUrlA)(s, cand[0], NULL, 0, 0, 0);
+    t_note("InternetOpenUrl(%s): h=%p err=%lu", cand[0], u0, u0 ? 0 : GetLastError());
+    EXPECT_FAIL(u0 == NULL, ERROR_PATH_NOT_FOUND);
+    if (u0) sh_close(u0);
+    HINTERNET u2 = U(InternetOpenUrlA)(s, cand[2], NULL, 0, 0, 0);
+    t_note("InternetOpenUrl(%s): h=%p err=%lu", cand[2], u2, u2 ? 0 : GetLastError());
+    if (u2) sh_close(u2);
+    HINTERNET u = U(InternetOpenUrlA)(s, cand[1], NULL, 0, 0, 0);
+    CHECKF(u != NULL, "InternetOpenUrl(%s) err %lu", cand[1], GetLastError());
     if (u) {
         EXPECT_EQ(sh_htype(u, NULL), INTERNET_HANDLE_TYPE_FILE_REQUEST);
         char b[32]; int ok; size_t n = t_inet_read_all(u, b, sizeof b, &ok);
         CHECK(ok); EXPECT_EQ(n, 8); EXPECT_STR(b, "filedata");
-        HINTERNET p = sh_parent(u, NULL);
-        t_note("file:// handle parent %p (session %p)", p, s);
+        EXPECT_EQ(sh_parent(u, NULL), s);     /* no hidden connect handle for file: */
         DWORD v, len, e;
         CHECK(!sh_qdw(u, INTERNET_OPTION_REQUEST_FLAGS, &v, &len, &e)); EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
         char un[16];
