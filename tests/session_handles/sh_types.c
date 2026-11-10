@@ -449,12 +449,12 @@ TEST(sh_types_cross_protocol_apis_12018) {
     if (s) {
         DWORD w; SetLastError(0);
         BOOL ok = U(InternetWriteFile)(s, "x", 1, &w);
-        t_note("InternetWriteFile(session): ok=%d err %lu", ok, ok ? 0 : GetLastError());
+        CHECKF(!ok && GetLastError() == ERROR_INVALID_HANDLE, "InternetWriteFile(session): ok=%d err %lu", ok, GetLastError());   /* VM: 6 */
         HINTERNET r = hc ? sh_request(hc, "/w", 0) : NULL;
         if (r) {
             SetLastError(0);
             ok = U(InternetWriteFile)(r, "x", 1, &w);
-            t_note("InternetWriteFile(unsent GET request): ok=%d err %lu", ok, ok ? 0 : GetLastError());
+            CHECKF(!ok && GetLastError() == ERROR_INTERNET_INCORRECT_HANDLE_STATE, "InternetWriteFile(unsent GET): ok=%d err %lu", ok, GetLastError());   /* VM: 12019 */
             sh_close(r);
         }
     }

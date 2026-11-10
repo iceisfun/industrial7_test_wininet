@@ -5,7 +5,7 @@ InternetQueryOption/InternetSetOption rules, status callbacks around handle life
 several threads, InternetAttemptConnect and InternetGetConnectedState(Ex). Test names start with `sh_`.
 
 The oracle is genuine Windows 10 22H2 (10.0.19045, wininet 11.0.19041.2193) on the local QEMU guest, run with
-`tools/vm_run.sh`. Every hard CHECK passed there. The tags below say where each expectation came from:
+`tools/vm_run.sh`. Every hard CHECK passed there (pass 1: 115-118 tests; pass 2: 202 tests, see "Pass 2" below). The tags below say where each expectation came from:
 
 - **D**: read in the corpus decompilation (`/api/function/wininet/<fn>/decomp`), then confirmed on the VM.
 - **VM**: measured on the VM and adopted as the expectation. The decompilation was silent, ambiguous or wrong.
@@ -24,6 +24,11 @@ Wine was not used to set any expectation.
 | `sh_options.c` | query matrix (NULL / session / HTTP connect / request, A and W), set matrix, buffer protocol, FTP handle matrix |
 | `sh_threads.c` | shared handles across threads, InternetAttemptConnect, InternetGetConnectedState(Ex) |
 | `sh_more.c` | VM-measured defaults, handle-value shape, FTP handle lifetime, User-Agent on the wire |
+| `sh_types.c` | handle type / parent / context / URL for every creating API (HttpOpenRequest SECURE, InternetOpenUrl http/ftp/file, FTP find/file/FtpCommand), option rules of the file: (14) and FTP handle kinds, cross-protocol APIs |
+| `sh_setrules.c` | InternetSetOption(Ex): Ex flags, read-only / not-implemented / no-op option classes, PROXY on a session, REQUEST_PRIORITY, ERROR_MASK, SECURITY_FLAGS mask, buffer sizes, timeout edge values, CODEPAGE, credentials A/W, CONTEXT_VALUE as the callback context |
+| `sh_life.c` | lifetime edges: hidden connects of InternetOpenUrl, wide trees, callbacks on part of a tree, re-entrant calls in HANDLE_CLOSING/HANDLE_CREATED, unread bodies, FTP trees, handle value reuse |
+| `sh_flags.c` | OFFLINE / FROM_CACHE, named-proxy forms (scheme lists, bypass entries, loopback), VIA_PROXY, ASYNC session handle creation, FTP passive/active |
+| `sh_conc.c` | racing closes, closing a parent under concurrent queries/creations, parallel trees, callback thread, concurrent SetStatusCallback, per-request options across threads |
 
 ## InternetOpen
 | expectation | tag |
@@ -120,3 +125,93 @@ Points worth knowing:
 ## Environment notes
 The lab image has ProxyEnable=0, autodetect=1 and SecureProtocols=0x800. PRECONFIG sessions report access type 1
 there (note only). The global MAX_CONNS_PER_SERVER is 2 (note).
+
+## Pass 2 (sh_types.c, sh_setrules.c, sh_life.c, sh_flags.c, sh_conc.c)
+Boot 1 of pass 2 ran 201 tests: 194 passed as written; the 7 failures were wrong guesses (replaced by the VM value:
+OpenUrl(ftp) USERNAME "", InternetWriteFile 6, CONNECT_TIMEOUT 0 ignored), a test bug (a 2 s connect timeout turns a
+refused loopback connect into 12002 because Windows retries the SYN for ~2 s) or a note-only fact (FTP QUIT, rare race
+error). Boot 2: 202/202 PASS, 4158 checks. Boot 3 confirmed the facts promoted from boot-2 notes. Tags as above.
+
+### Handle types and per-type rules (`sh_types.c`)
+| expectation | tag |
+|---|---|
+| HANDLE_TYPE values: session 1, FTP connect 2, HTTP connect 4, FTP find 5, FTP find HTML 6, FTP file 7, HTTP request 13, file: request 14; A and W agree; len 4; an 8-byte buffer keeps bytes 4..7; 3 bytes -> 122 with 4 | D `InternetQueryOptionA case 9` tag table; VM |
+| a SECURE request is type 13 with URL `https://127.0.0.1/sec` (port 0 + SECURE -> 443), REQUEST_FLAGS 8, SECURITY_FLAGS 0 before the handshake, and CERTIFICATE_STRUCT is **answered** (plain-HTTP requests give 12016) | D (URL); VM (flags, cert struct) |
+| dwContext is per handle and never inherited; option 10 (old CONTEXT_VALUE) reads the same 8 bytes; setting option 10 gives 12009 | D `case 10/0x2d`; VM (set) |
+| InternetOpenUrl(http): hidden HCon parent with CONTEXT_VALUE **0** (the OpenUrl context goes to the request only); REQUEST_FLAGS on the hidden HCon 12018; its USERNAME is "" | VM |
+| InternetOpenUrl(`http://u:p@host/`): the hidden connect and the request read USERNAME/PASSWORD from the URL; the URL option drops the userinfo; no Authorization is sent before a 401 | VM |
+| file: request (14): REQUEST_FLAGS, URL, USERNAME, PASSWORD, PROXY_USERNAME/PASSWORD, CODEPAGE, READ_BUFFER_SIZE, KEEP_CONNECTION, SECURITY_FLAGS, USER_AGENT, HTTP_DECODING, REQUEST_PRIORITY all give 12018; timeouts are readable (30000) but setting them gives 12018; CONTEXT_VALUE is settable | D (query/set tag lists for 0x17, 0x22, 0x1c, 0x44, 0xc, 2-8); VM |
+| file: request: HttpQueryInfo, HttpSendRequest, HttpOpenRequest and InternetConnect on it give 12018; closing the session closes it | D/VM |
+| FTP: FCon parent = session, FFnd/FFil parent = FCon, contexts as given; FtpFindFirstFile handles have an **empty** URL option; FtpOpenFile URL is `ftp://127.0.0.1:<port>/hello.txt` | VM |
+| InternetOpenUrl(ftp dir/): type 6 (HTML) by default, 5 with INTERNET_FLAG_RAW_DATA; REQUEST_FLAGS 8; URL as given; the hidden FCon closes with it | VM |
+| FtpCommand(fExpectResponse=TRUE) returns an FTP **file** handle (7) parented to the FCon, carrying the dwContext | VM |
+| InternetOpenUrl(ftp file): type 7, URL as given, USERNAME reads **""** (an explicit anonymous FCon reads "anonymous") | VM |
+| FTP handles: timeouts, READ_BUFFER_SIZE and CODEPAGE round-trip; HTTP_DECODING, SECURITY_FLAGS, REQUEST_PRIORITY, USER_AGENT give 12018 | D set case 0x41/0x1f/0x3a/0x29; VM |
+| cross-protocol: HttpOpenRequest(FCon), FtpFindFirstFile(HCon or session), FtpGetCurrentDirectory(HCon), InternetReadFile(session or HCon), InternetQueryDataAvailable(session) give 12018; **InternetWriteFile(HCon or session) gives 6**, InternetWriteFile on an unsent GET request gives 12019 | K/D; VM (WriteFile) |
+
+### Set rules (`sh_setrules.c`)
+| expectation | tag |
+|---|---|
+| InternetSetOptionExA/W: dwFlags != 0 -> 87 and nothing is applied; dwFlags 0 forwards to InternetSetOption (same errors: 12010, 12011, 6) | D `InternetSetOptionExA@0x139ba0` |
+| read-only list {1, 9, 0xf, 0x11, 0x13, 0x14, 0x16, 0x33, 0x37, 0x38, 0x39, 0x3d, 0x61, 0x93} -> 12011 on every handle type | D |
+| {0x10, 0x4e, 0x4f, 0x50} -> 120; 0x36 (CALLBACK_FILTER) -> 50 | D |
+| {0xb, 0x34, 0x5b, 0x5c, 0x5d} accepted and ignored; 0x46 / 0x52 accepted with length 4, 12010 otherwise; AUTODIAL_MODE still reads 1 | D |
+| option 0 and > 0xc0 -> 12009 for set, with any length | D `param_2 - 1 > 0xbf` |
+| PROXY on a session: length must be 24 (else 12010); access other than 0/1/3 -> 87; PROXY with NULL/"" proxy -> 87; access 0 accepted; connect/request -> 12018 before the length check; round-trip reads `lpszProxyBypass = "<proxy> <bypass>"`, size 70 for the test strings | D `case 0x26`; VM (bypass layout) |
+| a proxy set on a DIRECT session after InternetOpen is used by requests created afterwards (absolute-form target, Host = origin, REQUEST_FLAGS has VIA_PROXY 4) | D `case 0x17 +0x3bc`; VM |
+| REQUEST_PRIORITY: request only (12018 on session/connect), length 4 (12010), any value round-trips, default 0 | D `case 0x3a`; VM (default) |
+| ERROR_MASK: any handle; length 4; values with bits outside 0xb -> 87; not queryable (87) | D `case 0x3e`; VM (query) |
+| SECURITY_FLAGS on a SECURE request: set ORs `value & 0x13380` into the flags (0 removes nothing, 0xffffffff adds exactly 0x13380); length 2 -> 122, 8 accepted | D `case 0x1f`; VM |
+| READ/WRITE_BUFFER_SIZE on HCon/HReq: default 4096, any non-zero value round-trips, 0 -> 87, length 8 -> 12010; on a session 12018 | D `case 0xc/0xd`; VM |
+| timeouts on S/C/R: 0, 1, 999, 0x7fffffff, 0xffffffff round-trip, except **CONNECT_TIMEOUT 0 (accepted, value kept)** and **CONNECT_BACKOFF (accepted, always reads 0)**; FROM_CACHE_TIMEOUT default 0xffffffff | D (global 0 rule); VM (handles) |
+| BYPASS_EDITED_ENTRY on a handle -> 12018 (12010 first for a bad length) | D `case 0x40` |
+| CODEPAGE default 0xffffffff on S/C/R, round-trips, copied to children created later; IDN default 3 on the lab VM (note) | VM |
+| HTTP_DECODING stores any DWORD; NULL handle -> 12018 | D/VM |
+| NULL handle + PROXY_USERNAME/PROXY_PASSWORD/REQUEST_PRIORITY/SECURITY_FLAGS/READ_BUFFER_SIZE -> 12018 | D `IsPerProcessOption` |
+| credentials: the A length is ignored (NUL-terminated); W USERNAME also ignores its length; "" clears; W set on a session -> 12018 | VM |
+| USER_AGENT set with W on a session round-trips through A and W | VM |
+| CONTEXT_VALUE set after creation is the dwContext of every later callback for that handle, including HANDLE_CLOSING; set to 0 silences them | K, VM |
+
+### Lifetime (`sh_life.c`)
+| expectation | tag |
+|---|---|
+| closing the hidden connect of an InternetOpenUrl request succeeds and invalidates the request | VM |
+| two InternetOpenUrl requests get two hidden connects; closing one request closes only its own connect | VM |
+| a session with 12 connects x 6 requests: closing it invalidates all 84 children; HANDLE_CLOSING once per child with a context, requests before their connect, none for the zero-context session | D/VM |
+| a callback set on a connect reaches requests created under it, not siblings or the session | D (copied at creation); VM |
+| SetStatusCallback(h, NULL) returns the previous callback, CALLBACK reads 0, no HANDLE_CLOSING follows; a callback set on the session later does not reach existing children | VM |
+| inside HANDLE_CLOSING the handle is already unmapped: queries on it give 6 | D `MapHandleToAddress(h, &obj, 1)`; VM |
+| closing the new request inside its own HANDLE_CREATED: the close succeeds and HttpOpenRequest returns NULL with **12017** | VM |
+| a request closed with most of a 200000-byte body unread is not drained: each of 3 rounds used a new connection | VM |
+| closing a session mid-body ends the server-side connection | VM |
+| a failed send (refused port, 12029) leaves the request closable (GLE 0) and the connect usable | VM |
+| closing an FTP session invalidates FCon and FFnd (InternetFindNextFile -> 6); QUIT is **not** seen by the server within 3 s (note) | VM |
+| handle values are reused immediately (0xcc0004 again after close/open, note); 200 unrelated open/close cycles leave a live tree intact | VM |
+
+### Flags (`sh_flags.c`)
+| expectation | tag |
+|---|---|
+| INTERNET_FLAG_OFFLINE == INTERNET_FLAG_FROM_CACHE == 0x01000000 | K |
+| OFFLINE session or FROM_CACHE request, uncached URL: HttpSendRequest / InternetOpenUrl fail with **2** (ERROR_FILE_NOT_FOUND) and nothing reaches the server | D `InitBeginSendRequest uVar5 = 2`; VM |
+| an entry cached by a DIRECT session (max-age) is served to an OFFLINE session with no request; REQUEST_FLAGS reads exactly 1 | VM |
+| scheme lists: `http=host:port`, `http=http://host:port`, `http=...;ftp=...` and a bare `host:port` proxy http; `ftp=` / `https=` only lists leave http direct | K, VM |
+| **127.0.0.1 is never sent to a named proxy**: every bypass list (none, "", `<local>`, a non-matching name, exact IP, wildcards) goes direct | VM |
+| the implicit loopback bypass matches the host **string**: `localhost` (any case), `::1`, `[::1]` go direct; `127.0.0.2` and `127.1` go to the proxy (absolute form, VIA_PROXY) | VM |
+| `<local>` keeps a dotless host away from the proxy; a dotted name still goes to it | K, VM |
+| a proxy session does not affect a DIRECT session in the same process | VM |
+| a dead proxy gives 12029 and the request is not retried direct | VM |
+| ASYNC session: InternetConnect and HttpOpenRequest return handles synchronously with GLE 0, HANDLE_CREATED on the calling thread, REQUEST_FLAGS 8 | VM |
+| INTERNET_FLAG_ASYNC on InternetConnect/HttpOpenRequest of a synchronous session does not make sends asynchronous | D (flag masked); VM |
+| FTP connect with INTERNET_FLAG_PASSIVE uses PASV/EPSV, without it PORT/EPRT; FCon REQUEST_FLAGS 12018; the find handle reads 8 either way (no PASSIVE 0x10 bit) | VM |
+
+### Threads (`sh_conc.c`)
+| expectation | tag |
+|---|---|
+| 4 threads closing one handle at once: exactly one TRUE, the others 6 (100 rounds) | D (unmap under the map lock); VM |
+| 3 threads querying a request while the session is closed: answers are 13 or 6, nothing else | VM |
+| a thread creating connects while the session is closed: creations then fail with 6 (or 12018 if a child reused the freed session value), every created child is closable; a rare other error in the close window is tolerated (note) | VM |
+| 8 threads x 100 session/connect/request trees: no failures, kernel handle count unchanged | VM |
+| sync callbacks run on the thread that made the call, even for a session created on another thread | K, VM |
+| concurrent InternetSetStatusCallback on one handle: every return is NULL or one of the set callbacks; the final CALLBACK is one of them | VM |
+| 6 threads setting RECEIVE_TIMEOUT on their own requests under one connect: values never mix; the connect keeps 30000 | VM |
+| a request opened on one thread, sent on a second and read and closed on a third | K, VM |

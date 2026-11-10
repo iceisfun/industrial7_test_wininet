@@ -361,12 +361,15 @@ TEST(sh_flags_ftp_find_request_flags_passive_bit) {
     }
 }
 
-/* Which loopback spellings bypass a named proxy with no bypass list (127.0.0.1 does, see above). */
+/* Which loopback spellings bypass a named proxy with no bypass list (127.0.0.1 does, see above). VM: the implicit
+ * bypass matches the host string (127.0.0.1, localhost in any case, ::1 with or without brackets), not the 127/8
+ * range: 127.0.0.2 and 127.1 are sent to the proxy (absolute-form target, VIA_PROXY). */
 TEST(sh_flags_proxy_loopback_names) {
     REQUIRE(U(HttpSendRequestA));
     srv *px = srv_http(NULL, 0), *org = srv_http(NULL, 0);
     if (!px || !org) { srv_stop(px); srv_stop(org); t_skip("server unavailable"); return; }
     static const char *const hosts[] = { "localhost", "LOCALHOST", "::1", "[::1]", "127.0.0.2", "127.1" };
+    static const int direct[] = { 1, 1, 1, 1, 0, 0 };
     for (size_t i = 0; i < sizeof hosts / sizeof *hosts; i++) {
         int pb = srv_req_count(px), ob = srv_req_count(org);
         HINTERNET s = sh_proxy_session(srv_hostport(px), NULL);
@@ -379,7 +382,12 @@ TEST(sh_flags_proxy_loopback_names) {
         int pv = srv_req_count(px) - pb, ov = srv_req_count(org) - ob;
         t_note("named proxy, no bypass, host [%s]: ok=%d err %lu via proxy %d direct %d flags 0x%lx target [%s]", hosts[i], ok, ok ? 0 : e, pv, ov, f,
                pv ? srv_req_target(px, pb) : ov ? srv_req_target(org, ob) : "-");
-        CHECK(pv + ov <= 1);
+        CHECKF(ok && (direct[i] ? (ov == 1 && pv == 0) : (pv == 1 && ov == 0)), "host [%s]: ok=%d proxy %d direct %d", hosts[i], ok, pv, ov);
+        CHECKF(direct[i] ? !(f & INTERNET_REQFLAG_VIA_PROXY) : (f & INTERNET_REQFLAG_VIA_PROXY) != 0, "host [%s]: flags 0x%lx", hosts[i], f);
+        if (!direct[i] && pv == 1) {
+            char want[96]; snprintf(want, sizeof want, "http://%s:%u/lb", hosts[i], srv_port(org));
+            EXPECT_STR(srv_req_target(px, pb), want);
+        }
         sh_close(s);
     }
     srv_stop(px); srv_stop(org);
