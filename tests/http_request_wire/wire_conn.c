@@ -318,7 +318,8 @@ GTEST(hrw_proxy_host_case_preserved, 20000) {
     int st = 0;
     CHECK(proxy_get(s, hi, "Wire.I7Test.Example", 80, "/c", HRW_F, &st));
     CHECK(srv_wait_requests(s, 1, 3000));
-    t_note("proxy upper-case host: line=%s host=%s", srv_req_line(s, 0), srv_req_header(s, 0, "Host"));
+    /* Win10 VM: the request-target host is lower-cased, the Host header keeps the caller casing */
+    EXPECT_STR(srv_req_line(s, 0), "GET http://wire.i7test.example/c HTTP/1.1");
     EXPECT_HDR(s, 0, "Host", "Wire.I7Test.Example");
     t_inet_close(hi); srv_stop(s);
 }
@@ -356,8 +357,10 @@ GTEST(hrw_proxy_idn_host_w, 20000) {
         t_note("IDN via proxy: line=%s", srv_req_line(s, 0));
         hrw_dump(s, 0);
         const char *h = srv_req_header(s, 0, "Host");
-        CHECKF(h && (!strcmp(h, "xn--bcher-kva.i7test.example") || !strcmp(h, "b\xc3\xbc" "cher.i7test.example")), "Host %s", h ? h : "(none)");
-    } else t_note("IDN via proxy: nothing reached the proxy (err path)");
+        /* Win10 VM (C2): punycode in both the request-target and Host */
+        EXPECT_STR(h, "xn--bcher-kva.i7test.example");
+        EXPECT_STR(srv_req_line(s, 0), "GET http://xn--bcher-kva.i7test.example/idn HTTP/1.1");
+    } else CHECKF(0, "IDN via proxy: nothing reached the proxy");
     t_inet_close(hi); srv_stop(s);
 }
 GTEST(hrw_proxy_post_absolute, 20000) {
@@ -381,7 +384,7 @@ GTEST(hrw_proxy_keepalive_reuse, 20000) {
     CHECK(proxy_get(s, hi, "a.i7test.example", 80, "/1", HRW_F, &st));
     CHECK(proxy_get(s, hi, "b.i7test.example", 80, "/2", HRW_F, &st));
     CHECK(srv_wait_requests(s, 2, 3000));
-    t_note("two origins via one proxy: conns=%d", srv_conn_count(s));
+    EXPECT_EQ(srv_conn_count(s), 1);   /* Win10 VM: one proxy connection serves both origins */
     EXPECT_STR(srv_req_line(s, 1), "GET http://b.i7test.example/2 HTTP/1.1");
     t_inet_close(hi); srv_stop(s);
 }

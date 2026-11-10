@@ -204,13 +204,14 @@ TEST(hrw_obj_w_ascii_same_as_a) {
     srv *s = hrw_srv(); if (!s) { t_skip("server unavailable"); return; }
     hrw w; CHECK(hrw_open(&w, s, "w/1", "GET", "/", NULL, NULL, NULL, HRW_F));
     U(InternetCloseHandle)(w.hr);
-    w.hr = U(HttpOpenRequestW)(w.hc, L"PUT", L"/w?x=1", L"HTTP/1.1", L"http://ref.example/", NULL, HRW_F, 0);
+    w.hr = U(HttpOpenRequestW)(w.hc, L"PUT", L"/w?x=1", L"HTTP/1.1", NULL, NULL, HRW_F, 0);   /* W referer: see wire_more.c */
     CHECKF(w.hr != NULL, "open err %lu", GetLastError());
     hrw_send(&w, NULL, 0, NULL, 0); CHECKF(w.ok, "send err %lu %s", w.err, t_inet_errname(w.err)); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
     EXPECT_STR(srv_req_line(s, 0), "PUT /w?x=1 HTTP/1.1");
-    EXPECT_HDR(s, 0, "Referer", "http://ref.example/");
+    EXPECT_NOHDR(s, 0, "Referer");
     EXPECT_HDR(s, 0, "Content-Length", "0");
+    EXPECT_NAMES(s, 0, "User-Agent|Host|Content-Length|Cache-Control");
     hrw_done(&w);
 }
 
@@ -424,8 +425,8 @@ TEST(hrw_ua_option_after_request_open) {
     hrw_send(&w, NULL, 0, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
     const char *u = srv_req_header(s, 0, "User-Agent");
-    t_note("UA after late session option: %s", u ? u : "(none)");
-    CHECK(u && (!strcmp(u, "first/1") || !strcmp(u, "second/2")));
+    /* Win10 VM (boots 2, C2): the agent is taken when the request handle is created */
+    EXPECT_STR(u, "first/1");
     hrw_done(&w);
 }
 

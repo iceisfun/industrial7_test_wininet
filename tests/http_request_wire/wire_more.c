@@ -272,10 +272,10 @@ TEST(hrw_add2_space_inside_name) {
     OPEN2(w, s, "GET", "/sp", NULL, NULL);
     BOOL ok = addh(w.hr, "X Sp: v", HTTP_ADDREQ_FLAG_ADD);
     DWORD e = GetLastError();
-    t_note("space inside header name: ok=%d err=%lu", ok, e);
-    CHECK(ok);
+    CHECKF(ok, "err %lu", e);
     SEND2(w);
-    hrw_dump(s, 0);
+    EXPECT_NAMES(s, 0, "X Sp|User-Agent|Host|Cache-Control");   /* Win10 VM: an inner space is kept */
+    EXPECT_HDR(s, 0, "X Sp", "v");
     hrw_done(&w);
 }
 TEST(hrw_add2_value_with_crlf_continuation) {
@@ -352,8 +352,11 @@ TEST(hrw_resend_post_without_optional) {
     size_t n1 = 0; const char *b1 = srv_req_body(s, 1, &n1);
     t_note("POST re-send without optional: ok=%d err=%lu %s status=%d; wire CL %s body %.*s", ok2, e2, t_inet_errname(e2), w.status,
            srv_req_header(s, 1, "Content-Length"), (int)n1, b1 ? b1 : "");
+    /* Win10 VM (C1, C2): the stale Content-Length 5 goes out without a body; the server waits for 5 bytes and the
+     * send fails (C2: 12152 after the server's 1 s I/O timeout) */
     EXPECT_HDR(s, 0, "Content-Length", "5");
-    EXPECT_HDR(s, 1, "Content-Length", "5");   /* Win10 VM: the first optional data is re-sent */
+    EXPECT_HDR(s, 1, "Content-Length", "5");
+    CHECK(!ok2);
     hrw_done(&w);
 }
 
@@ -486,18 +489,36 @@ TEST(hrw_verb2_w_ver10_upgraded) {
     EXPECT_STR(srv_req_line(s, 0), "GET /v10 HTTP/1.1");
     hrw_done(&w);
 }
-TEST(hrw_ref2_w_nonascii) {
+/* Win10 VM (boots C1, C2; ASCII and non-ASCII referers): HttpOpenRequestW with a referer succeeds, but
+ * HttpSendRequest on that handle then fails with ERROR_INVALID_PARAMETER and nothing reaches the wire. The A entry
+ * point with the same referer works (hrw_ref_header_sent). */
+static void w_referer(const WCHAR *ref) {
+    srv *s = hrw_srv(); if (!s) { t_skip("server unavailable"); return; }
+    hrw w; memset(&w, 0, sizeof w); w.s = s;
+    w.hi = t_inet_open("rw/1"); w.hc = conn(w.hi, s);
+    w.hr = U(HttpOpenRequestW)(w.hc, NULL, L"/rw", NULL, ref, NULL, HRW_F, 0);
+    CHECKF(w.hr != NULL, "open err %lu", GetLastError());
+    char rb[256]; DWORD rl = sizeof rb;
+    BOOL q = U(HttpQueryInfoA)(w.hr, HTTP_QUERY_REFERER | HTTP_QUERY_FLAG_REQUEST_HEADERS, rb, &rl, NULL);
+    t_note("W referer stored: q=%d err=%lu value=%s", q, q ? 0 : GetLastError(), q ? rb : "(none)");
+    hrw_send(&w, NULL, 0, NULL, 0);
+    CHECK(!w.ok); EXPECT_EQ(w.err, ERROR_INVALID_PARAMETER);
+    Sleep(100);
+    EXPECT_EQ(srv_req_count(s), 0);
+    hrw_done(&w);
+}
+TEST(hrw_ref2_w_ascii_send_fails) { HRW_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); w_referer(L"http://r.example/"); }
+TEST(hrw_ref2_w_nonascii_send_fails) { HRW_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); w_referer(L"http://r.example/café"); }
+TEST(hrw_ref2_w_empty_ok) {
     HRW_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW));
     srv *s = hrw_srv(); if (!s) { t_skip("server unavailable"); return; }
-    hrw w; CHECK(hrw_open(&w, s, "rw/1", "GET", "/", NULL, NULL, NULL, HRW_F));
-    U(InternetCloseHandle)(w.hr);
-    w.hr = U(HttpOpenRequestW)(w.hc, NULL, L"/rw", NULL, L"http://r.example/café", NULL, HRW_F, 0);
-    CHECKF(w.hr != NULL, "open err %lu", GetLastError());
-    hrw_send(&w, NULL, 0, NULL, 0); CHECKF(w.ok, "send err %lu %s", w.err, t_inet_errname(w.err)); if (w.ok) hrw_read(&w);
+    hrw w; memset(&w, 0, sizeof w); w.s = s;
+    w.hi = t_inet_open("rw/2"); w.hc = conn(w.hi, s);
+    w.hr = U(HttpOpenRequestW)(w.hc, NULL, L"/rw", NULL, L"", NULL, HRW_F, 0);
+    CHECK(w.hr != NULL);
+    hrw_send(&w, NULL, 0, NULL, 0); CHECKF(w.ok, "err %lu", w.err); if (w.ok) hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
-    const char *r = srv_req_header(s, 0, "Referer");
-    t_note("W referer with U+00E9 -> \"%s\"", r ? r : "(none)");
-    CHECK(r != NULL);
+    EXPECT_NOHDR(s, 0, "Referer");
     hrw_done(&w);
 }
 
@@ -791,7 +812,8 @@ TEST(hrw_redir2_same_server_reuses_connection) {
     CHECK(srv_wait_requests(s, 2, 3000));
     EXPECT_EQ(srv_conn_count(s), 1);
     EXPECT_EQ(srv_req_conn(s, 1), srv_req_conn(s, 0));
-    EXPECT_NAMES(s, 1, "User-Agent|Host|Cache-Control");
+    EXPECT_NAMES(s, 1, "User-Agent|Host|Cache-Control|Connection");   /* VM: the follow-up is a re-send */
+    EXPECT_HDR(s, 1, "Connection", "Keep-Alive");
     hrw_done(&w);
 }
 

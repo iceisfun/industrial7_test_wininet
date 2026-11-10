@@ -83,9 +83,9 @@ TEST(hrw_body_user_content_length_replaced) {
     hrw_done(&w);
 }
 
-/* Re-sending the same POST handle with new optional data. Win10 VM (boot C1): the second request carried the FIRST
- * body ("one", Content-Length 3). */
-TEST(hrw_body_post_resend_reuses_first_body) {
+/* Re-sending the same POST handle with new optional data. Win10 VM (boots C1, C2): the Content-Length of the FIRST
+ * send (3) stays on the handle, while the new data is written; a server honouring Content-Length reads "sec". */
+TEST(hrw_body_post_resend_keeps_first_content_length) {
     HRW_REQUIRE_HTTP();
     srv *s = hrw_srv(); if (!s) { t_skip("server unavailable"); return; }
     hrw w; CHECK(hrw_open(&w, s, "rs/1", "POST", "/rs", NULL, NULL, NULL, HRW_F));
@@ -95,7 +95,7 @@ TEST(hrw_body_post_resend_reuses_first_body) {
     size_t n1 = 0; const char *b1 = srv_req_body(s, 1, &n1);
     t_note("re-send body: %.*s (CL %s) conns=%d", (int)n1, b1 ? b1 : "", srv_req_header(s, 1, "Content-Length"), srv_conn_count(s));
     hrw_dump(s, 1);
-    CHECK(body_is(s, 0, "one", 3)); CHECK(body_is(s, 1, "one", 3));
+    CHECK(body_is(s, 0, "one", 3)); CHECK(body_is(s, 1, "sec", 3));
     EXPECT_HDR(s, 1, "Content-Length", "3");
     EXPECT_EQ(srv_req_header_occurrences(s, 1, "Content-Length"), 1);
     hrw_done(&w);
