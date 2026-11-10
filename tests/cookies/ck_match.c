@@ -17,7 +17,6 @@ TEST(ck_dom_default_no_domain_visibility) {
     ck_set(ck_url(h, "/"), NULL, "d=1");
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "d=1");
     const char *s = ck_gets(ck_url(sub("www", h), "/"), NULL, 0);
-    t_note("cookie without Domain= set on host, read from www.host: '%s'", s);
     EXPECT_STR(s, "d=1");                                                  /* not host-only unless APPLY_HOST_ONLY */
     EXPECT_STR(ck_gets(ck_url(sub("a.b", h), "/"), NULL, 0), "d=1");
     const char *parent = strchr(h, '.') + 1;                                 /* i7test.example */
@@ -71,7 +70,6 @@ TEST(ck_dom_domain_attr_case_insensitive) {
     char up[300]; snprintf(up, sizeof up, "%s", h); for (char *p = up; *p; p++) *p = (char)toupper((unsigned char)*p);
     char d[400]; snprintf(d, sizeof d, "dc=1; domain=%s", up);
     BOOL r = ck_set(ck_url(sub("www", h), "/"), NULL, d);
-    t_note("upper-case Domain=: r=%d gle=%lu", r, GetLastError());
     EXPECT_EQ(r, TRUE);
     EXPECT_STR(ck_gets(ck_url(sub("z", h), "/"), NULL, 0), "dc=1");
     ck_cleanup();
@@ -112,7 +110,6 @@ TEST(ck_dom_registrable_parent_accepted) {
     REQUIRE(U(InternetSetCookieA));
     const char *h = ck_host("dreg");                      /* wininet...dreg.i7test.example */
     BOOL r = ck_set(ck_url(h, "/"), NULL, "reg=1; domain=i7test.example");
-    t_note("Domain=i7test.example from %s: r=%d gle=%lu", h, r, GetLastError());
     EXPECT_EQ(r, TRUE);
     /* visible to a sibling host: clean it up immediately, it is shared by every host of this suffix */
     EXPECT_STR(ck_gets(ck_url(ck_host("dsib"), "/"), "reg", 0), "reg=1");
@@ -163,8 +160,11 @@ TEST(ck_dom_localhost) {
     EXPECT_STR(ck_gets(ck_url("LOCALHOST", pp), NULL, 0), "lh=1");
     EXPECT_STR(ck_gets(ck_url("127.0.0.1", pp), NULL, 0), "");
     snprintf(d, sizeof d, "lhd=1; path=%s; domain=localhost", pp);
+    SetLastError(0xdeadbeef);
     BOOL r = ck_set(ck_url("localhost", pp), NULL, d);
-    t_note("Domain=localhost on localhost: r=%d gle=%lu", r, GetLastError());
+    DWORD e = GetLastError();
+    EXPECT_EQ(r, FALSE);                 /* VM: Domain=localhost is not a legal cookie domain */
+    EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
     ck_cleanup();
 }
 TEST(ck_dom_ipv6_literal) {
@@ -173,7 +173,6 @@ TEST(ck_dom_ipv6_literal) {
     char pp[300]; snprintf(pp, sizeof pp, "%s/", p);
     char d[400]; snprintf(d, sizeof d, "v6=1; path=%s", pp);
     BOOL r = ck_set(ck_url("[::1]", pp), NULL, d);
-    t_note("[::1]: set r=%d gle=%lu get='%s'", r, GetLastError(), ck_gets(ck_url("[::1]", pp), NULL, 0));
     EXPECT_EQ(r, TRUE);
     EXPECT_STR(ck_gets(ck_url("[::1]", pp), NULL, 0), "v6=1");
     EXPECT_STR(ck_gets(ck_url("127.0.0.1", pp), NULL, 0), "");
@@ -245,16 +244,17 @@ TEST(ck_path_default_from_url_table) {
 TEST(ck_path_default_ex2_view) {
     REQUIRE(UN(InternetGetCookieEx2)); REQUIRE(UN(InternetFreeCookies));
     static const char *setp[] = { "/d1/d2/page", "/d1/d2/", "/d1/d2", "/page", "/" };
+    static const char *want[] = { "/d1/d2/", "/d1/d2/", "/d1/", "/", "/" };
     for (int i = 0; i < 5; i++) {
         const char *h = ck_host("pdefx");
         ck_set(ck_url(h, setp[i]), NULL, "dx=1");
         INTERNET_COOKIE2 *arr = NULL; DWORD n = 0;
         DWORD r = UN(InternetGetCookieEx2)(ck_w(ck_url(h, "/d1/d2/x/")), NULL, 0, &arr, &n);
-        t_note("default path for set at %s: r=%lu n=%lu path=%s", setp[i], r, n, (n && arr) ? ck_a(arr[0].pwszPath) : "-");
+        const char *got = (n && arr) ? ck_a(arr[0].pwszPath) : "-";
+        CHECKF(r == 0 && n == 1 && !strcmp(got, want[i]), "default path for set at %s: r=%lu n=%lu path=%s want %s", setp[i], r, n, got, want[i]);
         if (arr) UN(InternetFreeCookies)(arr, n);
         ck_cleanup();
     }
-    CHECK(1);
 }
 TEST(ck_path_attr_without_slash_rejected) {
     REQUIRE(U(InternetSetCookieA));
@@ -270,9 +270,10 @@ TEST(ck_path_attr_empty_value) {
     REQUIRE(U(InternetSetCookieA));
     const char *h = ck_host("pempty");
     BOOL r = ck_set(ck_url(h, "/x/y/"), NULL, "pe=1; path=");
-    t_note("path= (empty) r=%d gle=%lu; / '%s' /x/ '%s' /x/y/ '%s'", r, GetLastError(), ck_gets(ck_url(h, "/"), NULL, 0),
-           ck_gets(ck_url(h, "/x/"), NULL, 0), ck_gets(ck_url(h, "/x/y/"), NULL, 0));
-    EXPECT_EQ(r, TRUE);
+    EXPECT_EQ(r, TRUE);                  /* VM: an empty Path= matches every path of the host */
+    EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "pe=1");
+    EXPECT_STR(ck_gets(ck_url(h, "/x/"), NULL, 0), "pe=1");
+    EXPECT_STR(ck_gets(ck_url(h, "/other/z/"), NULL, 0), "pe=1");
     ck_cleanup();
 }
 TEST(ck_path_attr_with_query_char) {
@@ -281,9 +282,10 @@ TEST(ck_path_attr_with_query_char) {
     SetLastError(0xdeadbeef);
     BOOL r = ck_set(ck_url(h, "/"), NULL, "pq=1; path=/a?b");
     DWORD e = GetLastError();
-    t_note("path=/a?b: r=%d gle=%lu; /a/ '%s'", r, e, ck_gets(ck_url(h, "/a/"), NULL, 0));
+    EXPECT_EQ(r, TRUE); EXPECT_EQ(e, 0);
+    EXPECT_STR(ck_gets(ck_url(h, "/a/"), NULL, 0), "pq=1");   /* VM: the path is cut at '?' -> "/a" */
+    EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
     ck_cleanup();
-    CHECK(1);
 }
 TEST(ck_path_case_sensitive) {
     REQUIRE(U(InternetSetCookieA));
@@ -330,7 +332,6 @@ TEST(ck_order_replace_keeps_position) {
     ck_set(u, NULL, "a=1"); ck_set(u, NULL, "b=2"); ck_set(u, NULL, "c=3");
     ck_set(u, NULL, "a=9");
     const char *g = ck_gets(u, NULL, 0);
-    t_note("after replacing first: '%s'", g);
     EXPECT_STR(g, "a=9; b=2; c=3");
     ck_cleanup();
 }
@@ -361,8 +362,7 @@ TEST(ck_order_domain_vs_host_cookies) {
     ck_set(ck_url(sub("www", h), "/"), NULL, "host=1");
     ck_set(ck_url(sub("www", h), "/"), NULL, d);
     const char *g = ck_gets(ck_url(sub("www", h), "/"), NULL, 0);
-    t_note("host vs domain order: '%s'", g);
-    CHECKF(ck_count(g) == 2 && ck_has(g, "host=1") && ck_has(g, "dom=1"), "got '%s'", g);
+    EXPECT_STR(g, "host=1; dom=1");      /* VM */
     ck_cleanup();
 }
 
@@ -379,7 +379,6 @@ TEST(ck_dup_names_case_sensitive) {
     const char *u = ck_url(ck_host("dup2"), "/");
     ck_set(u, NULL, "k=1"); ck_set(u, NULL, "K=2");
     const char *g = ck_gets(u, NULL, 0);
-    t_note("k vs K: '%s'", g);
     EXPECT_STR(g, "k=1; K=2");
     ck_cleanup();
 }
@@ -465,10 +464,9 @@ TEST(ck_secure_set_via_http_url) {
     REQUIRE(U(InternetSetCookieA));
     const char *h = ck_host("sech");
     BOOL r = ck_set(ck_url(h, "/"), NULL, "sh=1; secure");
-    t_note("secure cookie set through an http:// URL: r=%d gle=%lu", r, GetLastError());
+    EXPECT_EQ(r, TRUE);                  /* VM: Secure is accepted from an http:// URL ... */
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
-    const char *s = ck_gets(ck_surl(h, "/"), NULL, 0);
-    t_note("  visible on https: '%s'", s);
+    EXPECT_STR(ck_gets(ck_surl(h, "/"), NULL, 0), "sh=1");   /* ... and visible to https only */
     ck_cleanup();
 }
 TEST(ck_secure_mixed_list) {
@@ -506,7 +504,7 @@ TEST(ck_httponly_get_flags_table) {
     EXPECT_STR(ck_gets(u, NULL, 0), "plain=1");
     EXPECT_STR(ck_gets(u, NULL, INTERNET_COOKIE_HTTPONLY), "plain=1; ho=1");
     EXPECT_STR(ck_gets(u, NULL, INTERNET_COOKIE_NON_SCRIPT), "plain=1; ho=1");
-    EXPECT_STR(ck_gets(u, NULL, INTERNET_COOKIE_THIRD_PARTY), "plain=1");
+    EXPECT_STR(ck_gets(u, NULL, INTERNET_COOKIE_THIRD_PARTY), "");          /* VM: third-party get sees nothing here */
     EXPECT_STR(ck_gets(u, "ho", 0), "");
     EXPECT_EQ(ck_gle, ERROR_NO_MORE_ITEMS);
     EXPECT_STR(ck_gets(u, "ho", INTERNET_COOKIE_HTTPONLY), "ho=1");
@@ -543,8 +541,8 @@ TEST(ck_httponly_overwrite_without_flag_rejected) {
     EXPECT_STR(ck_gets(u, NULL, INTERNET_COOKIE_HTTPONLY), "ho=1");
     EXPECT_EQ(ck_setx(u, NULL, "ho=4", INTERNET_COOKIE_NON_SCRIPT, &gle), COOKIE_STATE_ACCEPT);
     const char *g = ck_gets(u, NULL, INTERNET_COOKIE_HTTPONLY);
-    t_note("after non-script overwrite without HttpOnly attr: '%s' / plain get '%s'", g, ck_gets(u, NULL, 0));
     EXPECT_STR(g, "ho=4");
+    EXPECT_STR(ck_gets(u, NULL, 0), "ho=4");   /* VM: the replacement has no HttpOnly attribute, so it is script-visible */
     ck_cleanup();
 }
 TEST(ck_httponly_delete_without_flag_rejected) {
@@ -598,8 +596,8 @@ TEST(ck_getex_restricted_zone_flag) {
     const char *u = ck_url(ck_host("grz"), "/");
     ck_set(u, NULL, "rz=1");
     const char *g = ck_gets(u, NULL, INTERNET_FLAG_RESTRICTED_ZONE);
-    t_note("get with INTERNET_FLAG_RESTRICTED_ZONE: '%s' gle=%lu", g, ck_gle);
-    EXPECT_STR(g, "rz=1");               /* 0x20000 is masked off by 0x461010 */
+    EXPECT_STR(g, "");                   /* 0x20000 survives the 0x461010 mask: zone 4 (restricted) blocks every cookie */
+    EXPECT_EQ(ck_gle, ERROR_NO_MORE_ITEMS);
     ck_cleanup();
 }
 TEST(ck_getex_third_party_flag) {
@@ -609,20 +607,22 @@ TEST(ck_getex_third_party_flag) {
     char d[200]; snprintf(d, sizeof d, "tpp=1; expires=%s", ck_date(2));
     ck_set(u, NULL, d);
     const char *g = ck_gets(u, NULL, INTERNET_COOKIE_THIRD_PARTY);
-    t_note("get THIRD_PARTY: '%s' gle=%lu", g, ck_gle);
+    EXPECT_STR(g, "");                   /* VM: session and persistent alike (default privacy settings) */
+    EXPECT_EQ(ck_gle, ERROR_NO_MORE_ITEMS);
+    EXPECT_STR(ck_gets(u, NULL, 0), "tp=1; tpp=1");
     ck_cleanup();
-    CHECK(1);
 }
 TEST(ck_setex_third_party_flag) {
     REQUIRE(U(InternetSetCookieExA));
     const char *u = ck_url(ck_host("s3p"), "/");
     DWORD gle, r = ck_setx(u, NULL, "s3=1", INTERNET_COOKIE_THIRD_PARTY, &gle);
-    t_note("set THIRD_PARTY session: state=%lu gle=%lu get='%s'", r, gle, ck_gets(u, NULL, 0));
+    EXPECT_EQ(r, COOKIE_STATE_ACCEPT); EXPECT_EQ(gle, 0);
+    EXPECT_STR(ck_gets(u, NULL, 0), "s3=1");
     char d[200]; snprintf(d, sizeof d, "s3p=1; expires=%s", ck_date(2));
     r = ck_setx(u, NULL, d, INTERNET_COOKIE_THIRD_PARTY, &gle);
-    t_note("set THIRD_PARTY persistent: state=%lu gle=%lu get='%s'", r, gle, ck_gets(u, NULL, 0));
+    EXPECT_EQ(r, COOKIE_STATE_ACCEPT); EXPECT_EQ(gle, 0);
+    EXPECT_STR(ck_gets(u, NULL, 0), "s3=1; s3p=1");
     ck_cleanup();
-    CHECK(1);
 }
 
 /* ------------------------------------------------------------------------------------------ limits */
@@ -787,16 +787,17 @@ TEST(ck_jar_suppress_behavior_bad_values) {
     SetLastError(0xdeadbeef);
     BOOL r = U(InternetSetOptionA)(NULL, INTERNET_OPTION_SUPPRESS_BEHAVIOR, &v, sizeof v);
     DWORD e = GetLastError();
-    t_note("SUPPRESS_BEHAVIOR 0x99: r=%d gle=%lu", r, e);
+    EXPECT_EQ(r, FALSE); EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
     SetLastError(0xdeadbeef);
     r = U(InternetSetOptionA)(NULL, INTERNET_OPTION_SUPPRESS_BEHAVIOR, &v, 2);
     e = GetLastError();
     EXPECT_EQ(r, FALSE);
-    t_note("SUPPRESS_BEHAVIOR len 2: r=%d gle=%lu", r, e);
+    EXPECT_EQ(e, ERROR_INTERNET_BAD_OPTION_LENGTH);
     DWORD q = 0, qs = sizeof q;
     SetLastError(0xdeadbeef);
     r = U(InternetQueryOptionA)(NULL, INTERNET_OPTION_SUPPRESS_BEHAVIOR, &q, &qs);
-    t_note("query SUPPRESS_BEHAVIOR: r=%d gle=%lu", r, GetLastError());
+    e = GetLastError();
+    EXPECT_EQ(r, FALSE); EXPECT_EQ(e, ERROR_INVALID_PARAMETER);   /* set-only option */
     v = INTERNET_SUPPRESS_COOKIE_PERSIST_RESET;
     U(InternetSetOptionA)(NULL, INTERNET_OPTION_SUPPRESS_BEHAVIOR, &v, sizeof v);
 }

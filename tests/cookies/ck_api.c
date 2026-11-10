@@ -200,6 +200,9 @@ TEST(ck_getex_a_reserved_nonnull) {
     BOOL r = U(InternetGetCookieExA)(u, NULL, b, &sz, 0, &dummy);
     DWORD e = GetLastError();
     t_note("InternetGetCookieExA(lpReserved=&x): r=%d gle=%lu size=%lu data=%s", r, e, sz, r ? b : "-");
+    EXPECT_EQ(r, TRUE);                 /* VM: the A form ignores lpReserved (only ...ExW checks it) */
+    EXPECT_EQ(sz, 4);
+    EXPECT_STR(r ? b : "", "a=1");
     ck_cleanup();
 }
 TEST(ck_get_a_null_url) {
@@ -454,7 +457,8 @@ TEST(ck_get_w_name_behaviour) {
     WCHAR b[128]; DWORD sz = 128;
     BOOL r = U(InternetGetCookieW)(ck_w(u), L"b", b, &sz);
     t_note("InternetGetCookieW(name=b): r=%d gle=%lu data=%s", r, GetLastError(), r ? ck_a(b) : "-");
-    CHECK(r);
+    EXPECT_EQ(r, TRUE);
+    EXPECT_WSTR(b, L"b=2");             /* VM: unlike InternetGetCookieA, the W form passes the name through */
     ck_cleanup();
 }
 TEST(ck_getex_a_name_filter) {
@@ -471,12 +475,14 @@ TEST(ck_getex_a_name_filter) {
     EXPECT_EQ(ck_gle, ERROR_NO_MORE_ITEMS);
     ck_cleanup();
 }
-TEST(ck_getex_a_name_filter_case_insensitive) {
+TEST(ck_getex_a_name_filter_case_sensitive) {
     REQUIRE(U(InternetGetCookieExA));
     const char *u = ck_url(ck_host("filtci"), "/");
     ck_set(u, NULL, "MixCase=1");
-    EXPECT_STR(ck_gets(u, "mixcase", 0), "MixCase=1");   /* lstrcmpA */
-    EXPECT_STR(ck_gets(u, "MIXCASE", 0), "MixCase=1");
+    EXPECT_STR(ck_gets(u, "mixcase", 0), "");           /* lstrcmpA: case-sensitive (VM) */
+    EXPECT_EQ(ck_gle, ERROR_NO_MORE_ITEMS);
+    EXPECT_STR(ck_gets(u, "MIXCASE", 0), "");
+    EXPECT_STR(ck_gets(u, "MixCase", 0), "MixCase=1");
     EXPECT_STR(ck_gets(u, "MixCas", 0), "");
     ck_cleanup();
 }
@@ -568,7 +574,7 @@ TEST(ck_set_url_empty) {
     BOOL r = U(InternetSetCookieA)("", NULL, "a=1");
     DWORD e = GetLastError();
     EXPECT_EQ(r, FALSE);
-    t_note("InternetSetCookieA(\"\"): gle=%lu %s", e, t_inet_errname(e));
+    EXPECT_EQ(e, ERROR_INTERNET_UNRECOGNIZED_SCHEME);
 }
 TEST(ck_get_url_empty) {
     REQUIRE(U(InternetGetCookieExA));
@@ -577,7 +583,7 @@ TEST(ck_get_url_empty) {
     BOOL r = U(InternetGetCookieExA)("", NULL, b, &sz, 0, NULL);
     DWORD e = GetLastError();
     EXPECT_EQ(r, FALSE);
-    t_note("InternetGetCookieExA(\"\"): gle=%lu %s", e, t_inet_errname(e));
+    EXPECT_EQ(e, ERROR_INTERNET_UNRECOGNIZED_SCHEME);
 }
 TEST(ck_set_url_ftp_scheme_invalid) {
     REQUIRE(U(InternetSetCookieA));
@@ -598,7 +604,6 @@ TEST(ck_set_url_host_bad_char) {
     BOOL r = U(InternetSetCookieA)("http://bad!host.i7test.example/", NULL, "a=1");
     DWORD e = GetLastError();
     EXPECT_EQ(r, FALSE);
-    t_note("bad host char: gle=%lu %s", e, t_inet_errname(e));
     EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
 }
 TEST(ck_set_url_uppercase_host_same_jar) {

@@ -17,6 +17,16 @@
 
 #define CK_PAST "expires=Thu, 01-Jan-1970 00:00:01 GMT"
 
+/* common/t.h's EXPECT_EQ/EXPECT_NE evaluate their first argument twice (compare + message), which re-runs calls
+ * with side effects (a second HttpSendRequest, a second sized InternetGetCookie...). This area uses
+ * single-evaluation versions. */
+#undef EXPECT_EQ
+#undef EXPECT_NE
+#define EXPECT_EQ(a, b) do { unsigned long long a_ = (unsigned long long)(ULONG_PTR)(a), b_ = (unsigned long long)(ULONG_PTR)(b); \
+    t_check(a_ == b_, __FILE__, __LINE__, #a " == " #b, "got 0x%llx want 0x%llx", a_, b_); } while (0)
+#define EXPECT_NE(a, b) do { unsigned long long a_ = (unsigned long long)(ULONG_PTR)(a), b_ = (unsigned long long)(ULONG_PTR)(b); \
+    t_check(a_ != b_, __FILE__, __LINE__, #a " != " #b, "got 0x%llx", a_); } while (0)
+
 /* Documented but missing from mingw's wininet.h */
 #ifndef INTERNET_SUPPRESS_COOKIE_PERSIST
 #define INTERNET_SUPPRESS_COOKIE_PERSIST 0x03

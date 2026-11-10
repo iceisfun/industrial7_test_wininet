@@ -86,7 +86,6 @@ TEST(ck_wire_set_cookie_comma_not_split) {
     HINTERNET hi = t_inet_open("ck-wire");
     EXPECT_EQ(ck_wire_get(hi, wurl(&w, NULL), NULL, 0), 200);
     const char *g = ck_gets(w.api_url, NULL, 0);
-    t_note("Set-Cookie: c1=1, c2=2 -> '%s'", g);
     EXPECT_STR(g, "c1=1, c2=2");
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();
@@ -135,7 +134,7 @@ TEST(ck_wire_secure_cookie_over_http) {
     HINTERNET hi = t_inet_open("ck-wire");
     EXPECT_EQ(ck_wire_get(hi, wurl(&w, NULL), NULL, 0), 200);
     char su[600]; snprintf(su, sizeof su, "https://127.0.0.1%s", w.path);
-    t_note("Secure Set-Cookie over http: http get '%s', https get '%s'", ck_gets(w.api_url, NULL, 0), ck_gets(su, NULL, 0));
+    EXPECT_STR(ck_gets(su, NULL, 0), "sw=1");   /* stored from plain http, readable for https */
     EXPECT_STR(ck_gets(w.api_url, NULL, 0), "");
     EXPECT_EQ(ck_wire_get(hi, wurl(&w, NULL), NULL, 0), 200);
     CHECK(srv_wait_requests(w.s, 2, 3000));
@@ -150,7 +149,6 @@ TEST(ck_wire_default_path) {
     EXPECT_EQ(ck_wire_get(hi, wurl(&w, "sub/page"), NULL, 0), 200);
     ck_track(wapi(&w, "sub/page"), "dp", NULL, 0);
     const char *a = ck_gets(wapi(&w, "sub/"), NULL, 0), *b = ck_gets(w.api_url, NULL, 0), *c = ck_gets(wapi(&w, "sub/x/"), NULL, 0);
-    t_note("Set-Cookie without Path from <P>sub/page: <P>sub/ '%s', <P> '%s', <P>sub/x/ '%s'", a, b, c);
     EXPECT_STR(a, "dp=1");
     EXPECT_STR(b, "");
     EXPECT_STR(c, "dp=1");
@@ -294,7 +292,6 @@ TEST(ck_wire_samesite_cookies_sent_direct) {
     EXPECT_EQ(ck_wire_get(hi, wurl(&w, NULL), NULL, 0), 200);
     CHECK(srv_wait_requests(w.s, 1, 3000));
     const char *c = cookie_hdr(w.s, 0);
-    t_note("SameSite cookies on a direct request: Cookie: %s", c ? c : "(none)");
     EXPECT_STR(c, "st=1; lx=1");
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();
@@ -324,8 +321,8 @@ TEST(ck_wire_user_cookie_header_and_jar) {
     int occ = srv_req_header_occurrences(w.s, 0, "Cookie");
     const char *c = cookie_hdr(w.s, 0);
     t_note("user Cookie header + jar: occurrences=%d first='%s'", occ, c ? c : "(none)");
-    CHECK(c != NULL && strstr(c, "user=1") != NULL);
-    CHECK(c != NULL && strstr(c, "jar=1") != NULL);
+    EXPECT_EQ(occ, 1);
+    EXPECT_STR(c, "jar=1");              /* VM: the jar's Cookie header replaces the caller's */
     t_inet_close(hi); srv_stop(w.s);
     ck_cleanup();
 }
@@ -496,7 +493,6 @@ TEST(ck_wire_query_request_cookie_header) {
     CHECK(h != NULL);
     char b[256]; DWORD sz = sizeof b;
     BOOL r = U(HttpQueryInfoA)(h, HTTP_QUERY_COOKIE | HTTP_QUERY_FLAG_REQUEST_HEADERS, b, &sz, NULL);
-    t_note("request Cookie header via HttpQueryInfo: r=%d gle=%lu '%s'", r, GetLastError(), r ? b : "");
     EXPECT_EQ(r, TRUE);
     EXPECT_STR(b, "rq=1");
     t_inet_close(h);
@@ -526,6 +522,8 @@ TEST(ck_wire_status_callbacks) {
     CHECK(h != NULL);
     t_inet_read_all(h, b, sizeof b, &ok); t_inet_close(h);
     t_note("callbacks: first request recv=%ld sent=%ld (len %lu); after second recv=%ld sent=%ld", r1, s1, g_cb_recv_len, g_cb_recv, g_cb_sent);
+    EXPECT_EQ(g_cb_recv, 1);
+    EXPECT_EQ(g_cb_sent, 1);
     EXPECT_EQ(r1, 1);
     EXPECT_EQ(s1, 0);
     CHECK(g_cb_sent >= 1);

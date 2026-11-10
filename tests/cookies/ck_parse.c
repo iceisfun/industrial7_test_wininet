@@ -97,6 +97,10 @@ TEST(ck_parse_empty_data) {
     DWORD e = GetLastError();
     char b[64]; BOOL g = ck_get(u, NULL, 0, b, sizeof b);
     t_note("set \"\": r=%d gle=%lu; get r=%d gle=%lu size=%lu '%s'", r, e, g, ck_gle, ck_size, b);
+    EXPECT_EQ(r, TRUE);                 /* VM: an empty nameless cookie is stored ... */
+    EXPECT_EQ(g, TRUE);                 /* ... and returned as an empty string of size 1 */
+    EXPECT_EQ(ck_size, 1);
+    EXPECT_STR(b, "");
     ck_cleanup();
 }
 TEST(ck_parse_name_with_semicolon_param) {
@@ -122,7 +126,7 @@ TEST(ck_parse_control_char_value) {
     char hex[64] = ""; for (int i = 0; got[i] && i < 12; i++) snprintf(hex + strlen(hex), sizeof hex - strlen(hex), "%02x", (unsigned char)got[i]);
     t_note("control char value: set r=%d got hex %s", r, hex);
     CHECK(r == TRUE);
-    CHECK(!strncmp(got, "c=x", 3) && strlen(got) == 5);
+    EXPECT_STR(got, "c=x_y");           /* VM: replaceControlChars maps control characters to '_' */
     ck_cleanup();
 }
 TEST(ck_parse_long_value_4096) {
@@ -136,45 +140,70 @@ TEST(ck_parse_long_value_4096) {
     free(d);
     ck_cleanup();
 }
-TEST(ck_parse_size_limit_total_5119_ok) {
+TEST(ck_parse_size_limit_total_5117_ok) {
     REQUIRE(U(InternetSetCookieA));
-    const char *u = ck_url(ck_host("l5119"), "/");
-    char *d = malloc(5120); strcpy(d, "L="); memset(d + 2, 'w', 5117); d[5119] = 0;     /* 5119 chars + NUL = 0x1400 */
+    const char *u = ck_url(ck_host("l5117"), "/");
+    char *d = malloc(5120); strcpy(d, "L="); memset(d + 2, 'w', 5115); d[5117] = 0;     /* StringCchCopyA(dst, 0x13fe, data) */
     BOOL r = ck_set(u, NULL, d);
-    DWORD e = GetLastError();
     EXPECT_EQ(r, TRUE);
-    t_note("5119-char cookie: r=%d gle=%lu", r, e);
-    EXPECT_EQ(strlen(ck_gets(u, NULL, 0)), 5119);
+    EXPECT_EQ(strlen(ck_gets(u, NULL, 0)), 5117);
     free(d);
     ck_cleanup();
 }
-TEST(ck_parse_size_limit_total_5120_fails) {
+TEST(ck_parse_size_limit_total_5118_fails) {
     REQUIRE(U(InternetSetCookieA));
-    const char *u = ck_url(ck_host("l5120"), "/");
-    char *d = malloc(5121); strcpy(d, "L="); memset(d + 2, 'w', 5118); d[5120] = 0;
+    const char *u = ck_url(ck_host("l5118"), "/");
+    char *d = malloc(5121); strcpy(d, "L="); memset(d + 2, 'w', 5116); d[5118] = 0;
     SetLastError(0xdeadbeef);
     BOOL r = ck_set(u, NULL, d);
     DWORD e = GetLastError();
     EXPECT_EQ(r, FALSE);
-    t_note("5120-char cookie: r=%d gle=%lu", r, e);
     EXPECT_EQ(e, ERROR_INSUFFICIENT_BUFFER);
     EXPECT_STR(ck_gets(u, NULL, 0), "");
     free(d);
     ck_cleanup();
 }
+TEST(ck_parse_size_limit_5119_and_5120_fail) {
+    REQUIRE(U(InternetSetCookieA));
+    for (int len = 5119; len <= 5120; len++) {
+        const char *u = ck_url(ck_host("l512x"), "/");
+        char *d = malloc(len + 1); strcpy(d, "L="); memset(d + 2, 'w', len - 2); d[len] = 0;
+        SetLastError(0xdeadbeef);
+        BOOL r = ck_set(u, NULL, d);
+        DWORD e = GetLastError();
+        CHECKF(r == FALSE && e == ERROR_INSUFFICIENT_BUFFER, "len %d: r=%d gle=%lu", len, r, e);
+        free(d);
+        ck_cleanup();
+    }
+}
 TEST(ck_parse_size_limit_name_param_counts) {
     REQUIRE(U(InternetSetCookieA));
     const char *u = ck_url(ck_host("lnp"), "/");
-    /* "N" + "=" + data: 2 + 5117 = 5119 fits, 2 + 5118 = 5120 does not */
-    char *d = malloc(5120); memset(d, 'x', 5118); d[5117] = 0;
-    EXPECT_EQ(ck_set(u, "N", d), TRUE);
-    EXPECT_EQ(strlen(ck_gets(u, NULL, 0)), 5119);
-    d[5117] = 'x'; d[5118] = 0;
+    /* name "N": "N=" + data is copied with room 0x13fd - 1 = 5116 incl. NUL, so data <= 5115 chars (5117 total) */
+    char *d = malloc(5120); memset(d, 'x', 5116); d[5115] = 0;
+    BOOL r = ck_set(u, "N", d);
+    EXPECT_EQ(r, TRUE);
+    EXPECT_EQ(strlen(ck_gets(u, NULL, 0)), 5117);
+    d[5115] = 'x'; d[5116] = 0;
     SetLastError(0xdeadbeef);
-    EXPECT_EQ(ck_set(u, "N", d), FALSE);
-    EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
-    EXPECT_EQ(strlen(ck_gets(u, NULL, 0)), 5119);      /* the earlier cookie is untouched */
+    r = ck_set(u, "N", d);
+    DWORD e = GetLastError();
+    EXPECT_EQ(r, FALSE);
+    EXPECT_EQ(e, ERROR_INSUFFICIENT_BUFFER);
+    EXPECT_EQ(strlen(ck_gets(u, NULL, 0)), 5117);      /* the earlier cookie is untouched */
     free(d);
+    ck_cleanup();
+}
+TEST(ck_parse_size_limit_long_name) {
+    REQUIRE(U(InternetSetCookieA));
+    const char *u = ck_url(ck_host("lname"), "/");
+    char *n = malloc(3001); memset(n, 'n', 3000); n[3000] = 0;
+    BOOL r = ck_set(u, n, "v");
+    EXPECT_EQ(r, TRUE);
+    const char *g = ck_gets(u, NULL, 0);
+    EXPECT_EQ(strlen(g), 3002);
+    CHECK(!strncmp(g, n, 3000) && !strcmp(g + 3000, "=v"));
+    free(n);
     ck_cleanup();
 }
 
@@ -194,7 +223,7 @@ TEST(ck_attr_expires_formats_table) {
     static const char *past[] = {
         "expires=Thu, 01 Jan 1970 00:00:01 GMT",
         "expires=Thu, 01-Jan-1970 00:00:01 GMT",
-        "expires=Thursday, 01-Jan-70 00:00:01 GMT",
+        "expires=Friday, 01-Jan-99 00:00:01 GMT",
         "expires=Thu Jan  1 00:00:01 1970",
         "Expires=Sat, 01 Jan 2000 00:00:00 GMT",
         "EXPIRES=Sat, 01-Jan-2000 00:00:00 GMT",
@@ -226,6 +255,16 @@ TEST(ck_attr_expires_future_formats_table) {
         ck_cleanup();
         EXPECT_STR(ck_gets(u, NULL, 0), "");   /* cleanup removed the persistent cookie */
     }
+}
+TEST(ck_attr_expires_two_digit_year_70_is_future) {
+    REQUIRE(U(InternetSetCookieA));
+    const char *u = ck_url(ck_host("exp70"), "/");
+    ck_set(u, NULL, "e=1");
+    BOOL r = ck_set(u, NULL, "e=1; expires=Thursday, 01-Jan-70 00:00:01 GMT");
+    EXPECT_EQ(r, TRUE);
+    EXPECT_STR(ck_gets(u, NULL, 0), "e=1");             /* VM: "70" is not read as 1970: the cookie stays */
+    ck_cleanup();
+    EXPECT_STR(ck_gets(u, NULL, 0), "");
 }
 TEST(ck_attr_expires_garbage_is_session) {
     REQUIRE(U(InternetSetCookieA));
@@ -305,6 +344,8 @@ TEST(ck_ex2_session_cookie_fields) {
     EXPECT_STR(c.value, "sv");
     EXPECT_STR(c.path, "/");
     t_note("ex2 session: domain='%s' flags=0x%lx expset=%d exp=%08lx%08lx", c.domain, c.flags, c.expset, c.exp.dwHighDateTime, c.exp.dwLowDateTime);
+    EXPECT_EQ(c.flags, INTERNET_COOKIE_IS_SESSION | INTERNET_COOKIE_IS_RESTRICTED);   /* VM: 0x202 */
+    EXPECT_EQ(c.exp.dwLowDateTime, 0); EXPECT_EQ(c.exp.dwHighDateTime, 0);
     EXPECT_STR(c.domain, h);
     CHECK(c.flags & INTERNET_COOKIE_IS_SESSION);
     CHECK(!(c.flags & INTERNET_COOKIE_IS_SECURE));
@@ -320,6 +361,7 @@ TEST(ck_ex2_persistent_cookie_fields) {
     ck2 c; EXPECT_EQ(ex2_get(u, NULL, 0, &c), 0);
     EXPECT_STR(c.name, "pn");
     t_note("ex2 persistent: flags=0x%lx expset=%d", c.flags, c.expset);
+    EXPECT_EQ(c.flags, INTERNET_COOKIE_IS_RESTRICTED);   /* VM: 0x200 */
     CHECK(!(c.flags & INTERNET_COOKIE_IS_SESSION));
     EXPECT_EQ(c.expset, TRUE);
     FILETIME now; GetSystemTimeAsFileTime(&now);
@@ -347,6 +389,7 @@ TEST(ck_ex2_secure_flag) {
     ck2 c; EXPECT_EQ(ex2_get(ck_surl(h, "/"), NULL, 0, &c), 0);
     EXPECT_EQ(c.count, 1);
     t_note("ex2 secure flags=0x%lx", c.flags);
+    EXPECT_EQ(c.flags, 0x203);
     CHECK(c.flags & INTERNET_COOKIE_IS_SECURE);
     EXPECT_EQ(ex2_get(ck_url(h, "/"), NULL, 0, &c), 0);
     EXPECT_EQ(c.count, 0);
@@ -361,6 +404,7 @@ TEST(ck_ex2_httponly_flag) {
     EXPECT_EQ(ex2_get(u, NULL, INTERNET_COOKIE_NON_SCRIPT, &c), 0);
     EXPECT_EQ(c.count, 1);
     t_note("ex2 httponly flags=0x%lx", c.flags);
+    EXPECT_EQ(c.flags, 0x2202);
     CHECK(c.flags & INTERNET_COOKIE_HTTPONLY);
     ck_cleanup();
 }
@@ -390,11 +434,13 @@ TEST(ck_ex2_host_only_flag) {
     EXPECT_EQ(ck_setx(u, NULL, "h=1", INTERNET_COOKIE_APPLY_HOST_ONLY, NULL), COOKIE_STATE_ACCEPT);
     ck2 c; EXPECT_EQ(ex2_get(u, NULL, 0, &c), 0);
     t_note("ex2 host-only flags=0x%lx", c.flags);
+    EXPECT_EQ(c.flags, INTERNET_COOKIE_HOST_ONLY_APPLIED | INTERNET_COOKIE_HOST_ONLY | 0x202);   /* VM: 0x84202 */
     CHECK(c.flags & INTERNET_COOKIE_HOST_ONLY);
     const char *u2 = ck_url(ck_host("ex2nohostonly"), "/");
     EXPECT_EQ(ck_setx(u2, NULL, "h=1", 0, NULL), COOKIE_STATE_ACCEPT);
     EXPECT_EQ(ex2_get(u2, NULL, 0, &c), 0);
     t_note("ex2 default flags=0x%lx", c.flags);
+    EXPECT_EQ(c.flags, 0x202);
     CHECK(!(c.flags & INTERNET_COOKIE_HOST_ONLY));
     ck_cleanup();
 }
@@ -407,6 +453,8 @@ TEST(ck_ex2_domain_attr_view) {
     ck2 c; EXPECT_EQ(ex2_get(ck_url(sub, "/"), NULL, 0, &c), 0);
     EXPECT_EQ(c.count, 1);
     t_note("ex2 domain attr: domain='%s' path='%s' flags=0x%lx", c.domain, c.path, c.flags);
+    EXPECT_STR(c.path, "/");
+    EXPECT_EQ(c.flags, 0x202);
     EXPECT_STR(c.domain, h);
     ck_cleanup();
 }
@@ -482,7 +530,7 @@ TEST(ck_ex2_set_invalid_args) {
     EXPECT_EQ(UN(InternetSetCookieEx2)(NULL, &c, NULL, 0, &st), ERROR_INVALID_PARAMETER);
     EXPECT_EQ(UN(InternetSetCookieEx2)(ck_w(ck_url(ck_host("s2i"), "/")), NULL, NULL, 0, &st), ERROR_INVALID_PARAMETER);
     DWORD r = UN(InternetSetCookieEx2)(ck_w(ck_url(ck_host("s2j"), "/")), &c, NULL, 0, NULL);
-    t_note("InternetSetCookieEx2 NULL state: r=%lu", r);
+    EXPECT_EQ(r, ERROR_INVALID_PARAMETER);   /* VM: the state out-pointer is required */
     ck_cleanup();
 }
 
