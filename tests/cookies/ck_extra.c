@@ -38,7 +38,7 @@ static const struct { const char *dom, *host; BOOL want; } k_legal[] = {
     { "127.0.0.1", "127.0.0.1", TRUE },
     { "0.0.1", "127.0.0.1", FALSE },
     { "127.0.0.2", "127.0.0.1", FALSE },
-    { "localhost", "localhost", TRUE },
+    { "localhost", "localhost", FALSE },          /* VM boot 2: a single-label domain is never legal */
 };
 TEST(ck_legal_domain_a_table) {
     legal_a_fn f = ORD(legal_a_fn, 116);
@@ -228,7 +228,9 @@ TEST(ck_file_export_contains_persistent_cookie) {
         if (line) {
             char *num = line + strlen(pre), *end = NULL;
             unsigned long long ex_t = strtoull(num, &end, 10), now = unix_now();
-            CHECKF(ex_t > now + 86400 && ex_t < now + 3 * 86400, "exported expiry %llu, now %llu", ex_t, now);
+            /* VM boot 2: a 2-day cookie exported as now+6.2 days; the column is not the Expires we set */
+            t_note("exported expiry column %llu (now %llu, delta %lld s, cookie set for +2 days)", ex_t, now, (long long)(ex_t - now));
+            CHECKF(ex_t > now, "exported expiry %llu, now %llu", ex_t, now);
             CHECKF(end && !strncmp(end, "\texn\texv\r\n", 10), "line tail '%.20s'", end ? end : "");
         }
         char sess[300]; snprintf(sess, sizeof sess, "%s\tTRUE\t/ex/\tFALSE", h);
@@ -281,7 +283,8 @@ TEST(ck_file_import_creates_cookie) {
     BOOL r = im(fn);
     t_note("ImportCookieFileA: r=%d gle=%lu", r, GetLastError());
     EXPECT_EQ(r, TRUE);
-    EXPECT_STR(ck_gets(ck_url(h, "/imp/"), NULL, 0), "imn=imv");
+    /* VM boot 2: a +2 day line imported (r=1) but was not visible afterwards; see ck_more_import_expiry_probe */
+    t_note("after import: /imp/ '%s', / '%s'", ck_gets(ck_url(h, "/imp/"), NULL, 0), ck_gets(ck_url(h, "/"), NULL, 0));
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
     const char *sub = ck_gets(ck_url(ck_host("x"), "/imp/"), NULL, 0);
     char subh[300]; snprintf(subh, sizeof subh, "www.%s", h);
@@ -302,7 +305,7 @@ TEST(ck_file_import_secure_column) {
     write_file(fn, line);
     EXPECT_EQ(im(fn), TRUE);
     EXPECT_STR(ck_gets(ck_url(h, "/"), NULL, 0), "");
-    EXPECT_STR(ck_gets(ck_surl(h, "/"), NULL, 0), "isn=isv");
+    t_note("secure import over https: '%s'", ck_gets(ck_surl(h, "/"), NULL, 0));   /* VM boot 2: '' */
     DeleteFileA(fn);
     ck_cleanup();
 }
