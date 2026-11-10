@@ -1,0 +1,87 @@
+RUN  netlb_srv_stop_is_bounded
+OK   netlb_srv_stop_is_bounded
+RUN  netlb_https_tls12_only_server
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE tls: proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+OK   netlb_https_tls12_only_server
+RUN  netlb_https_client_cert_requested
+  NOTE client cert requested, none configured: err=12044 ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED status=0
+  NOTE tls: TLS_ABORT handshake recv=0 round=1
+OK   netlb_https_client_cert_requested
+RUN  netlb_https_expired_cert
+  NOTE expired: flags 0x100 -> err=12037 ERROR_INTERNET_SEC_CERT_DATE_INVALID
+  NOTE expired: flags 0x2100 -> err=0 status=200
+OK   netlb_https_expired_cert
+RUN  netlb_auth_ntlm_server_probe
+  NOTE ntlm: send=1 err=0 status=401 requests=3
+  NOTE ntlm srv: fail 0x8009030c
+  NOTE req 0 auth=(none)
+  NOTE req 1 auth=NTLM TlRMTVNTUAABAAAAB4I
+  NOTE req 2 auth=NTLM TlRMTVNTUAADAAAAGAA
+OK   netlb_auth_ntlm_server_probe
+RUN  netlb_auth_basic_retry
+  NOTE basic: status=200 body=granted requests=2
+  NOTE req 0 auth=(none)
+  NOTE req 1 auth=Basic dXNlcjpwYXNz
+OK   netlb_auth_basic_retry
+RUN  netlb_ftp_findfirst_list
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE A
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] LIST
+OK   netlb_ftp_findfirst_list
+RUN  netlb_ftp_stor_passive
+OK   netlb_ftp_stor_passive
+RUN  netlb_ftp_retr_passive
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE I
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] SIZE hello.txt
+  NOTE ftp cmd[5] RETR hello.txt
+OK   netlb_ftp_retr_passive
+RUN  netlb_https_cn_mismatch
+OK   netlb_https_cn_mismatch
+RUN  netlb_https_get
+  NOTE security flags after success: 0x20000101 (04 F8: 0x20000101)
+  NOTE tls: TLS_ABORT handshake recv=0 round=1
+  NOTE tls: TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+OK   netlb_https_get
+RUN  netlb_localhost_dualstack
+  NOTE localhost GET took 0 ms (04 F2: ~1 ms dual-stack, ~2 s v4-only)
+OK   netlb_localhost_dualstack
+RUN  netlb_gzip_stored_decoding
+OK   netlb_gzip_stored_decoding
+RUN  netlb_gzip_decoding
+OK   netlb_gzip_decoding
+RUN  netlb_gzip_no_accept_encoding_passthrough
+OK   netlb_gzip_no_accept_encoding_passthrough
+RUN  netlb_redirect_302_relative
+OK   netlb_redirect_302_relative
+RUN  netlb_keepalive_reuse
+  NOTE keep-alive: conns=1 req0.conn=0 req1.conn=0
+OK   netlb_keepalive_reuse
+RUN  netlb_post_body_wire
+OK   netlb_post_body_wire
+RUN  netlb_large_pattern_body
+OK   netlb_large_pattern_body
+RUN  netlb_close_delimited_response
+OK   netlb_close_delimited_response
+RUN  netlb_chunked_response
+OK   netlb_chunked_response
+RUN  netlb_openurl_header_set
+OK   netlb_openurl_header_set
+RUN  netlb_get_basic_wire
+  NOTE hdr[0] User-Agent: netlb-agent/1.0
+  NOTE hdr[1] Host: 127.0.0.1:49726
+  NOTE hdr[2] Cache-Control: no-cache
+OK   netlb_get_basic_wire
+RUN  netlb_srv_selftest_encoders
+OK   netlb_srv_selftest_encoders
+RUN  netlb_srv_selftest_chunked_upload_and_pipelining
+OK   netlb_srv_selftest_chunked_upload_and_pipelining
+RUN  netlb_srv_selftest_raw
+OK   netlb_srv_selftest_raw
+SUMMARY tests=26 failed=0 skipped=0 checks_pass=132 checks_fail=0
+@@I7 END net_loopback exit=0x0 ms=40764 timeout=0 bytes=3297
