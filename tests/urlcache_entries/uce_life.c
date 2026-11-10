@@ -384,8 +384,7 @@ TEST(uce_life_stream_file_size_changed) {
     DWORD e = GetLastError();
     /* the stream refuses a file whose size no longer matches the committed size [W10]
        (RetrieveUrlCacheEntryFile does not look: uce_more_info_after_file_grows_retrieve) */
-    CHECK(h == NULL);
-    t_note("stream on a resized file: err %lu", e);
+    CHECK(h == NULL); EXPECT_EQ(e, ERROR_INVALID_DATA);   /* [W10] */
     if (h) U(UnlockUrlCacheEntryStream)(h, 0);
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &err);
     if (i) { EXPECT_EQ(i->dwUseCount, 0); free(i); } else t_note("entry after the refused stream: err %lu", err);
@@ -402,7 +401,7 @@ TEST(uce_life_stream_sees_same_size_rewrite) {
     SET_ERR(0xdeadbeef);
     HANDLE h = U(RetrieveUrlCacheEntryStreamA)(url, (INTERNET_CACHE_ENTRY_INFOA *)ib, &sz, FALSE, 0);
     DWORD e = GetLastError();
-    t_note("stream on a same-size rewrite: h=%p err %lu", h, e);
+    CHECK(h != NULL); EXPECT_EQ(e, 0);   /* only the size is compared [W10] */
     if (h) {
         char b[128]; DWORD n = sizeof b;
         CHECK(U(ReadUrlCacheEntryStream)(h, 0, b, &n, 0));
@@ -841,7 +840,7 @@ TEST(uce_life_create_unique_across_processes) {
     CHECK(U(CreateUrlCacheEntryA)(url, 0, "txt", p2, 0));
     /* the child's file still exists, so the parent's second name skips it: [1], [2] taken -> a third, distinct name [D CreateUniqueCacheFile] */
     CHECK(_stricmp(p1, p2) != 0);
-    { const char *lf = strrchr(p2, '\\'); CHECKF(lf && !strcmp(lf + 1, "lcxp[3].txt"), "second parent name %s", p2); }   /* [W10] */
+    { const char *lf = strrchr(p2, '\\'); CHECKF(lf && strncmp(lf + 1, "lcxp[", 5) == 0, "second parent name %s", p2); }   /* suffix varies: [3] or [2] seen [W10] */
     char d1[MAX_PATH], d2[MAX_PATH]; uce_dirname(p1, d1); uce_dirname(p2, d2);
     t_note("parent paths %s / %s", p1, p2);
     DeleteFileA(p1); DeleteFileA(p2);
@@ -889,7 +888,7 @@ TEST(uce_life_stream_122_hit_count) {
     CHECK(h == NULL); EXPECT_EQ(e, ERROR_INSUFFICIENT_BUFFER);
     if (h) U(UnlockUrlCacheEntryStream)(h, 0);
     INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &err);
-    if (i) { EXPECT_EQ(i->dwUseCount, 0); t_note("hit rate after one 122 stream retrieve: %lu", i->dwHitRate); free(i); } else CHECK(0);
+    if (i) { EXPECT_EQ(i->dwUseCount, 0); EXPECT_EQ(i->dwHitRate, 2); free(i); } else CHECK(0);   /* counted, like the file retrieve [W10] */
     CHECK(uce_del(url));
 }
 TEST(uce_life_visited_entry_w_and_set) {
@@ -909,7 +908,7 @@ TEST(uce_life_visited_entry_w_and_set) {
         EXPECT_EQ(i->dwHitRate, 5);
         EXPECT_EQ(uce_u64(i->ExpireTime), t);
         EXPECT_EQ(i->lpszLocalFileName, NULL);
-        t_note("Visited: W type 0x%lx", i->CacheEntryType);
+        EXPECT_EQ(i->CacheEntryType, URLHISTORY_CACHE_ENTRY);   /* [W10] */
         free(i);
     } else CHECKF(0, "info err %lu", err);
     CHECK(U(DeleteUrlCacheEntryW)(uce_w(key)));
@@ -929,7 +928,7 @@ TEST(uce_life_cookie_entry_retrieve) {
     SET_ERR(0xdeadbeef);
     BOOL rr = U(RetrieveUrlCacheEntryFileA)(key, (INTERNET_CACHE_ENTRY_INFOA *)b, &sz, 0);
     DWORD e = GetLastError();
-    t_note("retrieve of a Cookie: entry -> %d err %lu", rr, e);
+    CHECK(rr); EXPECT_EQ(e, 0);   /* [W10] */
     if (rr) {
         EXPECT_EQ(((INTERNET_CACHE_ENTRY_INFOA *)b)->dwSizeLow, 4);
         CHECK(U(UnlockUrlCacheEntryFileA)(key, 0));
@@ -949,7 +948,7 @@ TEST(uce_life_commit_w_original_url) {
     /* a malformed original URL fails the commit [D CommitUrlCacheEntryW converts it like the key] */
     BOOL b = U(CommitUrlCacheEntryW)(uce_w(url), NULL, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, NULL, L"https://");
     DWORD e = GetLastError();
-    t_note("CommitW with original \"https://\" -> %d err %lu", b, e);
+    CHECK(!b); EXPECT_EQ(e, ERROR_INTERNET_INVALID_URL);
     if (b) uce_del(url); else CHECK(!uce_exists(url));
 }
 TEST(uce_life_info_ex_flags_table) {
@@ -964,9 +963,12 @@ TEST(uce_life_info_ex_flags_table) {
         BOOL r = U(GetUrlCacheEntryInfoExA)(url, (INTERNET_CACHE_ENTRY_INFOA *)b, &sz, NULL, NULL, NULL, flags[k]);
         DWORD e = GetLastError();
         t_note("ExA flags 0x%lx -> %d err %lu size %lu (plain %lu)", flags[k], r, e, sz, need);
+        /* unknown flags are ignored: same result as the plain call; 0x800 left *size as passed in boot 2 (note only) [W10] */
+        if (flags[k] != 0x800) CHECKF(r && e == 0 && sz == need, "flags 0x%lx r %d e %lu sz %lu", flags[k], r, e, sz);
+        else CHECKF(r && e == 0, "flags 0x800 r %d e %lu", r, e);
         if (r && ((INTERNET_CACHE_ENTRY_INFOA *)b)->dwUseCount) U(UnlockUrlCacheEntryFileA)(url, 0);
     }
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &err);
-    if (i) { t_note("after the Ex flag table: use %lu hit %lu", i->dwUseCount, i->dwHitRate); free(i); }
+    if (i) { EXPECT_EQ(i->dwUseCount, 0); EXPECT_EQ(i->dwHitRate, 1); free(i); } else CHECK(0);   /* Ex never locks or counts [W10] */
     uce_del(url);
 }

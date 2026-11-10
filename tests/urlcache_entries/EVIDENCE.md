@@ -1,6 +1,8 @@
 # urlcache_entries: evidence
 
-Area prefix `uce_`. Files: `uce.h` (helpers), `uce_create.c`, `uce_commit.c`, `uce_info.c`, `uce_retrieve.c`, `uce_keys.c`, `uce_more.c`.
+Area prefix `uce_`. Files: `uce.h` (helpers), `uce_create.c`, `uce_commit.c`, `uce_info.c`, `uce_retrieve.c`, `uce_keys.c`, `uce_more.c`,
+`uce_matrix.c` (table-driven layout/sweep/time/type matrices), `uce_life.c` (lifecycle, streams, threads, prefixed keys,
+cross-process), `uce_apimx.c` (every URL-taking entry point x invalid / missing / equivalent / distinct keys).
 Oracle: Windows 10 22H2 VM (wininet 11.0.19041.2193) through `tools/vm_run.sh`. Decomp: Win10 reference corpus
 (`/api/function/wininet/<name>/decomp`). Every entry uses a unique `wininet<pid>n<seq><tag>.i7test.example` URL and
 is deleted by its test. `t_cache_track` is a second, at-exit safety net.
@@ -50,6 +52,43 @@ Anything still variable is a `t_note`.
 - Retrieve does not change LastAccessTime, and it reports the committed size even after the file grew. SPARSE entries are hidden from
   Retrieve as well (2). Committing a file directly in the container root gives 87, while an upper-case spelling of a valid path is accepted.
 - Container: `%LOCALAPPDATA%\Microsoft\Windows\INetCache\IE\<8 chars>\`.
+
+## Pass 3 additions (boots uce5/uce6, 2026-11-10)
+Decomp-grounded and VM-confirmed:
+- Layout tables over 18 (url, file, ext, header) shapes for A and W: strings in the order url, file, ext, header at the slot offsets of
+  ConvertCacheEntryInfoA/W; a NULL ext or file gets no slot; every buffer size in [1, need) -> 122, `*size = need`, buffer untouched.
+- Header lengths 1..65000 (A) / 1..16000 (W) round-trip; W headers go to UTF-8 (2-, 3- and 4-byte sequences checked through the A view).
+- Every URL-taking entry point (Get A/W/ExA/ExW, Set A/W, Retrieve A/W, Stream A/W, Unlock A/W, Delete A/W, Create W, Commit A/W) gives
+  12005 for 15 malformed http(s) keys, 87 for NULL, 2 for missing keys of six shapes. `:80`, `:080`, `:0000080` (http) and `:443`, `:0443`
+  (https) all reach the stored key for every operation, including unlock and delete. Scheme/host/path case, fragment, `?`, `:81`, https,
+  `//`, `/./`, `%2e`, a trailing host dot and user info are all distinct keys. Non-http keys (ftp, file, private schemes) match byte for byte.
+- ReadUrlCacheEntryStream: zero length -> TRUE, 0 bytes; reads past EOF -> TRUE, 0 bytes; backwards and byte-by-byte reads (seek when the
+  offset differs); ReadUrlCacheEntryStreamEx with 64-bit offsets; NULL handle -> 6; double unlock / read after unlock -> 6; the last argument
+  of ReadUrlCacheEntryStream is ignored; RetrieveUrlCacheEntryStreamA/W dwReserved != 0 -> 87.
+- Set: each time flag touches only its field; time, hit-rate, type and exempt-delta tables on W as well as A.
+VM-observed:
+- Times are stored exactly (no rounding), including 0, 1, 2^63-1 and 0xFFFFFFFFFFFFFFFF.
+- A failed RetrieveUrlCacheEntryFile (122) still counts a hit (the entry is found and locked before the conversion fails) but leaves no lock.
+  GetUrlCacheEntryInfo never counts. Stream retrieves count like file retrieves.
+- Hit rate +1 per retrieve, the returned struct already carries it; use count is the live lock count over nested locks and four threads.
+- Stream: an entry with no file -> 3; a deleted file -> 2; a file held open without sharing -> 32; a file whose size changed since commit is
+  refused (Retrieve File is not); stream handles are small odd cookies (3, 5, ...), not kernel handles. UnlockUrlCacheEntryFile drops a
+  stream's lock too. UnlockUrlCacheEntryStream ignores dwReserved. A child process exiting with a stream open leaves no lock.
+- Pending delete (delete of a locked entry -> 32): Retrieve and Set still work on the entry, a replacing commit fails with 32, the last
+  unlock removes it and the key is free again.
+- Delete while another handle has the file open: the entry is deleted (TRUE), the file stays.
+- Two entries may share one local file (no ownership check); deleting the first deletes the file.
+- A file created for URL A may be committed for URL B.
+- `Visited:` keys go to the history container and `Cookie:` keys to `...\INetCookies\`; their CacheEntryType is exactly the committed
+  type (no NORMAL bit ORed in, unlike the content container). Delete removes the cookie file.
+- Stream on a file whose size changed -> 13 (ERROR_INVALID_DATA); a same-size rewrite streams the new bytes. A W commit with a malformed
+  original URL -> 12005. GetUrlCacheEntryInfoEx ignores unknown flags (0x800 left `*size` untouched in one boot: note), never locks or counts.
+  A 122 stream retrieve counts a hit. Cookie: entries can be retrieved.
+- CreateUrlCacheEntryExW: the extension argument wins (`hint.dat` + `bin` -> `hint[1].bin`), fPreserveIncomingFileName made no difference for
+  these names; NULL ext cuts the last dotted part (`a.b.c` -> `a.b[1]`). URL leaves up to 150 chars keep the stem; 300+ chars get a random
+  8-char name. Names are unique across processes (the parent's second suffix was `[3]` in one boot and `[2]` in another: only distinctness is checked).
+- An empty extension on commit is stored as "" (not NULL).
+Notes only: empty-URL lookups (2 on a fresh profile, environment-dependent), `*size` after Ex flag 0x800, the cross-process suffix number.
 
 ## Notes only (t_note)
 - File names derived from the URL (table in uce_create_name_from_url; hard-checked by stem) and the unique-path list.
