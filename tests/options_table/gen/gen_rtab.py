@@ -16,7 +16,7 @@ import re, sys, gzip, collections
 VALS = [0, 1, 2, 3, 4, 0x10, 0x7fffffff, 0x80000000]
 KINDS = 'NSCR'
 # query data that is a pointer / handle / time / socket error: keep r/e/len, mask the bytes
-VOLATILE_DATA = {1, 21, 24, 27, 32, 33, 35, 66, 67, 69, 105, 109, 117, 129, 186}
+VOLATILE_DATA = {1, 21, 24, 27, 32, 33, 35, 66, 67, 69, 105, 109, 117, 129, 186, 192}
 
 def opn(p):
     return gzip.open(p, 'rt', errors='replace') if p.endswith('.gz') else open(p, errors='replace')

@@ -182,7 +182,8 @@ TEST(ot_val_request_flags_and_priority) {
     /* case 0x17: only request/file handles */
     l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_S], INTERNET_OPTION_REQUEST_FLAGS, &v, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_C], INTERNET_OPTION_REQUEST_FLAGS, &v, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
-    CHECK(ot_qdw(fx->h[OT_R], INTERNET_OPTION_REQUEST_FLAGS, &v)); EXPECT_EQ(v, 0);
+    /* unsent T_INET_FRESH request: INTERNET_REQFLAG_CACHE_WRITE_DISABLED (8) from INTERNET_FLAG_NO_CACHE_WRITE (VM) */
+    CHECK(ot_qdw(fx->h[OT_R], INTERNET_OPTION_REQUEST_FLAGS, &v)); EXPECT_EQ(v, INTERNET_REQFLAG_CACHE_WRITE_DISABLED);
     if (fx->h[OT_X]) { CHECK(ot_qdw(fx->h[OT_X], INTERNET_OPTION_REQUEST_FLAGS, &v)); t_note("REQUEST_FLAGS after a fresh GET: 0x%lx", v); }
     /* REQUEST_PRIORITY (58): requests only, any value */
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
@@ -198,15 +199,13 @@ TEST(ot_val_security_flags_http_request) {
     REQUIRE(U(InternetSetOptionA));
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
     DWORD v, l;
-    CHECK(ot_qdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, &v)); t_note("SECURITY_FLAGS on a plain HTTP request: 0x%lx", v);
-    DWORD base = v;
-    /* only the ignore bits are accepted (case 0x1f) */
-    CHECK(ot_sdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, base | SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    CHECK(ot_qdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, &v)); CHECKF(v & SECURITY_FLAG_IGNORE_UNKNOWN_CA, "0x%lx", v);
-    CHECK(ot_sdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, v | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID | SECURITY_FLAG_IGNORE_REVOCATION | SECURITY_FLAG_IGNORE_WRONG_USAGE));
-    CHECK(ot_qdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, &v));
-    CHECKF((v & 0x3380) == 0x3380, "ignore bits 0x%lx", v);
-    t_note("SECURITY_FLAGS after setting all ignore bits: 0x%lx", v);
+    /* a plain-HTTP request reads 0 and accepts the ignore bits without keeping them (VM; the HTTPS request of
+     * ot_tls_security_flags_after_handshake keeps them) */
+    CHECK(ot_qdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, &v)); EXPECT_EQ(v, 0);
+    CHECK(ot_sdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
+    CHECK(ot_qdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, &v)); EXPECT_EQ(v, 0);
+    CHECK(ot_sdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID | SECURITY_FLAG_IGNORE_REVOCATION | SECURITY_FLAG_IGNORE_WRONG_USAGE));
+    CHECK(ot_qdw(t.r, INTERNET_OPTION_SECURITY_FLAGS, &v)); EXPECT_EQ(v, 0);
     /* session / connect: wrong handle type (SRV.md F9) */
     SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.s, INTERNET_OPTION_SECURITY_FLAGS, 0x100), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.c, INTERNET_OPTION_SECURITY_FLAGS, 0x100), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
@@ -252,13 +251,15 @@ TEST(ot_val_max_conns_defaults_global) {
     CHECK(ot_qdw(NULL, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &b));
     t_note("MAX_CONNS_PER_SERVER %lu, PER_1_0_SERVER %lu (registry-configurable; IE11 defaults 10/10 on Win10)", a, b);
     CHECK(a >= 2 && a <= 128); CHECK(b >= 2 && b <= 128);
-    /* session/request: not HCon -> 12016 (case 0x49 LAB_18005a6f5 / 0x4a) */
+    /* a connect handle that never connected answers 128 (the upper clamp), not the global value (VM) */
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
-    DWORD v, l = sizeof v;
-    SET_ERR(0); BOOL r = U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l);
-    EXPECT_FAIL(!r, ERROR_INTERNET_INVALID_OPERATION);        /* connect without server info */
-    l = sizeof v; SET_ERR(0); r = U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &v, &l);
-    EXPECT_FAIL(!r, ERROR_INTERNET_INVALID_OPERATION);
+    DWORD v;
+    CHECK(ot_qdw(t.c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v)); EXPECT_EQ(v, 128);
+    CHECK(ot_qdw(t.c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &v)); EXPECT_EQ(v, 128);
+    /* session / request: 12016 */
+    DWORD l = sizeof v;
+    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.s, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
+    l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.r, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     ot_trio_close(&t);
 }
 

@@ -191,10 +191,13 @@ TEST(ot_conns_wrong_handles) {
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
     for (int i = 0; i < 2; i++) {
         DWORD opt = CONN_OPTS[i];
-        /* session / request: not an HCon -> 12016; connect never used: no server info -> 12016 */
+        /* session / request: not an HCon -> 12016; an unused connect accepts the value (clamped 2..128, VM) */
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.s, opt, 4), ERROR_INTERNET_INVALID_OPERATION);
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.r, opt, 4), ERROR_INTERNET_INVALID_OPERATION);
-        SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.c, opt, 4), ERROR_INTERNET_INVALID_OPERATION);
+        DWORD got;
+        CHECK(ot_sdw(t.c, opt, 4)); CHECK(ot_qdw(t.c, opt, &got)); EXPECT_EQ(got, 4);
+        CHECK(ot_sdw(t.c, opt, 1)); CHECK(ot_qdw(t.c, opt, &got)); EXPECT_EQ(got, 2);
+        CHECK(ot_sdw(t.c, opt, 1000)); CHECK(ot_qdw(t.c, opt, &got)); EXPECT_EQ(got, 128);
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.c, opt, 0), ERROR_BAD_ARGUMENTS);   /* 0 is checked first */
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.s, opt, 0), ERROR_BAD_ARGUMENTS);
     }

@@ -12,6 +12,12 @@
 #include "ot.h"
 #include "ot_tab.h"
 
+/* Each range runs in a child process with its own fixture (like the probe, which built its handles in a fresh
+ * process), so state left by other tests of this area cannot leak into the comparison. */
+static int g_bad;
+#undef CHECKF
+#define CHECKF(c, ...) do { if (!(c)) { printf("  QM MISMATCH "); printf(__VA_ARGS__); printf("\n"); g_bad++; } } while (0)
+
 static int hexeq(const unsigned char *p, const char *hex) {
     for (size_t i = 0; hex[2 * i]; i++) { unsigned v; sscanf(hex + 2 * i, "%2x", &v); if (p[i] != v) return 0; }
     return 1;
@@ -62,19 +68,29 @@ static void one(ot_fx *fx, const ot_qrow *q) {
                q->opt, q->kind, tag, r, e, l, q->r3, q->e3, q->l3);
 }
 
-static void run_range(long lo, long hi) {
-    REQUIRE(U(InternetQueryOptionA));
-    REQUIRE(U(InternetQueryOptionW));
-    ot_fx *fx = ot_fx_all();
-    if (!fx) { t_skip("fixture: InternetOpen failed"); return; }
-    if (!ot_qtab_n) { t_skip("no frozen table"); return; }
+CHILD(ot_qmc) {
+    if (argc < 3) return 0xC0DE0002;
+    long lo = atol(argv[1]), hi = atol(argv[2]);
+    ot_fx *fx = ot_fx_open(OT_MASK_ALL);
+    if (!fx) return 0xC0DE0004;
     int n = 0;
     for (int i = 0; i < ot_qtab_n; i++) {
         long o = ot_qtab[i].opt;
         if (o < lo || o > hi) continue;
         one(fx, &ot_qtab[i]); n++;
     }
-    CHECKF(n > 0, "no table rows in [%ld,%ld]", lo, hi);
+    printf("  QM [%ld,%ld] rows=%d mismatches=%d\n", lo, hi, n, g_bad);
+    fflush(stdout);
+    return n ? g_bad : 0xC0DE0006;   /* no ot_fx_close: process exit releases the handles and servers */
+}
+
+static void run_range(long lo, long hi) {
+    REQUIRE(U(InternetQueryOptionA));
+    REQUIRE(U(InternetQueryOptionW));
+    if (!ot_qtab_n) { t_skip("no frozen table"); return; }
+    char a[48]; snprintf(a, sizeof a, "%ld %ld", lo, hi);
+    DWORD rc = ot_run_child_io("ot_qmc", a, 60000);
+    t_check(rc == 0, __FILE__, __LINE__, "rc == 0", "range [%ld,%ld]: child exit 0x%lx (mismatch count, or 0xC0DE/0xDEAD failure)", lo, hi, rc);
 }
 
 #define QM(lo, hi) TEST(ot_qm_##lo##_##hi) { run_range(lo, hi); }

@@ -179,8 +179,8 @@ CHILD(rtp) {
         if (k && !hs[k]) continue;
         rtq(opt, kn[k], hs[k], -1);
         for (int i = 0; i < 8; i++) {
-            DWORD v = vals[i]; SetLastError(0xdead);
-            BOOL sr = U(InternetSetOptionA)(hs[k], opt, &v, 4); DWORD se = GetLastError();
+            DWORD v = vals[i], vb[2] = { v, 0 }; SetLastError(0xdead);   /* zero tail: string options read a NUL-terminated string */
+            BOOL sr = U(InternetSetOptionA)(hs[k], opt, vb, 4); DWORD se = GetLastError();
             printf("RTS %d %c %lu sr=%d se=%lu\n", opt, kn[k], (unsigned long)v, sr, sr ? 0 : se);
             rtq(opt, kn[k], hs[k], v);
         }

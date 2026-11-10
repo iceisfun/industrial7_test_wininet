@@ -33,7 +33,10 @@ TEST(ot_rule_query_null_handle_inside_range) {
         for (int w = 0; w < 2; w++) {
             BYTE b[64]; DWORD l = sizeof b;
             SET_ERR(0); EXPECT_FAIL(!ot_q(w, NULL, opts[i], b, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
-            CHECKF(l == 0, "opt %lu %c: len %lu after the NULL-handle rejection", opts[i], w ? 'W' : 'A', l);
+            /* A forces *len = 0; the W wrapper of the string options (28, 29, 33, 34, 41, 43, 44, 53) fails before
+             * calling A and leaves *len alone (VM) */
+            int wstr = w && (opts[i] == 28 || opts[i] == 29 || opts[i] == 33 || opts[i] == 34 || opts[i] == 41 || opts[i] == 43 || opts[i] == 44 || opts[i] == 53);
+            CHECKF(l == (wstr ? sizeof b : 0), "opt %lu %c: len %lu after the NULL-handle rejection", opts[i], w ? 'W' : 'A', l);
         }
 }
 
@@ -48,7 +51,9 @@ TEST(ot_rule_query_null_handle_outside_range) {
 
 TEST(ot_rule_set_null_handle) {
     REQUIRE(U(InternetSetOptionA));
-    static const DWORD inside[] = { 1, 9, 10, 12, 13, 21, 28, 31, 34, 41, 45, 58, 65, 68, 100, 0xC0 };
+    /* 28 USERNAME is absent on purpose: a NULL-handle USERNAME/PASSWORD set succeeds (process-wide credentials,
+     * set matrix row 28/29 N) and would leak into the rest of the process. */
+    static const DWORD inside[] = { 1, 9, 10, 12, 13, 21, 31, 34, 41, 45, 58, 65, 68, 100, 0xC0 };
     for (int w = 0; w < 2; w++) {
         for (int i = 0; i < (int)(sizeof inside / sizeof inside[0]); i++) {
             DWORD v = 1;

@@ -40,11 +40,15 @@ TEST(ot_tls_certificate_struct) {
     REQUIRE(U(InternetQueryOptionA));
     ot_fx *fx = tls_fx(); if (!fx) { t_skip("HTTPS fixture unavailable"); return; }
     INTERNET_CERTIFICATE_INFO ci; DWORD l = 0;
-    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, NULL, &l), ERROR_INSUFFICIENT_BUFFER);
+    /* VM: a NULL buffer is not an error here (TRUE, *len = 64, nothing written); a short buffer fails with
+     * 12004 ERROR_INTERNET_INTERNAL_ERROR, not 122 */
+    SET_ERR(0xdead); CHECK(U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, NULL, &l));
     EXPECT_EQ(l, sizeof ci);
     l = sizeof ci - 1;
-    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l), ERROR_INSUFFICIENT_BUFFER);
+    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l), ERROR_INTERNET_INTERNAL_ERROR);
     EXPECT_EQ(l, sizeof ci);
+    l = 1;
+    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l), ERROR_INTERNET_INTERNAL_ERROR);
     memset(&ci, 0, sizeof ci); l = sizeof ci;
     CHECK(U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l));
     EXPECT_EQ(l, sizeof ci);
@@ -62,20 +66,27 @@ TEST(ot_tls_certificate_struct) {
 TEST(ot_tls_certificate_string) {
     REQUIRE(U(InternetQueryOptionA));
     ot_fx *fx = tls_fx(); if (!fx) { t_skip("HTTPS fixture unavailable"); return; }
+    /* VM: the formatted certificate is built into the caller's buffer, so the size probe cannot report it:
+     * NULL buffer or any buffer that is too small -> 122 with *len = 1; a large buffer -> TRUE, *len = strlen. */
     DWORD l = 0;
     SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, NULL, &l), ERROR_INSUFFICIENT_BUFFER);
-    CHECK(l > 1 && l < 4096);
-    char *b = calloc(1, l + 16); DWORD need = l;
-    DWORD l2 = need;
-    CHECK(U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &l2));
-    CHECKF(l2 == need - 1 && strlen(b) == l2, "len %lu need %lu strlen %u", l2, need, (unsigned)strlen(b));
-    CHECK(strstr(b, "localhost") != NULL);
-    t_note("SECURITY_CERTIFICATE (%lu chars): %.160s", l2, b);
-    free(b);
-    /* W: same string, bytes on 122 */
+    EXPECT_EQ(l, 1);
+    static char b[4096]; DWORD n = sizeof b; memset(b, 0xCC, sizeof b);
+    CHECK(U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &n));
+    CHECKF(n > 16 && n < sizeof b && strlen(b) == n, "len %lu strlen %u", n, (unsigned)strlen(b));
+    CHECK(!strncmp(b, "Subject:\r\nlocalhost\r\nIssuer:\r\nlocalhost\r\n", 39));
+    t_note("SECURITY_CERTIFICATE (%lu chars): %.200s", n, b);
+    DWORD l2 = n; SET_ERR(0);
+    EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &l2), ERROR_INSUFFICIENT_BUFFER);
+    EXPECT_EQ(l2, 1);
+    l2 = n + 1; SET_ERR(0); BOOL r = U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &l2);
+    t_note("SECURITY_CERTIFICATE with strlen+1: r=%d err=%lu len=%lu", r, r ? 0 : GetLastError(), l2);
+    /* W forwards to A for this option: same answers */
     DWORD lw = 0;
-    SET_ERR(0); BOOL r = U(InternetQueryOptionW)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, NULL, &lw);
-    t_note("W SECURITY_CERTIFICATE NULL buffer: r=%d err=%lu len=%lu (A need %lu)", r, GetLastError(), lw, need);
+    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionW)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, NULL, &lw), ERROR_INSUFFICIENT_BUFFER);
+    EXPECT_EQ(lw, 1);
+    lw = sizeof b; CHECK(U(InternetQueryOptionW)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &lw));
+    EXPECT_EQ(lw, n);
 }
 
 TEST(ot_tls_server_cert_chain_context) {
