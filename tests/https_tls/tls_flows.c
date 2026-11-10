@@ -67,8 +67,10 @@ TEST(tls_flow_gzip_body) {
     srv_wait_requests(s, 2, 2000);
     ae = srv_req_header(s, 1, "Accept-Encoding");
     t_note("session-level HTTP_DECODING: body %u bytes, Accept-Encoding=%s", (unsigned)n, ae ? ae : "(none)");
-    EXPECT_EQ(n, SRV_FOX_LEN);
-    CHECK(!strcmp(b, srv_fox_text()));
+    /* Win10 VM (two boots): HTTP_DECODING alone adds no Accept-Encoding and the gzip body is returned as is */
+    CHECK(ae == NULL);
+    EXPECT_EQ(n, srv_fox_gzip_len);
+    CHECK(n == srv_fox_gzip_len && !memcmp(b, srv_fox_gzip, n));
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi);
     srv_stop(s);
 }
@@ -115,7 +117,7 @@ TEST(tls_flow_head_same_as_plain_http) {
     treq_close(&a); treq_close(&b); srv_stop(s1); srv_stop(s2);
 }
 
-TEST(tls_flow_keepalive_reuse_three_requests) {
+TEST(tls_flow_ignored_cert_connection_not_pooled) {
     static const srv_step st[] = { S_HEAD(), S_REPLY(200, NULL, "ka"), S_LOOP() };
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     HINTERNET hi = t_inet_open(NULL);
@@ -128,9 +130,11 @@ TEST(tls_flow_keepalive_reuse_three_requests) {
         U(InternetCloseHandle)(hr);
     }
     CHECK(srv_wait_requests(s, 3, 2000));
-    EXPECT_EQ(srv_req_conn(s, 0), srv_req_conn(s, 1));
-    EXPECT_EQ(srv_req_conn(s, 1), srv_req_conn(s, 2));
-    EXPECT_EQ(tls_count(s, SRV_EV_TLS_DONE), 1);
+    /* Win10 VM (two boots): a TLS connection whose certificate errors were ignored is NOT handed to another request
+     * handle - every request makes a new connection and handshake (a redirect on the same handle does reuse it). */
+    CHECK(srv_req_conn(s, 0) != srv_req_conn(s, 1));
+    CHECK(srv_req_conn(s, 1) != srv_req_conn(s, 2));
+    EXPECT_EQ(tls_count(s, SRV_EV_TLS_DONE), 3);
     U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -305,6 +309,8 @@ TEST(tls_proxy_connect_tunnel_success) {
     t_note("CONNECT head: %s", h ? h : "(none)");
     CHECK(h && !strncmp(h, "CONNECT i7tls.invalid:8443 HTTP/1.0\r\n", 37));   /* Win10 VM: CONNECT is HTTP/1.0 */
     if (h) { char tmp[2048]; snprintf(tmp, sizeof tmp, "%s", h); for (char *q = strtok(tmp, "\r\n"); q; q = strtok(NULL, "\r\n")) t_note("connect line: %s", q); }
+    EXPECT_STR(h, "CONNECT i7tls.invalid:8443 HTTP/1.0\r\nUser-Agent: tls-test\r\nHost: i7tls.invalid:8443\r\n"
+                  "Content-Length: 0\r\nProxy-Connection: Keep-Alive\r\nPragma: no-cache\r\n\r\n");
     CHECK(srv_wait_requests(s, 1, 2000));
     EXPECT_STR(srv_req_line(s, 0), "GET /via HTTP/1.1");          /* origin-form inside the tunnel */
     EXPECT_STR(srv_req_header(s, 0, "Host"), "i7tls.invalid:8443");

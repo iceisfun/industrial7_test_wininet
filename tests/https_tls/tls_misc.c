@@ -3,7 +3,9 @@
  *     7-entry table -> 87; a NULL buffer sets *pcch = 0 first, so it always ends in 122 with *pcch = length + 1;
  *     a buffer shorter than length+1 -> 122 with *pcch = length + 1; success writes *pcch = length (no NUL).
  *   InternetGetSecurityInfoByURLA/W (decomp 0x36b10): both out pointers NULL -> failure; URL host without a security
- *     cache entry -> 12028 ERROR_INTERNET_ITEM_NOT_FOUND; flags = entry flags & 0x7a00000 (| 0x400000). */
+ *     cache entry -> 12028 ERROR_INTERNET_ITEM_NOT_FOUND; flags = entry flags & 0x7a00000 (| 0x400000).
+ *     FindCertEntryInCache temporarily writes a NUL into the CALLER'S URL buffer (after the host name), so the URL
+ *     must be writable: a string literal faults with 0xC0000005 on Win10 (VM boot 2). Tests pass char arrays. */
 #include "tls_util.h"
 
 UDECL(BOOL, InternetSecurityProtocolToStringA, (DWORD, LPSTR, LPDWORD, DWORD));
@@ -71,7 +73,16 @@ TEST(tls_protostr_known_bits) {
         else CHECKF(e == ERROR_INVALID_PARAMETER, "bit %d err=%lu", bit, e);
     }
     t_note("known protocol bits (%d):%s", known, all);
-    CHECK(known >= 5 && known <= 7);
+    EXPECT_EQ(known, 7);
+    /* Win10 VM, en-US MUI strings */
+    static const struct { DWORD p; const char *s; } tab[] = { { 0x2, "PCT 1.0" }, { 0x8, "SSL 2.0" }, { 0x20, "SSL 3.0" }, { 0x80, "TLS 1.0" },
+                                                               { 0x200, "TLS 1.1" }, { 0x800, "TLS 1.2" }, { 0x2000, "TLS 1.3" } };
+    LANGID lang = GetUserDefaultUILanguage();
+    for (int i = 0; i < 7; i++) {
+        char b[128] = ""; DWORD n = sizeof b;
+        CHECKF(UN(InternetSecurityProtocolToStringA)(tab[i].p, b, &n, 0), "0x%lx", tab[i].p);
+        if (PRIMARYLANGID(lang) == LANG_ENGLISH) { CHECKF(!strcmp(b, tab[i].s), "0x%lx: %s", tab[i].p, b); EXPECT_EQ(n, strlen(tab[i].s)); }
+    }
     /* the TLS client bits are all known */
     static const DWORD must[] = { 0x80, 0x200, 0x800 };
     for (int i = 0; i < 3; i++) { char b[128]; DWORD n = sizeof b; CHECKF(UN(InternetSecurityProtocolToStringA)(must[i], b, &n, 0), "0x%lx", must[i]); }
@@ -122,13 +133,16 @@ TEST(tls_secinfo_by_url_params) {
     REQUIRE(P_SIBU_A);
     PCCERT_CHAIN_CONTEXT ch = NULL; DWORD f = 0;
     SET_ERR(0);
-    BOOL ok = P_SIBU_A("https://127.0.0.1:1/x", NULL, NULL);
+    char u1[] = "https://127.0.0.1:1/x";
+    BOOL ok = P_SIBU_A(u1, NULL, NULL);
     DWORD e = ok ? 0 : GetLastError();
     t_note("both out NULL: ok=%d err=%lu", ok, e);
     CHECK(!ok); EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
     /* never-contacted host -> not found */
     SET_ERR(0);
-    ok = P_SIBU_A("https://never-contacted.i7test.example/", &ch, &f);
+    char u2[] = "https://never-contacted.i7test.example/";
+    ok = P_SIBU_A(u2, &ch, &f);
+    EXPECT_STR(u2, "https://never-contacted.i7test.example/");   /* restored after the temporary NUL */
     e = ok ? 0 : GetLastError();
     CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_ITEM_NOT_FOUND);
     CHECK(ch == NULL);
@@ -148,6 +162,8 @@ TEST(tls_secinfo_by_url_after_connect) {
     BOOL ok = P_SIBU_A(url, &ch, &f);
     DWORD e = ok ? 0 : GetLastError();
     t_note("by URL after a 0x100 connect (handle open): ok=%d err=%lu chain=%p flags=0x%lx", ok, e, ch, f);
+    /* Win10 VM: not found; decomp VerifyServerCert persists the chain only when no ignore flag (0x7a13180) was used */
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_ITEM_NOT_FOUND); CHECK(ch == NULL); EXPECT_EQ(f, 0xDEAD);
     if (ok) {
         CHECK(ch != NULL);
         CHECK((f & ~0x7e00000u) == 0);

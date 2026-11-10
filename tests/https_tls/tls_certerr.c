@@ -235,8 +235,9 @@ TEST(tls_pooled_connection_flags_per_request) {
     t_inet_read_all(h2, b, sizeof b, NULL);
     CHECK(srv_wait_requests(s, 2, 2000));
     t_note("two ok requests: conns=%d req_conn=%d,%d tls_done=%d", srv_conn_count(s), srv_req_conn(s, 0), srv_req_conn(s, 1), tls_count(s, SRV_EV_TLS_DONE));
-    EXPECT_EQ(srv_req_conn(s, 0), srv_req_conn(s, 1));    /* keep-alive reuse over TLS */
-    EXPECT_EQ(tls_count(s, SRV_EV_TLS_DONE), 1);
+    /* Win10 VM: a connection whose cert errors were ignored is not reused by another request handle */
+    CHECK(srv_req_conn(s, 0) != srv_req_conn(s, 1));
+    EXPECT_EQ(tls_count(s, SRV_EV_TLS_DONE), 2);
     HINTERNET h3 = U(HttpOpenRequestA)(t.hc, "GET", "/c", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
     SET_ERR(0);
     BOOL ok = U(HttpSendRequestA)(h3, NULL, 0, NULL, 0);

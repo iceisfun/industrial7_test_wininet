@@ -406,7 +406,9 @@ TEST(tls_info_http_protocol_used) {
     l = 3; SET_ERR(0);
     EXPECT_FAIL(!U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_HTTP_PROTOCOL_USED, &v, &l), ERROR_INTERNET_BAD_OPTION_LENGTH);
     t_https_secflags(t.hr, 0x100);
-    SEND_EQ(&t, 0);
+    DWORD se = treq_send(&t);
+    if (se == ERROR_INTERNET_CONNECTION_ABORTED) { t_note("first send aborted (12030), retrying once"); se = treq_send(&t); }
+    EXPECT_EQ(se, 0);
     l = sizeof v; v = 0xDEAD;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_HTTP_PROTOCOL_USED, &v, &l));
     EXPECT_EQ(v, 0);                                   /* HTTP/1.1, not HTTP_PROTOCOL_FLAG_HTTP2 */

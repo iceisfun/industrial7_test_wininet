@@ -184,7 +184,7 @@ TEST(tls_enable_http_protocol_option_rules) {
 
 /* HTTP/2 enabled against an HTTP/1.1-only TLS server: ALPN is offered but not selected -> HTTP/1.1, protocol used 0 */
 /* the option on the session handle, set before the connect/request handles exist: probe inheritance */
-TEST(tls_hello_alpn_session_level_probe) {
+TEST(tls_hello_alpn_session_level_inherited) {
     TH_START_OR_SKIP(t, TH_CLOSE);
     HINTERNET hi = t_inet_open(NULL);
     DWORD v = HTTP_PROTOCOL_FLAG_HTTP2;
@@ -195,6 +195,7 @@ TEST(tls_hello_alpn_session_level_probe) {
     U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
     th_wait(t, 1, 3000);
     const th_hello *h = th_get(t, 0); note_hello("session-level http2", h);
+    if (client_secure_protocols() & 0x2800) { CHECK(h && h->has_alpn); if (h && h->has_alpn) EXPECT_STR(h->alpn, "h2,http/1.1"); }
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi);
     th_stop(t);
 }
