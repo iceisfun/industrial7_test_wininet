@@ -107,7 +107,7 @@ disagreement is listed below.
 
 ## Second pass (rsp_segments, rsp_lifecycle, hqi_generated, hqi_reqside, rsp_values)
 Win10 boots `rh-20261110-051251-b1` (171 tests, 6 failures, triaged below) and `rh-20261110-063749-b1`
-(173 tests, 42874 checks, 1 failure from a wrong probe, the REQ+COMMA pair, corrected and re-run).
+(173 tests, 42874 checks, 1 failure from a wrong probe, the REQ+COMMA pair, corrected), then `rh-20261110-082447-b1`: **PASS**, 173 tests, 42879 checks, 0 failures, 107 s.
 
 ### Decomp-grounded [D] (and confirmed on the VM)
 - `HTTP_REQUEST_HANDLE_OBJECT::ReuseObject@0x3ade8` runs on a resend: it clears the response flags (+0x142c) and calls
