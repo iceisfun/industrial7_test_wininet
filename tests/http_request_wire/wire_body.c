@@ -83,16 +83,20 @@ TEST(hrw_body_user_content_length_replaced) {
     hrw_done(&w);
 }
 
-/* Re-sending the same POST handle sends the body again. */
-TEST(hrw_body_post_resend) {
+/* Re-sending the same POST handle with new optional data. Win10 VM (boot C1): the second request carried the FIRST
+ * body ("one", Content-Length 3). */
+TEST(hrw_body_post_resend_reuses_first_body) {
     HRW_REQUIRE_HTTP();
     srv *s = hrw_srv(); if (!s) { t_skip("server unavailable"); return; }
     hrw w; CHECK(hrw_open(&w, s, "rs/1", "POST", "/rs", NULL, NULL, NULL, HRW_F));
     hrw_send(&w, NULL, 0, "one", 3); CHECK(w.ok); hrw_read(&w);
-    hrw_send(&w, NULL, 0, "second", 6); CHECK(w.ok); hrw_read(&w);
+    hrw_send(&w, NULL, 0, "second", 6); CHECKF(w.ok, "err %lu", w.err); hrw_read(&w);
     CHECK(srv_wait_events(s, SRV_EV_BODY, 2, 3000));
-    CHECK(body_is(s, 0, "one", 3)); CHECK(body_is(s, 1, "second", 6));
-    EXPECT_HDR(s, 1, "Content-Length", "6");
+    size_t n1 = 0; const char *b1 = srv_req_body(s, 1, &n1);
+    t_note("re-send body: %.*s (CL %s) conns=%d", (int)n1, b1 ? b1 : "", srv_req_header(s, 1, "Content-Length"), srv_conn_count(s));
+    hrw_dump(s, 1);
+    CHECK(body_is(s, 0, "one", 3)); CHECK(body_is(s, 1, "one", 3));
+    EXPECT_HDR(s, 1, "Content-Length", "3");
     EXPECT_EQ(srv_req_header_occurrences(s, 1, "Content-Length"), 1);
     hrw_done(&w);
 }

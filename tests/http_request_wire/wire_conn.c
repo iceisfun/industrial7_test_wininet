@@ -163,7 +163,7 @@ TEST(hrw_conn_keep_connection_flag_header) {
 TEST(hrw_conn_unread_body_forces_second_connection) {
     HRW_REQUIRE_HTTP();
     static const srv_step st_[] = { S_HEAD(), S_BODY(), S_REPLY_PATTERN(200, NULL, 200000, 0), S_LOOP() };
-    srv *s = hrw_srv_steps(st_, 4); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = hrw_srv_steps_io(st_, 4, 5000); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open("ub/1"), hc = connect_to(hi, s);
     HINTERNET h1 = U(HttpOpenRequestA)(hc, "GET", "/big1", NULL, NULL, NULL, HRW_F, 0);
     CHECK(U(HttpSendRequestA)(h1, NULL, 0, NULL, 0));
@@ -213,7 +213,7 @@ TEST(hrw_conn_max_conns_session_set_refused) {
 GTEST(hrw_conn_third_request_waits_for_free_connection, 25000) {
     HRW_REQUIRE_HTTP();
     static const srv_step st_[] = { S_HEAD(), S_BODY(), S_REPLY_PATTERN(200, NULL, 200000, 0), S_LOOP() };
-    srv *s = hrw_srv_steps(st_, 4); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = hrw_srv_steps_io(st_, 4, 5000); if (!s) { t_skip("server unavailable"); return; }
     DWORD lim = 0; hrw_get_dword_opt(NULL, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &lim);
     if (lim != 2) { t_skip("MAX_CONNS_PER_SERVER is %lu, not the default 2", lim); srv_stop(s); return; }
     HINTERNET hi = t_inet_open("mc/1"), hc = connect_to(hi, s);
@@ -244,7 +244,7 @@ GTEST(hrw_conn_third_request_waits_for_free_connection, 25000) {
 TEST(hrw_conn_default_limit_allows_two) {
     HRW_REQUIRE_HTTP();
     static const srv_step st_[] = { S_HEAD(), S_BODY(), S_REPLY_PATTERN(200, NULL, 200000, 0), S_LOOP() };
-    srv *s = hrw_srv_steps(st_, 4); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = hrw_srv_steps_io(st_, 4, 5000); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open("mc/2"), hc = connect_to(hi, s);
     HINTERNET h1 = U(HttpOpenRequestA)(hc, "GET", "/h1", NULL, NULL, NULL, HRW_F, 0);
     HINTERNET h2 = U(HttpOpenRequestA)(hc, "GET", "/h2", NULL, NULL, NULL, HRW_F, 0);

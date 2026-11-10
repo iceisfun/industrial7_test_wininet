@@ -4,15 +4,23 @@
 
 static const srv_step g_ok_steps[] = { S_HEAD(), S_BODY(), S_REPLY(200, NULL, "ok"), S_CLOSE_IF_ASKED(), S_LOOP() };
 
-srv *hrw_srv_steps(const srv_step *st, int n) {
-    srv_script *sc = (srv_script *)calloc(1, sizeof *sc);  /* leaked on purpose: tiny, must outlive the server */
-    sc->steps = st; sc->nsteps = n;
+/* Idle keep-alive connections: WinINet keeps pooled sockets open after every handle is closed, and a server
+ * connection thread blocked in recv() is not woken by srv_stop's shutdown(), so srv_stop waits its full 3 s deadline
+ * (measured on Win10: every sending test cost ~3.0 s). Wire-test servers therefore use a short per-connection I/O
+ * timeout: an idle connection ends by itself after HRW_IO_MS. Tests that hold unread bodies use hrw_srv_steps_io(5000). */
+srv *hrw_srv_cfg(const srv_script *sc, int nsc, void *user, DWORD io_ms) {
     srv_config cfg; memset(&cfg, 0, sizeof cfg);
-    cfg.kind = SRV_HTTP; cfg.scripts = sc; cfg.nscripts = 1;
+    cfg.kind = SRV_HTTP; cfg.scripts = sc; cfg.nscripts = nsc; cfg.user = user; cfg.io_timeout_ms = io_ms;
     srv *s = NULL;
     if (srv_start(&cfg, &s) != SRV_OK) return NULL;
     return s;
 }
+srv *hrw_srv_steps_io(const srv_step *st, int n, DWORD io_ms) {
+    srv_script *sc = (srv_script *)calloc(1, sizeof *sc);  /* leaked on purpose: tiny, must outlive the server */
+    sc->steps = st; sc->nsteps = n;
+    return hrw_srv_cfg(sc, 1, NULL, io_ms);
+}
+srv *hrw_srv_steps(const srv_step *st, int n) { return hrw_srv_steps_io(st, n, HRW_IO_MS); }
 srv *hrw_srv(void) { return hrw_srv_steps(g_ok_steps, 5); }
 srv *hrw_srv_call(srv_step_fn fn, void *user) {
     srv_step *st = (srv_step *)calloc(2, sizeof *st);
@@ -20,11 +28,7 @@ srv *hrw_srv_call(srv_step_fn fn, void *user) {
     st[1].op = SRV_END;
     srv_script *sc = (srv_script *)calloc(1, sizeof *sc);
     sc->steps = st; sc->nsteps = 2;
-    srv_config cfg; memset(&cfg, 0, sizeof cfg);
-    cfg.kind = SRV_HTTP; cfg.scripts = sc; cfg.nscripts = 1; cfg.user = user;
-    srv *s = NULL;
-    if (srv_start(&cfg, &s) != SRV_OK) return NULL;
-    return s;
+    return hrw_srv_cfg(sc, 1, user, HRW_IO_MS);
 }
 
 int hrw_open_host(hrw *w, srv *s, const char *agent, const char *host, const char *verb, const char *obj, DWORD flags) {

@@ -39,7 +39,9 @@ GTEST(hrw_https_post_body, 20000) {
     EXPECT_NAMES(s, 0, "Content-Type|User-Agent|Host|Content-Length|Cache-Control");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
-GTEST(hrw_https_keepalive_reuse, 20000) {
+/* Win10 VM (https_tls area too): a TLS connection whose certificate errors were ignored is not pooled; every request
+ * handle with SECURITY_FLAG_IGNORE_UNKNOWN_CA makes a new connection. */
+GTEST(hrw_https_ignored_cert_not_reused, 20000) {
     HRW_REQUIRE_HTTP();
     srv *s = https_ok(); if (!s) { t_skip("https server unavailable: %s", srv_strerror(srv_last_error())); return; }
     HINTERNET hi = t_inet_open("tls/3");
@@ -47,12 +49,15 @@ GTEST(hrw_https_keepalive_reuse, 20000) {
     for (int i = 0; i < 2; i++) {
         HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/k", NULL, NULL, NULL, HRW_F | INTERNET_FLAG_SECURE, 0);
         CHECK(t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-        CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
-        char b[32]; t_inet_read_all(hr, b, sizeof b, NULL);
+        BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+        DWORD e = ok ? 0 : GetLastError();
+        t_note("TLS request %d: ok=%d err=%lu %s conns=%d", i, ok, e, t_inet_errname(e), srv_conn_count(s));
+        if (i == 0) CHECKF(ok, "err %lu", e);
+        char b[32]; if (ok) t_inet_read_all(hr, b, sizeof b, NULL);
         U(InternetCloseHandle)(hr);
     }
-    CHECK(srv_wait_requests(s, 2, 3000));
-    EXPECT_EQ(srv_conn_count(s), 1);
+    CHECK(srv_wait_requests(s, 1, 3000));
+    EXPECT_EQ(srv_conn_count(s), 2);
     U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -80,15 +85,15 @@ TEST(hrw_openurl_no_path_is_slash) {
     EXPECT_STR(srv_req_line(s, 0), "GET / HTTP/1.1");
     t_inet_close(hi); srv_stop(s);
 }
-TEST(hrw_openurl_fragment_dropped) {
+TEST(hrw_openurl_fragment_kept) {
     REQUIRE(U(InternetOpenUrlA)); HRW_REQUIRE_HTTP();
     srv *s = hrw_srv(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open("ou/3");
     char body[16]; size_t n; DWORD err;
     EXPECT_EQ(t_http_get(hi, srv_url(s, "/frag?q=1#section"), NULL, HRW_F, body, sizeof body, &n, &err), 200);
     CHECK(srv_wait_requests(s, 1, 3000));
-    t_note("OpenUrl with fragment: %s", srv_req_line(s, 0));
-    EXPECT_STR(srv_req_line(s, 0), "GET /frag?q=1 HTTP/1.1");
+    /* Win10 VM: InternetOpenUrl keeps the fragment in the request-target */
+    EXPECT_STR(srv_req_line(s, 0), "GET /frag?q=1#section HTTP/1.1");
     t_inet_close(hi); srv_stop(s);
 }
 TEST(hrw_openurl_userinfo_basic) {
@@ -99,10 +104,12 @@ TEST(hrw_openurl_userinfo_basic) {
     char url[96]; snprintf(url, sizeof url, "http://usr:pwd@127.0.0.1:%u/ui", srv_port(s));
     char body[16]; size_t n; DWORD err;
     int code = t_http_get(hi, url, NULL, HRW_F, body, sizeof body, &n, &err);
-    t_note("OpenUrl user:pass@ -> %d, requests=%d, req0 auth=%s", code, srv_req_count(s), srv_req_header(s, 0, "Authorization"));
-    CHECK(srv_wait_requests(s, 1, 3000));
+    /* Win10 VM: credentials from the URL are not sent pre-emptively; they answer the 401 */
+    EXPECT_EQ(code, 200);
+    CHECK(srv_wait_requests(s, 2, 3000));
     EXPECT_STR(srv_req_line(s, 0), "GET /ui HTTP/1.1");
-    if (srv_req_count(s) >= 2) EXPECT_HDR(s, 1, "Authorization", "Basic dXNyOnB3ZA==");
+    EXPECT_NOHDR(s, 0, "Authorization");
+    EXPECT_HDR(s, 1, "Authorization", "Basic dXNyOnB3ZA==");
     t_inet_close(hi); srv_stop(s);
 }
 
@@ -115,8 +122,10 @@ TEST(hrw_decoding_option_adds_accept_encoding) {
     CHECK(U(InternetSetOptionA)(w.hr, INTERNET_OPTION_HTTP_DECODING, &on, sizeof on));
     hrw_send(&w, NULL, 0, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
-    EXPECT_HDR(s, 0, "Accept-Encoding", "gzip, deflate");
-    t_note("decoding names: %s", hrw_names(s, 0));
+    /* _CheckDecompressionRequestHeaders@0x664d4 only PARSES a caller Accept-Encoding (gzip/deflate/br bits); it never
+     * adds one. Win10 VM: no Accept-Encoding on the wire. */
+    EXPECT_NOHDR(s, 0, "Accept-Encoding");
+    EXPECT_NAMES(s, 0, "User-Agent|Host|Cache-Control");
     hrw_done(&w);
 }
 TEST(hrw_decoding_option_on_session) {
@@ -130,7 +139,7 @@ TEST(hrw_decoding_option_on_session) {
     w.hr = U(HttpOpenRequestA)(w.hc, "GET", "/dec2", NULL, NULL, NULL, HRW_F, 0);
     hrw_send(&w, NULL, 0, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
-    EXPECT_HDR(s, 0, "Accept-Encoding", "gzip, deflate");
+    EXPECT_NOHDR(s, 0, "Accept-Encoding");
     hrw_done(&w);
 }
 TEST(hrw_decoding_user_accept_encoding_kept) {
@@ -141,8 +150,8 @@ TEST(hrw_decoding_user_accept_encoding_kept) {
     CHECK(U(InternetSetOptionA)(w.hr, INTERNET_OPTION_HTTP_DECODING, &on, sizeof on));
     hrw_send(&w, "Accept-Encoding: identity\r\n", (DWORD)-1, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
-    t_note("user AE + decoding: %d occurrences, first=%s", srv_req_header_occurrences(s, 0, "Accept-Encoding"), srv_req_header(s, 0, "Accept-Encoding"));
     EXPECT_EQ(srv_req_header_occurrences(s, 0, "Accept-Encoding"), 1);
+    EXPECT_HDR(s, 0, "Accept-Encoding", "identity");
     hrw_done(&w);
 }
 TEST(hrw_no_decoding_user_accept_encoding_verbatim) {
@@ -184,8 +193,10 @@ TEST(hrw_redirect_302_post_becomes_get) {
     EXPECT_STR(srv_req_line(s, 0), "POST /src HTTP/1.1");
     EXPECT_STR(srv_req_line(s, 1), "GET /dst HTTP/1.1");
     EXPECT_NOHDR(s, 1, "Content-Length");
-    t_note("after 302: %s", hrw_names(s, 1));
-    hrw_dump(s, 1);
+    /* Win10 VM: the GET drops Content-Type, keeps caller headers, and ends with Connection: Keep-Alive (re-send) */
+    EXPECT_NAMES(s, 1, "X-Keep|User-Agent|Host|Cache-Control|Connection");
+    EXPECT_HDR(s, 1, "Connection", "Keep-Alive");
+    EXPECT_EQ(srv_req_conn(s, 1), srv_req_conn(s, 0));
     hrw_done(&w);
 }
 TEST(hrw_redirect_301_get_keeps_custom_headers) {
@@ -198,8 +209,8 @@ TEST(hrw_redirect_301_get_keeps_custom_headers) {
     CHECK(srv_wait_requests(s, 2, 3000));
     EXPECT_STR(srv_req_line(s, 1), "GET /moved HTTP/1.1");
     EXPECT_HDR(s, 1, "X-Keep", "k");
-    t_note("after 301: %s", hrw_names(s, 1));
-    hrw_dump(s, 1);
+    EXPECT_NAMES(s, 1, "Referer|X-Keep|User-Agent|Host|Cache-Control|Connection");
+    EXPECT_HDR(s, 1, "Referer", "http://ref.example/");
     hrw_done(&w);
 }
 TEST(hrw_redirect_303_put_becomes_get) {
@@ -213,18 +224,16 @@ TEST(hrw_redirect_303_put_becomes_get) {
     EXPECT_STR(srv_req_line(s, 1), "GET /see HTTP/1.1");
     hrw_done(&w);
 }
-TEST(hrw_redirect_307_post_keeps_body) {
+TEST(hrw_redirect_307_post_needs_confirmation) {
     HRW_REQUIRE_HTTP();
     static const srv_step st[] = { S_HEAD(), S_BODY(), S_REPLY(307, "Location: /tmp307\r\n", ""), S_HEAD(), S_BODY(), S_REPLY(200, NULL, "t"), S_LOOP_TO(3) };
     srv *s = hrw_srv_steps(st, 7); if (!s) { t_skip("server unavailable"); return; }
     hrw w; CHECK(hrw_open(&w, s, "rd/4", "POST", "/p307", NULL, NULL, NULL, HRW_F));
     hrw_send(&w, NULL, 0, "body7", 5);
-    t_note("POST 307: ok=%d err=%lu status=%d requests=%d", w.ok, w.err, w.status, srv_req_count(s));
-    if (w.ok) hrw_read(&w);
-    if (w.ok && srv_wait_requests(s, 2, 3000)) {
-        EXPECT_STR(srv_req_line(s, 1), "POST /tmp307 HTTP/1.1");
-        size_t n = 0; const char *b = srv_req_body(s, 1, &n);
-        CHECK(b && n == 5 && !memcmp(b, "body7", 5));
-    }
+    /* Win10 VM: a 307 for a POST is not followed; HttpSendRequest fails with 12168 REDIRECT_NEEDS_CONFIRMATION and
+     * nothing is re-sent */
+    CHECK(!w.ok); EXPECT_EQ(w.err, ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION);
+    Sleep(100);
+    EXPECT_EQ(srv_req_count(s), 1);
     hrw_done(&w);
 }

@@ -36,6 +36,10 @@ typedef struct {
 srv *hrw_srv(void);
 /* Server with a custom script (single script for every connection). */
 srv *hrw_srv_steps(const srv_step *st, int n);
+/* Per-connection I/O timeout of wire-test servers (see hrw_util.c). */
+#define HRW_IO_MS 1000
+srv *hrw_srv_cfg(const srv_script *sc, int nsc, void *user, DWORD io_ms);
+srv *hrw_srv_steps_io(const srv_step *st, int n, DWORD io_ms);
 /* Server whose every request is handled by fn (SRV_CALL loop). */
 srv *hrw_srv_call(srv_step_fn fn, void *user);
 

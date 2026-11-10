@@ -321,7 +321,7 @@ TEST(hrw_add_success_lasterror) {
     OPEN_OR_SKIP(w, "GET", "/a");
     SetLastError(0xdeadbeef);
     CHECK(U(HttpAddRequestHeadersA)(w.hr, "X-Le: 1", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD));
-    t_note("GetLastError after success: %lu", GetLastError());
+    EXPECT_EQ(GetLastError(), 0);   /* Win10 VM: success clears the last error */
     hrw_done(&w);
 }
 
@@ -388,7 +388,7 @@ TEST(hrw_add_user_agent_lowercase_name) {
     SEND_AND_WAIT(w);
     EXPECT_EQ(srv_req_header_occurrences(w.s, 0, "User-Agent"), 1);
     EXPECT_HDR(w.s, 0, "User-Agent", "lc");
-    t_note("UA name as sent: %s", srv_req_header_name(w.s, 0, srv_req_header_index(w.s, 0, "User-Agent")));
+    EXPECT_STR(srv_req_header_name(w.s, 0, srv_req_header_index(w.s, 0, "User-Agent")), "user-agent");   /* VM */
     hrw_done(&w);
 }
 TEST(hrw_replace_existing) {
@@ -398,15 +398,17 @@ TEST(hrw_replace_existing) {
     SEND_AND_WAIT(w);
     EXPECT_HDR(w.s, 0, "X-R", "new");
     EXPECT_EQ(srv_req_header_occurrences(w.s, 0, "X-R"), 1);
-    EXPECT_NAMES(w.s, 0, "X-R|X-Other|User-Agent|Host|Cache-Control");
+    /* Win10 VM: REPLACE removes the old line and appends the new one at the end of the caller headers */
+    EXPECT_NAMES(w.s, 0, "X-Other|X-R|User-Agent|Host|Cache-Control");
     hrw_done(&w);
 }
-TEST(hrw_replace_absent_fails) {
+/* Win10 VM: REPLACE without ADD on an absent header still adds it (no 12150). */
+TEST(hrw_replace_absent_adds) {
     OPEN_OR_SKIP(w, "GET", "/a");
-    CHECK(!add(w.hr, "X-Missing: v", (DWORD)-1, HTTP_ADDREQ_FLAG_REPLACE));
-    EXPECT_ERR(ERROR_HTTP_HEADER_NOT_FOUND);
+    CHECK(add(w.hr, "X-Missing: v", (DWORD)-1, HTTP_ADDREQ_FLAG_REPLACE));
     SEND_AND_WAIT(w);
-    EXPECT_NOHDR(w.s, 0, "X-Missing");
+    EXPECT_HDR(w.s, 0, "X-Missing", "v");
+    EXPECT_NAMES(w.s, 0, "X-Missing|User-Agent|Host|Cache-Control");
     hrw_done(&w);
 }
 TEST(hrw_replace_or_add_absent_adds) {
@@ -441,7 +443,7 @@ TEST(hrw_replace_case_insensitive_keeps_new_name) {
     SEND_AND_WAIT(w);
     EXPECT_EQ(srv_req_header_occurrences(w.s, 0, "X-Case"), 1);
     EXPECT_HDR(w.s, 0, "X-Case", "2");
-    t_note("replaced name casing on wire: %s", srv_req_header_name(w.s, 0, srv_req_header_index(w.s, 0, "x-case")));
+    EXPECT_STR(srv_req_header_name(w.s, 0, srv_req_header_index(w.s, 0, "x-case")), "x-CASE");   /* VM: new spelling */
     hrw_done(&w);
 }
 TEST(hrw_replace_duplicate_replaces_first) {
@@ -450,8 +452,10 @@ TEST(hrw_replace_duplicate_replaces_first) {
     CHECK(add(w.hr, "X-D: 2", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD));
     CHECK(add(w.hr, "X-D: 3", (DWORD)-1, HTTP_ADDREQ_FLAG_REPLACE));
     SEND_AND_WAIT(w);
-    t_note("after replace on duplicate: %d occurrences, first=%s", srv_req_header_occurrences(w.s, 0, "X-D"), srv_req_header(w.s, 0, "X-D"));
-    EXPECT_HDR(w.s, 0, "X-D", "3");
+    /* Win10 VM: the first occurrence is removed and the new value appended: X-D: 2, X-D: 3 */
+    EXPECT_NAMES(w.s, 0, "X-D|X-D|User-Agent|Host|Cache-Control");
+    EXPECT_STR(srv_req_header_value(w.s, 0, 0), "2");
+    EXPECT_STR(srv_req_header_value(w.s, 0, 1), "3");
     hrw_done(&w);
 }
 TEST(hrw_coalesce_comma) {
@@ -550,8 +554,9 @@ TEST(hrw_send_hdrs_null_len_minus1) { send_hdrs(NULL, (DWORD)-1, TRUE, 0, "User-
 TEST(hrw_send_hdrs_empty_string) { send_hdrs("", (DWORD)-1, TRUE, 0, "User-Agent|Host|Cache-Control"); }
 TEST(hrw_send_hdrs_only_crlf) { send_hdrs("\r\n", (DWORD)-1, TRUE, 0, "User-Agent|Host|Cache-Control"); }
 TEST(hrw_send_hdrs_double_crlf_terminated) { send_hdrs("X-S1: a\r\n\r\n", (DWORD)-1, TRUE, 0, "X-S1|User-Agent|Host|Cache-Control"); }
-TEST(hrw_send_hdrs_no_colon) { send_hdrs("Garbage\r\n", (DWORD)-1, FALSE, ERROR_INVALID_PARAMETER, NULL); }
-TEST(hrw_send_hdrs_empty_value) { send_hdrs("X-E:\r\n", (DWORD)-1, FALSE, ERROR_INVALID_PARAMETER, NULL); }
+/* Win10 VM: a malformed line in the HttpSendRequest headers fails the send with 12150 (HttpAddRequestHeaders itself says 87) */
+TEST(hrw_send_hdrs_no_colon) { send_hdrs("Garbage\r\n", (DWORD)-1, FALSE, ERROR_HTTP_HEADER_NOT_FOUND, NULL); }
+TEST(hrw_send_hdrs_empty_value) { send_hdrs("X-E:\r\n", (DWORD)-1, FALSE, ERROR_HTTP_HEADER_NOT_FOUND, NULL); }
 
 TEST(hrw_send_hdrs_replace_added_header) {
     REQUIRE(U(HttpAddRequestHeadersA)); HRW_REQUIRE_HTTP();
@@ -560,7 +565,6 @@ TEST(hrw_send_hdrs_replace_added_header) {
     CHECK(add(w.hr, "X-Both: from-add", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD));
     hrw_send(&w, "X-Both: from-send\r\n", (DWORD)-1, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
-    t_note("add + send same name: %d occurrences, first=%s", srv_req_header_occurrences(s, 0, "X-Both"), srv_req_header(s, 0, "X-Both"));
     EXPECT_EQ(srv_req_header_occurrences(s, 0, "X-Both"), 1);
     EXPECT_HDR(s, 0, "X-Both", "from-send");
     hrw_done(&w);
@@ -577,15 +581,16 @@ TEST(hrw_send_hdrs_cache_control_override) {
     hrw w; int r = hrw_simple(&w, "cc/1", "GET", "/s", NULL, NULL, NULL, HRW_F, "Cache-Control: max-age=0\r\n", NULL, 0);
     if (r < 0) { t_skip("server unavailable"); return; }
     CHECK(r);
-    t_note("Cache-Control occurrences %d: %s", srv_req_header_occurrences(w.s, 0, "Cache-Control"), hrw_raw(w.s, 0));
+    /* Win10 VM: the caller's Cache-Control replaces the RELOAD default and keeps its (first) position */
     EXPECT_HDR(w.s, 0, "Cache-Control", "max-age=0");
+    EXPECT_NAMES(w.s, 0, "Cache-Control|User-Agent|Host");
     hrw_done(&w);
 }
 TEST(hrw_send_hdrs_connection_close_sent) {
     hrw w; int r = hrw_simple(&w, "cl/1", "GET", "/s", NULL, NULL, NULL, HRW_F, "Connection: close\r\n", NULL, 0);
     if (r < 0) { t_skip("server unavailable"); return; }
     CHECK(r);
-    EXPECT_HDR(w.s, 0, "Connection", "close");
+    EXPECT_HDR(w.s, 0, "Connection", "Close");   /* Win10 VM: WinINet re-spells the token */
     EXPECT_EQ(srv_req_header_occurrences(w.s, 0, "Connection"), 1);
     hrw_done(&w);
 }
@@ -620,11 +625,11 @@ TEST(hrw_add_after_send_applies_to_resend) {
     SetLastError(0);
     BOOL ok = add(w.hr, "X-Second: 2", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD);
     DWORD e = GetLastError();
-    t_note("add after send: ok=%d err=%lu", ok, e);
-    CHECK(ok);
+    CHECK(ok); EXPECT_EQ(e, 0);
     hrw_send(&w, NULL, 0, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(w.s, 2, 3000));
-    t_note("resend names: %s", hrw_names(w.s, 1));
+    /* Win10 VM: after the first send the defaults are part of the block, so a later add lands after them */
+    EXPECT_NAMES(w.s, 1, "X-First|X-SendOnly|User-Agent|Host|Cache-Control|X-Second|Connection");
     EXPECT_HDR(w.s, 1, "X-First", "1");
     EXPECT_HDR(w.s, 1, "X-Second", "2");
     EXPECT_EQ(srv_req_header_occurrences(w.s, 1, "X-First"), 1);

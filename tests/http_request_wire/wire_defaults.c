@@ -175,8 +175,9 @@ TEST(hrw_obj_dotdot_above_root_kept) { HRW_REQUIRE_HTTP(); obj_test("/../x", "/.
 TEST(hrw_obj_star) { HRW_REQUIRE_HTTP(); obj_test("*", "/*"); }
 TEST(hrw_obj_absolute_uri_direct) { HRW_REQUIRE_HTTP(); obj_test("http://other.example/abs", "/http://other.example/abs"); }
 TEST(hrw_obj_double_slash) { HRW_REQUIRE_HTTP(); obj_test("//x//y", "//x//y"); }
-TEST(hrw_obj_utf8_bytes_a) { HRW_REQUIRE_HTTP(); obj_test("/caf\xc3\xa9", "/caf%C3%A9"); }
-TEST(hrw_obj_high_ansi_a) { HRW_REQUIRE_HTTP(); obj_test("/x\xe9y", "/x%EF%BF%BDy")   /* invalid UTF-8 byte -> U+FFFD, percent-encoded */; }
+/* Win10 VM: bytes >= 0x80 in the A object name go on the wire raw (no percent-encoding, no UTF-8 validation) */
+TEST(hrw_obj_utf8_bytes_a) { HRW_REQUIRE_HTTP(); obj_test("/caf\xc3\xa9", "/caf\xc3\xa9"); }
+TEST(hrw_obj_high_ansi_a) { HRW_REQUIRE_HTTP(); obj_test("/x\xe9y", "/x\xe9y"); }
 TEST(hrw_obj_quote_and_angle) { HRW_REQUIRE_HTTP(); obj_test("/a\"b<c>", "/a\"b<c>"); }
 
 TEST(hrw_obj_long_path) {
@@ -194,7 +195,7 @@ TEST(hrw_obj_w_unicode) {
     CHECK(w.hr != NULL);
     hrw_send(&w, NULL, 0, NULL, 0); CHECK(w.ok); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
-    EXPECT_STR(srv_req_target(s, 0), "/caf%C3%A9/%E4%B8%AD");
+    EXPECT_STR(srv_req_target(s, 0), "/caf\xc3\xa9/\xe4\xb8\xad");   /* W object name -> UTF-8, sent raw (02 0.1, VM) */
     hrw_done(&w);
 }
 
@@ -204,8 +205,8 @@ TEST(hrw_obj_w_ascii_same_as_a) {
     hrw w; CHECK(hrw_open(&w, s, "w/1", "GET", "/", NULL, NULL, NULL, HRW_F));
     U(InternetCloseHandle)(w.hr);
     w.hr = U(HttpOpenRequestW)(w.hc, L"PUT", L"/w?x=1", L"HTTP/1.1", L"http://ref.example/", NULL, HRW_F, 0);
-    CHECK(w.hr != NULL);
-    hrw_send(&w, NULL, 0, NULL, 0); CHECK(w.ok); hrw_read(&w);
+    CHECKF(w.hr != NULL, "open err %lu", GetLastError());
+    hrw_send(&w, NULL, 0, NULL, 0); CHECKF(w.ok, "send err %lu %s", w.err, t_inet_errname(w.err)); hrw_read(&w);
     CHECK(srv_wait_requests(s, 1, 3000));
     EXPECT_STR(srv_req_line(s, 0), "PUT /w?x=1 HTTP/1.1");
     EXPECT_HDR(s, 0, "Referer", "http://ref.example/");
