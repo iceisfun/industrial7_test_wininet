@@ -26,7 +26,7 @@ TEST(ac_pending_query_status_during_send) {
     BOOL ok = U(HttpQueryInfoA)(f.hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &st, &l, NULL);
     DWORD e = GetLastError();
     t_note("STATUS_CODE while send pending: ok=%d err=%lu (%s) st=%lu", ok, e, t_inet_errname(e), st);
-    CHECK(!ok);
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     INTERNET_ASYNC_RESULT r;
     CHECK(ac_wait_complete(CTX_REQ, 1, 5000, &r));
     EXPECT_EQ(r.dwResult, TRUE);
@@ -41,14 +41,16 @@ TEST(ac_pending_second_send) {
     BOOL ok = U(HttpSendRequestA)(f.hr, NULL, 0, NULL, 0);
     DWORD e = GetLastError();
     t_note("second send while pending: ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
-    CHECK(!ok);
-    CHECK(e != ERROR_IO_PENDING);
-    INTERNET_ASYNC_RESULT r;
-    CHECK(ac_wait_complete(CTX_REQ, 1, 5000, &r));
-    EXPECT_EQ(r.dwResult, TRUE);
-    ac_quiesce(100, 400);
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ), 1);
-    EXPECT_EQ(srv_req_count(f.s), 1);
+    /* [W10] round 2: accepted (997) and a second request reached the server; the first completion reported
+     * failure. Only the immediate return is asserted; the rest is recorded. */
+    EXPECT_EQ(ok, FALSE); EXPECT_EQ(e, ERROR_IO_PENDING);
+    ac_wait_st(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ, 2, 5000);
+    ac_quiesce(200, 1500);
+    for (int k = 1; k <= ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ); k++) {
+        INTERNET_ASYNC_RESULT r; ac_wait_complete(CTX_REQ, k, 10, &r);
+        t_note("completion %d: dwResult=%llu dwError=%lu (%s)", k, (unsigned long long)r.dwResult, r.dwError, t_inet_errname(r.dwError));
+    }
+    t_note("requests at server: %d, seq %s", srv_req_count(f.s), ac_seq(CTX_REQ, NULL));
     ac_flow_close(&f);
 }
 TEST(ac_pending_read_during_send) {
@@ -61,7 +63,7 @@ TEST(ac_pending_read_during_send) {
     BOOL ok = U(InternetReadFile)(f.hr, b, sizeof b, &rd);
     DWORD e = GetLastError();
     t_note("read while send pending: ok=%d err=%lu (%s) rd=0x%lx", ok, e, t_inet_errname(e), rd);
-    CHECK(!ok);
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     INTERNET_ASYNC_RESULT r;
     ac_wait_complete(CTX_REQ, 1, 5000, &r);
     ac_quiesce(200, 2000);
@@ -78,7 +80,7 @@ TEST(ac_pending_qda_during_send) {
     BOOL ok = U(InternetQueryDataAvailable)(f.hr, &av, 0, 0);
     DWORD e = GetLastError();
     t_note("QDA while send pending: ok=%d err=%lu (%s) av=0x%lx", ok, e, t_inet_errname(e), av);
-    CHECK(!ok);
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     INTERNET_ASYNC_RESULT r;
     ac_wait_complete(CTX_REQ, 1, 5000, &r);
     ac_quiesce(200, 2000);
@@ -119,7 +121,8 @@ TEST(ac_pending_context_changed) {
     ac_quiesce(100, 400);
     int old = ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ), neu = ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, CTX_ALT);
     t_note("context changed while pending: completion on old ctx=%d new ctx=%d seq(all)=%s", old, neu, ac_seq(0, NULL));
-    EXPECT_EQ(old + neu, 1);
+    /* [W10] the completion keeps the context the operation started with */
+    EXPECT_EQ(old, 1); EXPECT_EQ(neu, 0);
     U(InternetCloseHandle)(f.hr);
     ac_wait_st(INTERNET_STATUS_HANDLE_CLOSING, CTX_ALT, 1, 2000);
     f.hr = NULL;
@@ -171,7 +174,8 @@ TEST(ac_sequential_requests_reuse_table) {
         char body[16]; int np;
         EXPECT_EQ(ac_read_all_async(h, ctx, body, sizeof body, &np), 5);
         EXPECT_STR(body, "hello");
-        const char *want = k == 0 ? "80,20,21,30,31,40,41,100" : "80,30,31,40,41,100";
+        /* [W10] send, then the reads add one 40/41 pair */
+        const char *want = k == 0 ? "80,20,21,30,31,40,41,100,40,41" : "80,30,31,40,41,100,40,41";
         CHECKF(!strcmp(ac_seq_range(ctx, n0, -1, NULL), want), "k=%d seq %s want %s", k, ac_seq_range(ctx, n0, -1, NULL), want);
         ac_close_wait(h, ctx);
     }
@@ -221,7 +225,8 @@ TEST(ac_status_code_table) {
         EXPECT_EQ(ac_count_st(INTERNET_STATUS_REDIRECT), 0);
         char b[16]; int np;
         long n = ac_read_all_async(f.hr, CTX_REQ, b, sizeof b, &np);
-        CHECKF(n == (codes[k] == 204 ? 0 : 4), "code %d: body %ld", codes[k], n);
+        /* the server sends Content-Length: 4 and the bytes even with 204; WinINet delivers them [W10] */
+        CHECKF(n == 4, "code %d: body %ld", codes[k], n);
         ac_flow_close(&f);
     }
 }
@@ -324,7 +329,7 @@ TEST(ac_sync_redirect_sequence) {
     if (i >= 0 && ac_get(i, &ev)) {
         char want[96]; snprintf(want, sizeof want, "http://127.0.0.1:%u/dst", srv_port(f.s));
         EXPECT_STR((char *)ev.info, want);
-        EXPECT_EQ(ev.len, strlen(want));       /* [W10] length without the terminating NUL */
+        EXPECT_EQ(ev.len, strlen(want) + 1);   /* [W10] narrow: length includes the terminating NUL */
     } else CHECK(i >= 0);
     ac_flow_close(&f);
 }
@@ -351,8 +356,10 @@ TEST(ac_sync_closing_on_calling_thread) {
     CHECK(U(HttpSendRequestA)(f.hr, NULL, 0, NULL, 0));
     int n0 = ac_count();
     CHECK(U(InternetCloseHandle)(f.hr));
-    /* synchronous: delivered before InternetCloseHandle returns */
-    EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "70");
+    /* synchronous: delivered before InternetCloseHandle returns. The 5-byte body was never read, so the
+     * connection is not reusable and is closed first (50, 51) [W10] */
+    EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "50,51,70");
+    EXPECT_EQ(ac_count_not_tid(0, ac_main_tid), 0);
     int i = ac_find(INTERNET_STATUS_HANDLE_CLOSING, CTX_REQ, n0); ac_ev ev;
     if (i >= 0 && ac_get(i, &ev)) EXPECT_EQ(ev.tid, ac_main_tid);
     f.hr = NULL;
@@ -371,6 +378,7 @@ TEST(ac_async_close_unread_response) {
     CHECK(ac_wait_st(INTERNET_STATUS_HANDLE_CLOSING, CTX_REQ, 1, 3000));
     ac_quiesce(100, 500);
     t_note("close with 100000 unread bytes: %s", ac_seq_range(0, n0, -1, NULL));
+    EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "50,51,70");
     EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ), 1);
     ac_flow_close(&f);
 }
@@ -386,6 +394,7 @@ TEST(ac_async_zero_length_read) {
     BOOL ok = U(InternetReadFile)(f.hr, b, 0, &rd);
     DWORD err = GetLastError();
     t_note("zero-length async read: ok=%d err=%lu rd=0x%lx", ok, err, rd);
+    CHECK(ok); EXPECT_EQ(rd, 0);   /* [W10] */
     if (!ok && err == ERROR_IO_PENDING) { INTERNET_ASYNC_RESULT r; ac_wait_complete(CTX_REQ, 2, 3000, &r); }
     char body[16]; int np;
     EXPECT_EQ(ac_read_all_async(f.hr, CTX_REQ, body, sizeof body, &np), 5);

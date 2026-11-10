@@ -168,7 +168,7 @@ TEST(ac_redirect_status_and_url) {
         char want[128]; snprintf(want, sizeof want, "http://127.0.0.1:%u/dst", srv_port(f.s));
         CHECK(ev.has_info);
         EXPECT_STR((char *)ev.info, want);
-        t_note("REDIRECT len=%lu", ev.len);
+        EXPECT_EQ(ev.len, strlen(want) + 1);
     }
     t_note("redirect sequence: %s", ac_seq(CTX_REQ, NULL));
     CHECK(ac_before(INTERNET_STATUS_RESPONSE_RECEIVED, INTERNET_STATUS_REDIRECT, CTX_REQ));
@@ -205,7 +205,7 @@ TEST(ac_redirect_w_callback_url_wide) {
     if (i >= 0 && ac_get(i, &ev)) {
         WCHAR want[128]; swprintf(want, 128, L"http://127.0.0.1:%u/wdst", srv_port(f.s));
         CHECK(ev.has_info && !lstrcmpW((WCHAR *)ev.info, want));
-        t_note("W REDIRECT len=%lu", ev.len);
+        EXPECT_EQ(ev.len, (DWORD)lstrlenW(want));   /* [W10] W: characters, no NUL */
     } else CHECK(i >= 0);
     ac_flow_close(&f);
 }

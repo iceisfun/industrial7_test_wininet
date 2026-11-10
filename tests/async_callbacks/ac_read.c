@@ -169,7 +169,7 @@ TEST(ac_read_truncated_body_async) {
     char b[64]; int np;
     long n = ac_read_all_async(f.hr, CTX_REQ, b, sizeof b, &np);
     t_note("truncated body: read %ld", n);
-    CHECK(n == 5 || n == -1);
+    EXPECT_EQ(n, 5);   /* [W10] the premature close ends the body without an error */
     ac_flow_close(&f);
 }
 TEST(ac_read_sync_session_with_callback) {
@@ -207,6 +207,7 @@ TEST(ac_read_before_send_async) {
     BOOL ok = U(InternetReadFile)(f.hr, b, sizeof b, &rd);
     DWORD e = GetLastError();
     t_note("read before send (async): ok=%d err=%lu rd=%lu", ok, e, rd);
+    CHECK(ok); EXPECT_EQ(rd, 0);   /* [W10] */
     ac_flow_close(&f);
 }
 

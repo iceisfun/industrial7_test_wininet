@@ -233,6 +233,8 @@ TEST(ac_async_send_connect_refused) {
     SetLastError(0xdeadbeef);
     BOOL q = U(HttpQueryInfoA)(f.hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &st, &l, NULL);
     t_note("STATUS_CODE query after failed async send: ok=%d err=%lu status=%lu", q, GetLastError(), st);
+    /* [W10] answers 0 rather than failing */
+    CHECK(q); EXPECT_EQ(st, 0);
     ac_flow_close(&f);
 }
 TEST(ac_async_send_server_resets) {
@@ -396,16 +398,26 @@ TEST(ac_async_localhost_resolution_sequence) {
     ac_quiesce(100, 300);
     t_note("localhost async: %s", ac_seq_range(0, n0, -1, NULL));
     ac_dump("localhost");
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ), 1);
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ), 1);
-    CHECK(ac_before(INTERNET_STATUS_RESOLVING_NAME, INTERNET_STATUS_NAME_RESOLVED, CTX_REQ));
-    CHECK(ac_before(INTERNET_STATUS_NAME_RESOLVED, INTERNET_STATUS_CONNECTING_TO_SERVER, CTX_REQ));
+    /* [W10] 10/11 are raised only when WinINet really resolves the name: the first "localhost" lookup in the
+     * process reports them, later ones are answered from WinINet's resolver cache and report nothing. The test
+     * therefore checks them only when present; the rest of the sequence is fixed. */
     int i = ac_find(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ, n0); ac_ev ev;
-    if (i >= 0 && ac_get(i, &ev)) { EXPECT_STR((char *)ev.info, "localhost"); t_note("RESOLVING_NAME len=%lu", ev.len); }
-    i = ac_find(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ, n0);
-    if (i >= 0 && ac_get(i, &ev)) t_note("NAME_RESOLVED len=%lu '%s'", ev.len, (char *)ev.info);
+    if (i >= 0) {
+        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ), 1);
+        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ), 1);
+        CHECK(ac_before(INTERNET_STATUS_RESOLVING_NAME, INTERNET_STATUS_NAME_RESOLVED, CTX_REQ));
+        CHECK(ac_before(INTERNET_STATUS_NAME_RESOLVED, INTERNET_STATUS_CONNECTING_TO_SERVER, CTX_REQ));
+        if (ac_get(i, &ev)) { EXPECT_STR((char *)ev.info, "localhost"); t_note("RESOLVING_NAME len=%lu", ev.len); }
+    } else {
+        t_note("localhost already in the resolver cache: no 10/11");
+        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ), 0);
+        EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "80,20,21,30,31,40,41,100");
+    }
+    /* localhost resolves ::1 first (04 F2): the address strings are bracketed IPv6 literals */
     i = ac_find(INTERNET_STATUS_CONNECTED_TO_SERVER, CTX_REQ, n0);
-    if (i >= 0 && ac_get(i, &ev)) t_note("CONNECTED_TO_SERVER len=%lu '%s'", ev.len, (char *)ev.info);
+    if (i >= 0 && ac_get(i, &ev)) { EXPECT_STR((char *)ev.info, "[::1]"); EXPECT_EQ(ev.len, 6); } else CHECK(i >= 0);
+    i = ac_find(INTERNET_STATUS_CONNECTING_TO_SERVER, CTX_REQ, n0);
+    if (i >= 0 && ac_get(i, &ev)) { EXPECT_STR((char *)ev.info, "[::1]"); EXPECT_EQ(ev.len, 6); } else CHECK(i >= 0);
     close_localhost(s, hi, hc, hr);
 }
 TEST(ac_sync_localhost_resolution_sequence) {
@@ -416,8 +428,8 @@ TEST(ac_sync_localhost_resolution_sequence) {
     int n0 = ac_count();
     CHECK(hr && U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
     t_note("localhost sync: %s", ac_seq_range(0, n0, -1, NULL));
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ), 1);
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ), 1);
+    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ), ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ));
+    if (!ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ)) EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "80,20,21,30,31,40,41");
     EXPECT_EQ(ac_count_not_tid(0, ac_main_tid), 0);
     close_localhost(s, hi, hc, hr);
 }
@@ -430,20 +442,21 @@ TEST(ac_async_w_callback_strings) {
     CHECK(hr && ac_send_wait(hr, CTX_REQ, NULL, NULL, 0, &pending, &err));
     ac_ev ev; int i;
     /* UnicodeStatusCallbackWrapper converts RESOLVING_NAME (10) and REDIRECT (110) only [D] */
+    /* 10/11 only when not answered from the resolver cache (see ac_async_localhost_resolution_sequence) */
     i = ac_find(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ, n0);
     if (i >= 0 && ac_get(i, &ev)) {
         EXPECT_EQ(ev.wide, 1);
         CHECK(ev.has_info && !lstrcmpW((WCHAR *)ev.info, L"localhost"));
-        t_note("W RESOLVING_NAME len=%lu", ev.len);
-    } else CHECK(i >= 0);
-    i = ac_find(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ, n0);
-    if (i >= 0 && ac_get(i, &ev)) {
-        /* passed through unconverted: still a narrow string */
-        CHECKF(ev.has_info && ev.info[0] && ev.info[1], "NAME_RESOLVED stays narrow in the W callback");
-        t_note("W NAME_RESOLVED len=%lu '%s'", ev.len, (char *)ev.info);
-    } else CHECK(i >= 0);
+        EXPECT_EQ(ev.len, 9);    /* [W10] W length in characters, without the NUL */
+        i = ac_find(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ, n0);
+        if (i >= 0 && ac_get(i, &ev)) {
+            /* passed through unconverted: still the narrow string, length with the NUL */
+            EXPECT_STR((char *)ev.info, "[::1]");
+            EXPECT_EQ(ev.len, 6);
+        } else CHECK(i >= 0);
+    } else t_note("localhost resolution cached: W conversion of 10 not observable in this run");
     i = ac_find(INTERNET_STATUS_CONNECTING_TO_SERVER, CTX_REQ, n0);
-    if (i >= 0 && ac_get(i, &ev)) { CHECK(ev.info[0] && ev.info[1]); t_note("W CONNECTING_TO_SERVER len=%lu '%s'", ev.len, (char *)ev.info); }
+    if (i >= 0 && ac_get(i, &ev)) { EXPECT_STR((char *)ev.info, "[::1]"); EXPECT_EQ(ev.len, 6); } else CHECK(i >= 0);
     close_localhost(s, hi, hc, hr);
 }
 
@@ -541,6 +554,9 @@ TEST(ac_async_connection_close_statuses) {
     t_note("conn-close: send+read=%s close=%s", ac_seq_range(0, n0, n1, NULL), ac_seq_range(0, n1, -1, NULL));
     int cc = ac_count_st_ctx(INTERNET_STATUS_CLOSING_CONNECTION, CTX_REQ), cd = ac_count_st_ctx(INTERNET_STATUS_CONNECTION_CLOSED, CTX_REQ);
     t_note("CLOSING_CONNECTION=%d CONNECTION_CLOSED=%d", cc, cd);
+    /* [W10] the server's close is noticed by the read that hits the end of the body */
+    EXPECT_STR(ac_seq_range(0, n0, n1, NULL), "80,20,21,30,31,40,41,100,40,41,50,51");
+    EXPECT_STR(ac_seq_range(0, n1, -1, NULL), "70");
     EXPECT_EQ(cc, cd);
     if (cc && cd) CHECK(ac_before(INTERNET_STATUS_CLOSING_CONNECTION, INTERNET_STATUS_CONNECTION_CLOSED, CTX_REQ));
     ac_flow_close(&f);
