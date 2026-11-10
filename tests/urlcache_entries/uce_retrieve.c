@@ -169,9 +169,11 @@ TEST(uce_retr_delete_while_locked) {
     SET_ERR(0xdeadbeef);
     CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
     EXPECT_ERR(0);
-    SET_ERR(0xdeadbeef);
-    CHECK(uce_del(url)); EXPECT_ERR(0);
+    /* the refused delete is remembered: the last unlock removes entry and file [W10, 2 boots] */
+    CHECK(!uce_exists(url));
     CHECK(!uce_file_exists(p));
+    SET_ERR(0xdeadbeef);
+    EXPECT_FAIL(!uce_del(url), ERROR_FILE_NOT_FOUND);
     CHECK(!uce_exists(url));
 }
 TEST(uce_retr_lock_counts) {
@@ -209,8 +211,7 @@ TEST(uce_retr_updates_use_count) {
         EXPECT_EQ(b->dwUseCount, 0); EXPECT_EQ(b->dwHitRate, 1);
         EXPECT_EQ(r1->dwUseCount, 1); EXPECT_EQ(r1->dwHitRate, 2);
         EXPECT_EQ(a->dwUseCount, 1); EXPECT_EQ(a->dwHitRate, 2);
-        CHECK(uce_u64(a->LastAccessTime) >= uce_u64(b->LastAccessTime));
-        t_note("LastAccessTime before %llx after retrieve %llx", uce_u64(b->LastAccessTime), uce_u64(a->LastAccessTime));
+        EXPECT_EQ(uce_u64(a->LastAccessTime), uce_u64(b->LastAccessTime));   /* retrieve does not touch it [W10, 2 boots] */
     } else CHECK(0);
     free(a); free(b);
     CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
@@ -585,8 +586,9 @@ TEST(uce_delete_stream_locked) {
     /* the open stream still reads the data */
     char rb[8]; DWORD n = 3;
     if (h) { CHECK(U(ReadUrlCacheEntryStream)(h, 0, rb, &n, 0)); CHECK(n == 3 && !memcmp(rb, "The", 3)); }
-    CHECK(uce_exists(url));               /* [W10] */
+    CHECK(uce_exists(url));               /* still visible while locked [W10] */
     if (h) CHECK(U(UnlockUrlCacheEntryStream)(h, 0));
-    CHECK(uce_del(url));
+    CHECK(!uce_exists(url));              /* pending delete done at unlock [W10] */
+    CHECK(!uce_file_exists(p));
     CHECK(!uce_exists(url));
 }

@@ -79,7 +79,8 @@ TEST(uce_more_sparse_entry) {
     char buf[4096]; DWORD sz = sizeof buf;
     SET_ERR(0xdeadbeef);
     BOOL r = U(RetrieveUrlCacheEntryFileA)(url, (INTERNET_CACHE_ENTRY_INFOA *)buf, &sz, 0);
-    t_note("retrieve of SPARSE entry: r=%d err=%lu", r, r ? 0 : GetLastError());
+    DWORD e = GetLastError();
+    CHECK(!r); EXPECT_EQ(e, ERROR_FILE_NOT_FOUND);   /* hidden from retrieve too [W10] */
     if (r) U(UnlockUrlCacheEntryFileA)(url, 0);
     SET_ERR(0xdeadbeef);
     CHECK(uce_del(url)); EXPECT_ERR(0);
@@ -95,10 +96,10 @@ TEST(uce_more_set_while_locked) {
     INTERNET_CACHE_ENTRY_INFOA n; memset(&n, 0, sizeof n); n.ExpireTime = uce_ft(0x01DB000000000000ULL);
     SET_ERR(0xdeadbeef);
     BOOL r = U(SetUrlCacheEntryInfoA)(url, &n, CACHE_ENTRY_EXPTIME_FC);
-    t_note("set on locked entry: r=%d err=%lu", r, r ? 0 : GetLastError());
+    CHECK(r); EXPECT_ERR(0);              /* Set ignores locks [W10] */
     CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
     DWORD e; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &e);
-    if (i && r) EXPECT_EQ(uce_u64(i->ExpireTime), 0x01DB000000000000ULL);
+    if (i) EXPECT_EQ(uce_u64(i->ExpireTime), 0x01DB000000000000ULL); else CHECK(0);
     free(i);
     CHECK(uce_del(url));
 }
@@ -157,7 +158,7 @@ TEST(uce_more_commit_local_file_case) {
     char up[MAX_PATH]; strcpy(up, p); CharUpperA(up);
     SET_ERR(0xdeadbeef);
     BOOL r = U(CommitUrlCacheEntryA)(url, up, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL);
-    t_note("commit with upper-cased local path: r=%d err=%lu", r, r ? 0 : GetLastError());
+    CHECK(r); EXPECT_ERR(0);              /* [W10] */
     if (r) CHECK(uce_del(url)); else DeleteFileA(p);
 }
 TEST(uce_more_commit_file_in_container_root) {
@@ -172,7 +173,7 @@ TEST(uce_more_commit_file_in_container_root) {
     SET_ERR(0xdeadbeef);
     BOOL r = U(CommitUrlCacheEntryA)(url, q, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL);
     DWORD e = GetLastError();
-    t_note("commit of a file in the container root: r=%d err=%lu", r, e);
+    CHECK(!r); EXPECT_EQ(e, ERROR_INVALID_PARAMETER);   /* [D VerifyCacheEntryPath] [W10] */
     if (r) uce_del(url);
     DeleteFileA(q); DeleteFileA(p);
 }
@@ -194,7 +195,26 @@ TEST(uce_more_info_after_file_grows_retrieve) {
     CHECK(uce_write_file(p, "abcdefgh", 8));
     char buf[4096]; DWORD sz = sizeof buf;
     CHECK(U(RetrieveUrlCacheEntryFileA)(url, (INTERNET_CACHE_ENTRY_INFOA *)buf, &sz, 0));
-    t_note("size reported by retrieve after the file grew: %lu (committed 3)", ((INTERNET_CACHE_ENTRY_INFOA *)buf)->dwSizeLow);
+    EXPECT_EQ(((INTERNET_CACHE_ENTRY_INFOA *)buf)->dwSizeLow, 3);   /* committed size, file not re-read [W10] */
     CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
     CHECK(uce_del(url));
+}
+TEST(uce_more_set_edited_relative_name) {
+    REQUIRE(U(SetUrlCacheEntryInfoA));
+    /* a non-EDITED entry stores its file relative to the container [D AddUrl: path + dir length unless (flags & 8)];
+       flipping EDITED on with SetUrlCacheEntryInfo therefore exposes the bare leaf name [W10] */
+    const char *url = uce_url("medit"); char p[MAX_PATH];
+    CHECK(mk(url, "rel", p));
+    INTERNET_CACHE_ENTRY_INFOA n; memset(&n, 0, sizeof n); n.CacheEntryType = NORMAL_CACHE_ENTRY | EDITED_CACHE_ENTRY;
+    CHECK(U(SetUrlCacheEntryInfoA)(url, &n, CACHE_ENTRY_ATTRIBUTE_FC));
+    DWORD e; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &e);
+    const char *leaf = strrchr(p, '\\'); leaf = leaf ? leaf + 1 : p;
+    if (i) { CHECKF(i->lpszLocalFileName && !_stricmp(i->lpszLocalFileName, leaf), "%s", i->lpszLocalFileName ? i->lpszLocalFileName : "(null)"); free(i); } else CHECK(0);
+    /* back to NORMAL: the full path is seen again, and delete removes the file */
+    n.CacheEntryType = NORMAL_CACHE_ENTRY;
+    CHECK(U(SetUrlCacheEntryInfoA)(url, &n, CACHE_ENTRY_ATTRIBUTE_FC));
+    i = uce_info(url, NULL, &e);
+    if (i) { CHECK(i->lpszLocalFileName && !_stricmp(i->lpszLocalFileName, p)); free(i); } else CHECK(0);
+    CHECK(uce_del(url));
+    CHECK(!uce_file_exists(p));
 }

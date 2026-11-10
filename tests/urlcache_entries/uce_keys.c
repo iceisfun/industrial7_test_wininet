@@ -386,7 +386,7 @@ TEST(uce_xproc_replace_by_child) {
         EXPECT_EQ(i->dwSizeLow, 11);
         char rb[64]; int n = i->lpszLocalFileName ? uce_read_file(i->lpszLocalFileName, rb, sizeof rb) : -1;
         CHECK(n == 11 && !memcmp(rb, "version two", 11));
-        t_note("parent file %s, after child replace %s (exists=%d)", p, i->lpszLocalFileName, uce_file_exists(p));
+        CHECK(!uce_file_exists(p));       /* the replaced file is deleted, whichever process replaced it [W10] */
         free(i);
     } else CHECK(0);
     CHECK(uce_del(url));

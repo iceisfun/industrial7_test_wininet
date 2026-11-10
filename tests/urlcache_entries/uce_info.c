@@ -464,7 +464,7 @@ static const struct { DWORD fc; int field; const char *name; } g_fc[] = {
 };
 static void fill_new(INTERNET_CACHE_ENTRY_INFOA *n) {
     memset(n, 0, sizeof *n); n->dwStructSize = sizeof *n;
-    n->CacheEntryType = NORMAL_CACHE_ENTRY | EDITED_CACHE_ENTRY; n->dwHitRate = 77;
+    n->CacheEntryType = NORMAL_CACHE_ENTRY | TRACK_OFFLINE_CACHE_ENTRY; n->dwHitRate = 77;
     n->LastModifiedTime = uce_ft(0x01D1111111111111ULL); n->ExpireTime = uce_ft(0x01D2222222222222ULL);
     n->LastAccessTime = uce_ft(0x01D3333333333333ULL); n->LastSyncTime = uce_ft(0x01D4444444444444ULL);
     n->dwExemptDelta = 3600;
@@ -512,7 +512,7 @@ TEST(uce_set_all_flags) {
         EXPECT_EQ(uce_u64(a->ExpireTime), uce_u64(n.ExpireTime));
         EXPECT_EQ(uce_u64(a->LastSyncTime), uce_u64(n.LastSyncTime));
         EXPECT_EQ(a->dwExemptDelta, 3600);
-        CHECK(a->CacheEntryType & EDITED_CACHE_ENTRY);
+        CHECK(a->CacheEntryType & TRACK_OFFLINE_CACHE_ENTRY);
         CHECK(a->CacheEntryType & STICKY_CACHE_ENTRY);
         free(a);
     } else CHECK(0);
@@ -527,7 +527,7 @@ TEST(uce_set_no_flags_noop) {
     CHECK(U(SetUrlCacheEntryInfoA)(url, &n, 0));
     EXPECT_ERR(0);
     DWORD e; INTERNET_CACHE_ENTRY_INFOA *a = uce_info(url, NULL, &e);
-    if (a) { EXPECT_EQ(uce_u64(a->ExpireTime), 5); EXPECT_EQ(uce_u64(a->LastModifiedTime), 6); CHECK(!(a->CacheEntryType & EDITED_CACHE_ENTRY)); free(a); } else CHECK(0);
+    if (a) { EXPECT_EQ(uce_u64(a->ExpireTime), 5); EXPECT_EQ(uce_u64(a->LastModifiedTime), 6); CHECK(!(a->CacheEntryType & TRACK_OFFLINE_CACHE_ENTRY)); free(a); } else CHECK(0);
     CHECK(uce_del(url));
 }
 TEST(uce_set_headerinfo_flag_ignored) {
@@ -646,7 +646,6 @@ TEST(uce_set_does_not_change_strings) {
     if (a) {
         CHECKF(a->lpszLocalFileName && !_stricmp(a->lpszLocalFileName, p), "local %s want %s", a->lpszLocalFileName ? a->lpszLocalFileName : "(null)", p);
         EXPECT_STR(a->lpszFileExtension, "txt"); EXPECT_STR(a->lpszSourceUrlName, url); EXPECT_EQ(a->dwSizeLow, 7);
-        t_note("after set-all: type=0x%lx local=%s", a->CacheEntryType, a->lpszLocalFileName ? a->lpszLocalFileName : "(null)");
         free(a);
     } else CHECK(0);
     CHECK(uce_del(url));
