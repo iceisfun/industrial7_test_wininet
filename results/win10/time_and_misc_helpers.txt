@@ -1,0 +1,488 @@
+RUN  tmt_all_weekday_month_words_lowercase
+OK   tmt_all_weekday_month_words_lowercase
+RUN  tmt_long_input
+OK   tmt_long_input
+RUN  tmt_w_non_ascii_is_separator_or_failure
+OK   tmt_w_non_ascii_is_separator_or_failure
+RUN  tmt_w_roundtrip
+OK   tmt_w_roundtrip
+RUN  tmt_roundtrip_sweep
+  NOTE 1429 round trips
+OK   tmt_roundtrip_sweep
+RUN  tmt_a_asctime_zone_word_is_local_time
+  NOTE guest time zone bias 480 min (mode 2)
+OK   tmt_a_asctime_zone_word_is_local_time
+RUN  tmt_a_range_failure_writes_fields
+OK   tmt_a_range_failure_writes_fields
+RUN  tmt_a_unknown_word_leaves_output_untouched
+OK   tmt_a_unknown_word_leaves_output_untouched
+RUN  tmt_a_success_leaves_lasterror
+OK   tmt_a_success_leaves_lasterror
+RUN  tmt_w_args
+OK   tmt_w_args
+RUN  tmt_a_args
+OK   tmt_a_args
+RUN  tmt_plain_alias_table
+OK   tmt_plain_alias_table
+RUN  tmt_w_table
+OK   tmt_w_table
+RUN  tmt_a_table
+OK   tmt_a_table
+RUN  tmf_w_weekday_rule_same_as_a
+OK   tmf_w_weekday_rule_same_as_a
+RUN  tmf_w_matches_a_sweep
+OK   tmf_w_matches_a_sweep
+RUN  tmf_w_five_digit_year
+  FAIL tests/time_and_misc_helpers/time_from.c:329: buf == L"Sun, 31 Dec 30827 23:59:59 GMT" (wide string mismatch)
+FAIL tmf_w_five_digit_year
+RUN  tmf_w_errors_from_a
+OK   tmf_w_errors_from_a
+RUN  tmf_w_null_buffer
+OK   tmf_w_null_buffer
+RUN  tmf_w_bufsize_table
+OK   tmf_w_bufsize_table
+RUN  tmf_w_example
+OK   tmf_w_example
+RUN  tmf_a_input_not_modified
+OK   tmf_a_input_not_modified
+RUN  tmf_a_time_of_day_sweep
+OK   tmf_a_time_of_day_sweep
+RUN  tmf_a_years_sweep
+OK   tmf_a_years_sweep
+RUN  tmf_a_sweep_1601
+OK   tmf_a_sweep_1601
+RUN  tmf_a_sweep_2100
+OK   tmf_a_sweep_2100
+RUN  tmf_a_sweep_2024
+OK   tmf_a_sweep_2024
+RUN  tmf_a_sweep_2000
+OK   tmf_a_sweep_2000
+RUN  tmf_a_sweep_1994
+OK   tmf_a_sweep_1994
+RUN  tmf_a_weekday_out_of_range_ignored_when_day_gt_6
+OK   tmf_a_weekday_out_of_range_ignored_when_day_gt_6
+RUN  tmf_a_weekday_recomputed_when_day_gt_6
+OK   tmf_a_weekday_recomputed_when_day_gt_6
+RUN  tmf_a_weekday_from_caller_when_day_le_6
+OK   tmf_a_weekday_from_caller_when_day_le_6
+RUN  tmf_a_five_digit_year_truncates
+  NOTE 30827 truncated to [Fri, 31 Dec 30827 23:59:59 GM]
+  FAIL tests/time_and_misc_helpers/time_from.c:177: buf == "Sun, 31 Dec 30827 23:59:59 GM" (got "Fri, 31 Dec 30827 23:59:59 GM" want "Sun, 31 Dec 30827 23:59:59 GM")
+  FAIL tests/time_and_misc_helpers/time_from.c:180: big == "Sun, 31 Dec 30827 23:59:59 GMT" (got "Fri, 31 Dec 30827 23:59:59 GMT" want "Sun, 31 Dec 30827 23:59:59 GMT")
+FAIL tmf_a_five_digit_year_truncates
+RUN  tmf_a_valid_edges
+OK   tmf_a_valid_edges
+RUN  tmf_a_invalid_systemtime_table
+OK   tmf_a_invalid_systemtime_table
+RUN  tmf_a_rfc_values
+OK   tmf_a_rfc_values
+RUN  tmf_a_null_args
+OK   tmf_a_null_args
+RUN  tmf_a_small_buffer_beats_null_args
+OK   tmf_a_small_buffer_beats_null_args
+RUN  tmf_a_bufsize_table
+OK   tmf_a_bufsize_table
+RUN  tmf_plain_name_is_ansi
+OK   tmf_plain_name_is_ansi
+RUN  tmf_a_success_leaves_lasterror
+OK   tmf_a_success_leaves_lasterror
+RUN  tmf_a_rfc1123_example
+OK   tmf_a_rfc1123_example
+RUN  tmf_alias_resolves
+  NOTE InternetTimeFromSystemTime == InternetTimeFromSystemTimeA
+OK   tmf_alias_resolves
+RUN  tmf_constants
+OK   tmf_constants
+RUN  tsh_secinfo_after_tls_request
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  FAIL tests/time_and_misc_helpers/small_helpers.c:519: sent (send err 12030)
+FAIL tsh_secinfo_after_tls_request
+RUN  tsh_secinfo_unknown_host
+OK   tsh_secinfo_unknown_host
+RUN  tsh_secinfo_args
+OK   tsh_secinfo_args
+RUN  tsh_algid_args
+OK   tsh_algid_args
+RUN  tsh_algid_unknown_formatted
+  NOTE unknown alg 0x0 -> r=1 e=0 [Algorithm 0]
+  NOTE unknown alg 0x1 -> r=1 e=0 [Algorithm 1]
+  NOTE unknown alg 0x1234 -> r=1 e=0 [Algorithm 4660]
+  NOTE unknown alg 0xffff -> r=1 e=0 [Algorithm 65535]
+  NOTE unknown alg 0x12345678 -> r=1 e=0 [Algorithm 305419896]
+OK   tsh_algid_unknown_formatted
+RUN  tsh_algid_selected_names
+  FAIL tests/time_and_misc_helpers/small_helpers.c:441: strstr(buf, t[i].s) != NULL (0x6603 -> [Triple DES] expected to contain [3DES])
+FAIL tsh_algid_selected_names
+RUN  tsh_algid_known_a
+  NOTE alg 0x8001 -> [MD2]
+  NOTE alg 0x8002 -> [MD4]
+  NOTE alg 0x8003 -> [MD5]
+  NOTE alg 0x8004 -> [SHA]
+  NOTE alg 0x8005 -> [MAC]
+  NOTE alg 0x8009 -> [HMAC]
+  NOTE alg 0x2400 -> [RSA]
+  NOTE alg 0x2200 -> [DSS]
+  NOTE alg 0xa400 -> [RSA]
+  NOTE alg 0x6601 -> [DES]
+  NOTE alg 0x6609 -> [2 KeyTriple DES]
+  NOTE alg 0x6603 -> [Triple DES]
+  NOTE alg 0x6602 -> [RC2]
+  NOTE alg 0x6801 -> [RC4]
+  NOTE alg 0x660d -> [RC5]
+  NOTE alg 0x6802 -> [SEAL]
+  NOTE alg 0xaa01 -> [Diffie Hellman store and forward]
+  NOTE alg 0xaa02 -> [Diffie Hellman Ephemeral]
+  NOTE alg 0xaa04 -> [KEY (Fortezza)]
+  NOTE alg 0x660a -> [SKIPJACK (Fortezza)]
+  NOTE alg 0x660b -> [TEK (Fortezza)]
+  NOTE alg 0x2000 -> [No Signature]
+  NOTE alg 0x6604 -> [DESX ]
+  NOTE alg 0xaa03 -> [Any Key Exchange]
+  NOTE alg 0xa003 -> [Hughes MD5]
+  NOTE alg 0x660c -> [Cylink MEK]
+  NOTE alg 0x8008 -> [SHA and MD5]
+  NOTE alg 0x4c01 -> [SSL3 Master Key]
+  NOTE alg 0x4c02 -> [SSL Master Hash]
+  NOTE alg 0x4c03 -> [SSL MAC Key]
+  NOTE alg 0x4c07 -> [SSL Encryption Key]
+  NOTE alg 0x4c04 -> [PCT1 Master Key]
+  NOTE alg 0x4c05 -> [SSL2 Master Key]
+  NOTE alg 0x4c06 -> [TLS1 Master Key]
+  NOTE alg 0x800a -> [TLS1 PRF]
+  NOTE alg 0x800b -> [OWF Hash]
+  NOTE alg 0x660e -> [AES 128]
+  NOTE alg 0x660f -> [AES 192]
+  NOTE alg 0x6610 -> [AES 256]
+  NOTE alg 0x6611 -> [AES]
+  NOTE alg 0x800c -> [SHA 256]
+  NOTE alg 0x800d -> [SHA 384]
+  NOTE alg 0x800e -> [SHA 512]
+OK   tsh_algid_known_a
+RUN  tsh_secproto_unknown_and_args
+OK   tsh_secproto_unknown_and_args
+RUN  tsh_secproto_strings_w
+OK   tsh_secproto_strings_w
+RUN  tsh_secproto_strings_a
+  NOTE protocol 0x8 -> [SSL 2.0] (7)
+  NOTE protocol 0x20 -> [SSL 3.0] (7)
+  NOTE protocol 0x2 -> [PCT 1.0] (7)
+  NOTE protocol 0x80 -> [TLS 1.0] (7)
+  NOTE protocol 0x200 -> [TLS 1.1] (7)
+  NOTE protocol 0x800 -> [TLS 1.2] (7)
+  NOTE protocol 0x2000 -> [TLS 1.3] (7)
+OK   tsh_secproto_strings_a
+RUN  tsh_hsts_unknown_hosts
+  NOTE HttpIsHostHstsEnabled("") = 87, 0
+OK   tsh_hsts_unknown_hosts
+RUN  tsh_hsts_args
+OK   tsh_hsts_args
+RUN  tsh_fileext_length_limit
+OK   tsh_fileext_length_limit
+RUN  tsh_fileext_buffer_sizes
+OK   tsh_fileext_buffer_sizes
+RUN  tsh_fileext_args
+OK   tsh_fileext_args
+RUN  tsh_fileext_table
+OK   tsh_fileext_table
+RUN  tsh_cache_header_stable_reads
+OK   tsh_cache_header_stable_reads
+RUN  tsh_cache_header_get_null
+OK   tsh_cache_header_get_null
+RUN  tsh_cache_header_bad_index
+OK   tsh_cache_header_bad_index
+RUN  tsh_cache_header_get_all
+  NOTE cache header data: 0:0 1:0 2:0 3:0 4:0 5:0 6:0 7:0 8:0 9:0 10:0 11:0 12:0 13:0 14:0 15:0 16:0 17:0 18:0 19:0 20:0 21:0 22:0 23:0 24:0 25:0 26:0 27:0 28:0 29:0 30:0 31:0 
+OK   tsh_cache_header_get_all
+RUN  tsh_persite_enum_past_end
+  NOTE existing per-site decisions: 0 (not asserted)
+  NOTE enum index 100000: r=0 e=259
+OK   tsh_persite_enum_past_end
+RUN  tsh_persite_enum_args
+OK   tsh_persite_enum_args
+RUN  tsh_persite_get_unknown_host
+OK   tsh_persite_get_unknown_host
+RUN  tsh_persite_get_args
+OK   tsh_persite_get_args
+RUN  tsh_free_cookies_after_ex2
+  NOTE InternetGetCookieEx2 -> 0 cnt=1
+OK   tsh_free_cookies_after_ex2
+RUN  tsh_free_cookies_null
+OK   tsh_free_cookies_null
+RUN  tsh_idl_observations
+  NOTE IsDomainLegalCookieDomainA(.example.com, www.example.com) = 0
+  NOTE IsDomainLegalCookieDomainA(localhost, localhost) = 0
+  NOTE IsDomainLegalCookieDomainA(example.com., www.example.com) = 0
+  NOTE IsDomainLegalCookieDomainA(github.io, x.github.io) = 0
+  NOTE IsDomainLegalCookieDomainA(x.github.io, x.github.io) = 1
+  NOTE IsDomainLegalCookieDomainA(, example.com) = 0
+  NOTE IsDomainLegalCookieDomainA(, ) = 1
+  NOTE IsDomainLegalCookieDomainA(co.jp, a.co.jp) = 0
+  NOTE IsDomainLegalCookieDomainA(example, a.example) = 0
+OK   tsh_idl_observations
+RUN  tsh_idl_a_null
+OK   tsh_idl_a_null
+RUN  tsh_idl_w_table
+OK   tsh_idl_w_table
+RUN  tsh_idl_a_table
+OK   tsh_idl_a_table
+RUN  tsh_idl_resolve_by_ordinal
+  NOTE #116=00007ffaeb76ea30 #117=00007ffaeb8ba770
+OK   tsh_idl_resolve_by_ordinal
+RUN  tcb_wire_sequence_w
+  NOTE W callback sequence: 60/22 80/22 20/22 21/22 30/22 31/22 40/22 41/22 40/22 41/22 70/22 
+  NOTE no RESOLVING_NAME for an IP literal
+OK   tcb_wire_sequence_w
+RUN  tcb_wire_sequence_a
+  NOTE A callback sequence: 60/22 80/22 20/22 21/22 30/22 31/22 40/22 41/22 40/22 41/22 70/22 
+  NOTE no RESOLVING_NAME for an IP literal
+OK   tcb_wire_sequence_a
+RUN  tcb_child_inherits_parent_callback
+  NOTE connect handle initial callback == parent
+OK   tcb_child_inherits_parent_callback
+RUN  tcb_connect_and_request_handles
+OK   tcb_connect_and_request_handles
+RUN  tcb_closed_handle
+OK   tcb_closed_handle
+RUN  tcb_session_exchange_sequence
+OK   tcb_session_exchange_sequence
+RUN  tcb_unmapped_handles
+OK   tcb_unmapped_handles
+RUN  tcb_plain_alias_null_handle
+OK   tcb_plain_alias_null_handle
+RUN  tcb_null_handle
+OK   tcb_null_handle
+RUN  tlr_http_request_leaves_no_text
+  NOTE after HTTP GET (same thread as earlier tests): r=1 len=0 err=0 []
+OK   tlr_http_request_leaves_no_text
+RUN  tlr_after_ftp_missing_file
+  NOTE FtpOpenFile missing: h=0000000000000000 gle=12003
+  NOTE text [200 Type set to I.
+227 Entering Passive Mode (127,0,0,1,194,20).
+550 missing.txt: No such file.
+550 missing.txt: No such file or directory.
+] err=0
+OK   tlr_after_ftp_missing_file
+RUN  tlr_after_ftp_command_failure
+  NOTE FtpCommand XYZZ r=0 gle=12003
+  NOTE after 502: [502 Command not implemented.
+] err=0
+  NOTE after NOOP: [200 NOOP ok.
+] err=0
+OK   tlr_after_ftp_command_failure
+RUN  tlr_w_after_ftp_login
+  NOTE W size query r=0 gle=122 len=166 (A len incl NUL 83)
+  NOTE W N=strlen: r=0 gle=122 len=164
+  NOTE W N=2: r=0 gle=122 len=166
+OK   tlr_w_after_ftp_login
+RUN  tlr_a_after_ftp_login
+  NOTE after login: size query r=0 gle=122 len=83 err=0
+  NOTE after login: text [220 i7 test FTP ready
+331 Password required for anonymous.
+230 User logged in.
+] len=82 err=0
+OK   tlr_a_after_ftp_login
+RUN  tlr_w_fresh_thread_null_buffer
+  NOTE fresh-thread W NULL buffer: len 77 (input 77)
+OK   tlr_w_fresh_thread_null_buffer
+RUN  tlr_w_fresh_thread_empty
+OK   tlr_w_fresh_thread_empty
+RUN  tlr_a_fresh_thread_zero_len
+OK   tlr_a_fresh_thread_zero_len
+RUN  tlr_a_fresh_thread_null_buffer
+OK   tlr_a_fresh_thread_null_buffer
+RUN  tlr_a_fresh_thread_empty
+  NOTE fresh-thread A: err=0
+OK   tlr_a_fresh_thread_empty
+RUN  tlr_a_null_args
+OK   tlr_a_null_args
+RUN  tmh_connected_state_reserved
+  NOTE reserved=1: r=0 e=87 flags=0x0
+OK   tmh_connected_state_reserved
+RUN  tmh_connected_state_notes
+  NOTE InternetGetConnectedState r=1 flags=0x12 gle=0
+  NOTE ExA r=1 flags=0x12 name=[LAN Connection]
+  NOTE ExW r=1 flags=0x12
+  NOTE NULL flags r=1 gle=0
+OK   tmh_connected_state_notes
+RUN  tmh_check_connection_fresh_process
+  NOTE fresh ICC(NULL,0)=0x8ca ICC(NULL,FORCE)=0x2ef0 ICC(url,0)=0x8ca
+OK   tmh_check_connection_fresh_process
+RUN  tmh_check_connection_force_refused
+  NOTE ICC force to closed port: r=0 e=12029
+OK   tmh_check_connection_force_refused
+RUN  tmh_check_connection_force_loopback
+  NOTE ICC force A to live loopback: r=1 e=0 conns=0
+OK   tmh_check_connection_force_loopback
+RUN  tmh_check_connection_reserved
+OK   tmh_check_connection_reserved
+RUN  tmh_resume_suspended_download
+OK   tmh_resume_suspended_download
+RUN  tmh_errordlg_closed_handle_6
+OK   tmh_errordlg_closed_handle_6
+RUN  tmh_errordlg_cookie_no_ui_declined
+OK   tmh_errordlg_cookie_no_ui_declined
+RUN  tmh_errordlg_non_request_handle_0
+  NOTE session handle -> 0
+  NOTE connect handle -> 0
+OK   tmh_errordlg_non_request_handle_0
+RUN  tmh_errordlg_unmapped_handle_6
+OK   tmh_errordlg_unmapped_handle_6
+RUN  tmh_errordlg_null_request_87
+OK   tmh_errordlg_null_request_87
+RUN  tmh_errordlg_insert_cdrom_120
+OK   tmh_errordlg_insert_cdrom_120
+RUN  tmh_zone_crossing_scheme_case
+  NOTE scheme case: http->HTTPS 12039, HTTPS->https 0, HtTpS->HTTP 12040
+OK   tmh_zone_crossing_scheme_case
+RUN  tmh_zone_crossing_null_first_url
+OK   tmh_zone_crossing_null_first_url
+RUN  tmh_zone_crossing_plain_alias
+OK   tmh_zone_crossing_plain_alias
+RUN  tmh_zone_crossing_w_table
+OK   tmh_zone_crossing_w_table
+RUN  tmh_zone_crossing_a_table
+OK   tmh_zone_crossing_a_table
+RUN  tmh_autodial_callback_noop
+OK   tmh_autodial_callback_noop
+RUN  tmh_fortezza_stubs
+OK   tmh_fortezza_stubs
+RUN  tmh_attempt_connect
+OK   tmh_attempt_connect
+RUN  tmh_hangup
+OK   tmh_hangup
+RUN  tmh_dial_success_is_noop
+OK   tmh_dial_success_is_noop
+RUN  tmh_dial_args
+OK   tmh_dial_args
+RUN  tmh_autodial_hangup
+OK   tmh_autodial_hangup
+RUN  tmh_autodial_flags
+OK   tmh_autodial_flags
+RUN  tmh_setdialstate_always_120
+OK   tmh_setdialstate_always_120
+RUN  tmh_goonline_plain_alias
+OK   tmh_goonline_plain_alias
+RUN  tmh_goonline_valid_flags
+OK   tmh_goonline_valid_flags
+RUN  tmh_goonline_flags_table
+OK   tmh_goonline_flags_table
+RUN  terr_errname_table_matches_formatmessage
+  NOTE no message: ERROR_INTERNET_INSERT_CDROM (12053)
+  NOTE no message: ERROR_INTERNET_FORTEZZA_LOGIN_NEEDED (12054)
+  NOTE no message: ERROR_INTERNET_SEC_CERT_NO_REV (12056)
+  NOTE no message: ERROR_INTERNET_NEED_MSN_SSPI_PKG (12173)
+  NOTE 4 of 92 table codes have no message text
+OK   terr_errname_table_matches_formatmessage
+RUN  terr_cookie_not_found
+OK   terr_cookie_not_found
+RUN  terr_untrusted_certificate
+OK   terr_untrusted_certificate
+RUN  terr_header_not_found
+OK   terr_header_not_found
+RUN  terr_cannot_connect
+OK   terr_cannot_connect
+RUN  terr_wrong_handle_type
+  NOTE InternetConnect on a connect handle: 0000000000000000 e=12018
+OK   terr_wrong_handle_type
+RUN  terr_option_errors
+OK   terr_option_errors
+RUN  terr_close_twice
+OK   terr_close_twice
+RUN  terr_close_unmapped_handle
+OK   terr_close_unmapped_handle
+RUN  terr_crack_url_unrecognized_scheme
+OK   terr_crack_url_unrecognized_scheme
+RUN  terr_names_helper_consistent
+OK   terr_names_helper_consistent
+RUN  terr_message_table_not_for_win32_codes
+  NOTE FormatMessage(wininet, 2) = 0 err 317
+OK   terr_message_table_not_for_win32_codes
+RUN  terr_message_table_survey
+  NOTE wininet message table 12001..12185: 91 with text, 94 without: 12035 12053 12054 12056 12058 12059 12060 12061 12062 12063 12064 12065 12066 12067 12068 12069 12070 12071 12072 12073 12074 12075 12076 12077 12078 12079 12080 12081 12082 12083 12084 12085 12086 12087 12088 12089 12090 12091 12092 12093 12094 12095 12096 12097 12098 12099 12100 12101 12102 12103 12104 12105 12106 12107 12108 12109 12113 12114 12115 12116 12117 12118 12119 12120 12121 12122 12123 12124 12125 12126 12127 12128 12129 12139 12140 12141 12142 12143 12144 12145 12146 12147 12148 12149 12173 12177 12178 12179 12180 12181 12182 12183 12184 12185 
+  NOTE 12029: A connection with the server could not be established
+
+  NOTE 12003: The server returned extended information
+
+  NOTE 12150: The requested header was not found
+
+OK   terr_message_table_survey
+RUN  terr_message_table_core_codes
+OK   terr_message_table_core_codes
+RUN  terr_code_values
+OK   terr_code_values
+RUN  tcw_wire_url_cch_limits_input
+  NOTE cch 4 of /abcdef -> 0 [http://h.example/abc]
+OK   tcw_wire_url_cch_limits_input
+RUN  tcw_wire_url_combine
+  NOTE wire [http://h.example/a/b] base [http://other.example/] -> 0 [http://h.example/a/b]
+  NOTE wire [/x/y] base [http://h.example/a/b] -> 0 [http://h.example/x/y]
+  NOTE wire [c] base [http://h.example/a/b] -> 0 [http://h.example/a/c]
+  NOTE wire [../c] base [http://h.example/a/b/d] -> 0 [http://h.example/a/c]
+  NOTE wire [https://s.example:8443/p?q=1#f] base [http://h.example/] -> 0 [https://s.example:8443/p?q=1#f]
+  NOTE wire [/%E4%B8%AD] base [http://h.example/] -> 0 [http://h.example/%E4%B8%AD]
+  NOTE wire [/中] base [http://h.example/] -> 0 [http://h.example/]
+  NOTE wire [/a b] base [http://h.example/] -> 0 [http://h.example/a%20b]
+  NOTE wire [http://[::1]/v6] base [http://h.example/] -> 0 [http://[::1]/v6]
+  NOTE wire [http://xn--fsq.example/] base [http://h.example/] -> 0 [http://xn--fsq.example/]
+OK   tcw_wire_url_combine
+RUN  tcw_wire_url_args
+OK   tcw_wire_url_args
+RUN  tca_update_extra_data_args
+OK   tca_update_extra_data_args
+RUN  tca_read_stream_args
+OK   tca_read_stream_args
+RUN  tca_retrieve_missing_entry
+  NOTE RetrieveEntryFile(missing) -> 2
+  NOTE RetrieveEntryStream(missing) -> 2
+OK   tca_retrieve_missing_entry
+RUN  tca_retrieve_stream_args
+OK   tca_retrieve_stream_args
+RUN  tca_retrieve_file_args
+OK   tca_retrieve_file_args
+RUN  tca_get_entry_info_args
+  NOTE UrlCacheGetEntryInfo(missing) -> 2
+  NOTE UrlCacheGetEntryInfo(missing, NULL info) -> 2
+OK   tca_get_entry_info_args
+RUN  tca_find_next_args
+OK   tca_find_next_args
+RUN  tca_find_first_args
+OK   tca_find_first_args
+RUN  tca_create_container_args
+OK   tca_create_container_args
+RUN  tca_container_age_args
+OK   tca_container_age_args
+RUN  tca_content_paths_query
+  NOTE UrlCacheGetContentPaths -> 0 count=2
+  NOTE   path[0] = C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\
+  NOTE   path[1] = C:\Users\Administrator\AppData\Local\Packages\microsoft.windows.search_cw5n1h2txyewy\AC\INetCache\
+OK   tca_content_paths_query
+RUN  tca_content_paths_args
+OK   tca_content_paths_args
+RUN  tca_check_exist_committed_entry
+  NOTE CheckEntriesExist(committed, missing) -> 0 [1 0]
+  NOTE UrlCacheGetEntryInfo(committed) -> 0 (info zero=0)
+OK   tca_check_exist_committed_entry
+RUN  tca_check_exist_missing_urls
+  NOTE CheckEntriesExist(2 unique missing) -> 0 [0 0]
+OK   tca_check_exist_missing_urls
+RUN  tca_check_exist_count_limit
+OK   tca_check_exist_count_limit
+RUN  tca_check_exist_args
+OK   tca_check_exist_args
+RUN  tca_free_zeroed_info
+OK   tca_free_zeroed_info
+RUN  tca_free_and_close_null
+OK   tca_free_and_close_null
+RUN  tca_global_limit_set_rejects_type
+OK   tca_global_limit_set_rejects_type
+RUN  tca_global_limit_get
+  NOTE UrlCacheGetGlobalLimit(0) -> 0 value=346030080
+  NOTE UrlCacheGetGlobalLimit(1) -> 0 value=519045120
+  NOTE UrlCacheGetGlobalLimit(2) -> 0 value=52428800
+  NOTE UrlCacheGetGlobalLimit(3) -> 0 value=1048576000
+OK   tca_global_limit_get
+RUN  tca_global_cache_size_args
+  NOTE UrlCacheGetGlobalCacheSize -> 0 size=0 limit=398458880
+OK   tca_global_cache_size_args
+SUMMARY tests=164 failed=4 skipped=0 checks_pass=13331 checks_fail=5
+@@I7 END time_and_misc_helpers exit=0x1 ms=27492 timeout=0 bytes=18785

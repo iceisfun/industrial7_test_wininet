@@ -1,0 +1,1253 @@
+RUN  bio_rf_two_requests_interleaved
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE two concurrent requests used 2 connection(s)
+OK   bio_rf_two_requests_interleaved
+RUN  bio_rf_queryinfo_after_partial_read
+OK   bio_rf_queryinfo_after_partial_read
+RUN  bio_status_body_503
+OK   bio_status_body_503
+RUN  bio_status_body_500
+OK   bio_status_body_500
+RUN  bio_status_body_404
+OK   bio_status_body_404
+RUN  bio_status_body_403
+OK   bio_status_body_403
+RUN  bio_status_body_400
+OK   bio_status_body_400
+RUN  bio_status_body_201
+OK   bio_status_body_201
+RUN  bio_status_body_200
+OK   bio_status_body_200
+RUN  bio_openurl_read_wire_and_status
+OK   bio_openurl_read_wire_and_status
+RUN  bio_openurl_300000
+OK   bio_openurl_300000
+RUN  bio_openurl_65537
+OK   bio_openurl_65537
+RUN  bio_openurl_4096
+OK   bio_openurl_4096
+RUN  bio_openurl_1
+OK   bio_openurl_1
+RUN  bio_openurl_0
+OK   bio_openurl_0
+RUN  bio_rf_1mb_sha256
+OK   bio_rf_1mb_sha256
+RUN  bio_rf_nul_and_crlf_bytes_in_body
+OK   bio_rf_nul_and_crlf_bytes_in_body
+RUN  bio_rf_binary_all_byte_values
+OK   bio_rf_binary_all_byte_values
+RUN  bio_rf_varying_piece_sizes
+OK   bio_rf_varying_piece_sizes
+RUN  bio_rf_large_read_gathers
+  NOTE first read of a 20000-byte body into 30000: 20000 bytes
+OK   bio_rf_large_read_gathers
+RUN  bio_cl_1048577_by_32768
+OK   bio_cl_1048577_by_32768
+RUN  bio_cl_1048576_by_1048577
+OK   bio_cl_1048576_by_1048577
+RUN  bio_cl_1048576_by_8192
+OK   bio_cl_1048576_by_8192
+RUN  bio_cl_1048576_by_65536
+OK   bio_cl_1048576_by_65536
+RUN  bio_cl_262144_by_1048576
+OK   bio_cl_262144_by_1048576
+RUN  bio_cl_131073_by_4096
+OK   bio_cl_131073_by_4096
+RUN  bio_cl_131072_by_65536
+OK   bio_cl_131072_by_65536
+RUN  bio_cl_65537_by_131072
+OK   bio_cl_65537_by_131072
+RUN  bio_cl_65537_by_8192
+OK   bio_cl_65537_by_8192
+RUN  bio_cl_65537_by_65536
+OK   bio_cl_65537_by_65536
+RUN  bio_cl_65536_by_65537
+OK   bio_cl_65536_by_65537
+RUN  bio_cl_65536_by_4096
+OK   bio_cl_65536_by_4096
+RUN  bio_cl_65536_by_65535
+OK   bio_cl_65536_by_65535
+RUN  bio_cl_65536_by_65536
+OK   bio_cl_65536_by_65536
+RUN  bio_cl_65535_by_1
+OK   bio_cl_65535_by_1
+RUN  bio_cl_65535_by_512
+OK   bio_cl_65535_by_512
+RUN  bio_cl_65535_by_65536
+OK   bio_cl_65535_by_65536
+RUN  bio_cl_32769_by_32768
+OK   bio_cl_32769_by_32768
+RUN  bio_cl_32768_by_32768
+OK   bio_cl_32768_by_32768
+RUN  bio_cl_32767_by_32768
+OK   bio_cl_32767_by_32768
+RUN  bio_cl_16384_by_4096
+OK   bio_cl_16384_by_4096
+RUN  bio_cl_8193_by_65536
+OK   bio_cl_8193_by_65536
+RUN  bio_cl_8193_by_4096
+OK   bio_cl_8193_by_4096
+RUN  bio_cl_8193_by_8192
+OK   bio_cl_8193_by_8192
+RUN  bio_cl_8192_by_8193
+OK   bio_cl_8192_by_8193
+RUN  bio_cl_8192_by_8192
+OK   bio_cl_8192_by_8192
+RUN  bio_cl_8192_by_8191
+OK   bio_cl_8192_by_8191
+RUN  bio_cl_8192_by_1
+OK   bio_cl_8192_by_1
+RUN  bio_cl_8191_by_1000
+OK   bio_cl_8191_by_1000
+RUN  bio_cl_8191_by_8192
+OK   bio_cl_8191_by_8192
+RUN  bio_cl_4097_by_65536
+OK   bio_cl_4097_by_65536
+RUN  bio_cl_4097_by_13
+OK   bio_cl_4097_by_13
+RUN  bio_cl_4097_by_4096
+OK   bio_cl_4097_by_4096
+RUN  bio_cl_4096_by_65536
+OK   bio_cl_4096_by_65536
+RUN  bio_cl_4096_by_4097
+OK   bio_cl_4096_by_4097
+RUN  bio_cl_4096_by_4096
+OK   bio_cl_4096_by_4096
+RUN  bio_cl_4096_by_4095
+OK   bio_cl_4096_by_4095
+RUN  bio_cl_4096_by_1
+OK   bio_cl_4096_by_1
+RUN  bio_cl_4095_by_4095
+OK   bio_cl_4095_by_4095
+RUN  bio_cl_4095_by_4096
+OK   bio_cl_4095_by_4096
+RUN  bio_cl_4095_by_1
+OK   bio_cl_4095_by_1
+RUN  bio_cl_100_by_101
+OK   bio_cl_100_by_101
+RUN  bio_cl_100_by_99
+OK   bio_cl_100_by_99
+RUN  bio_cl_100_by_100
+OK   bio_cl_100_by_100
+RUN  bio_cl_100_by_7
+OK   bio_cl_100_by_7
+RUN  bio_cl_100_by_1
+OK   bio_cl_100_by_1
+RUN  bio_cl_2_by_1
+OK   bio_cl_2_by_1
+RUN  bio_cl_1_by_4096
+OK   bio_cl_1_by_4096
+RUN  bio_cl_1_by_1
+OK   bio_cl_1_by_1
+RUN  bio_cl_0_by_4096
+OK   bio_cl_0_by_4096
+RUN  bio_cl_0_by_1
+OK   bio_cl_0_by_1
+RUN  bio_rf_last_error_after_success
+  NOTE GetLastError after successful read: 0
+  NOTE GetLastError after final data read: 0
+  NOTE GetLastError after EOF read: 0
+OK   bio_rf_last_error_after_success
+RUN  bio_rf_eof_is_repeatable
+OK   bio_rf_eof_is_repeatable
+RUN  bio_rf_buffer_tail_untouched
+OK   bio_rf_buffer_tail_untouched
+RUN  bio_rf_before_send
+  NOTE read before send: ok=1 err=0 rd=0
+OK   bio_rf_before_send
+RUN  bio_rf_child_after_session_close_is_6
+OK   bio_rf_child_after_session_close_is_6
+RUN  bio_rf_closed_request_handle_is_6
+OK   bio_rf_closed_request_handle_is_6
+RUN  bio_rf_null_handle_is_6
+OK   bio_rf_null_handle_is_6
+RUN  bio_rf_connect_handle_is_12018
+OK   bio_rf_connect_handle_is_12018
+RUN  bio_rf_session_handle_is_12018
+  NOTE session handle: *read after 12018 = 77
+OK   bio_rf_session_handle_is_12018
+RUN  bio_rf_zero_length_read
+OK   bio_rf_zero_length_read
+RUN  bio_rf_null_buffer_is_87
+OK   bio_rf_null_buffer_is_87
+RUN  bio_rf_null_bytesread_is_87
+OK   bio_rf_null_bytesread_is_87
+RUN  bio_http_version_option_10
+  NOTE process HTTP version 1.1
+  NOTE request line with HTTP_VERSION 1.0: GET /opt10 HTTP/1.1
+  NOTE HTTP/1.0 request Connection header: (none)
+OK   bio_http_version_option_10
+RUN  bio_split_sweep_chunked
+  NOTE chunked: 83 split positions, 1 connections
+OK   bio_split_sweep_chunked
+RUN  bio_split_sweep_content_length
+  NOTE CL: 50 split positions, 1 connections
+OK   bio_split_sweep_content_length
+RUN  bio_401_body_readable
+OK   bio_401_body_readable
+RUN  bio_redirect_no_auto_body_readable
+OK   bio_redirect_no_auto_body_readable
+RUN  bio_redirect_chunked_body_drained
+OK   bio_redirect_chunked_body_drained
+RUN  bio_redirect_body_not_delivered
+OK   bio_redirect_body_not_delivered
+RUN  bio_openurl_decoding_session
+OK   bio_openurl_decoding_session
+RUN  bio_http10_request_http11_reply
+  NOTE HTTP/1.0 request Connection header: (none)
+OK   bio_http10_request_http11_reply
+RUN  bio_http10_request_closedelim
+  NOTE HTTP/1.0 request Connection header: (none)
+OK   bio_http10_request_closedelim
+RUN  bio_http10_request_cl
+  NOTE HTTP/1.0 request Connection header: (none)
+OK   bio_http10_request_cl
+RUN  bio_post_empty_response
+OK   bio_post_empty_response
+RUN  bio_put_response
+OK   bio_put_response
+RUN  bio_post_large_both
+OK   bio_post_large_both
+RUN  bio_post_large_response
+OK   bio_post_large_response
+RUN  bio_post_small_response
+OK   bio_post_small_response
+RUN  bio_m2_request_headers_after_body
+OK   bio_m2_request_headers_after_body
+RUN  bio_m2_resend_three_times_counts
+OK   bio_m2_resend_three_times_counts
+RUN  bio_m2_resend_after_chunked_partial
+  NOTE resend after 7 of 36 chunked bytes: ok=1 err=0
+OK   bio_m2_resend_after_chunked_partial
+RUN  bio_m2_data_receive_timeout_option
+  NOTE DATA_RECEIVE_TIMEOUT 400 on request: set ok=1; RECEIVE_TIMEOUT now 5000
+  NOTE mid-body stall with DATA_RECEIVE_TIMEOUT 400: ok=1 err=0  n=10 after 2500 ms
+OK   bio_m2_data_receive_timeout_option
+RUN  bio_m2_stall_session_timeout_1000
+  NOTE session timeouts 1000: request RECEIVE_TIMEOUT 1000, 2.5 s stall mid-body: ok=1 err=0  n=10 after 2516 ms
+OK   bio_m2_stall_session_timeout_1000
+RUN  bio_m2_stall_session_timeout_400
+  NOTE session timeouts 400: request RECEIVE_TIMEOUT 400, 2.5 s stall mid-body: ok=1 err=0  n=10 after 2515 ms
+OK   bio_m2_stall_session_timeout_400
+RUN  bio_m2_read_buffer_size_option
+  NOTE READ_BUFFER_SIZE on a request: ok=1 err=0 v=4096
+  NOTE set READ_BUFFER_SIZE 512: ok=1 err=0
+  NOTE 100000 bytes with READ_BUFFER_SIZE 512 and 65536-byte reads: 2 reads, largest 65536
+OK   bio_m2_read_buffer_size_option
+RUN  bio_m2_stale_bytes_before_next_response
+  NOTE next response after stale bytes: send ok=1 err=0 body 'hello' (connections 2)
+OK   bio_m2_stale_bytes_before_next_response
+RUN  bio_m2_http10_keepalive_no_length_close_delimited
+OK   bio_m2_http10_keepalive_no_length_close_delimited
+RUN  bio_m2_http11_no_length_keepalive_header_is_close_delimited
+OK   bio_m2_http11_no_length_keepalive_header_is_close_delimited
+RUN  bio_m2_head_and_body_one_segment
+OK   bio_m2_head_and_body_one_segment
+RUN  bio_m2_slow_head_fast_body
+OK   bio_m2_slow_head_fast_body
+RUN  bio_m2_head_4095_body_1
+OK   bio_m2_head_4095_body_1
+RUN  bio_m2_head_30k_body_100k
+OK   bio_m2_head_30k_body_100k
+RUN  bio_m2_head_8k_body_10
+OK   bio_m2_head_8k_body_10
+RUN  bio_m2_two_interim_100_then_chunked
+OK   bio_m2_two_interim_100_then_chunked
+RUN  bio_m2_partial_content_206
+OK   bio_m2_partial_content_206
+RUN  bio_m2_parallel_readers
+  NOTE 4 parallel readers used 4 connection(s)
+OK   bio_m2_parallel_readers
+RUN  bio_m2_close_handle_cancels_blocked_read
+  NOTE blocked read after close: thread done, ok=0 err=12017 ERROR_INTERNET_OPERATION_CANCELLED rd=0 read took 406 ms, close+join 0 ms
+OK   bio_m2_close_handle_cancels_blocked_read
+RUN  bio_m2_request_flags_fresh
+  NOTE REQUEST_FLAGS of a network response read to the end: 0x40
+OK   bio_m2_request_flags_fresh
+RUN  bio_m2_body_from_cache
+  NOTE QDA on a cache-served body: 30000
+  NOTE REQUEST_FLAGS of the cache-served handle: 0x1
+OK   bio_m2_body_from_cache
+RUN  bio_m2_seek_cached_before_full_read
+  NOTE seek back to 0 after 1000 of 100000 bytes: r=0 err=0
+  NOTE seek forward to 90000 (not downloaded yet): r=90000 err=0
+OK   bio_m2_seek_cached_before_full_read
+RUN  bio_m2_seek_cached_large_body
+  NOTE FILE_CURRENT -1510 after seeking to 1500 and reading 10: r=-1 err=131
+  NOTE FILE_END -10 on a 100000-byte cached body being read: r=4294967295 err=131
+  NOTE seek past the end of a 100000-byte cached body: r=200000 err=0
+  NOTE seek to 0 after reading to EOF (handle seeked before): r=0 err=0
+OK   bio_m2_seek_cached_large_body
+RUN  bio_m2_datafile_name_no_cache_write
+  NOTE DATAFILE_NAME with NO_CACHE_WRITE: ok=0 err=12028 ERROR_INTERNET_ITEM_NOT_FOUND
+OK   bio_m2_datafile_name_no_cache_write
+RUN  bio_m2_need_file_datafile_matches_body
+  NOTE DATAFILE_NAME: ok=1 err=0 len=86
+OK   bio_m2_need_file_datafile_matches_body
+RUN  bio_m2_wide_readfileex_large
+OK   bio_m2_wide_readfileex_large
+RUN  bio_m2_wide_openurl_read
+OK   bio_m2_wide_openurl_read
+RUN  bio_m2_wide_request_read
+OK   bio_m2_wide_request_read
+RUN  bio_m2_sendex_no_body_chunked_response
+OK   bio_m2_sendex_no_body_chunked_response
+RUN  bio_m2_read_before_end_request
+  NOTE InternetReadFile between HttpSendRequestEx and HttpEndRequest: ok=0 err=12019 ERROR_INTERNET_INCORRECT_HANDLE_STATE rd=0
+OK   bio_m2_read_before_end_request
+RUN  bio_m2_sendex_write_end_then_read
+OK   bio_m2_sendex_write_end_then_read
+RUN  bio_keepalive_size_sequence
+OK   bio_keepalive_size_sequence
+RUN  bio_resend_after_partial_read
+  NOTE resend after partial read: ok=1 err=0 
+OK   bio_resend_after_partial_read
+RUN  bio_resend_same_handle_without_reading
+  NOTE resend before reading the body: ok=1 err=0 
+OK   bio_resend_same_handle_without_reading
+RUN  bio_resend_same_handle_after_full_read
+  NOTE resend: connections 1
+OK   bio_resend_same_handle_after_full_read
+RUN  bio_drain_fully_read_reuses
+  NOTE 100-byte body fully read: second request on conn 0 (connections 1)
+OK   bio_drain_fully_read_reuses
+RUN  bio_drain_partial_large
+  NOTE 500000-byte body, 1000 read: second request on conn 1 (connections 2)
+OK   bio_drain_partial_large
+RUN  bio_drain_unread_large
+  NOTE 500000-byte body unread: second request on conn 1 (connections 2)
+OK   bio_drain_unread_large
+RUN  bio_drain_partial_small
+  NOTE 100-byte body, 10 read: second request on conn 1 (connections 2)
+OK   bio_drain_partial_small
+RUN  bio_drain_unread_small
+  NOTE 100-byte body unread: second request on conn 1 (connections 2)
+OK   bio_drain_unread_small
+RUN  bio_conn_client_connection_close_header
+  NOTE client Connection header sent: Close
+OK   bio_conn_client_connection_close_header
+RUN  bio_conn_http10_keepalive_token
+  NOTE HTTP/1.0 + Connection: Keep-Alive: 1 connection(s) for 2 sequential requests
+OK   bio_conn_http10_keepalive_token
+RUN  bio_conn_http10_not_reused
+  NOTE HTTP/1.0 CL, no keep-alive: 2 connection(s) for 2 sequential requests
+OK   bio_conn_http10_not_reused
+RUN  bio_conn_closedelim_new_connection
+  NOTE close-delimited: 2 connection(s) for 2 sequential requests
+OK   bio_conn_closedelim_new_connection
+RUN  bio_conn_close_header_new_connection
+  NOTE Connection: close: 2 connection(s) for 2 sequential requests
+OK   bio_conn_close_header_new_connection
+RUN  bio_conn_chunked_reused
+  NOTE HTTP/1.1 chunked: 1 connection(s) for 2 sequential requests
+OK   bio_conn_chunked_reused
+RUN  bio_conn_http11_keepalive_reused
+  NOTE HTTP/1.1 CL: 1 connection(s) for 2 sequential requests
+OK   bio_conn_http11_keepalive_reused
+RUN  bio_interim_100_then_body
+OK   bio_interim_100_then_body
+RUN  bio_head_content_length_header
+OK   bio_head_content_length_header
+RUN  bio_nobody_post_cl0
+  NOTE POST 201: 1 connection(s) for 2 requests
+OK   bio_nobody_post_cl0
+RUN  bio_nobody_head_chunked
+  NOTE HEAD 200: 2 connection(s) for 2 requests
+OK   bio_nobody_head_chunked
+RUN  bio_nobody_head_with_cl
+  NOTE HEAD 200: 1 connection(s) for 2 requests
+OK   bio_nobody_head_with_cl
+RUN  bio_nobody_304
+  NOTE GET 304: 1 connection(s) for 2 requests
+OK   bio_nobody_304
+RUN  bio_nobody_204_with_cl0
+  NOTE GET 204: 1 connection(s) for 2 requests
+OK   bio_nobody_204_with_cl0
+RUN  bio_nobody_204
+  NOTE GET 204: 1 connection(s) for 2 requests
+OK   bio_nobody_204
+RUN  bio_nobody_cl0
+  NOTE GET 200: 1 connection(s) for 2 requests
+OK   bio_nobody_cl0
+RUN  bio_cl_extra_bytes_ignored
+OK   bio_cl_extra_bytes_ignored
+RUN  bio_truncated_head_only
+  NOTE CL 10, no body, close: ok=1 err=0 n=0
+OK   bio_truncated_head_only
+RUN  bio_truncated_200000
+  NOTE truncated CL 200000 (sent 100000): ok=1 err=0 got=100000
+OK   bio_truncated_200000
+RUN  bio_truncated_10000
+  NOTE truncated CL 10000 (sent 5000): ok=1 err=0 got=5000
+OK   bio_truncated_10000
+RUN  bio_truncated_100_by_1
+  NOTE truncated CL 100 (sent 50): ok=1 err=0 got=50
+OK   bio_truncated_100_by_1
+RUN  bio_truncated_100
+  NOTE truncated CL 100 (sent 50): ok=1 err=0 got=50
+OK   bio_truncated_100
+RUN  bio_closedelim_slow_pieces
+  NOTE slow close-delimited body arrived in 1 reads
+OK   bio_closedelim_slow_pieces
+RUN  bio_closedelim_shutdown_wr
+OK   bio_closedelim_shutdown_wr
+RUN  bio_closedelim_http10_0
+OK   bio_closedelim_http10_0
+RUN  bio_closedelim_http10_5000
+OK   bio_closedelim_http10_5000
+RUN  bio_closedelim_1mb
+OK   bio_closedelim_1mb
+RUN  bio_closedelim_70000
+OK   bio_closedelim_70000
+RUN  bio_closedelim_8192
+OK   bio_closedelim_8192
+RUN  bio_closedelim_5000_by_1
+OK   bio_closedelim_5000_by_1
+RUN  bio_closedelim_1
+OK   bio_closedelim_1
+RUN  bio_closedelim_0
+OK   bio_closedelim_0
+RUN  bio_chunked_bare_lf_framing
+  NOTE LF-only chunk lines: send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+  NOTE LF-only chunked body: ''
+OK   bio_chunked_bare_lf_framing
+RUN  bio_chunked_negative_size
+  NOTE chunk size -5: send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_chunked_negative_size
+RUN  bio_chunked_huge_size
+  NOTE chunk size ffffffffffffffff: read ok=1 err=0 (-) n=3
+OK   bio_chunked_huge_size
+RUN  bio_chunked_short_chunk_then_close
+  NOTE chunk 10 with 4 bytes then close: read ok=1 err=0 (-) n=4
+OK   bio_chunked_short_chunk_then_close
+RUN  bio_chunked_missing_terminal_chunk
+  NOTE no 0-chunk then close: read ok=1 err=0 (-) n=5
+OK   bio_chunked_missing_terminal_chunk
+RUN  bio_chunked_bad_size_after_good_chunk
+  NOTE good then 'qq': send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_chunked_bad_size_after_good_chunk
+RUN  bio_chunked_bad_size_token
+  NOTE chunk size 'zz': send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_chunked_bad_size_token
+RUN  bio_chunked_split_segments
+OK   bio_chunked_split_segments
+RUN  bio_chunked_trailer_then_keepalive
+OK   bio_chunked_trailer_then_keepalive
+RUN  bio_chunked_with_content_length
+OK   bio_chunked_with_content_length
+RUN  bio_chunked_close_after
+OK   bio_chunked_close_after
+RUN  bio_chunked_te_mixed_case
+OK   bio_chunked_te_mixed_case
+RUN  bio_chunked_one_byte_reads
+OK   bio_chunked_one_byte_reads
+RUN  bio_chunked_trailers
+OK   bio_chunked_trailers
+RUN  bio_chunked_leading_zeros
+OK   bio_chunked_leading_zeros
+RUN  bio_chunked_uppercase_hex
+OK   bio_chunked_uppercase_hex
+RUN  bio_chunked_extensions
+OK   bio_chunked_extensions
+RUN  bio_chunked_empty_body
+OK   bio_chunked_empty_body
+RUN  bio_chunked_1048576_c0_r32768
+OK   bio_chunked_1048576_c0_r32768
+RUN  bio_chunked_1048576_c16384_r65536
+OK   bio_chunked_1048576_c16384_r65536
+RUN  bio_chunked_300000_c100000_r4096
+OK   bio_chunked_300000_c100000_r4096
+RUN  bio_chunked_300000_c65536_r65536
+OK   bio_chunked_300000_c65536_r65536
+RUN  bio_chunked_65535_c7_r65536
+OK   bio_chunked_65535_c7_r65536
+RUN  bio_chunked_65537_c65536_r1000
+OK   bio_chunked_65537_c65536_r1000
+RUN  bio_chunked_65537_c4096_r65536
+OK   bio_chunked_65537_c4096_r65536
+RUN  bio_chunked_65536_c65536_r65536
+OK   bio_chunked_65536_c65536_r65536
+RUN  bio_chunked_8193_c1_r8193
+OK   bio_chunked_8193_c1_r8193
+RUN  bio_chunked_8193_c8192_r512
+OK   bio_chunked_8193_c8192_r512
+RUN  bio_chunked_8192_c8192_r8192
+OK   bio_chunked_8192_c8192_r8192
+RUN  bio_chunked_4097_c4096_r4097
+OK   bio_chunked_4097_c4096_r4097
+RUN  bio_chunked_4096_c4095_r4096
+OK   bio_chunked_4096_c4095_r4096
+RUN  bio_chunked_4096_c4096_r1
+OK   bio_chunked_4096_c4096_r1
+RUN  bio_chunked_4096_c1000_r4096
+OK   bio_chunked_4096_c1000_r4096
+RUN  bio_chunked_100_c1_r4096
+OK   bio_chunked_100_c1_r4096
+RUN  bio_chunked_100_c1_r7
+OK   bio_chunked_100_c1_r7
+RUN  bio_chunked_10_c10_r100
+OK   bio_chunked_10_c10_r100
+RUN  bio_chunked_10_c3_r4
+OK   bio_chunked_10_c3_r4
+RUN  bio_chunked_10_c3_r1
+OK   bio_chunked_10_c3_r1
+RUN  bio_chunked_1_c0_r4096
+OK   bio_chunked_1_c0_r4096
+RUN  bio_chunked_1_c1_r1
+OK   bio_chunked_1_c1_r1
+RUN  bio_async_qda
+  NOTE async QDA loop: n=50000 pending=0
+OK   bio_async_qda
+RUN  bio_async_irf_no_wait
+  NOTE async IRF_NO_WAIT: n=30000 zero=0 pending=0
+OK   bio_async_irf_no_wait
+RUN  bio_async_read_loop
+  NOTE async read: 100000 bytes, 0 pending, 14 immediate completions
+OK   bio_async_read_loop
+RUN  bio_sfp_cached_seek
+  NOTE cache-backed seek to 0: r=0xffffffff err=12016
+  NOTE seek not available on this response (err 12016 ERROR_INTERNET_INVALID_OPERATION)
+OK   bio_sfp_cached_seek
+RUN  bio_sfp_before_send
+OK   bio_sfp_before_send
+RUN  bio_sfp_nocache_is_12016
+OK   bio_sfp_nocache_is_12016
+RUN  bio_sfp_null_handle_is_6
+OK   bio_sfp_null_handle_is_6
+RUN  bio_sfp_connect_handle_is_12018
+OK   bio_sfp_connect_handle_is_12018
+RUN  bio_sfp_session_handle_is_12018
+OK   bio_sfp_session_handle_is_12018
+RUN  bio_qda_truncated_body
+  NOTE truncated: QDA end value 0 err=0 after 500 bytes
+OK   bio_qda_truncated_body
+RUN  bio_qda_before_send
+  NOTE QDA before send: ok=1 err=0  n=0
+OK   bio_qda_before_send
+RUN  bio_qda_waits_for_slow_body
+  NOTE QDA across a 400 ms gap: 5 after 406 ms
+OK   bio_qda_waits_for_slow_body
+RUN  bio_qda_loop_closedelim_100000
+  NOTE QDA loop n=100000 flags=0x2: first=8192 max=8192 iterations=13
+OK   bio_qda_loop_closedelim_100000
+RUN  bio_qda_loop_closedelim_5000
+  NOTE QDA loop n=5000 flags=0x2: first=5000 max=5000 iterations=1
+OK   bio_qda_loop_closedelim_5000
+RUN  bio_qda_loop_chunked_200000
+  NOTE QDA loop n=200000 flags=0x1: first=8173 max=8178 iterations=25
+OK   bio_qda_loop_chunked_200000
+RUN  bio_qda_loop_chunked_10000
+  NOTE QDA loop n=10000 flags=0x1: first=8173 max=8173 iterations=2
+OK   bio_qda_loop_chunked_10000
+RUN  bio_qda_loop_cl_1mb
+  NOTE QDA loop n=1048576 flags=0x0: first=8192 max=8192 iterations=128
+OK   bio_qda_loop_cl_1mb
+RUN  bio_qda_loop_cl_65537
+  NOTE QDA loop n=65537 flags=0x0: first=8192 max=8192 iterations=9
+OK   bio_qda_loop_cl_65537
+RUN  bio_qda_loop_cl_8193
+  NOTE QDA loop n=8193 flags=0x0: first=8192 max=8192 iterations=2
+OK   bio_qda_loop_cl_8193
+RUN  bio_qda_loop_cl_4096
+  NOTE QDA loop n=4096 flags=0x0: first=4096 max=4096 iterations=1
+OK   bio_qda_loop_cl_4096
+RUN  bio_qda_loop_cl_1
+  NOTE QDA loop n=1 flags=0x0: first=1 max=1 iterations=1
+OK   bio_qda_loop_cl_1
+RUN  bio_qda_loop_cl_0
+  NOTE QDA loop n=0 flags=0x0: first=0 max=0 iterations=0
+OK   bio_qda_loop_cl_0
+RUN  bio_qda_flags_and_context_ignored
+  NOTE QDA dwFlags=0x1234 dwContext=0x5678: ok=1 err=0 n=5
+OK   bio_qda_flags_and_context_ignored
+RUN  bio_qda_does_not_consume
+OK   bio_qda_does_not_consume
+RUN  bio_qda_small_body_exact
+OK   bio_qda_small_body_exact
+RUN  bio_qda_bad_handles
+  NOTE QDA(session): ok=0 err=12018 n=0
+  NOTE QDA(connect): ok=0 err=12018 n=0
+OK   bio_qda_bad_handles
+RUN  bio_qda_null_out_is_87
+OK   bio_qda_null_out_is_87
+RUN  bio_rfexw_struct_size_wrong_is_87
+OK   bio_rfexw_struct_size_wrong_is_87
+RUN  bio_rfexw_full_read
+OK   bio_rfexw_full_read
+RUN  bio_rfexw_header_pointer_is_87
+OK   bio_rfexw_header_pointer_is_87
+RUN  bio_rfexw_null_buffers_is_87
+OK   bio_rfexw_null_buffers_is_87
+RUN  bio_rfex_next_not_followed
+OK   bio_rfex_next_not_followed
+RUN  bio_rfex_no_wait
+  NOTE IRF_NO_WAIT: n=40000 zero-reads=0 fails=0 lasterr=0
+OK   bio_rfex_no_wait
+RUN  bio_rfex_async_flag_on_sync_session
+OK   bio_rfex_async_flag_on_sync_session
+RUN  bio_rfex_by_1
+OK   bio_rfex_by_1
+RUN  bio_rfex_flags0_300000
+OK   bio_rfex_flags0_300000
+RUN  bio_rfex_sync_1mb
+OK   bio_rfex_sync_1mb
+RUN  bio_rfex_sync_65537
+OK   bio_rfex_sync_65537
+RUN  bio_rfex_sync_8193_by_4096
+OK   bio_rfex_sync_8193_by_4096
+RUN  bio_rfex_sync_small
+OK   bio_rfex_sync_small
+RUN  bio_rfex_fields_untouched
+  NOTE after ReadFileExA: total=0x1234 offlow=0x55 offhigh=0x66 hdrlen=0x77
+OK   bio_rfex_fields_untouched
+RUN  bio_rfex_zero_length
+OK   bio_rfex_zero_length
+RUN  bio_rfex_null_and_closed_handle_is_6
+OK   bio_rfex_null_and_closed_handle_is_6
+RUN  bio_rfex_connect_handle
+OK   bio_rfex_connect_handle
+RUN  bio_rfex_session_handle
+  NOTE ReadFileExA(session): ok=0 err=12018 ERROR_INTERNET_INCORRECT_HANDLE_TYPE
+OK   bio_rfex_session_handle
+RUN  bio_rfex_struct_size_wrong_is_87
+OK   bio_rfex_struct_size_wrong_is_87
+RUN  bio_d2_https_gzip_fox_request
+  NOTE https send /s: 12030 on the first attempt, retrying once (environment, see bio.h)
+  NOTE https gzip fox, request decoding: send ok=1 err=0 ?; read ok=1 err=0 n=900
+OK   bio_d2_https_gzip_fox_request
+RUN  bio_d2_https_gzip_pat300k_off
+  NOTE https gzip 300000, no decoding: send ok=1 err=0 ?; read ok=1 err=0 n=1590
+OK   bio_d2_https_gzip_pat300k_off
+RUN  bio_d2_https_gzip_pat300k_request
+  NOTE https gzip 300000, request decoding: send ok=1 err=0 ?; read ok=1 err=0 n=300000
+OK   bio_d2_https_gzip_pat300k_request
+RUN  bio_d2_https_gzip_pat300k
+  NOTE https gzip 300000, session decoding: send ok=1 err=0 ?; read ok=1 err=0 n=300000
+OK   bio_d2_https_gzip_pat300k
+RUN  bio_d2_openurl_br
+OK   bio_d2_openurl_br
+RUN  bio_d2_session_option_after_open_request
+  NOTE session option set after HttpOpenRequest: left encoded
+OK   bio_d2_session_option_after_open_request
+RUN  bio_d2_session_before_connect_inherited
+  NOTE request option after the connect handle was set FALSE: 1
+OK   bio_d2_session_before_connect_inherited
+RUN  bio_d2_session_option_after_connect_not_inherited
+OK   bio_d2_session_option_after_connect_not_inherited
+RUN  bio_d2_request_option_off_overrides_session
+  NOTE request HTTP_DECODING inherited from the session: ok=1 v=1
+  NOTE session TRUE, request FALSE: left encoded
+OK   bio_d2_request_option_off_overrides_session
+RUN  bio_d2_head_gzip_no_body
+OK   bio_d2_head_gzip_no_body
+RUN  bio_d2_partial_decoded_then_next
+  NOTE partly read decoded body then next request: 1 connection(s)
+OK   bio_d2_partial_decoded_then_next
+RUN  bio_d2_keepalive_two_decoded
+OK   bio_d2_keepalive_two_decoded
+RUN  bio_d2_readfileex_decoded
+OK   bio_d2_readfileex_decoded
+RUN  bio_d2_qda_loop_decoded
+  NOTE decoded QDA loop: 300000 bytes, 37 iterations, largest QDA 8192
+OK   bio_d2_qda_loop_decoded
+RUN  bio_d2_br_pat100k_by_1000_chunked
+  NOTE br pattern chunked: 100 reads, largest 1000
+OK   bio_d2_br_pat100k_by_1000_chunked
+RUN  bio_d2_br_pat100k
+  NOTE br pattern 100000: 25 reads, largest 4096
+OK   bio_d2_br_pat100k
+RUN  bio_d2_raw_pat100k
+  NOTE raw deflate pattern 100000: 25 reads, largest 4096
+OK   bio_d2_raw_pat100k
+RUN  bio_d2_zlib_pat100k_under_deflate_fails
+  NOTE zlib pattern under deflate: read ok=0 err=12175 n=0
+OK   bio_d2_zlib_pat100k_under_deflate_fails
+RUN  bio_d2_zlib_pat100k_under_gzip
+  NOTE zlib pattern 100000 under gzip: 25 reads, largest 4096
+OK   bio_d2_zlib_pat100k_under_gzip
+RUN  bio_d2_gzip_pat300k_closedelim
+  NOTE gzip pattern close-delimited: 30 reads, largest 10000
+OK   bio_d2_gzip_pat300k_closedelim
+RUN  bio_d2_gzip_pat300k_chunked7
+  NOTE gzip pattern, 7-byte chunks: 5 reads, largest 65536
+OK   bio_d2_gzip_pat300k_chunked7
+RUN  bio_d2_gzip_pat300k_by_3
+  NOTE gzip pattern 300000 by 3: 100000 reads, largest 3
+OK   bio_d2_gzip_pat300k_by_3
+RUN  bio_d2_gzip_pat300k
+  NOTE gzip pattern 300000: 37 reads, largest 8192
+OK   bio_d2_gzip_pat300k
+RUN  bio_d2_gzip_zeros_1mb_by_4096
+  NOTE gzip 1 MiB zeros by 4096: 256 reads, largest 4096
+OK   bio_d2_gzip_zeros_1mb_by_4096
+RUN  bio_d2_gzip_zeros_1mb
+  NOTE gzip 1 MiB zeros: 16 reads, largest 65536
+OK   bio_d2_gzip_zeros_1mb
+RUN  bio_d2_raw_deflate_retry_fox
+OK   bio_d2_raw_deflate_retry_fox
+RUN  bio_d2_gzip_body_labelled_br
+  NOTE gzip data, CE br: read ok=0 err=12175 n=0
+OK   bio_d2_gzip_body_labelled_br
+RUN  bio_d2_br_body_labelled_gzip
+  NOTE brotli data, CE gzip: read ok=0 err=12175 n=0
+OK   bio_d2_br_body_labelled_gzip
+RUN  bio_d2_zlib_body_labelled_deflate_fails
+  NOTE zlib data, CE deflate: read ok=0 err=12175 n=0
+OK   bio_d2_zlib_body_labelled_deflate_fails
+RUN  bio_d2_zlib_body_labelled_gzip
+OK   bio_d2_zlib_body_labelled_gzip
+RUN  bio_d2_gzip_body_labelled_deflate
+  NOTE gzip data, CE deflate: read ok=0 err=12175 n=0
+OK   bio_d2_gzip_body_labelled_deflate
+RUN  bio_d2_gzip_label_empty_body
+OK   bio_d2_gzip_label_empty_body
+RUN  bio_d2_br_empty_stream
+OK   bio_d2_br_empty_stream
+RUN  bio_d2_gzip_empty_stream
+OK   bio_d2_gzip_empty_stream
+RUN  bio_d2_gzip_truncated_by_close
+  NOTE gzip cut by the server (CL announced): read ok=1 err=0 n=138191
+OK   bio_d2_gzip_truncated_by_close
+RUN  bio_d2_gzip_no_trailer
+  NOTE no trailer: read ok=1 err=0  n=900
+OK   bio_d2_gzip_no_trailer
+RUN  bio_d2_gzip_trailing_garbage
+  NOTE member + junk: read ok=1 err=0  n=900
+OK   bio_d2_gzip_trailing_garbage
+RUN  bio_d2_gzip_two_members
+  NOTE two members: read ok=1 err=0  n=13
+OK   bio_d2_gzip_two_members
+RUN  bio_d2_gzip_bad_isize
+  NOTE bad ISIZE: read ok=0 err=12175 ERROR_INTERNET_DECODING_FAILED n=0
+OK   bio_d2_gzip_bad_isize
+RUN  bio_d2_br_fox_by_1
+OK   bio_d2_br_fox_by_1
+RUN  bio_d2_zlib_bad_adler_under_deflate_fails
+  NOTE zlib (bad Adler) under deflate: read ok=0 err=12175 n=0
+OK   bio_d2_zlib_bad_adler_under_deflate_fails
+RUN  bio_d2_zlib_bad_adler_ignored
+OK   bio_d2_zlib_bad_adler_ignored
+RUN  bio_d2_gzip_bad_crc_ignored
+OK   bio_d2_gzip_bad_crc_ignored
+RUN  bio_d2_gzip_ftext_mtime
+OK   bio_d2_gzip_ftext_mtime
+RUN  bio_d2_gzip_all_flags
+OK   bio_d2_gzip_all_flags
+RUN  bio_d2_gzip_fhcrc
+OK   bio_d2_gzip_fhcrc
+RUN  bio_d2_gzip_fcomment
+OK   bio_d2_gzip_fcomment
+RUN  bio_d2_gzip_fextra
+OK   bio_d2_gzip_fextra
+RUN  bio_d2_gzip_fname
+OK   bio_d2_gzip_fname
+RUN  bio_d2_content_length_after_decoding
+  NOTE Content-Length after decoding: ok=0 value=0 (wire 73)
+  NOTE Content-Length after reading the decoded body: ok=0 value=0
+OK   bio_d2_content_length_after_decoding
+RUN  bio_d2_vary_kept_when_not_decoding
+OK   bio_d2_vary_kept_when_not_decoding
+RUN  bio_d2_vary_other_token_untouched
+OK   bio_d2_vary_other_token_untouched
+RUN  bio_d2_vary_token_list_trimmed
+  NOTE Vary 'Accept-Encoding, Cookie' after decoding: 'Cookie' err=0
+OK   bio_d2_vary_token_list_trimmed
+RUN  bio_d2_vary_single_token_removed
+  NOTE Vary 'Accept-Encoding' after decoding: '' err=12150
+OK   bio_d2_vary_single_token_removed
+RUN  bio_d2_ce_header_kept_when_not_accepted
+OK   bio_d2_ce_header_kept_when_not_accepted
+RUN  bio_d2_ce_header_kept_when_not_decoding
+OK   bio_d2_ce_header_kept_when_not_decoding
+RUN  bio_d2_ce_header_removed_when_decoded
+OK   bio_d2_ce_header_removed_when_decoded
+RUN  bio_d2_ct_probe_x_spoon
+  NOTE Content-Type application/x-spoon with gzip: left encoded
+OK   bio_d2_ct_probe_x_spoon
+RUN  bio_d2_ct_probe_x_gtar
+  NOTE Content-Type application/x-gtar with gzip: decoded
+OK   bio_d2_ct_probe_x_gtar
+RUN  bio_d2_ct_probe_gzip
+  NOTE Content-Type application/gzip with gzip: decoded
+OK   bio_d2_ct_probe_gzip
+RUN  bio_d2_ct_probe_zip
+  NOTE Content-Type application/zip with gzip: decoded
+OK   bio_d2_ct_probe_zip
+RUN  bio_d2_ct_x_tar_deflate_left_encoded
+  NOTE CT application/x-tar, deflate: CE after send 'deflate' (err 0), read ok=1 n=61
+OK   bio_d2_ct_x_tar_deflate_left_encoded
+RUN  bio_d2_ct_octet_stream_decoded
+  NOTE CT application/octet-stream: CE after send '' (err 12150), read ok=1 n=900
+OK   bio_d2_ct_octet_stream_decoded
+RUN  bio_d2_ct_text_plain_decoded
+  NOTE CT text/plain: CE after send '' (err 12150), read ok=1 n=900
+OK   bio_d2_ct_text_plain_decoded
+RUN  bio_d2_ct_x_gzip_with_param_decoded
+  NOTE CT application/x-gzip; x=1: CE after send '' (err 12150), read ok=1 n=900
+OK   bio_d2_ct_x_gzip_with_param_decoded
+RUN  bio_d2_ct_x_gzip_uppercase_left_encoded
+  NOTE CT APPLICATION/X-GZIP: CE after send 'gzip' (err 0), read ok=1 n=73
+OK   bio_d2_ct_x_gzip_uppercase_left_encoded
+RUN  bio_d2_ct_x_compressed_left_encoded
+  NOTE CT application/x-compressed: CE after send 'gzip' (err 0), read ok=1 n=73
+OK   bio_d2_ct_x_compressed_left_encoded
+RUN  bio_d2_ct_x_compress_left_encoded
+  NOTE CT application/x-compress: CE after send 'gzip' (err 0), read ok=1 n=73
+OK   bio_d2_ct_x_compress_left_encoded
+RUN  bio_d2_ct_x_tar_left_encoded
+  NOTE CT application/x-tar: CE after send 'gzip' (err 0), read ok=1 n=73
+OK   bio_d2_ct_x_tar_left_encoded
+RUN  bio_d2_ct_x_gzip_left_encoded
+  NOTE CT application/x-gzip: CE after send 'gzip' (err 0), read ok=1 n=73
+OK   bio_d2_ct_x_gzip_left_encoded
+RUN  bio_d2_ce_lowercase_name
+  NOTE content-encoding: gzip: CE after send '' (err 12150), read ok=1 n=900
+OK   bio_d2_ce_lowercase_name
+RUN  bio_d2_ce_compress_not_decoded
+  NOTE Content-Encoding: compress: CE after send 'compress' (err 0), read ok=1 n=73
+OK   bio_d2_ce_compress_not_decoded
+RUN  bio_d2_ce_deflate_uppercase
+  NOTE Content-Encoding: DEFLATE: CE after send '' (err 12150), read ok=1 n=900
+OK   bio_d2_ce_deflate_uppercase
+RUN  bio_d2_ce_mixed_case_decoded
+  NOTE Content-Encoding: gZiP: CE after send '' (err 12150), read ok=1 n=900
+OK   bio_d2_ce_mixed_case_decoded
+RUN  bio_d2_ce_list_not_decoded
+  NOTE Content-Encoding: gzip, identity: CE after send 'gzip, identity' (err 0), read ok=1 n=73
+OK   bio_d2_ce_list_not_decoded
+RUN  bio_d2_ce_two_headers_not_decoded
+  NOTE two Content-Encoding: gzip lines: CE after send 'gzip' (err 0), read ok=1 n=73
+OK   bio_d2_ce_two_headers_not_decoded
+RUN  bio_d2_ae_two_header_lines
+  NOTE two AE lines arrived as: gzip
+OK   bio_d2_ae_two_header_lines
+RUN  bio_d2_ae_via_add_request_headers
+OK   bio_d2_ae_via_add_request_headers
+RUN  bio_d2_ae_br_uppercase_ce
+OK   bio_d2_ae_br_uppercase_ce
+RUN  bio_d2_ae_br_only_gzip_body
+OK   bio_d2_ae_br_only_gzip_body
+RUN  bio_d2_ae_br_only_br_body
+OK   bio_d2_ae_br_only_br_body
+RUN  bio_d2_ae_gdb_br_body
+OK   bio_d2_ae_gdb_br_body
+RUN  bio_d2_ae_gd_with_br_body_not_decoded
+OK   bio_d2_ae_gd_with_br_body_not_decoded
+RUN  bio_d2_ae_identity_only
+OK   bio_d2_ae_identity_only
+RUN  bio_d2_ae_gzip_accepts_xgzip
+OK   bio_d2_ae_gzip_accepts_xgzip
+RUN  bio_d2_ae_xgzip_token_not_matched
+OK   bio_d2_ae_xgzip_token_not_matched
+RUN  bio_d2_ae_star_not_matched
+OK   bio_d2_ae_star_not_matched
+RUN  bio_d2_ae_identity_then_gzip
+OK   bio_d2_ae_identity_then_gzip
+RUN  bio_d2_ae_qvalue_other_token_matched
+OK   bio_d2_ae_qvalue_other_token_matched
+RUN  bio_d2_ae_qvalue_token_not_matched
+OK   bio_d2_ae_qvalue_token_not_matched
+RUN  bio_d2_ae_no_space_tokens
+OK   bio_d2_ae_no_space_tokens
+RUN  bio_d2_ae_spaced_tokens
+OK   bio_d2_ae_spaced_tokens
+RUN  bio_d2_ae_uppercase_pair
+OK   bio_d2_ae_uppercase_pair
+RUN  bio_d2_ae_deflate_only_deflate_body
+OK   bio_d2_ae_deflate_only_deflate_body
+RUN  bio_d2_ae_gzip_only_deflate_body
+OK   bio_d2_ae_gzip_only_deflate_body
+RUN  bio_d2_ae_deflate_only_gzip_body
+OK   bio_d2_ae_deflate_only_gzip_body
+RUN  bio_d2_ae_gzip_only
+OK   bio_d2_ae_gzip_only
+RUN  bio_https_by_1
+OK   bio_https_by_1
+RUN  bio_https_closedelim_50000
+OK   bio_https_closedelim_50000
+RUN  bio_https_chunked_100000
+OK   bio_https_chunked_100000
+RUN  bio_https_cl_1mb
+OK   bio_https_cl_1mb
+RUN  bio_https_cl_16385
+OK   bio_https_cl_16385
+RUN  bio_keepalive_server_closed_between
+OK   bio_keepalive_server_closed_between
+RUN  bio_http09_style_body
+  NOTE response without status line: read ok=1 err=0  n=26
+OK   bio_http09_style_body
+RUN  bio_close_mid_head
+  NOTE close in the middle of the head: read ok=1 err=0  n=0
+OK   bio_close_mid_head
+RUN  bio_close_before_head
+  NOTE graceful close instead of a response: send failed err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE
+OK   bio_close_before_head
+RUN  bio_reset_before_head
+  NOTE RST instead of a response: send failed err=12031 ERROR_INTERNET_CONNECTION_RESET
+OK   bio_reset_before_head
+RUN  bio_reset_closedelim
+  NOTE RST ending a close-delimited body: read ok=0 err=12031 ERROR_INTERNET_CONNECTION_RESET n=0
+OK   bio_reset_closedelim
+RUN  bio_reset_mid_chunked
+  NOTE RST after one chunk: read ok=0 err=12031 ERROR_INTERNET_CONNECTION_RESET n=0
+OK   bio_reset_mid_chunked
+RUN  bio_reset_mid_body
+  NOTE RST after 5 of 10 body bytes: read ok=0 err=12031 ERROR_INTERNET_CONNECTION_RESET n=0
+OK   bio_reset_mid_body
+RUN  bio_timeout_option_roundtrip
+OK   bio_timeout_option_roundtrip
+RUN  bio_timeout_slow_but_within
+OK   bio_timeout_slow_but_within
+RUN  bio_timeout_mid_chunked
+  NOTE chunked stall: ok=1 err=0 (?) n=3
+OK   bio_timeout_mid_chunked
+RUN  bio_timeout_mid_body
+  NOTE mid-body stall: ok=1 err=0 (?) n=10 after 2500 ms
+OK   bio_timeout_mid_body
+RUN  bio_timeout_request_handle_option
+  NOTE request RECEIVE_TIMEOUT 500, head after 2.5 s: ok=1 err=0
+OK   bio_timeout_request_handle_option
+RUN  bio_timeout_before_head
+  NOTE head after 2.5 s, receive timeout 500 ms: ok=1 err=0 (?) after 2516 ms
+OK   bio_timeout_before_head
+RUN  bio_dec_truncated_gzip
+  NOTE gzip cut to half: read ok=1 err=0  n=25
+OK   bio_dec_truncated_gzip
+RUN  bio_dec_not_compressed_but_labelled
+  NOTE plain text labelled gzip: read ok=0 err=12175 ERROR_INTERNET_DECODING_FAILED n=0
+OK   bio_dec_not_compressed_but_labelled
+RUN  bio_dec_corrupt_deflate_stream
+  NOTE gzip with corrupted deflate data: read ok=0 err=12175 ERROR_INTERNET_DECODING_FAILED n=0
+OK   bio_dec_corrupt_deflate_stream
+RUN  bio_dec_corrupt_gzip_header
+  NOTE gzip with bad method byte: read ok=0 err=12175 ERROR_INTERNET_DECODING_FAILED n=0
+OK   bio_dec_corrupt_gzip_header
+RUN  bio_dec_headers_after_decoding
+  NOTE decoded response: Content-Encoding query -> (none) (err 12150)
+  NOTE decoded response: Content-Length query ok=0 value=0 (wire 73, decoded 900)
+  NOTE decoded response: first QDA 900
+OK   bio_dec_headers_after_decoding
+RUN  bio_dec_accept_gzip_only
+OK   bio_dec_accept_gzip_only
+RUN  bio_dec_stored_gzip_1mb
+OK   bio_dec_stored_gzip_1mb
+RUN  bio_dec_stored_raw_200000_chunked
+OK   bio_dec_stored_raw_200000_chunked
+RUN  bio_dec_stored_zlib_200000_chunked
+OK   bio_dec_stored_zlib_200000_chunked
+RUN  bio_dec_stored_gzip_300000
+OK   bio_dec_stored_gzip_300000
+RUN  bio_dec_stored_gzip_65537
+OK   bio_dec_stored_gzip_65537
+RUN  bio_dec_stored_gzip_chunked
+OK   bio_dec_stored_gzip_chunked
+RUN  bio_dec_stored_raw
+OK   bio_dec_stored_raw
+RUN  bio_dec_stored_zlib
+OK   bio_dec_stored_zlib
+RUN  bio_dec_stored_gzip
+OK   bio_dec_stored_gzip
+RUN  bio_dec_unknown_encoding_passthrough
+OK   bio_dec_unknown_encoding_passthrough
+RUN  bio_dec_no_content_encoding
+OK   bio_dec_no_content_encoding
+RUN  bio_dec_identity_passthrough
+OK   bio_dec_identity_passthrough
+RUN  bio_dec_rawdeflate
+OK   bio_dec_rawdeflate
+RUN  bio_dec_zlib_off_passthrough
+OK   bio_dec_zlib_off_passthrough
+RUN  bio_dec_rawdeflate_by_7
+  NOTE raw deflate fox read 7 byte(s) per call: ok=1 err=0 n=826 of 900, prefix matches
+OK   bio_dec_rawdeflate_by_7
+RUN  bio_dec_rawdeflate_by_1
+  NOTE raw deflate fox read 1 byte(s) per call: ok=1 err=0 n=820 of 900, prefix matches
+OK   bio_dec_rawdeflate_by_1
+RUN  bio_dec_zlib_by_1
+OK   bio_dec_zlib_by_1
+RUN  bio_dec_zlib_deflate
+OK   bio_dec_zlib_deflate
+RUN  bio_dec_gzip_uppercase_token
+OK   bio_dec_gzip_uppercase_token
+RUN  bio_dec_xgzip
+OK   bio_dec_xgzip
+RUN  bio_dec_gzip_closedelim
+OK   bio_dec_gzip_closedelim
+RUN  bio_dec_gzip_chunked
+OK   bio_dec_gzip_chunked
+RUN  bio_dec_gzip_by_7
+OK   bio_dec_gzip_by_7
+RUN  bio_dec_gzip_by_1
+OK   bio_dec_gzip_by_1
+RUN  bio_dec_gzip_on_no_accept_passthrough
+OK   bio_dec_gzip_on_no_accept_passthrough
+RUN  bio_dec_gzip_off_passthrough
+OK   bio_dec_gzip_off_passthrough
+RUN  bio_dec_gzip_connect_on
+OK   bio_dec_gzip_connect_on
+RUN  bio_dec_gzip_request_on
+OK   bio_dec_gzip_request_on
+RUN  bio_dec_gzip_session_on
+OK   bio_dec_gzip_session_on
+RUN  bio_dec_option_bad_length
+  NOTE set HTTP_DECODING len 2: ok=0 err=12010 ERROR_INTERNET_BAD_OPTION_LENGTH
+OK   bio_dec_option_bad_length
+RUN  bio_dec_option_set_null_handle
+  NOTE set HTTP_DECODING on NULL handle: ok=0 err=12018 ERROR_INTERNET_INCORRECT_HANDLE_TYPE
+OK   bio_dec_option_set_null_handle
+RUN  bio_dec_option_set_query_roundtrip
+  NOTE after set TRUE: query ok=1 err=0 v=1
+OK   bio_dec_option_set_query_roundtrip
+RUN  bio_dec_option_query_default
+  NOTE query HTTP_DECODING on a fresh session: ok=1 err=0 v=0 len=4
+OK   bio_dec_option_query_default
+RUN  bio_clv_s102_then_200
+  NOTE [1xx 102 then 200] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_s102_then_200
+RUN  bio_clv_s304_with_cl
+  NOTE [304 with CL 5] status=304 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_s304_with_cl
+RUN  bio_clv_s204_with_bytes
+  NOTE [204 with body bytes] status=204 CL query ok=0 val=0 err=12150 | read ok=1 err=0 n=0 ''
+OK   bio_clv_s204_with_bytes
+RUN  bio_clv_cl0_with_bytes
+  NOTE [CL 0 with body bytes] status=200 CL query ok=1 val=0 err=0 | read ok=1 err=0 n=0 ''
+OK   bio_clv_cl0_with_bytes
+RUN  bio_clv_te_unknown
+  NOTE [TE unknown] status=200 CL query ok=0 val=0 err=12150 | read ok=1 err=0 n=9 'helloXXXX'
+OK   bio_clv_te_unknown
+RUN  bio_clv_te_gzip_chunked
+  NOTE [TE gzip, chunked (no decoding)] status=200 CL query ok=0 val=0 err=12150 | read ok=1 err=0 n=15 '5
+hello
+0
+
+'
+OK   bio_clv_te_gzip_chunked
+RUN  bio_clv_te_identity
+  NOTE [TE identity + CL] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_te_identity
+RUN  bio_clv_folded_header
+  NOTE [folded header before CL] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_folded_header
+RUN  bio_clv_no_reason
+  NOTE [no reason phrase] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_no_reason
+RUN  bio_clv_http10_no_length
+  NOTE [HTTP/1.0 no length] status=200 CL query ok=0 val=0 err=12150 | read ok=1 err=0 n=9 'helloXXXX'
+OK   bio_clv_http10_no_length
+RUN  bio_clv_http10_cl
+  NOTE [HTTP/1.0 CL] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_http10_cl
+RUN  bio_clv_mixed_eol_head
+  NOTE [mixed CRLF/LF head] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_mixed_eol_head
+RUN  bio_clv_lf_only_head
+  NOTE [LF-only head] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_lf_only_head
+RUN  bio_clv_with_conn_close
+  NOTE [CL + Connection close] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_with_conn_close
+RUN  bio_clv_huge_digits
+  NOTE [CL huge digits] send failed err=12153 ERROR_HTTP_INVALID_HEADER
+OK   bio_clv_huge_digits
+RUN  bio_clv_over_4g
+  NOTE [CL 2^32+5] status=200 CL query ok=0 val=0 err=12153 | read ok=1 err=0 n=9 'helloXXXX'
+OK   bio_clv_over_4g
+RUN  bio_clv_empty_value
+  NOTE [CL empty value] status=200 CL query ok=0 val=0 err=12154 | read ok=1 err=0 n=0 ''
+OK   bio_clv_empty_value
+RUN  bio_clv_trailing_garbage
+  NOTE [CL trailing garbage] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_trailing_garbage
+RUN  bio_clv_negative
+  NOTE [CL negative] status=200 CL query ok=1 val=0 err=0 | read ok=1 err=0 n=0 ''
+OK   bio_clv_negative
+RUN  bio_clv_non_numeric
+  NOTE [CL non-numeric] status=200 CL query ok=1 val=0 err=0 | read ok=1 err=0 n=0 ''
+OK   bio_clv_non_numeric
+RUN  bio_clv_list_equal
+  NOTE [CL list 5, 5] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_list_equal
+RUN  bio_clv_dup_differ
+  NOTE [CL duplicate differ] status=200 CL query ok=1 val=3 err=0 | read ok=1 err=0 n=3 'hel'
+OK   bio_clv_dup_differ
+RUN  bio_clv_dup_equal
+  NOTE [CL duplicate equal] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_dup_equal
+RUN  bio_clv_upper_name
+  NOTE [CL upper-case name] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_upper_name
+RUN  bio_clv_lower_name
+  NOTE [CL lower-case name] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_lower_name
+RUN  bio_clv_tab
+  NOTE [CL tab] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_tab
+RUN  bio_clv_no_space
+  NOTE [CL no space] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_no_space
+RUN  bio_clv_extra_spaces
+  NOTE [CL extra spaces] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_extra_spaces
+RUN  bio_clv_leading_zeros
+  NOTE [CL leading zeros] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_leading_zeros
+RUN  bio_clv_plain
+  NOTE [plain CL 5] status=200 CL query ok=1 val=5 err=0 | read ok=1 err=0 n=5 'hello'
+OK   bio_clv_plain
+RUN  bio_ch2_qda_bounded_by_chunks
+OK   bio_ch2_qda_bounded_by_chunks
+RUN  bio_ch2_slow_bytes_with_trailers
+OK   bio_ch2_slow_bytes_with_trailers
+RUN  bio_ch2_200_varied_chunks_by_4001
+OK   bio_ch2_200_varied_chunks_by_4001
+RUN  bio_ch2_200_varied_chunks_by_1000
+OK   bio_ch2_200_varied_chunks_by_1000
+RUN  bio_ch2_200_varied_chunks
+OK   bio_ch2_200_varied_chunks
+RUN  bio_ch2_3000_one_byte_chunks_by_7
+OK   bio_ch2_3000_one_byte_chunks_by_7
+RUN  bio_ch2_3000_one_byte_chunks
+OK   bio_ch2_3000_one_byte_chunks
+RUN  bio_ch2_trailers_keepalive_three
+OK   bio_ch2_trailers_keepalive_three
+RUN  bio_ch2_inv_data_longer_by1
+  NOTE [data longer than size] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_data_longer_by1
+RUN  bio_ch2_inv_data_longer
+  NOTE [data longer than size] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_data_longer
+RUN  bio_ch2_inv_second_size_by1
+  NOTE [second size invalid] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_second_size_by1
+RUN  bio_ch2_inv_second_size
+  NOTE [second size invalid] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_second_size
+RUN  bio_ch2_inv_plus_sign_by1
+  NOTE [plus sign] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_plus_sign_by1
+RUN  bio_ch2_inv_plus_sign
+  NOTE [plus sign] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_plus_sign
+RUN  bio_ch2_inv_size_overflow_by1
+  NOTE [size 17 hex digits] send failed err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE
+OK   bio_ch2_inv_size_overflow_by1
+RUN  bio_ch2_inv_size_overflow
+  NOTE [size 17 hex digits] send failed err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE
+OK   bio_ch2_inv_size_overflow
+RUN  bio_ch2_inv_trailer_no_colon_by1
+  NOTE [trailer without colon] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_trailer_no_colon_by1
+RUN  bio_ch2_inv_trailer_no_colon
+  NOTE [trailer without colon] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_trailer_no_colon
+RUN  bio_ch2_inv_cr_cr_lf_by1
+  NOTE [CR CR LF after size] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_cr_cr_lf_by1
+RUN  bio_ch2_inv_cr_cr_lf
+  NOTE [CR CR LF after size] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_cr_cr_lf
+RUN  bio_ch2_inv_junk_after_data_by1
+  NOTE [junk after data] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_junk_after_data_by1
+RUN  bio_ch2_inv_junk_after_data
+  NOTE [junk after data] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_junk_after_data
+RUN  bio_ch2_inv_bare_lf_after_data_by1
+  NOTE [bare LF after data] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_bare_lf_after_data_by1
+RUN  bio_ch2_inv_bare_lf_after_data
+  NOTE [bare LF after data] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_bare_lf_after_data
+RUN  bio_ch2_inv_lf_only_by1
+  NOTE [LF-only lines] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_lf_only_by1
+RUN  bio_ch2_inv_lf_only
+  NOTE [LF-only lines] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_lf_only
+RUN  bio_ch2_inv_empty_size_line_by1
+  NOTE [empty size line] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_empty_size_line_by1
+RUN  bio_ch2_inv_empty_size_line
+  NOTE [empty size line] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_empty_size_line
+RUN  bio_ch2_inv_leading_space_by1
+  NOTE [leading space] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_leading_space_by1
+RUN  bio_ch2_inv_leading_space
+  NOTE [leading space] send failed err=12004 ERROR_INTERNET_INTERNAL_ERROR
+OK   bio_ch2_inv_leading_space
+RUN  bio_ch2_zero_then_nothing_by1
+OK   bio_ch2_zero_then_nothing_by1
+RUN  bio_ch2_zero_then_nothing
+OK   bio_ch2_zero_then_nothing
+RUN  bio_ch2_one_byte_chunks_by1
+OK   bio_ch2_one_byte_chunks_by1
+RUN  bio_ch2_one_byte_chunks
+OK   bio_ch2_one_byte_chunks
+RUN  bio_ch2_data_is_hex_text_by1
+OK   bio_ch2_data_is_hex_text_by1
+RUN  bio_ch2_data_is_hex_text
+OK   bio_ch2_data_is_hex_text
+RUN  bio_ch2_data_has_crlf_by1
+OK   bio_ch2_data_has_crlf_by1
+RUN  bio_ch2_data_has_crlf
+OK   bio_ch2_data_has_crlf
+RUN  bio_ch2_quoted_ext_by1
+OK   bio_ch2_quoted_ext_by1
+RUN  bio_ch2_quoted_ext
+OK   bio_ch2_quoted_ext
+RUN  bio_ch2_empty_ext_by1
+OK   bio_ch2_empty_ext_by1
+RUN  bio_ch2_empty_ext
+OK   bio_ch2_empty_ext
+RUN  bio_ch2_ext_last_chunk_by1
+OK   bio_ch2_ext_last_chunk_by1
+RUN  bio_ch2_ext_last_chunk
+OK   bio_ch2_ext_last_chunk
+RUN  bio_ch2_two_trailers_by1
+OK   bio_ch2_two_trailers_by1
+RUN  bio_ch2_two_trailers
+OK   bio_ch2_two_trailers
+RUN  bio_ch2_trailer_empty_value_by1
+OK   bio_ch2_trailer_empty_value_by1
+RUN  bio_ch2_trailer_empty_value
+OK   bio_ch2_trailer_empty_value
+RUN  bio_ch2_trailer_no_space_by1
+OK   bio_ch2_trailer_no_space_by1
+RUN  bio_ch2_trailer_no_space
+OK   bio_ch2_trailer_no_space
+RUN  bio_ch2_mixed_case_hex_by1
+OK   bio_ch2_mixed_case_hex_by1
+RUN  bio_ch2_mixed_case_hex
+OK   bio_ch2_mixed_case_hex
+RUN  bio_ch2_lower_f_by1
+OK   bio_ch2_lower_f_by1
+RUN  bio_ch2_lower_f
+OK   bio_ch2_lower_f
+RUN  bio_ch2_many_leading_zeros_by1
+OK   bio_ch2_many_leading_zeros_by1
+RUN  bio_ch2_many_leading_zeros
+OK   bio_ch2_many_leading_zeros
+RUN  bio_ch2_hex_prefix_is_zero_by1
+OK   bio_ch2_hex_prefix_is_zero_by1
+RUN  bio_ch2_hex_prefix_is_zero
+OK   bio_ch2_hex_prefix_is_zero
+RUN  bio_ch2_colon_after_size_by1
+OK   bio_ch2_colon_after_size_by1
+RUN  bio_ch2_colon_after_size
+OK   bio_ch2_colon_after_size
+RUN  bio_ch2_letters_after_size_by1
+OK   bio_ch2_letters_after_size_by1
+RUN  bio_ch2_letters_after_size
+OK   bio_ch2_letters_after_size
+RUN  bio_ch2_tab_after_size_by1
+OK   bio_ch2_tab_after_size_by1
+RUN  bio_ch2_tab_after_size
+OK   bio_ch2_tab_after_size
+RUN  bio_ch2_space_after_size_by1
+OK   bio_ch2_space_after_size_by1
+RUN  bio_ch2_space_after_size
+OK   bio_ch2_space_after_size
+SUMMARY tests=508 failed=0 skipped=0 checks_pass=3208 checks_fail=0
+@@I7 END http_body_io exit=0x0 ms=183444 timeout=0 bytes=49048

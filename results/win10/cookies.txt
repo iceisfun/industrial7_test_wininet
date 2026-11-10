@@ -1,0 +1,807 @@
+RUN  ck_wire2_httponly_and_plain_both_sent
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   ck_wire2_httponly_and_plain_both_sent
+RUN  ck_wire2_cookie_visible_to_new_session_after_close
+OK   ck_wire2_cookie_visible_to_new_session_after_close
+RUN  ck_wire2_redirect_target_path_scoped_cookie
+  NOTE redirect target: /wininet_1052_3_rd/x/to/
+OK   ck_wire2_redirect_target_path_scoped_cookie
+RUN  ck_wire2_add_request_headers_cookie_with_jar
+  NOTE HttpAddRequestHeaders Cookie + jar: 'jar=1' (occurrences 1)
+OK   ck_wire2_add_request_headers_cookie_with_jar
+RUN  ck_wire2_no_cookies_on_one_request_only
+OK   ck_wire2_no_cookies_on_one_request_only
+RUN  ck_wire2_cookie_header_position
+  NOTE request header order: User-Agent,Host,Cache-Control,Cookie (Cookie at 3 of 4)
+OK   ck_wire2_cookie_header_position
+RUN  ck_wire2_three_level_path_order
+OK   ck_wire2_three_level_path_order
+RUN  ck_wire2_set_cookie_domain_localhost_on_localhost
+  NOTE Set-Cookie domain=localhost from localhost: ''
+OK   ck_wire2_set_cookie_domain_localhost_on_localhost
+RUN  ck_wire2_set_cookie_samesite_and_secure_flags
+OK   ck_wire2_set_cookie_samesite_and_secure_flags
+RUN  ck_wire2_set_cookie_empty_header_stores_empty_cookie
+OK   ck_wire2_set_cookie_empty_header_stores_empty_cookie
+RUN  ck_wire2_set_cookie_empty_value
+OK   ck_wire2_set_cookie_empty_value
+RUN  ck_wire2_set_cookie_nameless_value
+OK   ck_wire2_set_cookie_nameless_value
+RUN  ck_wire2_set_cookie_max_age_persistent
+OK   ck_wire2_set_cookie_max_age_persistent
+RUN  ck_wire2_set_cookie_expires_with_comma_persistent
+OK   ck_wire2_set_cookie_expires_with_comma_persistent
+RUN  ck_wire2_set_cookie_on_401_stored
+OK   ck_wire2_set_cookie_on_401_stored
+RUN  ck_wire2_set_cookie_on_500_stored
+OK   ck_wire2_set_cookie_on_500_stored
+RUN  ck_wire2_set_cookie_close_delimited_response
+OK   ck_wire2_set_cookie_close_delimited_response
+RUN  ck_wire2_set_cookie_http10_response
+OK   ck_wire2_set_cookie_http10_response
+RUN  ck_wire2_set_cookie_chunked_response
+OK   ck_wire2_set_cookie_chunked_response
+RUN  ck_wire2_keepalive_second_request_carries_new_cookie
+  NOTE keep-alive: conn0=0 conn1=0
+OK   ck_wire2_keepalive_second_request_carries_new_cookie
+RUN  ck_wire2_head_sends_cookie_and_stores_set_cookie
+OK   ck_wire2_head_sends_cookie_and_stores_set_cookie
+RUN  ck_wire2_post_sends_cookie
+OK   ck_wire2_post_sends_cookie
+RUN  ck_wire2_get_via_open_request_sends_cookie
+OK   ck_wire2_get_via_open_request_sends_cookie
+RUN  ck_wire_https_secure_cookie_sent
+  NOTE https send failed: 12030 ERROR_INTERNET_CONNECTION_ABORTED
+  FAIL tests/cookies/ck_wire.c:561: https_get(hi, w.s, w.path) == 200 (got 0x0 want 0xc8)
+  FAIL tests/cookies/ck_wire.c:563: srv_wait_requests(w.s, 2, 5000)
+  FAIL tests/cookies/ck_wire.c:565: cookie_hdr(w.s, 1) == "plainck=1; tls=1" (got "(null)" want "plainck=1; tls=1")
+  FAIL tests/cookies/ck_wire.c:566: ck_gets(w.api_url, NULL, 0) == "plainck=1; tls=1" (got "plainck=1" want "plainck=1; tls=1")
+FAIL ck_wire_https_secure_cookie_sent
+RUN  ck_wire_status_callbacks
+  NOTE callbacks: first request recv=1 sent=0 (len 32); after second recv=1 sent=1
+OK   ck_wire_status_callbacks
+RUN  ck_wire_query_request_cookie_header
+OK   ck_wire_query_request_cookie_header
+RUN  ck_wire_query_set_cookie_header
+OK   ck_wire_query_set_cookie_header
+RUN  ck_wire_jar_shared_between_sessions
+OK   ck_wire_jar_shared_between_sessions
+RUN  ck_wire_set_cookie_on_404_stored
+OK   ck_wire_set_cookie_on_404_stored
+RUN  ck_wire_set_cookie_on_redirect_stored_and_sent
+OK   ck_wire_set_cookie_on_redirect_stored_and_sent
+RUN  ck_wire_no_cookies_on_http_open_request
+OK   ck_wire_no_cookies_on_http_open_request
+RUN  ck_wire_no_cookies_user_header_kept
+OK   ck_wire_no_cookies_user_header_kept
+RUN  ck_wire_no_cookies_flag_not_sent
+OK   ck_wire_no_cookies_flag_not_sent
+RUN  ck_wire_no_cookies_flag_not_stored
+OK   ck_wire_no_cookies_flag_not_stored
+RUN  ck_wire_large_cookie_roundtrip
+OK   ck_wire_large_cookie_roundtrip
+RUN  ck_wire_user_cookie_header_and_jar
+  NOTE user Cookie header + jar: occurrences=1 first='jar=1'
+OK   ck_wire_user_cookie_header_and_jar
+RUN  ck_wire_nameless_cookie_sent_as_value
+OK   ck_wire_nameless_cookie_sent_as_value
+RUN  ck_wire_samesite_cookies_sent_direct
+OK   ck_wire_samesite_cookies_sent_direct
+RUN  ck_wire_api_httponly_cookie_sent
+OK   ck_wire_api_httponly_cookie_sent
+RUN  ck_wire_order_longer_path_first
+OK   ck_wire_order_longer_path_first
+RUN  ck_wire_no_cookie_header_when_empty
+OK   ck_wire_no_cookie_header_when_empty
+RUN  ck_wire_api_cookie_sent
+OK   ck_wire_api_cookie_sent
+RUN  ck_wire_localhost_and_ip_separate
+OK   ck_wire_localhost_and_ip_separate
+RUN  ck_wire_domain_attr_rules
+OK   ck_wire_domain_attr_rules
+RUN  ck_wire_bad_path_attr_rejected
+OK   ck_wire_bad_path_attr_rejected
+RUN  ck_wire_path_mismatch_not_sent
+OK   ck_wire_path_mismatch_not_sent
+RUN  ck_wire_expires_past_deletes
+OK   ck_wire_expires_past_deletes
+RUN  ck_wire_max_age_zero_deletes
+OK   ck_wire_max_age_zero_deletes
+RUN  ck_wire_default_path
+OK   ck_wire_default_path
+RUN  ck_wire_secure_cookie_over_http
+OK   ck_wire_secure_cookie_over_http
+RUN  ck_wire_httponly_stored_and_sent
+OK   ck_wire_httponly_stored_and_sent
+RUN  ck_wire_set_cookie_header_case
+OK   ck_wire_set_cookie_header_case
+RUN  ck_wire_set_cookie2_ignored
+OK   ck_wire_set_cookie2_ignored
+RUN  ck_wire_set_cookie_comma_not_split
+OK   ck_wire_set_cookie_comma_not_split
+RUN  ck_wire_set_cookie_same_name_last_wins
+OK   ck_wire_set_cookie_same_name_last_wins
+RUN  ck_wire_multiple_set_cookie_headers
+OK   ck_wire_multiple_set_cookie_headers
+RUN  ck_wire_cookie_roundtrip
+OK   ck_wire_cookie_roundtrip
+RUN  ck_wire_set_cookie_stored
+OK   ck_wire_set_cookie_stored
+RUN  ck_rev_wire_connect_flag_no_cookies
+  NOTE InternetConnect(NO_COOKIES) + HttpOpenRequest(0): Cookie=pre=1 jar='pre=1; cn=1'
+OK   ck_rev_wire_connect_flag_no_cookies
+RUN  ck_rev_wire_max_age_one_second_not_sent_later
+OK   ck_rev_wire_max_age_one_second_not_sent_later
+RUN  ck_rev_wire_path_attr_not_prefix_of_request
+  NOTE Set-Cookie with a Path that does not prefix the request path: jar at else/ = 'np=1; ok=1'
+OK   ck_rev_wire_path_attr_not_prefix_of_request
+RUN  ck_rev_wire_domain_localhost_from_ip_rejected
+OK   ck_rev_wire_domain_localhost_from_ip_rejected
+RUN  ck_rev_wire_whitespace_around_name_and_value
+OK   ck_rev_wire_whitespace_around_name_and_value
+RUN  ck_rev_wire_high_bytes_verbatim
+  NOTE UTF-8 Set-Cookie stored as (hex tail) c3 a9
+OK   ck_rev_wire_high_bytes_verbatim
+RUN  ck_rev_wire_quoted_value_verbatim
+OK   ck_rev_wire_quoted_value_verbatim
+RUN  ck_rev_wire_forty_set_cookie_headers
+OK   ck_rev_wire_forty_set_cookie_headers
+RUN  ck_rev_wire_no_cookies_across_redirect
+OK   ck_rev_wire_no_cookies_across_redirect
+RUN  ck_rev_wire_redirect_to_other_host_keeps_scope
+OK   ck_rev_wire_redirect_to_other_host_keeps_scope
+RUN  ck_rev_suppress_behavior_w_matches_a
+OK   ck_rev_suppress_behavior_w_matches_a
+RUN  ck_rev_suppress_behavior_null_buffer
+OK   ck_rev_suppress_behavior_null_buffer
+RUN  ck_rev_suppress_cookie_policy_values_accepted
+  NOTE SUPPRESS_COOKIE_POLICY_RESET: r=1 gle=0
+OK   ck_rev_suppress_cookie_policy_values_accepted
+RUN  ck_rev_suppress_reset_all_clears_persist_suppression
+OK   ck_rev_suppress_reset_all_clears_persist_suppression
+RUN  ck_rev_httponly_name_filter_needs_flag
+OK   ck_rev_httponly_name_filter_needs_flag
+RUN  ck_rev_getex_a_name_filter_size_query
+OK   ck_rev_getex_a_name_filter_size_query
+RUN  ck_rev_expired_cookie_not_counted_in_size_query
+OK   ck_rev_expired_cookie_not_counted_in_size_query
+RUN  ck_rev_max_age_one_second_expires
+OK   ck_rev_max_age_one_second_expires
+RUN  ck_rev_secure_cookie_overwritten_from_http
+  NOTE plain so=2 over secure so=1 from http: r=1 http='so=2' https='so=2'
+OK   ck_rev_secure_cookie_overwritten_from_http
+RUN  ck_rev_secure_httponly_combined
+OK   ck_rev_secure_httponly_combined
+RUN  ck_rev_host_cookie_not_deleted_by_domain_delete
+  NOTE host cookie after a Domain= delete of the same name: ''
+OK   ck_rev_host_cookie_not_deleted_by_domain_delete
+RUN  ck_rev_delete_domain_cookie_from_sibling_host
+OK   ck_rev_delete_domain_cookie_from_sibling_host
+RUN  ck_rev_same_name_host_and_domain_cookie_coexist
+OK   ck_rev_same_name_host_and_domain_cookie_coexist
+RUN  ck_rev_path_attr_cut_at_first_of_query_and_hash
+OK   ck_rev_path_attr_cut_at_first_of_query_and_hash
+RUN  ck_rev_path_attr_cut_at_hash
+OK   ck_rev_path_attr_cut_at_hash
+RUN  ck_rev_non_script_flag_on_plain_cookie
+OK   ck_rev_non_script_flag_on_plain_cookie
+RUN  ck_rev_httponly_flag_on_plain_cookie
+  NOTE plain cookie set with INTERNET_COOKIE_HTTPONLY: get(0)='' get(HTTPONLY)='pl=1' ex2 n=0 flags=0x0
+OK   ck_rev_httponly_flag_on_plain_cookie
+RUN  ck_rev_apply_p3p_null_state_accepts
+  NOTE APPLY_P3P, NULL state: state 1 gle 0
+OK   ck_rev_apply_p3p_null_state_accepts
+RUN  ck_rev_name_param_overwrites_data_form
+OK   ck_rev_name_param_overwrites_data_form
+RUN  ck_rev_name_param_attributes_in_data_apply
+OK   ck_rev_name_param_attributes_in_data_apply
+RUN  ck_rev_name_param_with_equals_reparsed
+OK   ck_rev_name_param_with_equals_reparsed
+RUN  ck_rev_httponly_bad_url_set_a_returns_false
+OK   ck_rev_httponly_bad_url_set_a_returns_false
+RUN  ck_rev_httponly_check_precedes_url_parse
+OK   ck_rev_httponly_check_precedes_url_parse
+RUN  ck_attr_comment_ignored
+OK   ck_attr_comment_ignored
+RUN  ck_attr_version_ignored
+OK   ck_attr_version_ignored
+RUN  ck_attr_httponly_lookalikes_accepted
+OK   ck_attr_httponly_lookalikes_accepted
+RUN  ck_attr_httponly_case_variants_rejected_without_flag
+OK   ck_attr_httponly_case_variants_rejected_without_flag
+RUN  ck_attr_secure_case_and_spacing
+OK   ck_attr_secure_case_and_spacing
+RUN  ck_attr_names_case_insensitive
+OK   ck_attr_names_case_insensitive
+RUN  ck_ex2_set_invalid_args
+OK   ck_ex2_set_invalid_args
+RUN  ck_ex2_set_basic
+  NOTE InternetSetCookieEx2: r=0 state=1
+OK   ck_ex2_set_basic
+RUN  ck_ex2_free_null_ok
+OK   ck_ex2_free_null_ok
+RUN  ck_ex2_all_cookies_requires_empty_url
+OK   ck_ex2_all_cookies_requires_empty_url
+RUN  ck_ex2_invalid_args
+OK   ck_ex2_invalid_args
+RUN  ck_ex2_none_is_success_zero
+OK   ck_ex2_none_is_success_zero
+RUN  ck_ex2_name_filter_and_counts
+OK   ck_ex2_name_filter_and_counts
+RUN  ck_ex2_domain_attr_view
+  NOTE ex2 domain attr: domain='wininet1052n132ex2dom.i7test.example' path='/' flags=0x202
+OK   ck_ex2_domain_attr_view
+RUN  ck_ex2_host_only_flag
+  NOTE ex2 host-only flags=0x84202
+  NOTE ex2 default flags=0x202
+OK   ck_ex2_host_only_flag
+RUN  ck_ex2_samesite_flags
+OK   ck_ex2_samesite_flags
+RUN  ck_ex2_httponly_flag
+  NOTE ex2 httponly flags=0x2202
+OK   ck_ex2_httponly_flag
+RUN  ck_ex2_secure_flag
+  NOTE ex2 secure flags=0x203
+OK   ck_ex2_secure_flag
+RUN  ck_ex2_max_age_expiry
+OK   ck_ex2_max_age_expiry
+RUN  ck_ex2_persistent_cookie_fields
+  NOTE ex2 persistent: flags=0x200 expset=1
+OK   ck_ex2_persistent_cookie_fields
+RUN  ck_ex2_session_cookie_fields
+  NOTE ex2 session: domain='wininet1052n145ex2s.i7test.example' flags=0x202 expset=0 exp=0000000000000000
+OK   ck_ex2_session_cookie_fields
+RUN  ck_attr_max_age_garbage_ignored
+OK   ck_attr_max_age_garbage_ignored
+RUN  ck_attr_max_age_zero_wins_over_future_expires
+OK   ck_attr_max_age_zero_wins_over_future_expires
+RUN  ck_attr_max_age_wins_over_past_expires_after
+OK   ck_attr_max_age_wins_over_past_expires_after
+RUN  ck_attr_max_age_wins_over_past_expires_before
+OK   ck_attr_max_age_wins_over_past_expires_before
+RUN  ck_attr_max_age_positive_kept
+OK   ck_attr_max_age_positive_kept
+RUN  ck_attr_max_age_negative_deletes
+OK   ck_attr_max_age_negative_deletes
+RUN  ck_attr_max_age_zero_deletes
+OK   ck_attr_max_age_zero_deletes
+RUN  ck_attr_expires_garbage_is_session
+OK   ck_attr_expires_garbage_is_session
+RUN  ck_attr_expires_two_digit_year_70_is_future
+OK   ck_attr_expires_two_digit_year_70_is_future
+RUN  ck_attr_expires_future_formats_table
+OK   ck_attr_expires_future_formats_table
+RUN  ck_attr_expires_formats_table
+OK   ck_attr_expires_formats_table
+RUN  ck_attr_expires_past_deletes
+OK   ck_attr_expires_past_deletes
+RUN  ck_parse_size_limit_long_name
+OK   ck_parse_size_limit_long_name
+RUN  ck_parse_size_limit_name_param_counts
+OK   ck_parse_size_limit_name_param_counts
+RUN  ck_parse_size_limit_5119_and_5120_fail
+OK   ck_parse_size_limit_5119_and_5120_fail
+RUN  ck_parse_size_limit_total_5118_fails
+OK   ck_parse_size_limit_total_5118_fails
+RUN  ck_parse_size_limit_total_5117_ok
+OK   ck_parse_size_limit_total_5117_ok
+RUN  ck_parse_long_value_4096
+OK   ck_parse_long_value_4096
+RUN  ck_parse_control_char_value
+  NOTE control char value: set r=1 got hex 633d785f79
+OK   ck_parse_control_char_value
+RUN  ck_parse_value_with_semicolon_param
+OK   ck_parse_value_with_semicolon_param
+RUN  ck_parse_name_with_semicolon_param
+OK   ck_parse_name_with_semicolon_param
+RUN  ck_parse_empty_data
+  NOTE set "": r=1 gle=0; get r=1 gle=0 size=1 ''
+OK   ck_parse_empty_data
+RUN  ck_parse_name_param_table
+OK   ck_parse_name_param_table
+RUN  ck_parse_name_value_table
+OK   ck_parse_name_value_table
+RUN  ck_more_export_expiry_skew
+  NOTE export +1d: line=1 value=1791245063 delta=449943 s
+  NOTE export +2d: line=1 value=1791331463 delta=536343 s
+  NOTE export +30d: line=1 value=1793750663 delta=2955543 s
+  NOTE export max-age 3600: line=1 value=1791162263 delta=367143 s
+OK   ck_more_export_expiry_skew
+RUN  ck_more_import_expiry_skew
+  NOTE import +1d: r=1 get='' httponly-get='' ex2 n=0 flags=0x0 expset=0
+  NOTE import +2d: r=1 get='' httponly-get='' ex2 n=0 flags=0x0 expset=0
+  NOTE import +7d: r=1 get='ix=iv' httponly-get='ix=iv' ex2 n=1 flags=0x200 expset=1
+  NOTE import +30d: r=1 get='ix=iv' httponly-get='ix=iv' ex2 n=1 flags=0x200 expset=1
+  NOTE import +365d: r=1 get='ix=iv' httponly-get='ix=iv' ex2 n=1 flags=0x200 expset=1
+OK   ck_more_import_expiry_skew
+RUN  ck_more_threads_concurrent_setters
+OK   ck_more_threads_concurrent_setters
+RUN  ck_more_many_hosts_isolated
+OK   ck_more_many_hosts_isolated
+RUN  ck_more_query_in_get_url_ignored
+OK   ck_more_query_in_get_url_ignored
+RUN  ck_more_percent_encoded_path_not_decoded
+OK   ck_more_percent_encoded_path_not_decoded
+RUN  ck_more_url_trailing_dot_host
+OK   ck_more_url_trailing_dot_host
+RUN  ck_more_file_url_cookie
+  NOTE file URL cookie: set=1 gle=0
+OK   ck_more_file_url_cookie
+RUN  ck_more_evaluate_p3p_null_header
+  NOTE EVALUATE_P3P without header: state=1 gle=0 get='p3n=1'
+OK   ck_more_evaluate_p3p_null_header
+RUN  ck_more_evaluate_p3p_with_header
+OK   ck_more_evaluate_p3p_with_header
+RUN  ck_more_get_flags_combined_httponly_and_plain
+OK   ck_more_get_flags_combined_httponly_and_plain
+RUN  ck_more_setex_non_script_accepts_httponly
+OK   ck_more_setex_non_script_accepts_httponly
+RUN  ck_more_setex_w_httponly_without_flag_rejected
+OK   ck_more_setex_w_httponly_without_flag_rejected
+RUN  ck_more_setex_w_httponly_and_getex_w_flags
+OK   ck_more_setex_w_httponly_and_getex_w_flags
+RUN  ck_more_session_to_persistent_and_back
+OK   ck_more_session_to_persistent_and_back
+RUN  ck_more_expires_then_max_age_zero_case_mix
+OK   ck_more_expires_then_max_age_zero_case_mix
+RUN  ck_more_expires_exact_value
+OK   ck_more_expires_exact_value
+RUN  ck_more_expires_far_future_forms
+  NOTE expires 'Fri, 31 Dec 2100 23:59:59 GMT': n=1 expset=1 -> 2100-12-31
+  NOTE expires 'Thu, 31-Dec-2037 23:59:59 GMT': n=1 expset=1 -> 2037-12-31
+  NOTE expires 'Tue, 19 Jan 2038 03:14:08 GMT': n=1 expset=1 -> 2038-01-19
+  NOTE expires 'Wed, 01 Jan 2200 00:00:00 GMT': n=1 expset=1 -> 2200-01-01
+OK   ck_more_expires_far_future_forms
+RUN  ck_more_max_age_huge_is_persistent
+OK   ck_more_max_age_huge_is_persistent
+RUN  ck_more_max_age_odd_forms_ignored
+  NOTE 'max-age=+60': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=60abc': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=60.5': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=0x10': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=99999999999': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=2147483648': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=4294967296': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age=-0': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age="60"': set=1 n=1 expset=0 secs=0
+  NOTE 'max-age= -5': set=1 n=0 expset=0 secs=0
+OK   ck_more_max_age_odd_forms_ignored
+RUN  ck_more_max_age_forms_table
+OK   ck_more_max_age_forms_table
+RUN  ck_more_size_grows_with_each_cookie
+OK   ck_more_size_grows_with_each_cookie
+RUN  ck_more_get_a_non_ex_sweep
+OK   ck_more_get_a_non_ex_sweep
+RUN  ck_more_w_buffer_sweep
+OK   ck_more_w_buffer_sweep
+RUN  ck_more_a_buffer_sweep
+OK   ck_more_a_buffer_sweep
+RUN  ck_jar_end_browser_session_clears_session_cookies
+  NOTE END_BROWSER_SESSION: r=1 gle=0 -> 'pers=1'
+OK   ck_jar_end_browser_session_clears_session_cookies
+RUN  ck_jar_suppress_behavior_bad_values
+OK   ck_jar_suppress_behavior_bad_values
+RUN  ck_jar_suppress_persist_option
+  NOTE SUPPRESS_BEHAVIOR(COOKIE_PERSIST): r=1 gle=0
+  CKGET 0 259 
+  NOTE suppressed persistent cookie flags=0x202 expset=1
+  CKGET 1 0 sp2=1
+OK   ck_jar_suppress_persist_option
+RUN  ck_jar_child_session_gone_in_parent
+OK   ck_jar_child_session_gone_in_parent
+RUN  ck_jar_child_persistent_visible_in_parent
+OK   ck_jar_child_persistent_visible_in_parent
+RUN  ck_jar_persistent_visible_in_child
+  CKGET 1 0 pers=1
+  CKGET 0 259 
+OK   ck_jar_persistent_visible_in_child
+RUN  ck_jar_session_not_visible_in_child
+  CKGET 0 259 
+OK   ck_jar_session_not_visible_in_child
+RUN  ck_jar_no_session_needed
+OK   ck_jar_no_session_needed
+RUN  ck_jar_shared_between_sessions
+OK   ck_jar_shared_between_sessions
+RUN  ck_limit_separate_hosts_independent
+OK   ck_limit_separate_hosts_independent
+RUN  ck_limit_counts_all_paths_of_domain
+OK   ck_limit_counts_all_paths_of_domain
+RUN  ck_limit_replacing_does_not_evict
+OK   ck_limit_replacing_does_not_evict
+RUN  ck_limit_180_per_domain_evicts_oldest
+OK   ck_limit_180_per_domain_evicts_oldest
+RUN  ck_setex_third_party_flag
+OK   ck_setex_third_party_flag
+RUN  ck_getex_third_party_flag
+OK   ck_getex_third_party_flag
+RUN  ck_getex_restricted_zone_flag
+OK   ck_getex_restricted_zone_flag
+RUN  ck_getex_unknown_flags_masked
+OK   ck_getex_unknown_flags_masked
+RUN  ck_samesite_cross_site_get
+OK   ck_samesite_cross_site_get
+RUN  ck_httponly_other_name_unaffected
+OK   ck_httponly_other_name_unaffected
+RUN  ck_httponly_delete_without_flag_rejected
+OK   ck_httponly_delete_without_flag_rejected
+RUN  ck_httponly_overwrite_without_flag_rejected
+OK   ck_httponly_overwrite_without_flag_rejected
+RUN  ck_httponly_only_cookie_invisible_no_more_items
+OK   ck_httponly_only_cookie_invisible_no_more_items
+RUN  ck_httponly_get_flags_table
+OK   ck_httponly_get_flags_table
+RUN  ck_httponly_set_flags_table
+OK   ck_httponly_set_flags_table
+RUN  ck_secure_mixed_list
+OK   ck_secure_mixed_list
+RUN  ck_secure_set_via_http_url
+OK   ck_secure_set_via_http_url
+RUN  ck_del_value_irrelevant
+OK   ck_del_value_irrelevant
+RUN  ck_del_one_of_many
+OK   ck_del_one_of_many
+RUN  ck_del_requires_same_domain
+OK   ck_del_requires_same_domain
+RUN  ck_del_requires_same_path
+OK   ck_del_requires_same_path
+RUN  ck_dup_same_value_twice
+OK   ck_dup_same_value_twice
+RUN  ck_dup_nameless_replaced
+OK   ck_dup_nameless_replaced
+RUN  ck_dup_name_param_vs_data_same_cookie
+OK   ck_dup_name_param_vs_data_same_cookie
+RUN  ck_dup_session_replaced_by_persistent
+OK   ck_dup_session_replaced_by_persistent
+RUN  ck_dup_names_case_sensitive
+OK   ck_dup_names_case_sensitive
+RUN  ck_dup_replace_value
+OK   ck_dup_replace_value
+RUN  ck_order_domain_vs_host_cookies
+OK   ck_order_domain_vs_host_cookies
+RUN  ck_order_longer_path_first
+OK   ck_order_longer_path_first
+RUN  ck_order_delete_then_readd_goes_last
+OK   ck_order_delete_then_readd_goes_last
+RUN  ck_order_replace_keeps_position
+OK   ck_order_replace_keeps_position
+RUN  ck_order_reverse_alpha_names_kept_in_insertion
+OK   ck_order_reverse_alpha_names_kept_in_insertion
+RUN  ck_order_same_path_insertion
+OK   ck_order_same_path_insertion
+RUN  ck_path_same_name_different_paths_coexist
+OK   ck_path_same_name_different_paths_coexist
+RUN  ck_path_case_sensitive
+OK   ck_path_case_sensitive
+RUN  ck_path_attr_with_query_char
+OK   ck_path_attr_with_query_char
+RUN  ck_path_attr_empty_value
+OK   ck_path_attr_empty_value
+RUN  ck_path_attr_without_slash_rejected
+OK   ck_path_attr_without_slash_rejected
+RUN  ck_path_default_ex2_view
+OK   ck_path_default_ex2_view
+RUN  ck_path_default_from_url_table
+OK   ck_path_default_from_url_table
+RUN  ck_path_root_visible_everywhere
+OK   ck_path_root_visible_everywhere
+RUN  ck_path_attr_trailing_slash_table
+OK   ck_path_attr_trailing_slash_table
+RUN  ck_path_attr_prefix_table
+OK   ck_path_attr_prefix_table
+RUN  ck_dom_ipv6_literal
+OK   ck_dom_ipv6_literal
+RUN  ck_dom_localhost
+OK   ck_dom_localhost
+RUN  ck_dom_ip_domain_attr_exact_only
+OK   ck_dom_ip_domain_attr_exact_only
+RUN  ck_dom_ip_literal_exact
+OK   ck_dom_ip_literal_exact
+RUN  ck_dom_suffix_not_label_boundary
+OK   ck_dom_suffix_not_label_boundary
+RUN  ck_dom_registrable_parent_accepted
+OK   ck_dom_registrable_parent_accepted
+RUN  ck_dom_tld_rejected
+OK   ck_dom_tld_rejected
+RUN  ck_dom_child_domain_rejected
+OK   ck_dom_child_domain_rejected
+RUN  ck_dom_unrelated_domain_rejected
+OK   ck_dom_unrelated_domain_rejected
+RUN  ck_dom_domain_attr_case_insensitive
+OK   ck_dom_domain_attr_case_insensitive
+RUN  ck_dom_leading_dot_equivalent
+OK   ck_dom_leading_dot_equivalent
+RUN  ck_dom_parent_domain_attr
+OK   ck_dom_parent_domain_attr
+RUN  ck_dom_apply_host_only_ignored_with_domain_attr
+OK   ck_dom_apply_host_only_ignored_with_domain_attr
+RUN  ck_dom_apply_host_only
+OK   ck_dom_apply_host_only
+RUN  ck_dom_default_no_domain_visibility
+OK   ck_dom_default_no_domain_visibility
+RUN  ck_file_export_import_roundtrip
+OK   ck_file_export_import_roundtrip
+RUN  ck_file_import_empty_file
+  NOTE import of a comment-only file: r=0
+OK   ck_file_import_empty_file
+RUN  ck_file_import_missing_file_and_null
+OK   ck_file_import_missing_file_and_null
+RUN  ck_file_import_short_line_ignored
+  NOTE import of a 6-field line: r=0
+OK   ck_file_import_short_line_ignored
+RUN  ck_file_import_does_not_overwrite
+  NOTE import over an existing cookie: r=0
+OK   ck_file_import_does_not_overwrite
+RUN  ck_file_import_secure_column
+OK   ck_file_import_secure_column
+RUN  ck_file_import_creates_cookie
+  NOTE ImportCookieFileA: r=1 gle=0
+  NOTE imported cookie from www.<host>: 'imn=imv'
+OK   ck_file_import_creates_cookie
+RUN  ck_file_export_w_and_null
+OK   ck_file_export_w_and_null
+RUN  ck_file_export_append_has_no_header
+OK   ck_file_export_append_has_no_header
+RUN  ck_file_export_contains_persistent_cookie
+OK   ck_file_export_contains_persistent_cookie
+RUN  ck_persite_enum_past_end
+  NOTE enum index 100000: r=0 gle=259
+  NOTE per-site decisions on this machine: 0 (enumerated, not asserted)
+OK   ck_persite_enum_past_end
+RUN  ck_persite_enum_null_args
+OK   ck_persite_enum_null_args
+RUN  ck_persite_clear_unknown_host
+  NOTE clear decision of an unknown host: r=0 gle=12004
+OK   ck_persite_clear_unknown_host
+RUN  ck_persite_set_invalid_decisions_noop
+  NOTE SetPerSiteCookieDecisionW(3): gle=0
+OK   ck_persite_set_invalid_decisions_noop
+RUN  ck_persite_set_null_host
+OK   ck_persite_set_null_host
+RUN  ck_persite_get_unknown_host
+OK   ck_persite_get_unknown_host
+RUN  ck_persite_get_null_args
+OK   ck_persite_get_null_args
+RUN  ck_persite_exports_present
+OK   ck_persite_exports_present
+RUN  ck_internal_get_cookie_stub
+OK   ck_internal_get_cookie_stub
+RUN  ck_legal_domain_leading_dot
+  NOTE IsDomainLegalCookieDomainA(.example.com, www.example.com) = 0
+OK   ck_legal_domain_leading_dot
+RUN  ck_legal_domain_a_null_args
+OK   ck_legal_domain_a_null_args
+RUN  ck_legal_domain_w_table
+OK   ck_legal_domain_w_table
+RUN  ck_legal_domain_a_table
+OK   ck_legal_domain_a_table
+RUN  ck_ex2get_bad_url_errors
+OK   ck_ex2get_bad_url_errors
+RUN  ck_ex2get_many_cookies_count
+OK   ck_ex2get_many_cookies_count
+RUN  ck_ex2get_third_party_flag_hides
+OK   ck_ex2get_third_party_flag_hides
+RUN  ck_ex2get_secure_filtered_by_scheme
+OK   ck_ex2get_secure_filtered_by_scheme
+RUN  ck_ex2get_name_filter_multiple_paths
+OK   ck_ex2get_name_filter_multiple_paths
+RUN  ck_ex2get_array_order_and_fields
+  NOTE Ex2 array: [deep /a/b/] [mid /a/] [root /]
+OK   ck_ex2get_array_order_and_fields
+RUN  ck_ex2set_p3p_header_accepted
+OK   ck_ex2set_p3p_header_accepted
+RUN  ck_ex2set_bad_url_errors
+OK   ck_ex2set_bad_url_errors
+RUN  ck_ex2set_path_too_long_rejected
+OK   ck_ex2set_path_too_long_rejected
+RUN  ck_ex2set_path_without_slash_rejected
+OK   ck_ex2set_path_without_slash_rejected
+RUN  ck_ex2set_path_default_from_url
+OK   ck_ex2set_path_default_from_url
+RUN  ck_ex2set_path_scoping
+OK   ck_ex2set_path_scoping
+RUN  ck_ex2set_domain_child_rejected
+OK   ck_ex2set_domain_child_rejected
+RUN  ck_ex2set_domain_unrelated_rejected
+OK   ck_ex2set_domain_unrelated_rejected
+RUN  ck_ex2set_domain_leading_dot_skipped
+OK   ck_ex2set_domain_leading_dot_skipped
+RUN  ck_ex2set_domain_field
+OK   ck_ex2set_domain_field
+RUN  ck_ex2set_host_only_flag_and_apply
+OK   ck_ex2set_host_only_flag_and_apply
+RUN  ck_ex2set_samesite_flags
+OK   ck_ex2set_samesite_flags
+RUN  ck_ex2set_httponly_existing_protected
+  NOTE overwrite HttpOnly with NON_SCRIPT, no HttpOnly cookie flag: r=4317 state=5 now='hp=orig'
+OK   ck_ex2set_httponly_existing_protected
+RUN  ck_ex2set_httponly_requires_non_script
+OK   ck_ex2set_httponly_requires_non_script
+RUN  ck_ex2set_secure_cookie
+OK   ck_ex2set_secure_cookie
+RUN  ck_ex2set_value_with_semicolon_stored_verbatim
+OK   ck_ex2set_value_with_semicolon_stored_verbatim
+RUN  ck_ex2set_value_null_is_empty
+OK   ck_ex2set_value_null_is_empty
+RUN  ck_ex2set_nameless_cookie
+OK   ck_ex2set_nameless_cookie
+RUN  ck_ex2set_interop_with_string_api
+OK   ck_ex2set_interop_with_string_api
+RUN  ck_ex2set_replace_value
+OK   ck_ex2set_replace_value
+RUN  ck_ex2set_past_expiry_unknown_name_ok
+OK   ck_ex2set_past_expiry_unknown_name_ok
+RUN  ck_ex2set_past_expiry_deletes
+OK   ck_ex2set_past_expiry_deletes
+RUN  ck_ex2set_persistent_expiry_roundtrip
+  NOTE Ex2-set persistent: flags=0x200 set=01dd536a23d38807 got=01dd536a23d38807
+OK   ck_ex2set_persistent_expiry_roundtrip
+RUN  ck_ex2set_expires_ignored_without_expset
+OK   ck_ex2set_expires_ignored_without_expset
+RUN  ck_ex2set_session_default_fields
+OK   ck_ex2set_session_default_fields
+RUN  ck_ex2set_good_cookie_flags_table
+OK   ck_ex2set_good_cookie_flags_table
+RUN  ck_ex2set_bad_cookie_flags_table
+OK   ck_ex2set_bad_cookie_flags_table
+RUN  ck_ex2set_good_call_flags_table
+  NOTE Ex2 set flags 0x0: r=0 state=1 get='gf=1'
+  NOTE Ex2 set flags 0x10: r=0 state=1 get='gf=1'
+  NOTE Ex2 set flags 0x1000: r=0 state=1 get='gf=1'
+  NOTE Ex2 set flags 0x8000: r=0 state=1 get='gf=1'
+  NOTE Ex2 set flags 0x40000: r=0 state=1 get='gf=1'
+  NOTE Ex2 set flags 0x40000000: r=0 state=1 get='gf=1'
+OK   ck_ex2set_good_call_flags_table
+RUN  ck_ex2set_bad_call_flags_table
+OK   ck_ex2set_bad_call_flags_table
+RUN  ck_ex2set_null_state_after_flag_checks
+OK   ck_ex2set_null_state_after_flag_checks
+RUN  ck_ex2set_null_url
+OK   ck_ex2set_null_url
+RUN  ck_ex2set_name_and_value_null
+OK   ck_ex2set_name_and_value_null
+RUN  ck_ex2set_null_cookie_state_untouched
+OK   ck_ex2set_null_cookie_state_untouched
+RUN  ck_set_w_httponly_rejected
+OK   ck_set_w_httponly_rejected
+RUN  ck_setex_w_url_conversion
+OK   ck_setex_w_url_conversion
+RUN  ck_set_https_get_http_same_jar
+OK   ck_set_https_get_http_same_jar
+RUN  ck_set_url_userinfo
+OK   ck_set_url_userinfo
+RUN  ck_set_url_query_and_fragment
+OK   ck_set_url_query_and_fragment
+RUN  ck_set_url_with_port_ignored
+OK   ck_set_url_with_port_ignored
+RUN  ck_set_url_uppercase_host_same_jar
+OK   ck_set_url_uppercase_host_same_jar
+RUN  ck_set_url_host_bad_char
+OK   ck_set_url_host_bad_char
+RUN  ck_get_url_ftp_scheme_invalid
+OK   ck_get_url_ftp_scheme_invalid
+RUN  ck_set_url_ftp_scheme_invalid
+OK   ck_set_url_ftp_scheme_invalid
+RUN  ck_get_url_empty
+OK   ck_get_url_empty
+RUN  ck_set_url_empty
+OK   ck_set_url_empty
+RUN  ck_get_url_no_scheme
+  NOTE InternetGetCookieA("not a url"): gle=12006 ERROR_INTERNET_UNRECOGNIZED_SCHEME
+OK   ck_get_url_no_scheme
+RUN  ck_set_url_no_scheme
+  NOTE InternetSetCookieA("not a url"): gle=12006 ERROR_INTERNET_UNRECOGNIZED_SCHEME
+OK   ck_set_url_no_scheme
+RUN  ck_a_set_w_get_mixed
+OK   ck_a_set_w_get_mixed
+RUN  ck_w_value_latin1_acp
+OK   ck_w_value_latin1_acp
+RUN  ck_w_roundtrip_ascii
+OK   ck_w_roundtrip_ascii
+RUN  ck_getex_name_filter_nameless
+OK   ck_getex_name_filter_nameless
+RUN  ck_getex_w_name_filter
+OK   ck_getex_w_name_filter
+RUN  ck_getex_a_name_filter_case_sensitive
+OK   ck_getex_a_name_filter_case_sensitive
+RUN  ck_getex_a_name_filter
+OK   ck_getex_a_name_filter
+RUN  ck_get_w_name_behaviour
+  NOTE InternetGetCookieW(name=b): r=1 gle=0 data=b=2
+OK   ck_get_w_name_behaviour
+RUN  ck_get_a_ignores_name
+OK   ck_get_a_ignores_name
+RUN  ck_getex_w_zero_size_nonnull
+OK   ck_getex_w_zero_size_nonnull
+RUN  ck_get_w_size_query_and_fetch
+OK   ck_get_w_size_query_and_fetch
+RUN  ck_getex_w_one_short_reports_bytes
+OK   ck_getex_w_one_short_reports_bytes
+RUN  ck_getex_w_exact_chars
+OK   ck_getex_w_exact_chars
+RUN  ck_getex_w_success_size_chars
+OK   ck_getex_w_success_size_chars
+RUN  ck_getex_w_size_query_null_buffer_bytes
+OK   ck_getex_w_size_query_null_buffer_bytes
+RUN  ck_get_a_insufficient_then_retry
+OK   ck_get_a_insufficient_then_retry
+RUN  ck_getex_a_large_buffer_size_out
+OK   ck_getex_a_large_buffer_size_out
+RUN  ck_getex_a_zero_size_nonnull_buffer
+OK   ck_getex_a_zero_size_nonnull_buffer
+RUN  ck_getex_a_one_short
+OK   ck_getex_a_one_short
+RUN  ck_getex_a_exact_buffer
+OK   ck_getex_a_exact_buffer
+RUN  ck_get_a_size_query_null_buffer
+OK   ck_get_a_size_query_null_buffer
+RUN  ck_getex_a_size_query_null_buffer
+OK   ck_getex_a_size_query_null_buffer
+RUN  ck_getex_none_by_name
+OK   ck_getex_none_by_name
+RUN  ck_getex_w_none_null_buffer
+OK   ck_getex_w_none_null_buffer
+RUN  ck_getex_a_none_null_buffer
+OK   ck_getex_a_none_null_buffer
+RUN  ck_get_w_none_no_more_items
+OK   ck_get_w_none_no_more_items
+RUN  ck_get_a_none_no_more_items
+OK   ck_get_a_none_no_more_items
+RUN  ck_get_w_null_size
+OK   ck_get_w_null_size
+RUN  ck_get_a_null_size
+OK   ck_get_a_null_size
+RUN  ck_get_w_null_url
+OK   ck_get_w_null_url
+RUN  ck_get_a_null_url
+OK   ck_get_a_null_url
+RUN  ck_getex_a_reserved_nonnull
+  NOTE InternetGetCookieExA(lpReserved=&x): r=1 gle=0 size=4 data=a=1
+OK   ck_getex_a_reserved_nonnull
+RUN  ck_getex_w_reserved_nonnull
+OK   ck_getex_w_reserved_nonnull
+RUN  ck_getex_w_null_size
+OK   ck_getex_w_null_size
+RUN  ck_getex_w_null_url
+OK   ck_getex_w_null_url
+RUN  ck_getex_a_null_size
+OK   ck_getex_a_null_size
+RUN  ck_getex_a_null_url
+OK   ck_getex_a_null_url
+RUN  ck_setex_expired_nonexistent_returns_accept
+OK   ck_setex_expired_nonexistent_returns_accept
+RUN  ck_set_expired_nonexistent_returns_true
+OK   ck_set_expired_nonexistent_returns_true
+RUN  ck_set_w_name_and_data
+OK   ck_set_w_name_and_data
+RUN  ck_setex_w_name_and_data
+OK   ck_setex_w_name_and_data
+RUN  ck_setex_w_returns_accept
+OK   ck_setex_w_returns_accept
+RUN  ck_setex_a_returns_accept
+OK   ck_setex_a_returns_accept
+RUN  ck_set_w_returns_one_and_clears_error
+OK   ck_set_w_returns_one_and_clears_error
+RUN  ck_set_a_returns_one_and_clears_error
+OK   ck_set_a_returns_one_and_clears_error
+RUN  ck_setex_p3p_evaluate_and_apply_rejected
+OK   ck_setex_p3p_evaluate_and_apply_rejected
+RUN  ck_setex_w_null_data
+OK   ck_setex_w_null_data
+RUN  ck_setex_w_null_url
+OK   ck_setex_w_null_url
+RUN  ck_setex_a_null_data
+OK   ck_setex_a_null_data
+RUN  ck_setex_a_null_url
+OK   ck_setex_a_null_url
+RUN  ck_set_w_null_data
+OK   ck_set_w_null_data
+RUN  ck_set_w_null_url
+OK   ck_set_w_null_url
+RUN  ck_set_a_null_both
+OK   ck_set_a_null_both
+RUN  ck_set_a_null_data
+OK   ck_set_a_null_data
+RUN  ck_set_a_null_url
+OK   ck_set_a_null_url
+SUMMARY tests=359 failed=1 skipped=0 checks_pass=1601 checks_fail=4
+@@I7 END cookies exit=0x1 ms=217011 timeout=0 bytes=32678

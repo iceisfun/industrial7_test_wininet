@@ -1,0 +1,597 @@
+RUN  sh_types_http_connect_port_table_type
+OK   sh_types_http_connect_port_table_type
+RUN  sh_types_openurl_ftp_file_options
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   sh_types_openurl_ftp_file_options
+RUN  sh_types_cross_protocol_apis_12018
+OK   sh_types_cross_protocol_apis_12018
+RUN  sh_types_ftp_set_rules
+OK   sh_types_ftp_set_rules
+RUN  sh_types_ftp_command_data_handle
+OK   sh_types_ftp_command_data_handle
+RUN  sh_types_openurl_ftp_directory_types
+OK   sh_types_openurl_ftp_directory_types
+RUN  sh_types_ftp_tree_parents_and_contexts
+OK   sh_types_ftp_tree_parents_and_contexts
+RUN  sh_types_file_handle_closed_with_session
+OK   sh_types_file_handle_closed_with_session
+RUN  sh_types_file_handle_http_apis_12018
+OK   sh_types_file_handle_http_apis_12018
+RUN  sh_types_file_handle_option_rules
+OK   sh_types_file_handle_option_rules
+RUN  sh_types_openurl_http_url_credentials_on_hidden_connect
+OK   sh_types_openurl_http_url_credentials_on_hidden_connect
+RUN  sh_types_openurl_http_hidden_connect_options
+OK   sh_types_openurl_http_hidden_connect_options
+RUN  sh_types_context_old_and_new_option
+OK   sh_types_context_old_and_new_option
+RUN  sh_types_contexts_are_per_handle
+OK   sh_types_contexts_are_per_handle
+RUN  sh_types_secure_request
+OK   sh_types_secure_request
+RUN  sh_types_handle_type_buffer_protocol
+OK   sh_types_handle_type_buffer_protocol
+RUN  sh_types_session_connect_values_a_and_w
+OK   sh_types_session_connect_values_a_and_w
+RUN  sh_connected_state_ex_a_shape
+OK   sh_connected_state_ex_a_shape
+RUN  sh_connected_state_ex_w_shape
+  NOTE InternetGetConnectedStateExW: ret=1 flags=0x12 name=[LAN Connection]
+OK   sh_connected_state_ex_w_shape
+RUN  sh_connected_state_reserved_87
+OK   sh_connected_state_reserved_87
+RUN  sh_connected_state_shape
+  NOTE InternetGetConnectedState: ret=1 flags=0x12 GLE=0
+OK   sh_connected_state_shape
+RUN  sh_attempt_connect
+OK   sh_attempt_connect
+RUN  sh_thr_extended_error_null_handle
+  NOTE EXTENDED_ERROR on this thread: 997
+OK   sh_thr_extended_error_null_handle
+RUN  sh_thr_shared_session_parallel_gets
+  NOTE parallel GETs: 20 requests over 2 connections
+OK   sh_thr_shared_session_parallel_gets
+RUN  sh_thr_close_on_other_thread
+OK   sh_thr_close_on_other_thread
+RUN  sh_thr_user_agent_concurrent_set_query
+  NOTE USER_AGENT concurrent reads 3681, torn/mixed values 265 (unsynchronised on Win10)
+OK   sh_thr_user_agent_concurrent_set_query
+RUN  sh_thr_independent_session_trees
+OK   sh_thr_independent_session_trees
+RUN  sh_thr_shared_connect_requests
+OK   sh_thr_shared_connect_requests
+RUN  sh_set_context_value_zero_silences
+OK   sh_set_context_value_zero_silences
+RUN  sh_set_context_value_changes_callback_context
+OK   sh_set_context_value_changes_callback_context
+RUN  sh_set_user_agent_w_on_session
+OK   sh_set_user_agent_w_on_session
+RUN  sh_set_credentials_w
+OK   sh_set_credentials_w
+RUN  sh_set_credentials_a_length_ignored
+OK   sh_set_credentials_a_length_ignored
+RUN  sh_set_null_handle_proxy_credentials_12018
+OK   sh_set_null_handle_proxy_credentials_12018
+RUN  sh_set_http_decoding_values
+OK   sh_set_http_decoding_values
+RUN  sh_set_codepage_and_idn_roundtrip
+  NOTE IDN default on 0: 0x3
+  NOTE IDN default on 1: 0x3
+  NOTE IDN default on 2: 0x3
+OK   sh_set_codepage_and_idn_roundtrip
+RUN  sh_set_bypass_edited_entry_on_handle_12018
+OK   sh_set_bypass_edited_entry_on_handle_12018
+RUN  sh_set_from_cache_timeout_roundtrip
+OK   sh_set_from_cache_timeout_roundtrip
+RUN  sh_set_timeout_edge_values
+OK   sh_set_timeout_edge_values
+RUN  sh_set_buffer_sizes
+OK   sh_set_buffer_sizes
+RUN  sh_set_security_flags_individual_bits
+OK   sh_set_security_flags_individual_bits
+RUN  sh_set_security_flags_mask_on_secure_request
+  NOTE SECURE request initial SECURITY_FLAGS 0x0
+OK   sh_set_security_flags_mask_on_secure_request
+RUN  sh_set_error_mask_values
+OK   sh_set_error_mask_values
+RUN  sh_set_request_priority
+OK   sh_set_request_priority
+RUN  sh_set_proxy_session_used_by_new_request
+OK   sh_set_proxy_session_used_by_new_request
+RUN  sh_set_proxy_session_validation
+OK   sh_set_proxy_session_validation
+RUN  sh_set_proxy_session_roundtrip
+OK   sh_set_proxy_session_roundtrip
+RUN  sh_set_out_of_range_options_12009
+OK   sh_set_out_of_range_options_12009
+RUN  sh_set_noop_options_on_handles
+OK   sh_set_noop_options_on_handles
+RUN  sh_set_not_implemented_and_not_supported
+OK   sh_set_not_implemented_and_not_supported
+RUN  sh_set_readonly_option_list_12011
+OK   sh_set_readonly_option_list_12011
+RUN  sh_setex_flags_zero_forwards
+OK   sh_setex_flags_zero_forwards
+RUN  sh_setex_flags_nonzero_87
+OK   sh_setex_flags_nonzero_87
+RUN  sh_rv_connected_state_ex_a_rules
+  NOTE ExA reserved 3: ret 0 err 87 flags 0x0 name[0] 0
+OK   sh_rv_connected_state_ex_a_rules
+RUN  sh_rv_async_sessions_loop_no_leak
+  NOTE kernel handle count before 243 after 243 (150 async session trees)
+OK   sh_rv_async_sessions_loop_no_leak
+RUN  sh_rv_conc_close_connect_while_requests_created
+  NOTE requests created around connect close: made 731 fail6 21 fail18 0 failother 0 (last 0) close_ok 731 close6 0
+OK   sh_rv_conc_close_connect_while_requests_created
+RUN  sh_rv_proxy_info_readback_forms
+  NOTE row 0 proxy [127.0.0.1:9] bypass [(null)]: access 3 lpszProxy [127.0.0.1:9] lpszProxyBypass [127.0.0.1:9] len 48
+  NOTE row 1 proxy [127.0.0.1:9] bypass []: access 3 lpszProxy [127.0.0.1:9] lpszProxyBypass [127.0.0.1:9] len 48
+  NOTE row 2 proxy [http=127.0.0.1:9 ftp=127.0.0.1:10] bypass [a.example;b.example]: access 3 lpszProxy [http=127.0.0.1:9 ftp=127.0.0.1:10] lpszProxyBypass [http=127.0.0.1:9 ftp=127.0.0.1:10 a.example b.example] len 112
+  NOTE row 3 proxy [http://127.0.0.1:9] bypass [<local>]: access 3 lpszProxy [http://127.0.0.1:9] lpszProxyBypass [http://127.0.0.1:9 <local>] len 70
+OK   sh_rv_proxy_info_readback_forms
+RUN  sh_rv_http_long_credentials_roundtrip
+OK   sh_rv_http_long_credentials_roundtrip
+RUN  sh_rv_http_partial_credentials
+OK   sh_rv_http_partial_credentials
+RUN  sh_rv_connect_server_names_not_validated
+  NOTE server name [127.0.0.1:8080]: HttpOpenRequest ok (err 0), URL [http://127.0.0.1:8080/p]
+  NOTE server name [a b]: HttpOpenRequest ok (err 0), URL [http://a%20b/p]
+  NOTE server name [http://h.example]: HttpOpenRequest ok (err 0), URL [http://http:%2F%2Fh.example/p]
+  NOTE server name [h.example/path]: HttpOpenRequest ok (err 0), URL [http://h.example%2fpath/p]
+  NOTE server name [%41%42]: HttpOpenRequest ok (err 0), URL [http://%2541%2542/p]
+  NOTE server name [-]: HttpOpenRequest ok (err 0), URL [http://-/p]
+  NOTE server name [_]: HttpOpenRequest ok (err 0), URL [http://_/p]
+  NOTE server name [a..b]: HttpOpenRequest ok (err 0), URL [http://a..b/p]
+  NOTE server name [300.1.1.1]: HttpOpenRequest ok (err 0), URL [http://300.1.1.1/p]
+OK   sh_rv_connect_server_names_not_validated
+RUN  sh_rv_set_identity_options_12009
+OK   sh_rv_set_identity_options_12009
+RUN  sh_rv_context_value_w_roundtrip
+OK   sh_rv_context_value_w_roundtrip
+RUN  sh_rv_parent_handle_buffer_protocol
+OK   sh_rv_parent_handle_buffer_protocol
+RUN  sh_rv_close_parent_inside_child_handle_closing
+  NOTE close parent inside child HANDLE_CLOSING: inner ok=1 err 0, outer ok=1 err 0
+OK   sh_rv_close_parent_inside_child_handle_closing
+RUN  sh_rv_close_self_inside_own_handle_closing
+  NOTE re-close inside own HANDLE_CLOSING: ok=0 err 6
+OK   sh_rv_close_self_inside_own_handle_closing
+RUN  sh_rv_callback_args_created_and_closing
+  NOTE HANDLE_CREATED(connect): hInternet 0000000000cc0004 (session 0000000000cc0004 connect 0000000000cc0008) infolen 8 info cc0008
+OK   sh_rv_callback_args_created_and_closing
+RUN  sh_rv_openurl_handle_checked_before_url
+OK   sh_rv_openurl_handle_checked_before_url
+RUN  sh_rv_openurl_async_session_zero_context_sync
+  FAIL tests/session_handles/sh_rv.c:193: r != NULL (async session, InternetOpenUrl context 0: err 997)
+FAIL sh_rv_openurl_async_session_zero_context_sync
+RUN  sh_rv_ftp_connect_async_session_context_rule
+  NOTE async session, FTP connect with context: h=0000000000000000 err 997
+  NOTE async FTP connect completion: result 0000000000cc0008 err 0
+OK   sh_rv_ftp_connect_async_session_context_rule
+RUN  sh_rv_ftp_connect_offline_no_io
+  NOTE offline FTP connect: USERNAME ok=1 [anonymous]
+OK   sh_rv_ftp_connect_offline_no_io
+RUN  sh_rv_ftp_anonymous_password_note
+  NOTE anonymous FTP connect: PASSWORD ok=1 len 7
+OK   sh_rv_ftp_anonymous_password_note
+RUN  sh_rv_ftp_user_without_password
+  NOTE FTP user-only connect: PASSWORD reads [] len 0
+  NOTE FTP user-only connect: second command [PASS ]
+OK   sh_rv_ftp_user_without_password
+RUN  sh_rv_ftp_password_without_user_87
+OK   sh_rv_ftp_password_without_user_87
+RUN  sh_opt_ftp_handle_matrix
+OK   sh_opt_ftp_handle_matrix
+RUN  sh_opt_security_flags_request_only_adds
+  NOTE SECURITY_FLAGS on http request before 0 after set 0x100: 0
+OK   sh_opt_security_flags_request_only_adds
+RUN  sh_opt_http_decoding_roundtrip
+OK   sh_opt_http_decoding_roundtrip
+RUN  sh_opt_timeouts_per_handle_and_inherited
+OK   sh_opt_timeouts_per_handle_and_inherited
+RUN  sh_opt_user_agent_wrong_handle_12018
+OK   sh_opt_user_agent_wrong_handle_12018
+RUN  sh_opt_set_bad_handles
+  NOTE set USER_AGENT on NULL: err 12018
+OK   sh_opt_set_bad_handles
+RUN  sh_opt_set_null_buffer_or_zero_length_87
+OK   sh_opt_set_null_buffer_or_zero_length_87
+RUN  sh_opt_set_matrix
+  NOTE set PARENT_HANDLE on session: ok=0 err=12009
+  NOTE set PARENT_HANDLE on connect: ok=0 err=12009
+  NOTE set PARENT_HANDLE on request: ok=0 err=12009
+  NOTE set REQUEST_FLAGS on session: ok=0 err=12009
+  NOTE set REQUEST_FLAGS on connect: ok=0 err=12009
+  NOTE set REQUEST_FLAGS on request: ok=0 err=12009
+  NOTE set URL on session: ok=0 err=12009
+  NOTE set URL on connect: ok=0 err=12009
+  NOTE set URL on request: ok=0 err=12009
+  NOTE set ASYNC_ID on session: ok=0 err=12011
+  NOTE set ASYNC_ID on connect: ok=0 err=12011
+  NOTE set ASYNC_ID on request: ok=0 err=12011
+OK   sh_opt_set_matrix
+RUN  sh_opt_identity_values
+OK   sh_opt_identity_values
+RUN  sh_opt_query_constant_values
+  NOTE fresh http request SECURITY_FLAGS 0x0
+  NOTE connect READ_BUFFER_SIZE 4096
+  NOTE request READ_BUFFER_SIZE 4096
+  NOTE global MAX_CONNS_PER_SERVER 2
+  NOTE session timeout option 2 = 60000
+  NOTE session timeout option 3 = 5
+  NOTE session timeout option 4 = 0
+  NOTE session timeout option 5 = 30000
+  NOTE session timeout option 6 = 30000
+  NOTE session timeout option 7 = 30000
+  NOTE session timeout option 8 = 30000
+OK   sh_opt_query_constant_values
+RUN  sh_opt_query_string_size_protocol
+OK   sh_opt_query_string_size_protocol
+RUN  sh_opt_query_null_buffer_size
+OK   sh_opt_query_null_buffer_size
+RUN  sh_opt_query_null_length_87
+OK   sh_opt_query_null_length_87
+RUN  sh_opt_query_matrix_w
+  NOTE W query DATAFILE_NAME on request: ok=0 err=12028 len=4096
+  NOTE W query USER_AGENT on NULL: ok=0 err=12018 len=4096
+  NOTE W query SECONDARY_CACHE_KEY on NULL: ok=0 err=12018 len=4096
+  NOTE W query CALLBACK_FILTER on NULL: ok=0 err=12018 len=0
+  NOTE W query CONNECT_TIME on NULL: ok=0 err=12018 len=0
+  NOTE W query SEND_THROUGHPUT on NULL: ok=0 err=12018 len=0
+  NOTE W query RECEIVE_THROUGHPUT on NULL: ok=0 err=12018 len=0
+  NOTE W query BYPASS_EDITED_ENTRY on NULL: ok=1 err=0 len=4
+  NOTE W query CODEPAGE on NULL: ok=0 err=12018 len=0
+  NOTE W query DISABLE_AUTODIAL on NULL: ok=0 err=50 len=0
+  NOTE W query CODEPAGE_PATH on NULL: ok=0 err=12018 len=0
+  NOTE W query CODEPAGE_EXTRA on NULL: ok=0 err=12018 len=0
+  NOTE W query IDN on NULL: ok=0 err=12018 len=0
+  NOTE W query SERVER_CERT_CHAIN_CONTEXT on NULL: ok=0 err=12018 len=0
+  NOTE W query SERVER_CERT_CHAIN_CONTEXT on request: ok=0 err=12019 len=8
+OK   sh_opt_query_matrix_w
+RUN  sh_opt_query_matrix_a
+  NOTE A query DATAFILE_NAME on request: ok=0 err=12028 len=0
+  NOTE A query PROXY on NULL: ok=1 err=0 len=24
+  NOTE A query PROXY on session: ok=1 err=0 len=24
+  NOTE A query USER_AGENT on NULL: ok=0 err=12018 len=0
+  NOTE A query SECONDARY_CACHE_KEY on NULL: ok=0 err=12018 len=0
+  NOTE A query CALLBACK_FILTER on NULL: ok=0 err=12018 len=0
+  NOTE A query CONNECT_TIME on NULL: ok=0 err=12018 len=0
+  NOTE A query SEND_THROUGHPUT on NULL: ok=0 err=12018 len=0
+  NOTE A query RECEIVE_THROUGHPUT on NULL: ok=0 err=12018 len=0
+  NOTE A query BYPASS_EDITED_ENTRY on NULL: ok=1 err=0 len=4
+  NOTE A query CODEPAGE on NULL: ok=0 err=12018 len=0
+  NOTE A query DISABLE_AUTODIAL on NULL: ok=0 err=50 len=0
+  NOTE A query CODEPAGE_PATH on NULL: ok=0 err=12018 len=0
+  NOTE A query CODEPAGE_EXTRA on NULL: ok=0 err=12018 len=0
+  NOTE A query IDN on NULL: ok=0 err=12018 len=0
+  NOTE A query SERVER_CERT_CHAIN_CONTEXT on NULL: ok=0 err=12018 len=0
+  NOTE A query SERVER_CERT_CHAIN_CONTEXT on request: ok=0 err=12019 len=8
+OK   sh_opt_query_matrix_a
+RUN  sh_open_w_agent_non_ascii_note
+  NOTE W agent with U+00E9 U+4E2D stored as 11 bytes: 6167656e742dc3a9e4b8ad (ACP->UTF-8 fallback per InternetOpenW)
+OK   sh_open_w_agent_non_ascii_note
+RUN  sh_open_http_version_option
+OK   sh_open_http_version_option
+RUN  sh_open_version_option
+OK   sh_open_version_option
+RUN  sh_open_many_concurrent_sessions
+OK   sh_open_many_concurrent_sessions
+RUN  sh_open_many_sessions_tree_loop
+  NOTE kernel handle count before 243 after 243 (200 session trees)
+OK   sh_open_many_sessions_tree_loop
+RUN  sh_open_many_sessions_loop
+  NOTE kernel handle count before 243 after 243 open/close x500
+OK   sh_open_many_sessions_loop
+RUN  sh_open_named_proxy_bypass_goes_direct
+OK   sh_open_named_proxy_bypass_goes_direct
+RUN  sh_open_named_proxy_sends_absolute_uri
+  NOTE proxy request: [GET http://origin.i7test.example/via?x=1 HTTP/1.1] Proxy-Connection=[(none)]
+OK   sh_open_named_proxy_sends_absolute_uri
+RUN  sh_open_proxy_w_query
+  NOTE W PROXY query len 56: proxy as A [127.0.0.1:9] as W [?????9?????�???>???]; bypass as A [127.0.0.1:9 <local>] as W [?????�???>???]
+OK   sh_open_proxy_w_query
+RUN  sh_open_proxy_info_preconfig_note
+  NOTE PRECONFIG session PROXY query ok=1 err=0 access=1 len=24
+  NOTE PRECONFIG_WITH_NO_AUTOPROXY PROXY query ok=1 access=1
+OK   sh_open_proxy_info_preconfig_note
+RUN  sh_open_proxy_info_direct_ignores_proxy_string
+OK   sh_open_proxy_info_direct_ignores_proxy_string
+RUN  sh_open_proxy_info_direct
+  NOTE DIRECT proxy info: proxy=0000000000000000 bypass=0000000000000000 len=24
+OK   sh_open_proxy_info_direct
+RUN  sh_open_proxy_info_named_proxy
+  NOTE INTERNET_OPTION_PROXY size for named proxy: 56
+OK   sh_open_proxy_info_named_proxy
+RUN  sh_open_session_handle_values_distinct
+  NOTE session handle values 0000000000cc0004 0000000000cc0008 0000000000cc000c
+OK   sh_open_session_handle_values_distinct
+RUN  sh_open_session_context_default_zero
+OK   sh_open_session_context_default_zero
+RUN  sh_open_session_parent_is_null
+OK   sh_open_session_parent_is_null
+RUN  sh_open_async_session_basic_options
+OK   sh_open_async_session_basic_options
+RUN  sh_open_flags_never_fail
+OK   sh_open_flags_never_fail
+RUN  sh_open_agent_set_w_length_in_chars
+OK   sh_open_agent_set_w_length_in_chars
+RUN  sh_open_agent_set_empty_12010
+OK   sh_open_agent_set_empty_12010
+RUN  sh_open_agent_set_roundtrip
+  NOTE USER_AGENT set with length 1 of "third" reads back [third]
+OK   sh_open_agent_set_roundtrip
+RUN  sh_open_agent_with_spaces_kept_in_option
+  NOTE agent with blanks reads back as [  padded agent 	] len 16
+OK   sh_open_agent_with_spaces_kept_in_option
+RUN  sh_open_agent_long_roundtrip
+OK   sh_open_agent_long_roundtrip
+RUN  sh_open_agent_a_set_w_query
+OK   sh_open_agent_a_set_w_query
+RUN  sh_open_agent_query_w_protocol
+OK   sh_open_agent_query_w_protocol
+RUN  sh_open_agent_query_a_protocol
+OK   sh_open_agent_query_a_protocol
+RUN  sh_open_empty_agent_ok
+OK   sh_open_empty_agent_ok
+RUN  sh_open_null_agent_ok
+OK   sh_open_null_agent_ok
+RUN  sh_open_proxy_null_and_empty_87
+OK   sh_open_proxy_null_and_empty_87
+RUN  sh_open_w_direct_basic
+OK   sh_open_w_direct_basic
+RUN  sh_open_a_direct_basic
+OK   sh_open_a_direct_basic
+RUN  sh_open_w_access_type_table
+OK   sh_open_w_access_type_table
+RUN  sh_open_a_access_type_table
+OK   sh_open_a_access_type_table
+RUN  sh_more_null_agent_no_user_agent_header
+OK   sh_more_null_agent_no_user_agent_header
+RUN  sh_more_user_agent_on_wire_follows_session
+  NOTE User-Agent on wire after late session set: [before-set]
+OK   sh_more_user_agent_on_wire_follows_session
+RUN  sh_more_two_sessions_same_agent_independent
+OK   sh_more_two_sessions_same_agent_independent
+RUN  sh_more_ftp_close_connect_with_open_file
+OK   sh_more_ftp_close_connect_with_open_file
+RUN  sh_more_ftp_find_close_releases_connect
+OK   sh_more_ftp_find_close_releases_connect
+RUN  sh_more_handle_values_step
+  NOTE handle values: session 0000000000cc0004 connect 0000000000cc0008
+OK   sh_more_handle_values_step
+RUN  sh_more_keep_connection_value_and_close_last_error
+OK   sh_more_keep_connection_value_and_close_last_error
+RUN  sh_more_session_timeout_defaults
+OK   sh_more_session_timeout_defaults
+RUN  sh_life_close_after_failed_send
+OK   sh_life_close_after_failed_send
+RUN  sh_life_handles_survive_unrelated_churn
+OK   sh_life_handles_survive_unrelated_churn
+RUN  sh_life_handle_value_reuse_after_close
+  NOTE handle value after close/open: old 0000000000cc0004 new 0000000000cc0004 (reused=1)
+OK   sh_life_handle_value_reuse_after_close
+RUN  sh_life_close_ftp_connect_sends_quit
+  NOTE QUIT after closing an FTP connect: 0 (commands 2)
+OK   sh_life_close_ftp_connect_sends_quit
+RUN  sh_life_close_session_with_ftp_tree
+  NOTE FTP session close: QUIT=0 eof=0 reset=0
+OK   sh_life_close_session_with_ftp_tree
+RUN  sh_life_close_session_ends_server_connection
+  NOTE after closing a session mid-body: eof=1 reset=0 error=0 closed=1
+OK   sh_life_close_session_ends_server_connection
+RUN  sh_life_close_request_with_unread_body_then_reuse_connect
+OK   sh_life_close_request_with_unread_body_then_reuse_connect
+RUN  sh_life_close_inside_handle_created
+  NOTE HttpOpenRequest whose HANDLE_CREATED callback closed it: h=0000000000000000 (cb saw 0000000000cc000c) err 12017 close ok=1 err 0
+OK   sh_life_close_inside_handle_created
+RUN  sh_life_query_inside_handle_closing
+  NOTE HANDLE_TYPE inside HANDLE_CLOSING: ok=0 err 6 val 0 ctx 0x0
+OK   sh_life_query_inside_handle_closing
+RUN  sh_life_callback_set_late_not_propagated
+OK   sh_life_callback_set_late_not_propagated
+RUN  sh_life_callback_removed_with_null
+OK   sh_life_callback_removed_with_null
+RUN  sh_life_callback_only_on_connect
+  NOTE callback on connect only callbacks (status/ctx): 60/a3 70/a3 70/a1 
+OK   sh_life_callback_only_on_connect
+RUN  sh_life_close_session_with_wide_tree
+OK   sh_life_close_session_with_wide_tree
+RUN  sh_life_openurl_hidden_connects_distinct
+OK   sh_life_openurl_hidden_connects_distinct
+RUN  sh_life_close_hidden_connect_of_openurl
+  NOTE request after closing its hidden connect: type 0 err 6
+OK   sh_life_close_hidden_connect_of_openurl
+RUN  sh_flags_proxy_loopback_names
+  NOTE named proxy, no bypass, host [localhost]: ok=1 err 0 via proxy 0 direct 1 flags 0x40 target [/lb]
+  NOTE named proxy, no bypass, host [LOCALHOST]: ok=1 err 0 via proxy 0 direct 1 flags 0x40 target [/lb]
+  NOTE named proxy, no bypass, host [::1]: ok=1 err 0 via proxy 0 direct 1 flags 0x40 target [/lb]
+  NOTE named proxy, no bypass, host [[::1]]: ok=1 err 0 via proxy 0 direct 1 flags 0x40 target [/lb]
+  NOTE named proxy, no bypass, host [127.0.0.2]: ok=1 err 0 via proxy 1 direct 0 flags 0x44 target [http://127.0.0.2:49772/lb]
+  NOTE named proxy, no bypass, host [127.1]: ok=1 err 0 via proxy 1 direct 0 flags 0x44 target [http://127.1:49772/lb]
+OK   sh_flags_proxy_loopback_names
+RUN  sh_flags_ftp_find_request_flags_passive_bit
+OK   sh_flags_ftp_find_request_flags_passive_bit
+RUN  sh_flags_ftp_passive_flag_selects_data_mode
+OK   sh_flags_ftp_passive_flag_selects_data_mode
+RUN  sh_flags_async_connect_flag_on_sync_session
+OK   sh_flags_async_connect_flag_on_sync_session
+RUN  sh_flags_async_session_handles_created_synchronously
+OK   sh_flags_async_session_handles_created_synchronously
+RUN  sh_flags_proxy_dead_no_direct_fallback
+OK   sh_flags_proxy_dead_no_direct_fallback
+RUN  sh_flags_proxy_session_isolated
+OK   sh_flags_proxy_session_isolated
+RUN  sh_flags_proxy_local_bypasses_dotless_names
+  NOTE <local> bypass, dotless host: ok=0 err 0 proxy requests 0
+OK   sh_flags_proxy_local_bypasses_dotless_names
+RUN  sh_flags_proxy_bypass_entries_for_loopback
+OK   sh_flags_proxy_bypass_entries_for_loopback
+RUN  sh_flags_proxy_scheme_specific_lists
+OK   sh_flags_proxy_scheme_specific_lists
+RUN  sh_flags_offline_session_serves_cached_entry
+OK   sh_flags_offline_session_serves_cached_entry
+RUN  sh_flags_from_cache_request_uncached_no_wire
+  NOTE OpenUrl FROM_CACHE uncached: h=0000000000000000 err 2 (?)
+OK   sh_flags_from_cache_request_uncached_no_wire
+RUN  sh_flags_offline_session_uncached_no_wire
+  NOTE OFFLINE session, uncached GET: ok=0 err 2 (?)
+OK   sh_flags_offline_session_uncached_no_wire
+RUN  sh_flags_offline_flag_value
+OK   sh_flags_offline_flag_value
+RUN  sh_conn_openurl_ftp_handle
+  NOTE InternetOpenUrl(ftp file) handle type 7
+OK   sh_conn_openurl_ftp_handle
+RUN  sh_conn_ftp_find_and_file_handles
+  NOTE FTP find REQUEST_FLAGS 0x8
+  NOTE FTP file URL option: [ftp://127.0.0.1:49818/hello.txt]
+OK   sh_conn_ftp_find_and_file_handles
+RUN  sh_conn_ftp_no_listener_12029
+OK   sh_conn_ftp_no_listener_12029
+RUN  sh_conn_ftp_credentials_sent
+OK   sh_conn_ftp_credentials_sent
+RUN  sh_conn_ftp_connect_basic
+  NOTE FTP connect without credentials: USERNAME=[anonymous]
+OK   sh_conn_ftp_connect_basic
+RUN  sh_conn_openurl_file_handle
+  NOTE InternetOpenUrl(file:///C:/Users/Administrator/AppData/Local/Temp/wininet_3912/sh_file.txt): h=0000000000000000 err=3
+  NOTE InternetOpenUrl(file:///C:\Users\Administrator\AppData\Local\Temp\wininet_3912\sh_file.txt): h=0000000000000000 err=3
+OK   sh_conn_openurl_file_handle
+RUN  sh_conn_openurl_http_handle_tree
+OK   sh_conn_openurl_http_handle_tree
+RUN  sh_conn_keep_connection_option
+  NOTE KEEP_CONNECTION on HCon = 0
+OK   sh_conn_keep_connection_option
+RUN  sh_conn_request_flags_after_network_get
+  NOTE REQUEST_FLAGS after a network GET: 0x40
+OK   sh_conn_request_flags_after_network_get
+RUN  sh_conn_request_flags_option_unsent
+OK   sh_conn_request_flags_option_unsent
+RUN  sh_conn_request_on_wrong_parent
+OK   sh_conn_request_on_wrong_parent
+RUN  sh_conn_request_type_and_parent
+OK   sh_conn_request_type_and_parent
+RUN  sh_conn_many_under_one_session
+OK   sh_conn_many_under_one_session
+RUN  sh_conn_http_flags_accepted
+OK   sh_conn_http_flags_accepted
+RUN  sh_conn_context_value_set_query
+OK   sh_conn_context_value_set_query
+RUN  sh_conn_context_value_from_param
+OK   sh_conn_context_value_from_param
+RUN  sh_conn_credentials_used_for_basic
+OK   sh_conn_credentials_used_for_basic
+RUN  sh_conn_credentials_on_session_12018
+OK   sh_conn_credentials_on_session_12018
+RUN  sh_conn_credentials_set_on_connect
+  NOTE request PROXY_USERNAME after connect set: [proxyuser]
+OK   sh_conn_credentials_set_on_connect
+RUN  sh_conn_credentials_inherited_by_request
+OK   sh_conn_credentials_inherited_by_request
+RUN  sh_conn_credentials_none_and_empty
+OK   sh_conn_credentials_none_and_empty
+RUN  sh_conn_credentials_roundtrip_w
+OK   sh_conn_credentials_roundtrip_w
+RUN  sh_conn_credentials_roundtrip_a
+OK   sh_conn_credentials_roundtrip_a
+RUN  sh_conn_port_and_url_table
+OK   sh_conn_port_and_url_table
+RUN  sh_conn_http_long_hostname
+  NOTE HttpOpenRequest on it: h=0000000000000000 err=122
+OK   sh_conn_http_long_hostname
+RUN  sh_conn_http_hostnames_no_io
+OK   sh_conn_http_hostnames_no_io
+RUN  sh_conn_empty_server
+OK   sh_conn_empty_server
+RUN  sh_conn_null_server_before_handle
+OK   sh_conn_null_server_before_handle
+RUN  sh_conn_null_server_87
+OK   sh_conn_null_server_87
+RUN  sh_conn_on_closed_session_6
+OK   sh_conn_on_closed_session_6
+RUN  sh_conn_parent_wrong_type_12018
+OK   sh_conn_parent_wrong_type_12018
+RUN  sh_conn_bad_handles
+OK   sh_conn_bad_handles
+RUN  sh_conn_service_checked_before_handle
+OK   sh_conn_service_checked_before_handle
+RUN  sh_conn_service_type_table_w
+OK   sh_conn_service_type_table_w
+RUN  sh_conn_service_type_table_a
+OK   sh_conn_service_type_table_a
+RUN  sh_conn_w_http_basic
+OK   sh_conn_w_http_basic
+RUN  sh_conn_a_http_basic
+OK   sh_conn_a_http_basic
+RUN  sh_conc_request_hops_threads
+OK   sh_conc_request_hops_threads
+RUN  sh_conc_per_request_options_do_not_mix
+OK   sh_conc_per_request_options_do_not_mix
+RUN  sh_conc_set_status_callback_concurrently
+OK   sh_conc_set_status_callback_concurrently
+RUN  sh_conc_sync_callbacks_on_calling_thread
+  NOTE sync callbacks for the worker's handles: 13, on another thread: 0
+OK   sh_conc_sync_callbacks_on_calling_thread
+RUN  sh_conc_parallel_session_trees_no_leak
+  NOTE kernel handle count before 279 after 279 (8 threads x 100 trees)
+OK   sh_conc_parallel_session_trees_no_leak
+RUN  sh_conc_create_children_while_session_closed
+  NOTE children created around session close: made 16587 fail6 21 fail18 0 failother 0 (last other err 0) close_ok 16586 close6 1
+OK   sh_conc_create_children_while_session_closed
+RUN  sh_conc_query_while_session_closed
+  NOTE queries during session close: ok 70123 invalid 53 other 0
+OK   sh_conc_query_while_session_closed
+RUN  sh_conc_racing_close_exactly_one_wins
+OK   sh_conc_racing_close_exactly_one_wins
+RUN  sh_close_async_pending_send
+  NOTE async pending send closed: completion wait=0 seen=1 result=0 err=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+OK   sh_close_async_pending_send
+RUN  sh_close_session_while_send_blocked
+  NOTE blocked send after session close: ok=0 err=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+OK   sh_close_session_while_send_blocked
+RUN  sh_close_request_while_send_blocked
+  NOTE blocked send after close: ok=0 err=12017 (ERROR_INTERNET_OPERATION_CANCELLED), returned 0 ms after close
+OK   sh_close_request_while_send_blocked
+RUN  sh_close_self_from_callback_during_send
+  NOTE send after self-close in REQUEST_SENT: ok=0 err=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+  NOTE self-close during send callbacks (status/ctx): 80/49 20/49 21/49 30/49 31/49 50/49 51/49 70/49 
+OK   sh_close_self_from_callback_during_send
+RUN  sh_close_from_closing_callback_sibling
+OK   sh_close_from_closing_callback_sibling
+RUN  sh_close_from_callback_other_handle
+OK   sh_close_from_callback_other_handle
+RUN  sh_close_callback_zero_context_silent
+  NOTE zero-context callbacks (status/ctx): 
+OK   sh_close_callback_zero_context_silent
+RUN  sh_close_callback_handle_created_and_closing
+  NOTE after create callbacks (status/ctx): 60/82 60/83 
+  NOTE HANDLE_CREATED(request): cb handle 0000000000cc0008 infolen 8 info0 cc000c (request 0000000000cc000c)
+  NOTE after close callbacks (status/ctx): 60/82 60/83 70/83 70/82 70/81 
+  NOTE HANDLE_CLOSING order indices: request 2 connect 3 session 4
+  NOTE HANDLE_CLOSING(request) infolen 8 info0 cc000c
+OK   sh_close_callback_handle_created_and_closing
+RUN  sh_close_set_status_callback_rules
+OK   sh_close_set_status_callback_rules
+RUN  sh_close_other_session_unaffected
+OK   sh_close_other_session_unaffected
+RUN  sh_close_children_first_then_parent
+OK   sh_close_children_first_then_parent
+RUN  sh_close_request_leaves_connect_usable
+OK   sh_close_request_leaves_connect_usable
+RUN  sh_close_connect_invalidates_requests
+OK   sh_close_connect_invalidates_requests
+RUN  sh_close_session_invalidates_children
+  NOTE close(request) after its session was closed: ok=0 err=6
+OK   sh_close_session_invalidates_children
+RUN  sh_close_closed_handle_all_apis_6
+OK   sh_close_closed_handle_all_apis_6
+RUN  sh_close_success_last_error_note
+  NOTE GetLastError after successful InternetCloseHandle: 0
+OK   sh_close_success_last_error_note
+RUN  sh_close_double_close_each_type
+OK   sh_close_double_close_each_type
+RUN  sh_close_garbage_6
+OK   sh_close_garbage_6
+RUN  sh_close_null_6
+OK   sh_close_null_6
+SUMMARY tests=222 failed=1 skipped=0 checks_pass=4381 checks_fail=1
+@@I7 END session_handles exit=0x1 ms=69457 timeout=0 bytes=28547

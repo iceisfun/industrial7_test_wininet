@@ -5,4 +5,4 @@ OK   smoke_getprocaddress_negative
 RUN  smoke_module_loads
 OK   smoke_module_loads
 SUMMARY tests=3 failed=0 skipped=0 checks_pass=4 checks_fail=0
-@@I7 END core_smoke exit=0x0 ms=48 timeout=0 bytes=242
+@@I7 END core_smoke exit=0x0 ms=233 timeout=0 bytes=242

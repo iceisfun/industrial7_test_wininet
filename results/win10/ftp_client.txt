@@ -1,0 +1,824 @@
+RUN  ftpc_put_then_get_roundtrip
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   ftpc_put_then_get_roundtrip
+RUN  ftpc_putfile_w_and_ex
+OK   ftpc_putfile_w_and_ex
+RUN  ftpc_putfile_validation_87
+OK   ftpc_putfile_validation_87
+RUN  ftpc_putfile_rejected
+OK   ftpc_putfile_rejected
+RUN  ftpc_putfile_local_missing
+OK   ftpc_putfile_local_missing
+RUN  ftpc_putfile_empty_local
+OK   ftpc_putfile_empty_local
+RUN  ftpc_putfile_large_and_ascii
+OK   ftpc_putfile_large_and_ascii
+RUN  ftpc_putfile_basic
+OK   ftpc_putfile_basic
+RUN  ftpc_getfile_while_file_open
+OK   ftpc_getfile_while_file_open
+RUN  ftpc_getfile_w_and_ex
+OK   ftpc_getfile_w_and_ex
+RUN  ftpc_getfile_validation_87
+OK   ftpc_getfile_validation_87
+RUN  ftpc_getfile_local_dir_missing
+OK   ftpc_getfile_local_dir_missing
+RUN  ftpc_getfile_remote_missing_deletes_overwritten_local
+OK   ftpc_getfile_remote_missing_deletes_overwritten_local
+RUN  ftpc_getfile_remote_missing_leaves_no_file
+OK   ftpc_getfile_remote_missing_leaves_no_file
+RUN  ftpc_getfile_attributes_applied
+OK   ftpc_getfile_attributes_applied
+RUN  ftpc_getfile_overwrite_existing
+OK   ftpc_getfile_overwrite_existing
+RUN  ftpc_getfile_fail_if_exists
+OK   ftpc_getfile_fail_if_exists
+RUN  ftpc_getfile_ascii_type_and_no_conversion
+OK   ftpc_getfile_ascii_type_and_no_conversion
+RUN  ftpc_getfile_large_binary
+OK   ftpc_getfile_large_binary
+RUN  ftpc_getfile_basic
+OK   ftpc_getfile_basic
+RUN  ftpc_ipv6_passive_sends_epsv
+  NOTE v6 passive RETR: h=0000000000000000 err=12029 seq=USER anonymous|PASS ***|TYPE I|EPSV
+OK   ftpc_ipv6_passive_sends_epsv
+RUN  ftpc_ipv6_active_eprt
+OK   ftpc_ipv6_active_eprt
+RUN  ftpc_type_rejected
+OK   ftpc_type_rejected
+RUN  ftpc_pasv_foreign_address_rejected
+OK   ftpc_pasv_foreign_address_rejected
+RUN  ftpc_pasv_other_failures_no_fallback
+OK   ftpc_pasv_other_failures_no_fallback
+RUN  ftpc_pasv_refused_falls_back_to_port
+OK   ftpc_pasv_refused_falls_back_to_port
+RUN  ftpc_active_mode_list_and_stor
+OK   ftpc_active_mode_list_and_stor
+RUN  ftpc_active_mode_port
+OK   ftpc_active_mode_port
+RUN  ftpc_getfilesize_wrong_handles
+OK   ftpc_getfilesize_wrong_handles
+RUN  ftpc_getfilesize_unknown_on_write_handle
+OK   ftpc_getfilesize_unknown_on_write_handle
+RUN  ftpc_getfilesize_from_150_when_size_unsupported
+OK   ftpc_getfilesize_from_150_when_size_unsupported
+RUN  ftpc_getfilesize_64bit_and_null_high
+OK   ftpc_getfilesize_64bit_and_null_high
+RUN  ftpc_getfilesize_from_size_reply
+OK   ftpc_getfilesize_from_size_reply
+RUN  ftpc_read_write_direction_mismatch
+  NOTE InternetWriteFile on FTP read handle: err=5
+  NOTE InternetReadFile on FTP write handle: err=5
+OK   ftpc_read_write_direction_mismatch
+RUN  ftpc_open_write_rejected
+OK   ftpc_open_write_rejected
+RUN  ftpc_open_write_large
+OK   ftpc_open_write_large
+RUN  ftpc_open_write_empty_file
+OK   ftpc_open_write_empty_file
+RUN  ftpc_open_write_ascii_wire_no_conversion
+OK   ftpc_open_write_ascii_wire_no_conversion
+RUN  ftpc_open_write_wire_and_data
+  NOTE last response after write close: [226 Transfer complete.
+]
+OK   ftpc_open_write_wire_and_data
+RUN  ftpc_close_read_before_eof_then_continue
+  NOTE PWD after early close: ok=1 err=0 dir=[/]
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE I
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] SIZE hello.txt
+  NOTE ftp cmd[5] RETR hello.txt
+  NOTE ftp cmd[6] PWD
+  NOTE ABOR on the wire: no
+OK   ftpc_close_read_before_eof_then_continue
+RUN  ftpc_commands_blocked_while_file_open
+OK   ftpc_commands_blocked_while_file_open
+RUN  ftpc_open_second_open_in_progress
+OK   ftpc_open_second_open_in_progress
+RUN  ftpc_file_handle_properties
+  NOTE FTP file handle URL: ok=1 [ftp://127.0.0.1:49885/hello.txt]
+  NOTE FTP file handle read buffer size: ok=1 4096
+OK   ftpc_file_handle_properties
+RUN  ftpc_open_w
+OK   ftpc_open_w
+RUN  ftpc_open_validation_87
+OK   ftpc_open_validation_87
+RUN  ftpc_open_retr_reply_classes
+OK   ftpc_open_retr_reply_classes
+RUN  ftpc_open_read_missing_extended_error
+OK   ftpc_open_read_missing_extended_error
+RUN  ftpc_ascii_read_no_newline_conversion
+OK   ftpc_ascii_read_no_newline_conversion
+RUN  ftpc_open_read_empty_file
+OK   ftpc_open_read_empty_file
+RUN  ftpc_open_read_small_chunks
+OK   ftpc_open_read_small_chunks
+RUN  ftpc_open_read_large_binary
+OK   ftpc_open_read_large_binary
+RUN  ftpc_open_read_relative_to_cwd
+OK   ftpc_open_read_relative_to_cwd
+RUN  ftpc_open_path_forms_verbatim
+OK   ftpc_open_path_forms_verbatim
+RUN  ftpc_open_flags_zero_is_binary
+OK   ftpc_open_flags_zero_is_binary
+RUN  ftpc_open_read_ascii_wire
+OK   ftpc_open_read_ascii_wire
+RUN  ftpc_open_read_binary_wire
+OK   ftpc_open_read_binary_wire
+RUN  ftpc_offline_open_file_not_cached
+OK   ftpc_offline_open_file_not_cached
+RUN  ftpc_offline_current_directory_invalid_handle
+OK   ftpc_offline_current_directory_invalid_handle
+RUN  ftpc_offline_command_invalid_handle
+OK   ftpc_offline_command_invalid_handle
+RUN  ftpc_offline_handle_operations_invalid_handle
+OK   ftpc_offline_handle_operations_invalid_handle
+RUN  ftpc_offline_connect_makes_no_connection
+OK   ftpc_offline_connect_makes_no_connection
+RUN  ftpc_conn_http_peer_is_not_ftp
+  NOTE HTTP peer on FTP connect: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_conn_http_peer_is_not_ftp
+RUN  ftpc_conn_server_closes_without_banner
+  NOTE peer closed before banner: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_conn_server_closes_without_banner
+RUN  ftpc_conn_server_closes_after_banner
+  NOTE peer closed after banner: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_conn_server_closes_after_banner
+RUN  ftpc_conn_silent_server_times_out
+  NOTE silent server: err=12002 ERROR_INTERNET_TIMEOUT after 4016 ms
+OK   ftpc_conn_silent_server_times_out
+RUN  ftpc_conn_no_listener_cannot_connect
+OK   ftpc_conn_no_listener_cannot_connect
+RUN  ftpc_conn_login_retry_after_failure
+OK   ftpc_conn_login_retry_after_failure
+RUN  ftpc_conn_pass_202_is_success
+OK   ftpc_conn_pass_202_is_success
+RUN  ftpc_conn_pass_332_account_needed
+OK   ftpc_conn_pass_332_account_needed
+RUN  ftpc_conn_pass_530_anonymous_any_case
+OK   ftpc_conn_pass_530_anonymous_any_case
+RUN  ftpc_conn_pass_530_anonymous_login_failure
+OK   ftpc_conn_pass_530_anonymous_login_failure
+RUN  ftpc_conn_pass_530_named_user_incorrect_password
+OK   ftpc_conn_pass_530_named_user_incorrect_password
+RUN  ftpc_conn_user_1xx_incorrect_user_name
+OK   ftpc_conn_user_1xx_incorrect_user_name
+RUN  ftpc_conn_user_530_is_extended_error
+  NOTE USER 530 -> 12003 ERROR_INTERNET_EXTENDED_ERROR
+OK   ftpc_conn_user_530_is_extended_error
+RUN  ftpc_conn_user_230_skips_pass
+OK   ftpc_conn_user_230_skips_pass
+RUN  ftpc_conn_banner_multiline_421_last_line
+OK   ftpc_conn_banner_multiline_421_last_line
+RUN  ftpc_conn_banner_multiline
+OK   ftpc_conn_banner_multiline
+RUN  ftpc_conn_banner_120_login_failure
+OK   ftpc_conn_banner_120_login_failure
+RUN  ftpc_conn_banner_421_login_failure
+OK   ftpc_conn_banner_421_login_failure
+RUN  ftpc_conn_last_response_after_login
+  NOTE last response after login: err=0 text=[220 i7 test FTP ready
+331 Password required for anonymous.
+230 User logged in.
+]
+OK   ftpc_conn_last_response_after_login
+RUN  ftpc_conn_existing_connect_flag
+  NOTE EXISTING_CONNECT: handles 0000000000cc0008 0000000000cc0010, control connections 2, commands USER anonymous|PASS ***|USER anonymous|PASS ***
+OK   ftpc_conn_existing_connect_flag
+RUN  ftpc_conn_two_handles_two_control_connections
+OK   ftpc_conn_two_handles_two_control_connections
+RUN  ftpc_conn_close_connect_handle
+  NOTE QUIT after closing the connect handle: not sent within 1.5 s (seq USER anonymous|PASS ***)
+OK   ftpc_conn_close_connect_handle
+RUN  ftpc_conn_username_password_options
+OK   ftpc_conn_username_password_options
+RUN  ftpc_conn_parent_handle_is_session
+OK   ftpc_conn_parent_handle_is_session
+RUN  ftpc_conn_handle_type_is_connect_ftp
+OK   ftpc_conn_handle_type_is_connect_ftp
+RUN  ftpc_conn_wide_api
+OK   ftpc_conn_wide_api
+RUN  ftpc_conn_null_or_empty_server_is_87
+OK   ftpc_conn_null_or_empty_server_is_87
+RUN  ftpc_conn_password_without_user_is_87
+OK   ftpc_conn_password_without_user_is_87
+RUN  ftpc_conn_empty_user_and_password_is_anonymous
+OK   ftpc_conn_empty_user_and_password_is_anonymous
+RUN  ftpc_conn_user_empty_password_sends_empty_pass
+OK   ftpc_conn_user_empty_password_sends_empty_pass
+RUN  ftpc_conn_user_null_password_sends_empty_pass
+OK   ftpc_conn_user_null_password_sends_empty_pass
+RUN  ftpc_conn_user_pass_wire
+OK   ftpc_conn_user_pass_wire
+RUN  ftpc_conn_anonymous_password_is_email
+  NOTE anonymous password sent: PASS IEUser@
+OK   ftpc_conn_anonymous_password_is_email
+RUN  ftpc_conn_anonymous_wire
+OK   ftpc_conn_anonymous_wire
+RUN  ftpc_proto_pass_reply_class_table
+  FAIL tests/ftp_client/fc_proto.c:452: err == tab[i].err ([0] PASS reply 230 ok
+ -> err=12111 want 0)
+  FAIL tests/ftp_client/fc_proto.c:452: err == tab[i].err ([1] PASS reply 202 not needed
+ -> err=12111 want 0)
+  FAIL tests/ftp_client/fc_proto.c:452: err == tab[i].err ([2] PASS reply 250 odd but 2xx
+ -> err=12111 want 0)
+  FAIL tests/ftp_client/fc_proto.c:452: err == tab[i].err ([3] PASS reply 530 no
+ -> err=12111 want 12014)
+  FAIL tests/ftp_client/fc_proto.c:452: err == tab[i].err ([4] PASS reply 430 no
+ -> err=12111 want 12014)
+  FAIL tests/ftp_client/fc_proto.c:452: err == tab[i].err ([5] PASS reply 332 account
+ -> err=12111 want 12014)
+FAIL ftpc_proto_pass_reply_class_table
+RUN  ftpc_proto_user_reply_eof_is_dropped
+OK   ftpc_proto_user_reply_eof_is_dropped
+RUN  ftpc_proto_pass_reply_eof_is_dropped
+  NOTE EOF after PASS: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_proto_pass_reply_eof_is_dropped
+RUN  ftpc_proto_user_reply_multiline_331
+OK   ftpc_proto_user_reply_multiline_331
+RUN  ftpc_proto_reply_timeout
+  NOTE reply 3.5 s late with a 1 s receive timeout: ok=1 err=0 ? after 3500 ms
+OK   ftpc_proto_reply_timeout
+RUN  ftpc_proto_drop_after_login_then_pwd
+  NOTE PWD on a control connection the peer closed: err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+OK   ftpc_proto_drop_after_login_then_pwd
+RUN  ftpc_proto_reset_instead_of_reply
+  NOTE RST instead of a reply: err=12031 ERROR_INTERNET_CONNECTION_RESET
+OK   ftpc_proto_reset_instead_of_reply
+RUN  ftpc_proto_continuation_only_then_eof_is_dropped
+OK   ftpc_proto_continuation_only_then_eof_is_dropped
+RUN  ftpc_proto_partial_reply_then_eof_is_dropped
+  NOTE partial reply then EOF: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_proto_partial_reply_then_eof_is_dropped
+RUN  ftpc_proto_eof_instead_of_reply_is_dropped
+  NOTE EOF instead of a reply: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_proto_eof_instead_of_reply_is_dropped
+RUN  ftpc_proto_421_then_close_mid_session
+  NOTE command after 421+close: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_proto_421_then_close_mid_session
+RUN  ftpc_proto_feat_502_default_server
+OK   ftpc_proto_feat_502_default_server
+RUN  ftpc_proto_unsupported_feat_via_command
+OK   ftpc_proto_unsupported_feat_via_command
+RUN  ftpc_proto_multiline_reply_text_complete
+  NOTE multi-line 550 response text: [550-line one
+text two
+550 line three
+] err field=0
+OK   ftpc_proto_multiline_reply_text_complete
+RUN  ftpc_proto_command_reply_parsing_table
+OK   ftpc_proto_command_reply_parsing_table
+RUN  ftpc_proto_ftpcommand_bytes_exact
+OK   ftpc_proto_ftpcommand_bytes_exact
+RUN  ftpc_proto_pwd_and_rename_bytes_exact
+OK   ftpc_proto_pwd_and_rename_bytes_exact
+RUN  ftpc_proto_directory_command_bytes_exact
+OK   ftpc_proto_directory_command_bytes_exact
+RUN  ftpc_proto_login_bytes_exact
+OK   ftpc_proto_login_bytes_exact
+RUN  ftpc_proto_cr_without_lf_is_not_line_end
+OK   ftpc_proto_cr_without_lf_is_not_line_end
+RUN  ftpc_proto_lf_only_line_ends
+OK   ftpc_proto_lf_only_line_ends
+RUN  ftpc_proto_banner_split_into_small_pieces
+OK   ftpc_proto_banner_split_into_small_pieces
+RUN  ftpc_proto_banner_partial_line_then_close
+  NOTE banner without line end then close: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_proto_banner_partial_line_then_close
+RUN  ftpc_proto_banner_bare_code_without_space_then_close
+  NOTE banner "220\r\n" then close: err=12111 ERROR_FTP_DROPPED
+OK   ftpc_proto_banner_bare_code_without_space_then_close
+RUN  ftpc_proto_banner_failure_text_keeps_all_lines
+OK   ftpc_proto_banner_failure_text_keeps_all_lines
+RUN  ftpc_proto_banner_text_is_last_response
+  FAIL tests/ftp_client/fc_proto.c:88: strstr(t, "line two") == NULL (resp=[220-line one
+220-line two
+220 line three
+331 Password required for anonymous.
+230 User logged in.
+])
+FAIL ftpc_proto_banner_text_is_last_response
+RUN  ftpc_proto_banner_terminator_table
+OK   ftpc_proto_banner_terminator_table
+RUN  ftpc_listing_total_zero_header
+OK   ftpc_listing_total_zero_header
+RUN  ftpc_listing_unix_detection_needs_perm_token
+  NOTE non-permission first token: n=1 err=18 name=[abcdefghij 1 o g 1 Jan  1  2001 f]
+OK   ftpc_listing_unix_detection_needs_perm_token
+RUN  ftpc_dos_listing_many_entries
+OK   ftpc_dos_listing_many_entries
+RUN  ftpc_dos_listing_leading_spaces
+OK   ftpc_dos_listing_leading_spaces
+RUN  ftpc_dos_listing_wildcard
+OK   ftpc_dos_listing_wildcard
+RUN  ftpc_dos_listing_parse
+  NOTE dos[0] name=[My Dir] attr=0x10 size=0:0 res0=0x0 2019-01-15 10:30
+  NOTE dos[1] name=[old.txt] attr=0x80 size=0:1234 res0=0x0 1999-12-31 23:59
+  NOTE dos[2] name=[leap.txt] attr=0x80 size=0:0 res0=0x0 2020-02-29 00:00
+  NOTE dos[3] name=[big.bin] attr=0x80 size=1:705032704 res0=0x0 2021-07-04 12:15
+  NOTE dos[4] name=[eighty.txt] attr=0x80 size=0:42 res0=0x0 1980-03-05 01:02
+  NOTE dos[5] name=[seventynine.txt] attr=0x80 size=0:43 res0=0x0 2079-03-05 13:02
+  NOTE dos[6] name=[a b c.txt] attr=0x80 size=0:10 res0=0x0 2011-11-11 12:00
+  NOTE dos[7] name=[no ampm.txt] attr=0x80 size=0:7 res0=0x0 2005-06-30 09:09
+  NOTE dos[8] name=[lower dir] attr=0x10 size=0:0 res0=0x0 2015-10-01 08:00
+OK   ftpc_dos_listing_parse
+RUN  ftpc_unix_permission_bits_table
+OK   ftpc_unix_permission_bits_table
+RUN  ftpc_unix_listing_bad_month_default_time
+OK   ftpc_unix_listing_bad_month_default_time
+RUN  ftpc_unix_listing_time_of_day_year_inference
+  NOTE future-dated Nov 29 -> year 2025 (now 2026)
+OK   ftpc_unix_listing_time_of_day_year_inference
+RUN  ftpc_unix_listing_long_name_truncated
+  NOTE 300-char name stored as 259 chars
+OK   ftpc_unix_listing_long_name_truncated
+RUN  ftpc_unix_listing_dot_entries
+OK   ftpc_unix_listing_dot_entries
+RUN  ftpc_unix_listing_wildcard_filter
+  NOTE filtered: file1.txt
+  NOTE filtered: name with spaces.txt
+  NOTE filtered: nogroup.txt
+  NOTE filtered: upper.txt
+  NOTE filtered: readonly.txt
+OK   ftpc_unix_listing_wildcard_filter
+RUN  ftpc_unix_listing_no_trailing_newline
+OK   ftpc_unix_listing_no_trailing_newline
+RUN  ftpc_unix_listing_lf_only_and_blank_lines
+OK   ftpc_unix_listing_lf_only_and_blank_lines
+RUN  ftpc_unix_listing_order_preserved
+OK   ftpc_unix_listing_order_preserved
+RUN  ftpc_unix_listing_parse
+  NOTE unix[0] name=[file1.txt] attr=0x80 size=0:1234 perm=0x644
+  NOTE unix[1] name=[subdir] attr=0x10 size=0:4096 perm=0x755
+  NOTE unix[2] name=[link] attr=0x0 size=0:11 perm=0x777
+  NOTE unix[3] name=[name with spaces.txt] attr=0x80 size=0:5 perm=0x644
+  NOTE unix[4] name=[big.iso] attr=0x80 size=1:705032704 perm=0x750
+  NOTE unix[5] name=[empty] attr=0x80 size=0:0 perm=0x600
+  NOTE unix[6] name=[nogroup.txt] attr=0x80 size=0:77 perm=0x644
+  NOTE unix[7] name=[trail  ] attr=0x80 size=0:3 perm=0x644
+  NOTE unix[8] name=[upper.txt] attr=0x80 size=0:3 perm=0x644
+  NOTE unix[9] name=[readonly.txt] attr=0x80 size=0:10 perm=0x444
+  NOTE unix[10] name=[private dir] attr=0x10 size=0:512 perm=0x700
+  NOTE unix[11] name=[max64] attr=0x80 size=4294967295:4294967295 perm=0x666
+  NOTE unix[12] name=[3 Jan  1  2001 nulldev] attr=0x0 size=0:1 perm=0x666
+OK   ftpc_unix_listing_parse
+RUN  ftpc_find_name_not_found_text
+OK   ftpc_find_name_not_found_text
+RUN  ftpc_find_free_text_listing
+  NOTE free-text listing: h=0000000000cc0010 err=0 first=[this is not a directory listing] last response=[200 Type set to A.
+227 Entering Passive Mode (127,0,0,1,196,53).
+150 Opening ASCII mode data connection for file list.
+226 Transfer complete.
+]
+OK   ftpc_find_free_text_listing
+RUN  ftpc_find_whitespace_only_listing
+OK   ftpc_find_whitespace_only_listing
+RUN  ftpc_find_empty_listing_no_more_files
+OK   ftpc_find_empty_listing_no_more_files
+RUN  ftpc_find_type_a_rejected
+OK   ftpc_find_type_a_rejected
+RUN  ftpc_find_list_450_is_extended_error
+OK   ftpc_find_list_450_is_extended_error
+RUN  ftpc_find_list_550_immediate_is_extended_error
+OK   ftpc_find_list_550_immediate_is_extended_error
+RUN  ftpc_find_w_next_via_a_handle_mix
+  NOTE InternetFindNextFileW on an A find handle: ok=1 err=0 name0=0x0063
+OK   ftpc_find_w_next_via_a_handle_mix
+RUN  ftpc_find_w_variant
+OK   ftpc_find_w_variant
+RUN  ftpc_find_next_on_wrong_handles
+OK   ftpc_find_next_on_wrong_handles
+RUN  ftpc_find_other_commands_allowed_while_find_open
+OK   ftpc_find_other_commands_allowed_while_find_open
+RUN  ftpc_find_second_find_while_open_in_progress
+OK   ftpc_find_second_find_while_open_in_progress
+RUN  ftpc_find_null_finddata_keeps_first_entry
+OK   ftpc_find_null_finddata_keeps_first_entry
+RUN  ftpc_find_handle_type_and_next_exhaustion
+OK   ftpc_find_handle_type_and_next_exhaustion
+RUN  ftpc_find_missing_name_empty_listing
+OK   ftpc_find_missing_name_empty_listing
+RUN  ftpc_find_single_file_by_name
+OK   ftpc_find_single_file_by_name
+RUN  ftpc_find_wildcard_no_match_is_no_more_files
+OK   ftpc_find_wildcard_no_match_is_no_more_files
+RUN  ftpc_find_wildcard_table
+OK   ftpc_find_wildcard_table
+RUN  ftpc_find_wildcard_filters_client_side
+OK   ftpc_find_wildcard_filters_client_side
+RUN  ftpc_find_subdir_via_cwd
+OK   ftpc_find_subdir_via_cwd
+RUN  ftpc_find_root_entries_from_server_listing
+  NOTE root listing: 6 entries
+OK   ftpc_find_root_entries_from_server_listing
+RUN  ftpc_find_wire_list_argument_table
+OK   ftpc_find_wire_list_argument_table
+RUN  ftpc_find_wire_null_pattern
+OK   ftpc_find_wire_null_pattern
+RUN  ftpc_connect_ipv6_literal
+  NOTE InternetConnect("::1") FTP: h=0000000000cc0008 err=0
+OK   ftpc_connect_ipv6_literal
+RUN  ftpc_connect_hostname_localhost
+OK   ftpc_connect_hostname_localhost
+RUN  ftpc_connect_port_zero_means_21
+OK   ftpc_connect_port_zero_means_21
+RUN  ftpc_dos_listing_shapes
+  NOTE dos shape[0] [noon.txt] attr=0x80 size=100 2020-01-01 12:00
+  NOTE dos shape[1] [half past midnight.txt] attr=0x80 size=101 2020-01-01 00:30
+  NOTE dos shape[2] [year4dir] attr=0x10 size=0 2021-12-31 23:59
+OK   ftpc_dos_listing_shapes
+RUN  ftpc_unix_listing_shapes_table
+  NOTE [0] name=[numeric ids.txt] attr=0x80 size=10
+  NOTE [1] name=[leapdir] attr=0x10 size=4096
+  NOTE [2] name=[y2k.bin] attr=0x80 size=1234567890
+  NOTE [3] name=[lead spaces] attr=0x80 size=0
+  NOTE [4] name=[tab	here] attr=0x80 size=42
+OK   ftpc_unix_listing_shapes_table
+RUN  ftpc_find_ansi_codepage_name
+  NOTE ACP=1252: name bytes 0xE9 -> W char U+00E9
+OK   ftpc_find_ansi_codepage_name
+RUN  ftpc_find_a_unused_fields
+  NOTE A find: dwReserved1=0x0 cAlternateFileName[0]=0x00 name tail byte=0x00
+OK   ftpc_find_a_unused_fields
+RUN  ftpc_find_w_fields
+  NOTE W find: cAlternateFileName[0]=0x0000 ftCreation=00000000:00000000
+OK   ftpc_find_w_fields
+RUN  ftpc_open_w_write_and_read_back
+OK   ftpc_open_w_write_and_read_back
+RUN  ftpc_command_list_raw_text_not_parsed
+OK   ftpc_command_list_raw_text_not_parsed
+RUN  ftpc_command_nlst_content
+OK   ftpc_command_nlst_content
+RUN  ftpc_command_appe_appends
+OK   ftpc_command_appe_appends
+RUN  ftpc_command_rest_then_retr
+  NOTE REST 2 + RETR hello.txt via FtpCommand: [llo] seq REST 2|TYPE I|PASV|SIZE ��J�|RETR hello.txt
+OK   ftpc_command_rest_then_retr
+RUN  ftpc_callback_find_handle_created
+  NOTE FtpFindFirstFile callbacks: 60,30,31,40,41,30,31,40,41,30,31,40,41,40,41,40,41
+OK   ftpc_callback_find_handle_created
+RUN  ftpc_callback_zero_context_suppressed
+  NOTE FtpOpenFile ctx=0 callbacks: 
+OK   ftpc_callback_zero_context_suppressed
+RUN  ftpc_callback_file_handle_created_and_closing
+  NOTE FtpOpenFile callbacks: 60,30,31,40,41,30,31,40,41,30,31,40,41,30,31,40,41
+  FAIL tests/ftp_client/fc_handles.c:363: cb_h[created] == hf (got 0xcc0008 want 0xcc0010)
+  NOTE FtpOpenFile close callbacks: 60,30,31,40,41,30,31,40,41,30,31,40,41,30,31,40,41,40,41,40,41,70
+FAIL ftpc_callback_file_handle_created_and_closing
+RUN  ftpc_callback_connect_sequence
+  NOTE FTP connect callbacks: 60,20,21,40,41,30,31,40,41,30,31,40,41
+  NOTE HANDLE_CREATED at 0, CONNECTED_TO_SERVER at 2
+  NOTE FTP connect close callbacks: 60,20,21,40,41,30,31,40,41,30,31,40,41,50,51,70
+OK   ftpc_callback_connect_sequence
+RUN  ftpc_close_connect_with_open_file_child
+  NOTE read on a file handle whose connect handle was closed: ok=0 err=6 r=0
+OK   ftpc_close_connect_with_open_file_child
+RUN  ftpc_closed_file_handle_invalid
+OK   ftpc_closed_file_handle_invalid
+RUN  ftpc_closed_find_handle_invalid
+OK   ftpc_closed_find_handle_invalid
+RUN  ftpc_connect_handle_server_port_options
+OK   ftpc_connect_handle_server_port_options
+RUN  ftpc_file_handle_url_option
+  NOTE URL of FtpOpenFile(pub/readme.txt): ok=1 [ftp://127.0.0.1:50476/pub/readme.txt] len=36
+OK   ftpc_file_handle_url_option
+RUN  ftpc_connect_handle_context_value
+OK   ftpc_connect_handle_context_value
+RUN  ftpc_file_handle_context_value
+OK   ftpc_file_handle_context_value
+RUN  ftpc_find_handle_parent_and_type
+OK   ftpc_find_handle_parent_and_type
+RUN  ftpc_readfileex_ftp_file
+  NOTE InternetReadFileExA on FTP file: ok=0 err=12018 len=31
+OK   ftpc_readfileex_ftp_file
+RUN  ftpc_setfilepointer_find_and_connect_wrong_type
+OK   ftpc_setfilepointer_find_and_connect_wrong_type
+RUN  ftpc_setfilepointer_ftp_file_wrong_type
+OK   ftpc_setfilepointer_ftp_file_wrong_type
+RUN  ftpc_qda_write_handle
+  NOTE QDA on an FTP write handle: ok=1 avail=0 err=0
+OK   ftpc_qda_write_handle
+RUN  ftpc_qda_connect_handle_wrong_type
+OK   ftpc_qda_connect_handle_wrong_type
+RUN  ftpc_qda_file_handle
+  NOTE FTP file QDA before reading: 65536
+  NOTE FTP file QDA at EOF: ok=1 avail=0 err=0
+OK   ftpc_qda_file_handle
+RUN  ftpc_qda_find_single_entry
+  NOTE find QDA with the only entry already returned: 0
+OK   ftpc_qda_find_single_entry
+RUN  ftpc_qda_find_handle_reports_find_data_size
+  NOTE find QDA after exhausting (5 more entries): ok=1 avail=320 err=0
+  FAIL tests/ftp_client/fc_handles.c:30: avail == 0 (got 0x140 want 0x0)
+FAIL ftpc_qda_find_handle_reports_find_data_size
+RUN  ftpc_x_putfile_binary_bytes_exact
+OK   ftpc_x_putfile_binary_bytes_exact
+RUN  ftpc_x_readfile_on_find_handle_note
+  NOTE InternetReadFile on an FTP find handle: ok=0 err=12018 read=57005
+  NOTE FindNext after ReadFile: 5 more entries
+OK   ftpc_x_readfile_on_find_handle_note
+RUN  ftpc_x_close_session_invalidates_connect
+  NOTE PWD on a connect handle whose session was closed: ok=0 err=6
+OK   ftpc_x_close_session_invalidates_connect
+RUN  ftpc_x_command_w_data_handle
+OK   ftpc_x_command_w_data_handle
+RUN  ftpc_x_getfile_session_usable_after_local_failure
+OK   ftpc_x_getfile_session_usable_after_local_failure
+RUN  ftpc_x_getfile_local_path_is_directory
+  FAIL tests/ftp_client/fc_extra.c:130: 80l (GetLastError got 5 want 80)
+FAIL ftpc_x_getfile_local_path_is_directory
+RUN  ftpc_x_putfile_active_mode
+OK   ftpc_x_putfile_active_mode
+RUN  ftpc_x_getfile_active_mode
+OK   ftpc_x_getfile_active_mode
+RUN  ftpc_x_cdup_via_command
+OK   ftpc_x_cdup_via_command
+RUN  ftpc_x_cwd_dotdot_verbatim
+OK   ftpc_x_cwd_dotdot_verbatim
+RUN  ftpc_x_pwd_w_converts_with_acp
+OK   ftpc_x_pwd_w_converts_with_acp
+RUN  ftpc_x_w_unmappable_name_note
+  NOTE FtpCreateDirectoryW(L"x\u4e2dy") ACP=1252: ok=1 err=0 wire=[MKD x?y] hex 4d4b4420783f79
+OK   ftpc_x_w_unmappable_name_note
+RUN  ftpc_x_w_name_converted_with_acp
+OK   ftpc_x_w_name_converted_with_acp
+RUN  ftpc_dir_ops_on_http_connect_handle_12018
+OK   ftpc_dir_ops_on_http_connect_handle_12018
+RUN  ftpc_dir_ops_on_session_handle_12018
+OK   ftpc_dir_ops_on_session_handle_12018
+RUN  ftpc_dir_ops_invalid_handle_6
+OK   ftpc_dir_ops_invalid_handle_6
+RUN  ftpc_rename_directory
+OK   ftpc_rename_directory
+RUN  ftpc_rename_w_and_validation
+OK   ftpc_rename_w_and_validation
+RUN  ftpc_rename_target_exists
+OK   ftpc_rename_target_exists
+RUN  ftpc_rename_rnto_class3_fails
+OK   ftpc_rename_rnto_class3_fails
+RUN  ftpc_rename_rnto_failure
+OK   ftpc_rename_rnto_failure
+RUN  ftpc_rename_rnfr_must_be_3xx
+OK   ftpc_rename_rnfr_must_be_3xx
+RUN  ftpc_rename_missing_source_no_rnto
+OK   ftpc_rename_missing_source_no_rnto
+RUN  ftpc_rename_file
+OK   ftpc_rename_file
+RUN  ftpc_delete_w_and_validation
+OK   ftpc_delete_w_and_validation
+RUN  ftpc_delete_relative_to_cwd
+OK   ftpc_delete_relative_to_cwd
+RUN  ftpc_delete_missing_extended_error
+OK   ftpc_delete_missing_extended_error
+RUN  ftpc_delete_file
+OK   ftpc_delete_file
+RUN  ftpc_mkdir_rmdir_null_or_empty_is_87
+OK   ftpc_mkdir_rmdir_null_or_empty_is_87
+RUN  ftpc_mkdir_rmdir_w
+OK   ftpc_mkdir_rmdir_w
+RUN  ftpc_mkdir_rmdir_paths_verbatim
+OK   ftpc_mkdir_rmdir_paths_verbatim
+RUN  ftpc_rmdir_nonempty_fails
+OK   ftpc_rmdir_nonempty_fails
+RUN  ftpc_mkdir_existing_fails
+OK   ftpc_mkdir_existing_fails
+RUN  ftpc_mkdir_rmdir_roundtrip
+OK   ftpc_mkdir_rmdir_roundtrip
+RUN  ftpc_dele_reply_classes
+OK   ftpc_dele_reply_classes
+RUN  ftpc_rmd_reply_classes
+OK   ftpc_rmd_reply_classes
+RUN  ftpc_mkd_reply_classes
+OK   ftpc_mkd_reply_classes
+RUN  ftpc_cwd_reply_classes
+OK   ftpc_cwd_reply_classes
+RUN  ftpc_cwd_w
+OK   ftpc_cwd_w
+RUN  ftpc_cwd_null_or_empty_is_87
+OK   ftpc_cwd_null_or_empty_is_87
+RUN  ftpc_cwd_missing_dir_extended_error
+OK   ftpc_cwd_missing_dir_extended_error
+RUN  ftpc_cwd_wire_verbatim
+OK   ftpc_cwd_wire_verbatim
+RUN  ftpc_pwd_w_null_length_is_87
+OK   ftpc_pwd_w_null_length_is_87
+RUN  ftpc_pwd_w_null_buffer
+  NOTE FtpGetCurrentDirectoryW NULL buffer -> length 4
+OK   ftpc_pwd_w_null_buffer
+RUN  ftpc_pwd_w_small_buffer
+  NOTE FtpGetCurrentDirectoryW cap 2 -> length 10
+OK   ftpc_pwd_w_small_buffer
+RUN  ftpc_pwd_w_length_includes_nul
+  NOTE FtpGetCurrentDirectoryW success length=5 for L"/pub"
+OK   ftpc_pwd_w_length_includes_nul
+RUN  ftpc_pwd_long_path
+OK   ftpc_pwd_long_path
+RUN  ftpc_pwd_null_length_is_87
+OK   ftpc_pwd_null_length_is_87
+RUN  ftpc_pwd_null_buffer_reports_size
+OK   ftpc_pwd_null_buffer_reports_size
+RUN  ftpc_pwd_buffer_lengths
+OK   ftpc_pwd_buffer_lengths
+RUN  ftpc_pwd_error_response_text
+  NOTE last response error field after 550: 0
+OK   ftpc_pwd_error_response_text
+RUN  ftpc_pwd_reply_parsing_table
+OK   ftpc_pwd_reply_parsing_table
+RUN  ftpc_pwd_dir_with_space
+OK   ftpc_pwd_dir_with_space
+RUN  ftpc_pwd_after_cwd
+OK   ftpc_pwd_after_cwd
+RUN  ftpc_pwd_each_call_sends_pwd
+OK   ftpc_pwd_each_call_sends_pwd
+RUN  ftpc_pwd_root
+OK   ftpc_pwd_root
+RUN  ftpc_url_login_failure
+OK   ftpc_url_login_failure
+RUN  ftpc_url_directory_raw_data
+OK   ftpc_url_directory_raw_data
+RUN  ftpc_url_missing_path
+  NOTE ftp:// missing file: err=12003 ERROR_INTERNET_EXTENDED_ERROR
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE I
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] SIZE /ghost.txt
+  NOTE ftp cmd[5] RETR /ghost.txt
+  NOTE ftp cmd[6] CWD /ghost.txt
+  NOTE ftp cmd[7] USER anonymous
+  NOTE ftp cmd[8] PASS ***
+  NOTE ftp cmd[9] TYPE I
+  NOTE ftp cmd[10] PASV
+  NOTE ftp cmd[11] SIZE /ghost.txt
+  NOTE ftp cmd[12] RETR /ghost.txt
+  NOTE ftp cmd[13] CWD /ghost.txt
+  NOTE ftp cmd[14] USER anonymous
+  NOTE ftp cmd[15] PASS ***
+  NOTE ftp cmd[16] TYPE I
+  NOTE ftp cmd[17] PASV
+  NOTE ftp cmd[18] SIZE /ghost.txt
+  NOTE ftp cmd[19] RETR /ghost.txt
+  NOTE ftp cmd[20] CWD /ghost.txt
+OK   ftpc_url_missing_path
+RUN  ftpc_url_type_d_forces_directory
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] CWD /pub
+  NOTE ftp cmd[3] TYPE A
+  NOTE ftp cmd[4] PASV
+  NOTE ftp cmd[5] LIST
+OK   ftpc_url_type_d_forces_directory
+RUN  ftpc_url_directory_without_slash
+  NOTE ftp://.../pub (no slash): handle type 6, body <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<TITLE>FTP directory /pub at 127.0.0.1</TITLE>
+</HEAD>
+<BODY>
+<H2 ID="WinINetFtpDirectory">FTP directory /pub at 127.0.0.1</H2>
+<HR>
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE I
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] SIZE /pub
+  NOTE ftp cmd[5] RETR /pub
+  NOTE ftp cmd[6] CWD /pub
+  NOTE ftp cmd[7] TYPE A
+  NOTE ftp cmd[8] PASV
+  NOTE ftp cmd[9] LIST
+OK   ftpc_url_directory_without_slash
+RUN  ftpc_url_root_directory
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] CWD /
+  NOTE ftp cmd[3] TYPE A
+  NOTE ftp cmd[4] PASV
+  NOTE ftp cmd[5] LIST
+OK   ftpc_url_root_directory
+RUN  ftpc_url_directory_html
+  NOTE directory HTML (440 bytes): <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<TITLE>FTP directory /pub/ at 127.0.0.1</TITLE>
+</HEAD>
+<BODY>
+<H2 ID="WinINetFtpDirectory">FTP directory /pub/ at 127.0.0.1</H2>
+<HR>
+<A HREF="..">Up to higher level directory</A><BR><PRE>
+06/15/2019 12:00AM              8 <A HREF="/pub/readme.txt">readme.txt</A>
+01/02/2020 12:00AM        100,000 <A HREF="/pub/data.bin">data.bin</A>
+</PRE>
+<HR>
+</BODY>
+</HTML>
+
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] CWD /pub/
+  NOTE ftp cmd[3] TYPE A
+  NOTE ftp cmd[4] PASV
+  NOTE ftp cmd[5] LIST
+OK   ftpc_url_directory_html
+RUN  ftpc_url_bad_type_invalid_url
+OK   ftpc_url_bad_type_invalid_url
+RUN  ftpc_url_type_a_and_i
+OK   ftpc_url_type_a_and_i
+RUN  ftpc_url_credentials
+OK   ftpc_url_credentials
+RUN  ftpc_url_nested_file_with_space
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE I
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] SIZE /dir two/in space.txt
+  NOTE ftp cmd[5] RETR /dir two/in space.txt
+OK   ftpc_url_nested_file_with_space
+RUN  ftpc_url_file
+  NOTE ftp cmd[0] USER anonymous
+  NOTE ftp cmd[1] PASS ***
+  NOTE ftp cmd[2] TYPE I
+  NOTE ftp cmd[3] PASV
+  NOTE ftp cmd[4] SIZE /hello.txt
+  NOTE ftp cmd[5] RETR /hello.txt
+OK   ftpc_url_file
+RUN  ftpc_lastresp_replaced_by_each_command
+OK   ftpc_lastresp_replaced_by_each_command
+RUN  ftpc_lastresp_is_per_thread
+OK   ftpc_lastresp_is_per_thread
+RUN  ftpc_lastresp_wide
+OK   ftpc_lastresp_wide
+RUN  ftpc_lastresp_buffer_contract
+  NOTE response text len=16 err=0 [250 0123456789
+]
+OK   ftpc_lastresp_buffer_contract
+RUN  ftpc_lastresp_validation
+OK   ftpc_lastresp_validation
+RUN  ftpc_command_active_mode_data
+OK   ftpc_command_active_mode_data
+RUN  ftpc_command_data_while_handle_open
+OK   ftpc_command_data_while_handle_open
+RUN  ftpc_command_data_rejected
+  NOTE phFtpCommand after a failed data command: 0000000000cc0020
+OK   ftpc_command_data_rejected
+RUN  ftpc_command_stor_data_handle
+  NOTE InternetWriteFile on an FtpCommand(STOR) handle: ok=1 err=0 w=8
+OK   ftpc_command_stor_data_handle
+RUN  ftpc_command_retr_sends_size_first
+OK   ftpc_command_retr_sends_size_first
+RUN  ftpc_command_list_binary_type
+OK   ftpc_command_list_binary_type
+RUN  ftpc_command_nlst_data_handle
+  NOTE FtpCommand data handle type: 7
+OK   ftpc_command_nlst_data_handle
+RUN  ftpc_command_w
+OK   ftpc_command_w
+RUN  ftpc_command_validation_87
+OK   ftpc_command_validation_87
+RUN  ftpc_command_multiline_reply_text
+  NOTE FEAT response text: [211-Features:
+ SIZE
+ MDTM
+ REST STREAM
+ EPSV
+211 End
+]
+OK   ftpc_command_multiline_reply_text
+RUN  ftpc_command_changes_server_state
+OK   ftpc_command_changes_server_state
+RUN  ftpc_command_unknown_502
+OK   ftpc_command_unknown_502
+RUN  ftpc_command_reply_class_table
+OK   ftpc_command_reply_class_table
+RUN  ftpc_command_sent_verbatim
+OK   ftpc_command_sent_verbatim
+RUN  ftpc_command_noop
+OK   ftpc_command_noop
+RUN  ftpc_async_find_first_file
+  NOTE async FtpFindFirstFile: callbacks 60,30,31,40,41,30,31,40,41,30,31,40,41,40,41,40,41,100; completes=1 res=0xcc0020 err=0
+OK   ftpc_async_find_first_file
+RUN  ftpc_async_open_file_and_read
+  NOTE async FtpOpenFile: callbacks 60,30,31,40,41,30,31,40,41,30,31,40,41,30,31,40,41,100; completes=1 res=0xcc0020 err=0
+  NOTE async FtpOpenFile: pending=1 h=0000000000cc0020 err=0
+  FAIL tests/ftp_client/fc_async.c:215: b == "hello" (got "" want "hello")
+FAIL ftpc_async_open_file_and_read
+RUN  ftpc_async_directory_calls
+  NOTE async FtpSetCurrentDirectory: callbacks 30,31,40,41,100; completes=1 res=0x1 err=0
+  NOTE async FtpGetCurrentDirectory: callbacks 30,31,40,41,100; completes=1 res=0x1 err=0
+  NOTE async PWD: pending=1 ok=1 err=0 dir=[/pub] len=4
+OK   ftpc_async_directory_calls
+RUN  ftpc_async_connect_no_listener
+  NOTE async FTP connect, refused: callbacks 60,20,100; completes=1 res=0x0 err=12029
+OK   ftpc_async_connect_no_listener
+RUN  ftpc_async_connect_login_failure_completes_with_error
+  NOTE async FTP connect, PASS 530: callbacks 60,10,11,20,21,40,41,30,31,40,41,30,31,40,41,50,51,100; completes=1 res=0x0 err=12014
+OK   ftpc_async_connect_login_failure_completes_with_error
+RUN  ftpc_async_connect_with_context_pends
+  NOTE async FTP connect: callbacks 60,20,21,40,41,30,31,40,41,30,31,40,41,100; completes=1 res=0xcc0020 err=0
+OK   ftpc_async_connect_with_context_pends
+RUN  ftpc_async_connect_zero_context_is_synchronous
+OK   ftpc_async_connect_zero_context_is_synchronous
+SUMMARY tests=289 failed=6 skipped=0 checks_pass=1886 checks_fail=11
+@@I7 END ftp_client exit=0x1 ms=100549 timeout=0 bytes=34008

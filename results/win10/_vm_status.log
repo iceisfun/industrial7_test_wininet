@@ -1,0 +1,42 @@
+gopher_and_stubs                         PASS      tests=195 failed=0 skipped=0 checks_fail=0 ms=4634
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-gopher_and_stubs/serial.log
+core_smoke                               PASS      tests=3 failed=0 skipped=0 checks_fail=0 ms=233
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-core_smoke/serial.log
+ftp_client                               FAIL      tests=289 failed=6 skipped=0 checks_fail=11 ms=100549
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-ftp_client/serial.log
+http_body_io                             PASS      tests=508 failed=0 skipped=0 checks_fail=0 ms=183444
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_body_io/serial.log
+cookies                                  FAIL      tests=359 failed=1 skipped=0 checks_fail=4 ms=217011
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-cookies/serial.log
+http_cache_integration                   PASS      tests=250 failed=0 skipped=0 checks_fail=0 ms=163224
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_cache_integration/serial.log
+http_edge_protocol                       PASS      tests=350 failed=0 skipped=0 checks_fail=0 ms=167345
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_edge_protocol/serial.log
+http_auth                                FAIL      tests=237 failed=2 skipped=0 checks_fail=4 ms=430043
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_auth/serial.log
+net_loopback                             FAIL      tests=26 failed=1 skipped=0 checks_fail=1 ms=56589
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-net_loopback/serial.log
+http_response_headers                    FAIL      tests=190 failed=2 skipped=0 checks_fail=7 ms=122205
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_response_headers/serial.log
+async_callbacks                          FAIL      tests=243 failed=1 skipped=0 checks_fail=2 ms=497794
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-async_callbacks/serial.log
+http_redirect_status                     FAIL      tests=358 failed=2 skipped=0 checks_fail=2 ms=344738
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_redirect_status/serial.log
+session_handles                          FAIL      tests=222 failed=1 skipped=0 checks_fail=1 ms=69457
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-session_handles/serial.log
+options_table                            FAIL      tests=143 failed=4 skipped=0 checks_fail=5 ms=89644
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-options_table/serial.log
+url_crack                                PASS      tests=934 failed=0 skipped=0 checks_fail=0 ms=2560
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-url_crack/serial.log
+time_and_misc_helpers                    FAIL      tests=164 failed=4 skipped=0 checks_fail=5 ms=27492
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-time_and_misc_helpers/serial.log
+https_tls                                PASS      tests=203 failed=0 skipped=0 checks_fail=0 ms=310124
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-https_tls/serial.log
+http_request_wire                        PASS      tests=362 failed=0 skipped=0 checks_fail=0 ms=391143
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-http_request_wire/serial.log
+urlcache_entries                         FAIL      tests=304 failed=1 skipped=0 checks_fail=2 ms=3402
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-urlcache_entries/serial.log
+urlcache_enum_groups                     FAIL      tests=183 failed=20 skipped=25 checks_fail=48 ms=1514
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-urlcache_enum_groups/serial.log
+proxy_connectivity                       FAIL      tests=239 failed=1 skipped=0 checks_fail=1 ms=396451
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-proxy_connectivity/serial.log

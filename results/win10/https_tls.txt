@@ -1,0 +1,627 @@
+RUN  tls_proto_both_ends_agree
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE transient 12030 on send, retrying once
+OK   tls_proto_both_ends_agree
+RUN  tls_proto_no_overlap_error
+  NOTE no overlap: err=12157 ERROR_INTERNET_SECURITY_CHANNEL_ERROR, connections=1
+OK   tls_proto_no_overlap_error
+RUN  tls_proto_server_tls13_only
+  NOTE TLS1.3 server: err=12029 ERROR_INTERNET_CANNOT_CONNECT status=0 tls=(no TLS_DONE) conns=1 (client SecureProtocols=0x800)
+  NOTE srv ev conn=0 TLS_ABORT ASC=0x80090331 round=0
+OK   tls_proto_server_tls13_only
+RUN  tls_proto_server_tls10_only
+  NOTE TLS1.0 server: err=12157 ERROR_INTERNET_SECURITY_CHANNEL_ERROR status=0 tls=(no TLS_DONE) conns=1 (client SecureProtocols=0x800)
+  NOTE srv ev conn=0 TLS_ABORT handshake recv=0 round=1
+OK   tls_proto_server_tls10_only
+RUN  tls_proto_server_tls11_only
+  NOTE TLS1.1 server: err=12157 ERROR_INTERNET_SECURITY_CHANNEL_ERROR status=0 tls=(no TLS_DONE) conns=1 (client SecureProtocols=0x800)
+  NOTE srv ev conn=0 TLS_ABORT handshake recv=0 round=1
+OK   tls_proto_server_tls11_only
+RUN  tls_proto_server_tls12_only
+  NOTE TLS1.2 server: err=0 ? status=200 tls=proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0 conns=1 (client SecureProtocols=0x800)
+  NOTE srv ev conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+OK   tls_proto_server_tls12_only
+RUN  tls_broken_http_to_https_server
+  NOTE http->https server: err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE status=0
+  NOTE srv ev conn=0 TLS_ABORT handshake recv=-1 round=1
+OK   tls_broken_http_to_https_server
+RUN  tls_broken_https_to_http_server
+  NOTE https->http server: err=12029 ERROR_INTERNET_CANNOT_CONNECT, server requests=0
+OK   tls_broken_https_to_http_server
+RUN  tls_broken_server_close_without_reading
+  NOTE close-noread: err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+OK   tls_broken_server_close_without_reading
+RUN  tls_broken_server_truncated_serverhello
+  NOTE truncated-sh: err=12029 ERROR_INTERNET_CANNOT_CONNECT connections=1 (62 ms)
+OK   tls_broken_server_truncated_serverhello
+RUN  tls_broken_server_garbage
+  NOTE garbage: err=12157 ERROR_INTERNET_SECURITY_CHANNEL_ERROR connections=1 (0 ms)
+OK   tls_broken_server_garbage
+RUN  tls_broken_server_plaintext_http
+  NOTE plaintext: err=12157 ERROR_INTERNET_SECURITY_CHANNEL_ERROR connections=1 (0 ms)
+OK   tls_broken_server_plaintext_http
+RUN  tls_broken_server_fatal_alert
+  NOTE alert: err=12157 ERROR_INTERNET_SECURITY_CHANNEL_ERROR connections=1 (0 ms)
+OK   tls_broken_server_fatal_alert
+RUN  tls_broken_server_reset_after_hello
+  NOTE reset: err=12031 ERROR_INTERNET_CONNECTION_RESET connections=1 (0 ms)
+OK   tls_broken_server_reset_after_hello
+RUN  tls_broken_server_close_after_hello
+  NOTE close: err=12029 ERROR_INTERNET_CANNOT_CONNECT connections=1 (0 ms)
+OK   tls_broken_server_close_after_hello
+RUN  tls_alpn_offered_server_ignores
+OK   tls_alpn_offered_server_ignores
+RUN  tls_hello_alpn_session_level_inherited
+  NOTE session-level http2: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=21 first=c02c sni=localhost alpn=h2,http/1.1 versions= exts=0,5,10,11,13,35,16,23,65281 bytes=198
+OK   tls_hello_alpn_session_level_inherited
+RUN  tls_enable_http_protocol_option_rules
+  NOTE ENABLE_HTTP_PROTOCOL on NULL: ok=0 err=12018
+  NOTE query ENABLE_HTTP_PROTOCOL on session: ok=0 err=87 v=0xdead
+OK   tls_enable_http_protocol_option_rules
+RUN  tls_hello_alpn_flag1_ignored
+  NOTE flag1: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=21 first=c02c sni=localhost alpn=(none) versions= exts=0,5,10,11,13,35,23,65281 bytes=180
+OK   tls_hello_alpn_flag1_ignored
+RUN  tls_hello_alpn_http2_enabled
+  NOTE http2: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=21 first=c02c sni=localhost alpn=h2,http/1.1 versions= exts=0,5,10,11,13,35,16,23,65281 bytes=198
+OK   tls_hello_alpn_http2_enabled
+RUN  tls_hello_alpn_default_absent
+  NOTE default: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=21 first=c02c sni=localhost alpn=(none) versions= exts=0,5,10,11,13,35,23,65281 bytes=180
+OK   tls_hello_alpn_default_absent
+RUN  tls_hello_sni_ipv6_literal
+  NOTE [::1] against a v4-only observer: err=12029 ERROR_INTERNET_CANNOT_CONNECT conns=0
+OK   tls_hello_sni_ipv6_literal
+RUN  tls_hello_sni_case_preserved
+  NOTE LocalHost: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=21 first=c02c sni=LocalHost alpn=(none) versions= exts=0,5,10,11,13,35,23,65281 bytes=180
+  NOTE SNI for 'LocalHost' = LocalHost
+OK   tls_hello_sni_case_preserved
+RUN  tls_hello_sni_localhost
+  NOTE localhost: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=21 first=c02c sni=localhost alpn=(none) versions= exts=0,5,10,11,13,35,23,65281 bytes=180
+OK   tls_hello_sni_localhost
+RUN  tls_hello_sni_ip_literal
+  NOTE ip: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=19 first=c02c sni=(none) alpn=(none) versions= exts=5,10,11,13,35,23,65281 bytes=190
+OK   tls_hello_sni_ip_literal
+RUN  tls_hello_basic_shape
+  NOTE 127.0.0.1: complete=1 rec=16/0303 hs=1 ver=0303 ciphers=19 first=c02c sni=(none) alpn=(none) versions= exts=5,10,11,13,35,23,65281 bytes=158
+  NOTE request error=12029 ERROR_INTERNET_CANNOT_CONNECT, connections=1
+OK   tls_hello_basic_shape
+RUN  tls_secflags_openurl_handle
+OK   tls_secflags_openurl_handle
+RUN  tls_secflags_not_inherited_by_next_request
+  NOTE second request before send: 0x0
+OK   tls_secflags_not_inherited_by_next_request
+RUN  tls_secflags_private_options_probe
+  NOTE before send: opt98 ok=1 err=0 v=0x0; opt151 ok=1 err=0 v=0x0
+  NOTE after send err=12045: opt98 ok=1 err=0 v=0x0; opt151 ok=1 err=0 v=0x1
+OK   tls_secflags_private_options_probe
+RUN  tls_secflags_request_date_flag_after_success
+OK   tls_secflags_request_date_flag_after_success
+RUN  tls_secflags_request_flag_after_success
+OK   tls_secflags_request_flag_after_success
+RUN  tls_secflags_after_cn_failure
+  NOTE after 12038: flags=0x100
+OK   tls_secflags_after_cn_failure
+RUN  tls_secflags_after_invalid_ca_failure
+  NOTE after 12045: flags=0x0
+OK   tls_secflags_after_invalid_ca_failure
+RUN  tls_secflags_after_success_all_ignores
+  NOTE after success with SECURITY_SET_MASK: 0x20003381
+OK   tls_secflags_after_success_all_ignores
+RUN  tls_secflags_after_success_localhost_cert
+  NOTE after success: 0x20000101
+OK   tls_secflags_after_success_localhost_cert
+RUN  tls_secflags_plain_http_request
+  NOTE http request: query ok=1 err=0 flags=0x0
+  NOTE http request: set ok=1 err=0 -> 0x0
+OK   tls_secflags_plain_http_request
+RUN  tls_secflags_wide_entry_points
+OK   tls_secflags_wide_entry_points
+RUN  tls_secflags_set_on_top_of_request_flags
+OK   tls_secflags_set_on_top_of_request_flags
+RUN  tls_secflags_set_combinations
+OK   tls_secflags_set_combinations
+RUN  tls_secflags_set_is_or_only
+OK   tls_secflags_set_is_or_only
+RUN  tls_secflags_set_all_ones
+OK   tls_secflags_set_all_ones
+RUN  tls_secflags_set_single_bits
+OK   tls_secflags_set_single_bits
+RUN  tls_secflags_from_request_flags
+OK   tls_secflags_from_request_flags
+RUN  tls_secflags_initial_https_request
+  NOTE secure request before send: 0x0
+OK   tls_secflags_initial_https_request
+RUN  tls_secflags_set_null_buffer
+OK   tls_secflags_set_null_buffer
+RUN  tls_secflags_set_short_buffer
+OK   tls_secflags_set_short_buffer
+RUN  tls_secflags_query_short_buffer
+OK   tls_secflags_query_short_buffer
+RUN  tls_secflags_null_handle_rejected
+OK   tls_secflags_null_handle_rejected
+RUN  tls_secflags_connect_handle_rejected
+OK   tls_secflags_connect_handle_rejected
+RUN  tls_secflags_session_handle_rejected
+OK   tls_secflags_session_handle_rejected
+RUN  tls_pki_aia_expired_issuer
+  NOTE registry CertificateRevocation: HKCU=0x1 policy=0xffffffff
+  NOTE aia expired issuer: helper server saw 7 request(s): GET /issuer-7376-1.crt HTTP/1.1
+OK   tls_pki_aia_expired_issuer
+RUN  tls_pki_aia_cdp_revoked
+  NOTE aia+cdp revoked: helper server saw 0 request(s)
+OK   tls_pki_aia_cdp_revoked
+RUN  tls_pki_aia_cdp_good_crl
+  NOTE aia+cdp good: helper server saw 0 request(s)
+OK   tls_pki_aia_cdp_good_crl
+RUN  tls_pki_aia_cdp_404
+  NOTE aia+cdp 404: helper server saw 0 request(s)
+OK   tls_pki_aia_cdp_404
+RUN  tls_pki_aia_complete_chain
+  NOTE aia: helper server saw 1 request(s): GET /issuer-7376-8.crt HTTP/1.1
+  NOTE   AIA hdr Connection: Keep-Alive
+  NOTE   AIA hdr Accept: */*
+  NOTE   AIA hdr User-Agent: Microsoft-CryptoAPI/10.0
+  NOTE   AIA hdr Host: 127.0.0.1:49778
+OK   tls_pki_aia_complete_chain
+RUN  tls_pki_cdp_closed_port
+OK   tls_pki_cdp_closed_port
+RUN  tls_pki_cdp_partial_chain_good_crl
+  NOTE cdp good partial: helper server saw 0 request(s)
+OK   tls_pki_cdp_partial_chain_good_crl
+RUN  tls_pki_cdp_partial_chain_revoked_crl
+  NOTE cdp revoked partial: helper server saw 0 request(s)
+OK   tls_pki_cdp_partial_chain_revoked_crl
+RUN  tls_pki_cdp_partial_chain_404
+  NOTE cdp 404 partial: helper server saw 0 request(s)
+OK   tls_pki_cdp_partial_chain_404
+RUN  tls_pki_rsa4096_leaf_keybitness
+OK   tls_pki_rsa4096_leaf_keybitness
+RUN  tls_pki_rsa1024_leaf
+OK   tls_pki_rsa1024_leaf
+RUN  tls_pki_sha384_signed_leaf
+OK   tls_pki_sha384_signed_leaf
+RUN  tls_pki_sha1_signed_leaf
+OK   tls_pki_sha1_signed_leaf
+RUN  tls_pki_md5_signed_leaf_rejected_by_schannel
+OK   tls_pki_md5_signed_leaf_rejected_by_schannel
+RUN  tls_pki_retry_sequence_same_handle
+OK   tls_pki_retry_sequence_same_handle
+RUN  tls_pki_error_order_all_four
+OK   tls_pki_error_order_all_four
+RUN  tls_pki_error_order_usage_expired
+OK   tls_pki_error_order_usage_expired
+RUN  tls_pki_error_order_expired_cn
+OK   tls_pki_error_order_expired_cn
+RUN  tls_pki_eku_matrix
+OK   tls_pki_eku_matrix
+RUN  tls_pki_expired_leaf
+OK   tls_pki_expired_leaf
+RUN  tls_pki_not_yet_valid_leaf
+OK   tls_pki_not_yet_valid_leaf
+RUN  tls_pki_trailing_dot_host
+OK   tls_pki_trailing_dot_host
+RUN  tls_pki_san_wildcard_forms_do_not_match_localhost
+OK   tls_pki_san_wildcard_forms_do_not_match_localhost
+RUN  tls_pki_san_uppercase_dns
+OK   tls_pki_san_uppercase_dns
+RUN  tls_pki_cn_only_name
+OK   tls_pki_cn_only_name
+RUN  tls_pki_cn_only_ip_literal
+OK   tls_pki_cn_only_ip_literal
+RUN  tls_pki_san_ip_only_cn_fallback
+OK   tls_pki_san_ip_only_cn_fallback
+RUN  tls_pki_san_dns_only_ip_host
+OK   tls_pki_san_dns_only_ip_host
+RUN  tls_pki_chain_context_partial
+OK   tls_pki_chain_context_partial
+RUN  tls_pki_certinfo_wide_query_is_ansi
+OK   tls_pki_certinfo_wide_query_is_ansi
+RUN  tls_pki_certinfo_names_and_dates
+OK   tls_pki_certinfo_names_and_dates
+RUN  tls_pki_secflags_after_rev_failure_and_success
+  NOTE issued chain success secflags=0x20000181
+OK   tls_pki_secflags_after_rev_failure_and_success
+RUN  tls_pki_rejected_handshake_server_view
+  NOTE rejected: server handshake done=0 asc=0xeeee0001
+OK   tls_pki_rejected_handshake_server_view
+RUN  tls_pki_success_wire_and_body
+OK   tls_pki_success_wire_and_body
+RUN  tls_pki_partial_chain_matrix
+OK   tls_pki_partial_chain_matrix
+RUN  tls_pki_factory_chain_shape
+OK   tls_pki_factory_chain_shape
+RUN  tls_more_head_then_get_new_requests
+OK   tls_more_head_then_get_new_requests
+RUN  tls_more_secflags_set_after_success_no_effect_on_result
+OK   tls_more_secflags_set_after_success_no_effect_on_result
+RUN  tls_more_redirect_no_auto_redirect
+OK   tls_more_redirect_no_auto_redirect
+RUN  tls_more_redirect_to_http_both_flags
+  NOTE https->http both flags=0xc000: err=0 ? status=200 dst requests=1
+OK   tls_more_redirect_to_http_both_flags
+RUN  tls_more_redirect_to_http_ignore_flag
+  NOTE https->http IGNORE_REDIRECT_TO_HTTP flags=0x8000: err=0 ? status=200 dst requests=1
+OK   tls_more_redirect_to_http_ignore_flag
+RUN  tls_more_redirect_to_https_ignore_flag
+  NOTE http->https IGNORE_REDIRECT_TO_HTTPS flags=0x4000: err=12045 ERROR_INTERNET_INVALID_CA status=0 dst requests=0
+OK   tls_more_redirect_to_https_ignore_flag
+RUN  tls_more_request_flags_option_secure_bit
+  NOTE REQUEST_FLAGS before send 0x8
+  NOTE REQUEST_FLAGS after send 0x40
+OK   tls_more_request_flags_option_secure_bit
+RUN  tls_more_secure_flag_on_connect_only
+  NOTE connect-level SECURE: request flags 0x8
+  NOTE connect-level SECURE: URL http://127.0.0.1:49997/s
+  NOTE connect-level SECURE: send ok=0 err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE TLS handshakes=0
+OK   tls_more_secure_flag_on_connect_only
+RUN  tls_more_concurrent_sessions
+OK   tls_more_concurrent_sessions
+RUN  tls_more_readfileex_chunks
+OK   tls_more_readfileex_chunks
+RUN  tls_more_query_data_available_large
+  NOTE 100000 bytes over TLS in 12 QueryDataAvailable rounds
+OK   tls_more_query_data_available_large
+RUN  tls_more_large_request_headers
+OK   tls_more_large_request_headers
+RUN  tls_more_sendrequestex_chunked_upload
+OK   tls_more_sendrequestex_chunked_upload
+RUN  tls_more_post_large_body
+OK   tls_more_post_large_body
+RUN  tls_more_status_text_and_version
+OK   tls_more_status_text_and_version
+RUN  tls_more_verb_status_table
+OK   tls_more_verb_status_table
+RUN  tls_secflags_fresh_requests_stable
+OK   tls_secflags_fresh_requests_stable
+RUN  tls_secflags_handle_types_matrix
+OK   tls_secflags_handle_types_matrix
+RUN  tls_secinfo_by_url_after_connect
+  NOTE by URL after a 0x100 connect (handle open): ok=0 err=12028 chain=0000000000000000 flags=0xdead
+OK   tls_secinfo_by_url_after_connect
+RUN  tls_secinfo_by_url_params
+  NOTE both out NULL: ok=0 err=87
+OK   tls_secinfo_by_url_params
+RUN  tls_protostr_of_live_connection
+  NOTE live protocol 0x800 = TLS 1.2
+OK   tls_protostr_of_live_connection
+RUN  tls_protostr_wide_matches_ansi
+OK   tls_protostr_wide_matches_ansi
+RUN  tls_protostr_known_bits
+  NOTE known protocol bits (7): 0x2="PCT 1.0" 0x8="SSL 2.0" 0x20="SSL 3.0" 0x80="TLS 1.0" 0x200="TLS 1.1" 0x800="TLS 1.2" 0x2000="TLS 1.3"
+OK   tls_protostr_known_bits
+RUN  tls_protostr_tls12_sizing
+  NOTE 0x800 -> "TLS 1.2" (7)
+OK   tls_protostr_tls12_sizing
+RUN  tls_protostr_param_validation
+OK   tls_protostr_param_validation
+RUN  tls_info_request_flags_probe
+  NOTE request flags after TLS GET: ok=1 0x40
+OK   tls_info_request_flags_probe
+RUN  tls_info_url_option_scheme
+  NOTE port 0 + SECURE url=https://127.0.0.1:80/p
+OK   tls_info_url_option_scheme
+RUN  tls_info_localhost_host
+OK   tls_info_localhost_host
+RUN  tls_info_http_protocol_used
+OK   tls_info_http_protocol_used
+RUN  tls_info_server_chain_after_failure
+  NOTE chain after 12045: ok=1 err=0 ch=000001b5ed38b6d0
+OK   tls_info_server_chain_after_failure
+RUN  tls_info_server_chain_short_buffer
+OK   tls_info_server_chain_short_buffer
+RUN  tls_info_server_chain_after_success
+  NOTE chain trust error=0x20 info=0x100
+  NOTE element[0] trust error=0x20 info=0x10c
+OK   tls_info_server_chain_after_success
+RUN  tls_info_connection_info_after_failure
+  NOTE after 12045: ok=1 dwSize=716 fSecure=1 proto=0x0 suite=0x0
+OK   tls_info_connection_info_after_failure
+RUN  tls_info_connection_info_after_success
+  NOTE conn: proto=0x800 cipher=0x6610 strength=256 hash=0x800d/0 exch=0xae06/384
+  NOTE cipherinfo: ver=1 proto=0x303 suite=0xc030 base=0xc030 name=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 cipher=AES len=256 hash= exch=ECDH cert=RSA keytype=24
+OK   tls_info_connection_info_after_success
+RUN  tls_info_connection_info_size_rule
+OK   tls_info_connection_info_size_rule
+RUN  tls_info_key_bitness
+  NOTE key bitness 256
+OK   tls_info_key_bitness
+RUN  tls_info_certificate_string
+  NOTE certificate string (227 chars): Subject:
+localhost
+Issuer:
+localhost
+Effective Date:	9/29/2026 7:01:44 PM
+Expiration Date:	9/30/2027 7:01:44 PM
+Security Protocol:	(null)
+Signature Type:	(null)
+Encryption Type:	(null)
+Privacy Strength:	High (256 bits)
+  NOTE short query asked for 1 (string 227)
+  NOTE W certificate string length field 227
+OK   tls_info_certificate_string
+RUN  tls_info_wrong_handle_types
+OK   tls_info_wrong_handle_types
+RUN  tls_info_https_request_before_send
+  NOTE unsent https opt 32: ok=1 err=0 first dword=0x0
+  NOTE unsent certstruct: subject=0000000000000000 issuer=0000000000000000 key=0
+  NOTE unsent https opt 35: ok=1 err=0 first dword=0x6a627553
+  NOTE unsent https opt 36: ok=1 err=0 first dword=0x0
+  NOTE unsent https opt 66: ok=1 err=0 dwSize=716 fSecure=1 proto=0x0
+OK   tls_info_https_request_before_send
+RUN  tls_info_plain_http_request_invalid_operation
+OK   tls_info_plain_http_request_invalid_operation
+RUN  tls_info_certstruct_buffer_sizes
+  NOTE certstruct NULL/0: ok=1 err=0 len=64
+  NOTE certstruct len 1: ok=0 err=12004 len=64
+  NOTE certstruct len 8: ok=0 err=12004 len=64
+  NOTE certstruct len 32: ok=0 err=12004 len=64
+  NOTE certstruct len 63: ok=0 err=12004 len=64
+OK   tls_info_certstruct_buffer_sizes
+RUN  tls_info_certstruct_after_ca_failure
+  NOTE certstruct after 12045: ok=1 err=0 subject=localhost
+OK   tls_info_certstruct_after_ca_failure
+RUN  tls_info_certstruct_expired_dates
+OK   tls_info_certstruct_expired_dates
+RUN  tls_info_certstruct_cn_other
+OK   tls_info_certstruct_cn_other
+RUN  tls_info_certstruct_after_success
+  NOTE certstruct dwKeySize=256
+OK   tls_info_certstruct_after_success
+RUN  tls_info_certstruct_size
+OK   tls_info_certstruct_size
+RUN  tls_flow_truncated_body
+  NOTE truncated over TLS: read 8 bytes ok=1 err=0
+OK   tls_flow_truncated_body
+RUN  tls_flow_split_records_slow
+OK   tls_flow_split_records_slow
+RUN  tls_openurl_cn_flag_path
+  NOTE OpenUrl CN_OTHER + IGNORE_CERT_CN_INVALID: err=12045
+OK   tls_openurl_cn_flag_path
+RUN  tls_redirect_https_to_https_other_cert
+  NOTE https->https(CN_OTHER) with 0x100: err=12045 ERROR_INTERNET_INVALID_CA
+  NOTE flags after redirect failure: 0x0
+  NOTE +0x1100 resend: err=0 status=200
+OK   tls_redirect_https_to_https_other_cert
+RUN  tls_redirect_https_same_server
+OK   tls_redirect_https_same_server
+RUN  tls_redirect_https_to_http
+  NOTE https->http redirect: err=0 ? status=200 http requests=1
+  NOTE flags after landing on http: 0x0
+OK   tls_redirect_https_to_http
+RUN  tls_redirect_http_to_https_flags_preset
+  NOTE presetting 0x100 on an http request: ok=1 flags=0x0
+  NOTE http->https with preset flags: err=12045 ERROR_INTERNET_INVALID_CA
+OK   tls_redirect_http_to_https_flags_preset
+RUN  tls_redirect_http_to_https
+  NOTE http->https redirect, no flags: err=12045 ERROR_INTERNET_INVALID_CA
+  NOTE after 0x100 resend: err=0 status=200
+OK   tls_redirect_http_to_https
+RUN  tls_proxy_connect_refused_matrix
+  NOTE proxy reply HTTP/1.1 403 Forbidden
+Conten -> err=0 ? status=403 connects=1
+  NOTE proxy reply HTTP/1.1 502 Bad Gateway
+Cont -> err=0 ? status=502 connects=1
+  NOTE proxy reply HTTP/1.1 407 Proxy Authenticat -> err=0 ? status=407 connects=1
+  NOTE proxy reply HTTP/1.0 200 OK
+
+ -> err=12029 ERROR_INTERNET_CANNOT_CONNECT status=0 connects=1
+  NOTE proxy reply garbage
+
+ -> err=12029 ERROR_INTERNET_CANNOT_CONNECT status=0 connects=1
+OK   tls_proxy_connect_refused_matrix
+RUN  tls_proxy_connect_sni_is_target
+  NOTE tunnel SNI: err=12029 sni=sni-target.i7test.example
+OK   tls_proxy_connect_sni_is_target
+RUN  tls_proxy_connect_cert_checked_against_target
+OK   tls_proxy_connect_cert_checked_against_target
+RUN  tls_proxy_connect_tunnel_success
+  NOTE CONNECT tunnel: err=0 ?
+  NOTE CONNECT head: CONNECT i7tls.invalid:8443 HTTP/1.0
+User-Agent: tls-test
+Host: i7tls.invalid:8443
+Content-Length: 0
+Proxy-Connection: Keep-Alive
+Pragma: no-cache
+
+
+  NOTE connect line: CONNECT i7tls.invalid:8443 HTTP/1.0
+  NOTE connect line: User-Agent: tls-test
+  NOTE connect line: Host: i7tls.invalid:8443
+  NOTE connect line: Content-Length: 0
+  NOTE connect line: Proxy-Connection: Keep-Alive
+  NOTE connect line: Pragma: no-cache
+OK   tls_proxy_connect_tunnel_success
+RUN  tls_clientcert_up_front
+  NOTE up-front client cert: err=0 ?
+  NOTE srv ev conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=1
+OK   tls_clientcert_up_front
+RUN  tls_clientcert_continue_without_probe
+  NOTE continue without cert: CERT_CONTEXT(NULL) ok=0 err=87; SELECT(-1) ok=1 err=0; resend err=0 ?
+  NOTE srv ev conn=0 TLS_ABORT handshake recv=0 round=1
+  NOTE srv ev conn=1 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+OK   tls_clientcert_continue_without_probe
+RUN  tls_clientcert_retry_with_context
+  NOTE after CLIENT_CERT_CONTEXT: err=0 ?
+  NOTE srv ev conn=0 TLS_ABORT handshake recv=0 round=1
+  NOTE srv ev conn=1 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=1
+OK   tls_clientcert_retry_with_context
+RUN  tls_clientcert_select_option_rules
+  NOTE SELECT_CLIENT_CERT before any request: ok=0 err=12046
+OK   tls_clientcert_select_option_rules
+RUN  tls_clientcert_context_option_rules
+  NOTE CLIENT_CERT_CONTEXT NULL,0: ok=0 err=87
+  NOTE CLIENT_CERT_CONTEXT on http request: ok=0 err=12046
+OK   tls_clientcert_context_option_rules
+RUN  tls_clientcert_ca_error_first
+  NOTE client cert requested, no ignore flags: err=12044 ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED
+OK   tls_clientcert_ca_error_first
+RUN  tls_clientcert_needed_even_with_all_ignore_flags
+OK   tls_clientcert_needed_even_with_all_ignore_flags
+RUN  tls_clientcert_needed_error
+OK   tls_clientcert_needed_error
+RUN  tls_flow_connection_close_new_handshake
+OK   tls_flow_connection_close_new_handshake
+RUN  tls_flow_ignored_cert_connection_not_pooled
+OK   tls_flow_ignored_cert_connection_not_pooled
+RUN  tls_flow_head_same_as_plain_http
+  NOTE https headers=3 http headers=3
+OK   tls_flow_head_same_as_plain_http
+RUN  tls_flow_post_body_and_wire
+  NOTE hdr[0] Content-Type: text/plain
+  NOTE hdr[1] X-Tls-Test: 1
+  NOTE hdr[2] User-Agent: tls-test
+  NOTE hdr[3] Host: 127.0.0.1:50158
+  NOTE hdr[4] Content-Length: 11
+  NOTE hdr[5] Cache-Control: no-cache
+OK   tls_flow_post_body_and_wire
+RUN  tls_flow_gzip_body
+  NOTE request-level HTTP_DECODING: body 73 bytes, Accept-Encoding=(none)
+  NOTE session-level HTTP_DECODING: body 73 bytes, Accept-Encoding=(none)
+OK   tls_flow_gzip_body
+RUN  tls_flow_close_delimited_body_with_close_notify
+OK   tls_flow_close_delimited_body_with_close_notify
+RUN  tls_flow_chunked_body
+OK   tls_flow_chunked_body
+RUN  tls_flow_large_body_many_records
+OK   tls_flow_large_body_many_records
+RUN  tls_comb_pki_wrong_usage
+  NOTE pki clientAuth sec=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1000000 reqs=0
+  NOTE pki clientAuth sec=0x100 -> err=12169 ERROR_INTERNET_SEC_INVALID_CERT flags=0x100 reqs=0
+  NOTE pki clientAuth sec=0x380 -> err=12169 ERROR_INTERNET_SEC_INVALID_CERT flags=0x380 reqs=0
+  NOTE pki clientAuth sec=0x3380 -> err=12169 ERROR_INTERNET_SEC_INVALID_CERT flags=0x3380 reqs=0
+OK   tls_comb_pki_wrong_usage
+RUN  tls_comb_pki_all_errors_at_once
+  NOTE registry WarnonBadCertRecving: HKCU=0xffffffff policy=0xffffffff; CertificateRevocation effective=1
+  NOTE pki expired+cn sec=0x0 -> err=12057 ERROR_INTERNET_SEC_CERT_REV_FAILED flags=0x7800000 reqs=0
+  NOTE pki expired+cn sec=0x80 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x7800080 reqs=0
+  NOTE pki expired+cn sec=0x180 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x7800180 reqs=0
+  NOTE pki expired+cn sec=0x2180 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x7802180 reqs=0
+  NOTE pki expired+cn sec=0x3180 -> err=0 ? flags=0x20003181 reqs=1
+OK   tls_comb_pki_all_errors_at_once
+RUN  tls_comb_pki_revocation_precedence
+  NOTE pki partial sec=0x0 -> err=12057 ERROR_INTERNET_SEC_CERT_REV_FAILED flags=0x1800000 reqs=0
+  NOTE pki partial sec=0x100 -> err=12057 ERROR_INTERNET_SEC_CERT_REV_FAILED flags=0x1800100 reqs=0
+  NOTE pki partial sec=0x80 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1800080 reqs=0
+  NOTE pki partial sec=0x180 -> err=0 ? flags=0x20000181 reqs=1
+  NOTE pki partial sec=0x3380 -> err=0 ? flags=0x20003381 reqs=1
+OK   tls_comb_pki_revocation_precedence
+RUN  tls_comb_mask_set_wide
+OK   tls_comb_mask_set_wide
+RUN  tls_comb_sendrequestex
+OK   tls_comb_sendrequestex
+RUN  tls_comb_mask_toggle_between_sends
+OK   tls_comb_mask_toggle_between_sends
+RUN  tls_comb_retry_one_bit_at_a_time
+OK   tls_comb_retry_one_bit_at_a_time
+RUN  tls_comb_retry_same_handle
+  NOTE after first 12055: flags=0x3000000
+  NOTE after success: flags=0x23001101
+OK   tls_comb_retry_same_handle
+RUN  tls_comb_mask_on_parent_handles
+  NOTE mask on session: err=12045 ERROR_INTERNET_INVALID_CA flags=0x0
+  NOTE mask on connect: err=12045 ERROR_INTERNET_INVALID_CA flags=0x0
+OK   tls_comb_mask_on_parent_handles
+RUN  tls_comb_other_mask_bits_no_effect
+OK   tls_comb_other_mask_bits_no_effect
+RUN  tls_comb_wrong_usage_stops_loop
+  NOTE client-eku CLIENT sec=0x0 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1000000 reqs=0
+  NOTE client-eku CLIENT sec=0x200 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1000200 reqs=0
+  NOTE client-eku CLIENT sec=0x100 open=0x0 -> err=12169 ERROR_INTERNET_SEC_INVALID_CERT flags=0x100 reqs=0
+  NOTE client-eku CLIENT sec=0x1300 open=0x0 -> err=12169 ERROR_INTERNET_SEC_INVALID_CERT flags=0x1300 reqs=0
+  NOTE client-eku CLIENT sec=0x3380 open=0x0 -> err=12169 ERROR_INTERNET_SEC_INVALID_CERT flags=0x3380 reqs=0
+OK   tls_comb_wrong_usage_stops_loop
+RUN  tls_comb_no_eku
+  NOTE no_eku NO_EKU sec=0x0 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1000000 reqs=0
+  NOTE no_eku NO_EKU sec=0x100 open=0x0 -> err=0 ? flags=0x20000101 reqs=1
+OK   tls_comb_no_eku
+RUN  tls_comb_expired
+  NOTE expired EXPIRED sec=0x0 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x5000000 reqs=0
+  NOTE expired EXPIRED sec=0x100 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x5000100 reqs=0
+  NOTE expired EXPIRED sec=0x2000 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x5002000 reqs=0
+  NOTE expired EXPIRED sec=0x2100 open=0x0 -> err=0 ? flags=0x20002101 reqs=1
+  NOTE expired EXPIRED sec=0x100 open=0x2000 -> err=0 ? flags=0x20002101 reqs=1
+OK   tls_comb_expired
+RUN  tls_comb_cn_other
+  NOTE cn_other CN_OTHER sec=0x0 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x3000000 reqs=0
+  NOTE cn_other CN_OTHER sec=0x100 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x3000100 reqs=0
+  NOTE cn_other CN_OTHER sec=0x1000 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x3001000 reqs=0
+  NOTE cn_other CN_OTHER sec=0x1100 open=0x0 -> err=0 ? flags=0x20001101 reqs=1
+  NOTE cn_other CN_OTHER sec=0x100 open=0x1000 -> err=0 ? flags=0x20001101 reqs=1
+OK   tls_comb_cn_other
+RUN  tls_comb_localhost_untrusted
+  NOTE localhost LOCALHOST sec=0x0 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1000000 reqs=0
+  NOTE localhost LOCALHOST sec=0x3280 open=0x0 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1003280 reqs=0
+  NOTE localhost LOCALHOST sec=0x100 open=0x0 -> err=0 ? flags=0x20000101 reqs=1
+  NOTE localhost LOCALHOST sec=0x3380 open=0x0 -> err=0 ? flags=0x20003381 reqs=1
+  NOTE localhost LOCALHOST sec=0x0 open=0x3000 -> err=12055 ERROR_INTERNET_SEC_CERT_ERRORS flags=0x1003000 reqs=0
+OK   tls_comb_localhost_untrusted
+RUN  tls_errordlg_no_ui_probe
+  NOTE InternetErrorDlg(NO_UI|CHANGE_OPTIONS|GENERATE_DATA, 12045) -> 1223, flags now 0x0
+  NOTE resend after the NO_UI dialog call: err=12045
+OK   tls_errordlg_no_ui_probe
+RUN  tls_pooled_connection_flags_per_request
+  NOTE two ok requests: conns=2 req_conn=0,1 tls_done=2
+  NOTE third request without flags on a pooled TLS connection: ok=0 err=12045 requests=2 conns=3
+OK   tls_pooled_connection_flags_per_request
+RUN  tls_retry_sendrequestex_path
+  NOTE SendRequestEx without flags: ok=0 err=12045 ERROR_INTERNET_INVALID_CA
+OK   tls_retry_sendrequestex_path
+RUN  tls_retry_wide_send
+OK   tls_retry_wide_send
+RUN  tls_retry_wrong_usage_chain
+  NOTE wrong-usage chain: 12045 -> +0x100 12169 -> +0x1000 12169 -> +0x200 0
+OK   tls_retry_wrong_usage_chain
+RUN  tls_retry_expired_chain
+OK   tls_retry_expired_chain
+RUN  tls_retry_cn_then_ca_chain
+OK   tls_retry_cn_then_ca_chain
+RUN  tls_retry_unknown_ca_same_handle
+  NOTE connections=3 tls_done=1 tls_abort=2
+OK   tls_retry_unknown_ca_same_handle
+RUN  tls_cert_wrong_usage_matrix
+OK   tls_cert_wrong_usage_matrix
+RUN  tls_cert_no_eku_matrix
+OK   tls_cert_no_eku_matrix
+RUN  tls_cert_expired_matrix
+OK   tls_cert_expired_matrix
+RUN  tls_cert_cn_other_matrix
+OK   tls_cert_cn_other_matrix
+RUN  tls_cert_localhost_matrix
+OK   tls_cert_localhost_matrix
+RUN  tls_async_combined_cert_errors
+  NOTE async combined: flags=0x3000000
+OK   tls_async_combined_cert_errors
+RUN  tls_async_ignore_flags_at_open
+OK   tls_async_ignore_flags_at_open
+RUN  tls_async_sendrequestex_unknown_ca
+OK   tls_async_sendrequestex_unknown_ca
+RUN  tls_async_openurl_unknown_ca
+  NOTE OpenUrl completion dwResult=0x0
+OK   tls_async_openurl_unknown_ca
+RUN  tls_async_info_options_after_completion
+OK   tls_async_info_options_after_completion
+RUN  tls_async_broken_reset
+OK   tls_async_broken_reset
+RUN  tls_async_broken_plaintext
+OK   tls_async_broken_plaintext
+RUN  tls_async_broken_garbage
+OK   tls_async_broken_garbage
+RUN  tls_async_broken_alert
+OK   tls_async_broken_alert
+RUN  tls_async_client_cert_needed
+OK   tls_async_client_cert_needed
+RUN  tls_async_cert_error_matrix
+OK   tls_async_cert_error_matrix
+RUN  tls_async_cert_error_status_sequence
+  NOTE 12045: statuses 80 20 21 50 51 100 
+  NOTE 12045: SENDING_REQUEST=0 REQUEST_SENT=0 CLOSING_CONNECTION=1 CONNECTION_CLOSED=1
+OK   tls_async_cert_error_status_sequence
+RUN  tls_async_success_status_order
+  NOTE success: statuses 80 20 21 30 31 40 41 100 
+OK   tls_async_success_status_order
+RUN  tls_async_retry_with_flag_then_read
+OK   tls_async_retry_with_flag_then_read
+RUN  tls_async_unknown_ca_completion
+  NOTE unknown CA: statuses 60 60 80 20 21 50 51 100 
+OK   tls_async_unknown_ca_completion
+SUMMARY tests=203 failed=0 skipped=0 checks_pass=2038 checks_fail=0
+@@I7 END https_tls exit=0x0 ms=310124 timeout=0 bytes=30057

@@ -1,0 +1,981 @@
+RUN  rs_status_304_unsolicited_nocache
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE unsolicited 304 (no cache entry): ok=1 err=0 status=304 n=0
+OK   rs_status_304_unsolicited_nocache
+RUN  rs_status_204_then_keepalive
+OK   rs_status_204_then_keepalive
+RUN  rs_query_status_index_nonzero
+  NOTE index after STATUS_CODE query: 0
+OK   rs_query_status_index_nonzero
+RUN  rs_openurl_503
+OK   rs_openurl_503
+RUN  rs_openurl_403
+OK   rs_openurl_403
+RUN  rs_openurl_500
+OK   rs_openurl_500
+RUN  rs_openurl_404
+OK   rs_openurl_404
+RUN  rs_error_status_resend_same_handle
+OK   rs_error_status_resend_same_handle
+RUN  rs_error_status_keepalive_reuse
+OK   rs_error_status_keepalive_reuse
+RUN  rs_location_on_500_ignored
+OK   rs_location_on_500_ignored
+RUN  rs_location_on_404_ignored
+OK   rs_location_on_404_ignored
+RUN  rs_location_on_201_ignored
+OK   rs_location_on_201_ignored
+RUN  rs_location_on_200_ignored
+OK   rs_location_on_200_ignored
+RUN  rs_content_location_ignored
+OK   rs_content_location_ignored
+RUN  rs_refresh_ignored_404
+OK   rs_refresh_ignored_404
+RUN  rs_refresh_ignored_absolute
+OK   rs_refresh_ignored_absolute
+RUN  rs_refresh_ignored_200
+OK   rs_refresh_ignored_200
+RUN  rs_retry_after_on_redirect_followed
+OK   rs_retry_after_on_redirect_followed
+RUN  rs_retry_after_429_date
+OK   rs_retry_after_429_date
+RUN  rs_retry_after_503_not_retried
+  NOTE RETRY_AFTER|FLAG_NUMBER: ok=0 err=12154 val=0 len=4
+OK   rs_retry_after_503_not_retried
+RUN  rs_1xx_intermediate_callback
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,120,40,41,70,70
+  NOTE INTERMEDIATE_RESPONSE count=1 first dw=100 len=4
+OK   rs_1xx_intermediate_callback
+RUN  rs_1xx_100_on_post_body
+  NOTE Expect header sent by wininet: (none)
+OK   rs_1xx_100_on_post_body
+RUN  rs_1xx_100_then_redirect
+OK   rs_1xx_100_then_redirect
+RUN  rs_1xx_100_http10
+  NOTE 1.0 100+200: ok=1 err=0 status=200 raw0='HTTP/1.1 200 OK
+X-Final: yes' intermediate_cb=1
+OK   rs_1xx_100_http10
+RUN  rs_1xx_100_with_headers
+  NOTE 100(hdr)+200: ok=1 err=0 status=200 raw0='HTTP/1.1 200 OK
+X-Final: yes' intermediate_cb=1
+OK   rs_1xx_100_with_headers
+RUN  rs_1xx_103_early_hints
+  NOTE 103+200: ok=1 err=0 status=200 raw0='HTTP/1.1 200 OK
+X-Final: yes' intermediate_cb=1
+OK   rs_1xx_103_early_hints
+RUN  rs_1xx_102_processing
+  NOTE 102+200: ok=1 err=0 status=200 raw0='HTTP/1.1 200 OK
+X-Final: yes' intermediate_cb=1
+OK   rs_1xx_102_processing
+RUN  rs_1xx_two_100s
+  NOTE 100+100+200: ok=1 err=0 status=200 raw0='HTTP/1.1 200 OK
+X-Final: yes' intermediate_cb=2
+OK   rs_1xx_two_100s
+RUN  rs_1xx_100_then_404
+  NOTE 100+404: ok=1 err=0 status=404 raw0='HTTP/1.1 404 Not Found
+X-Fina' intermediate_cb=1
+OK   rs_1xx_100_then_404
+RUN  rs_1xx_100_then_200
+  NOTE 100+200: ok=1 err=0 status=200 raw0='HTTP/1.1 200 OK
+X-Final: yes' intermediate_cb=1
+OK   rs_1xx_100_then_200
+RUN  rs_line_odd_code_199
+  NOTE odd status line 'HTTP/1.1 199 Odd': ok=1 err=0(0) status=200 text='OK' version='HTTP/1.0'
+OK   rs_line_odd_code_199
+RUN  rs_line_odd_extra_space
+  NOTE odd status line 'HTTP/1.1  200 OK': ok=1 err=0(0) status=200 text='OK' version='HTTP/1.1'
+OK   rs_line_odd_extra_space
+RUN  rs_line_odd_lowercase
+  NOTE odd status line 'http/1.1 200 OK': ok=1 err=0(0) status=200 text='OK' version='http/1.1'
+OK   rs_line_odd_lowercase
+RUN  rs_line_odd_http2
+  NOTE odd status line 'HTTP/2 200 OK': ok=1 err=0(0) status=200 text='OK' version='HTTP/2'
+OK   rs_line_odd_http2
+RUN  rs_line_odd_nonnumeric
+  NOTE odd status line 'HTTP/1.1 abc Bad': ok=1 err=0(0) status=4294967295 text='Bad' version='HTTP/1.1'
+OK   rs_line_odd_nonnumeric
+RUN  rs_line_odd_four_digit
+  NOTE odd status line 'HTTP/1.1 2000 Long': ok=1 err=0(0) status=2000 text='Long' version='HTTP/1.1'
+OK   rs_line_odd_four_digit
+RUN  rs_line_odd_two_digit
+  NOTE odd status line 'HTTP/1.1 99 Short': ok=1 err=0(0) status=99 text='Short' version='HTTP/1.1'
+OK   rs_line_odd_two_digit
+RUN  rs_line_code_299
+  NOTE status line 'HTTP/1.1 299 Custom': ok=1 err=0 status=299 text='Custom' version='HTTP/1.1' body=sl
+OK   rs_line_code_299
+RUN  rs_line_code_999
+  NOTE status line 'HTTP/1.1 999 Max': ok=1 err=0 status=999 text='Max' version='HTTP/1.1' body=sl
+OK   rs_line_code_999
+RUN  rs_line_code_600
+  NOTE status line 'HTTP/1.1 600 Beyond': ok=1 err=0 status=600 text='Beyond' version='HTTP/1.1' body=sl
+OK   rs_line_code_600
+RUN  rs_line_lowercase_reason
+  NOTE status line 'HTTP/1.1 200 ok': ok=1 err=0 status=200 text='ok' version='HTTP/1.1' body=sl
+OK   rs_line_lowercase_reason
+RUN  rs_line_reason_long
+  NOTE status line 'HTTP/1.1 201 A rather long reason phrase with several words': ok=1 err=0 status=201 text='A rather long reason phrase with several words' version='HTTP/1.1' body=sl
+OK   rs_line_reason_long
+RUN  rs_line_reason_wrong_for_code
+  NOTE status line 'HTTP/1.1 500 OK': ok=1 err=0 status=500 text='OK' version='HTTP/1.1' body=sl
+OK   rs_line_reason_wrong_for_code
+RUN  rs_line_http10
+  NOTE status line 'HTTP/1.0 200 OK': ok=1 err=0 status=200 text='OK' version='HTTP/1.0' body=sl
+OK   rs_line_http10
+RUN  rs_line_reason_missing
+  NOTE status line 'HTTP/1.1 200': ok=1 err=0 status=200 text='' version='HTTP/1.1' body=sl
+OK   rs_line_reason_missing
+RUN  rs_line_reason_empty
+  NOTE status line 'HTTP/1.1 200 ': ok=1 err=0 status=200 text='' version='HTTP/1.1' body=sl
+OK   rs_line_reason_empty
+RUN  rs_line_custom_reason
+  NOTE status line 'HTTP/1.1 404 Nope Nope': ok=1 err=0 status=404 text='Nope Nope' version='HTTP/1.1' body=sl
+OK   rs_line_custom_reason
+RUN  rs_status_408_fresh_connection
+  NOTE 408: ok=1 err=0 status=408 reqs=1
+OK   rs_status_408_fresh_connection
+RUN  rs_status_401_basic_no_creds_noauth
+OK   rs_status_401_basic_no_creds_noauth
+RUN  rs_status_407_no_challenge
+  NOTE 407 without Proxy-Authenticate, no proxy: ok=1 err=0(0) status=407 reqs=1 body=special-body
+OK   rs_status_407_no_challenge
+RUN  rs_status_401_no_challenge
+  NOTE 401 without WWW-Authenticate: ok=1 err=0(0) status=401 reqs=1 body=special-body
+OK   rs_status_401_no_challenge
+RUN  rs_status_416_unsolicited
+  NOTE 416: ok=1 err=0(0) status=416 reqs=1 body=special-body
+OK   rs_status_416_unsolicited
+RUN  rs_status_412_unsolicited
+  NOTE 412: ok=1 err=0(0) status=412 reqs=1 body=special-body
+OK   rs_status_412_unsolicited
+RUN  rs_status_206_unsolicited
+  NOTE 206 without Range: ok=1 err=0(0) status=206 reqs=1 body=special-body
+OK   rs_status_206_unsolicited
+RUN  rs_status_511
+OK   rs_status_511
+RUN  rs_status_510
+OK   rs_status_510
+RUN  rs_status_508
+OK   rs_status_508
+RUN  rs_status_507
+OK   rs_status_507
+RUN  rs_status_506
+OK   rs_status_506
+RUN  rs_status_505
+OK   rs_status_505
+RUN  rs_status_504
+OK   rs_status_504
+RUN  rs_status_503
+OK   rs_status_503
+RUN  rs_status_502
+OK   rs_status_502
+RUN  rs_status_501
+OK   rs_status_501
+RUN  rs_status_500
+OK   rs_status_500
+RUN  rs_status_451
+OK   rs_status_451
+RUN  rs_status_431
+OK   rs_status_431
+RUN  rs_status_429
+OK   rs_status_429
+RUN  rs_status_428
+OK   rs_status_428
+RUN  rs_status_426
+OK   rs_status_426
+RUN  rs_status_425
+OK   rs_status_425
+RUN  rs_status_424
+OK   rs_status_424
+RUN  rs_status_423
+OK   rs_status_423
+RUN  rs_status_422
+OK   rs_status_422
+RUN  rs_status_421
+OK   rs_status_421
+RUN  rs_status_418
+OK   rs_status_418
+RUN  rs_status_417
+OK   rs_status_417
+RUN  rs_status_415
+OK   rs_status_415
+RUN  rs_status_414
+OK   rs_status_414
+RUN  rs_status_413
+OK   rs_status_413
+RUN  rs_status_411
+OK   rs_status_411
+RUN  rs_status_410
+OK   rs_status_410
+RUN  rs_status_409
+OK   rs_status_409
+RUN  rs_status_406
+OK   rs_status_406
+RUN  rs_status_405
+OK   rs_status_405
+RUN  rs_status_404
+OK   rs_status_404
+RUN  rs_status_403
+OK   rs_status_403
+RUN  rs_status_402
+OK   rs_status_402
+RUN  rs_status_401
+OK   rs_status_401
+RUN  rs_status_400
+OK   rs_status_400
+RUN  rs_status_226
+OK   rs_status_226
+RUN  rs_status_208
+OK   rs_status_208
+RUN  rs_status_207
+OK   rs_status_207
+RUN  rs_status_205
+OK   rs_status_205
+RUN  rs_status_204
+OK   rs_status_204
+RUN  rs_status_203
+OK   rs_status_203
+RUN  rs_status_202
+OK   rs_status_202
+RUN  rs_status_201
+OK   rs_status_201
+RUN  rs_status_200
+OK   rs_status_200
+RUN  rs_option_89_session_budget_probe
+  NOTE option 89 = -1: send ok=0 err=12156 requests=11
+  NOTE option 89 = 3: send ok=0 err=12156 requests=11
+  NOTE option 89 = 20: send ok=0 err=12156 requests=11
+  NOTE budget: default 11 requests, option89=3 -> 11, option89=20 -> 11
+OK   rs_option_89_session_budget_probe
+RUN  rs_option_probe_88_winhttp_redirect_policy
+  NOTE option 88 (WINHTTP_OPTION_REDIRECT_POLICY) on session: query ok=0 err=87 val=0 len=0; set(5) ok=0 err=12018
+  NOTE option 88 (WINHTTP_OPTION_REDIRECT_POLICY) on connect: query ok=0 err=87 val=0 len=0; set(5) ok=0 err=12018
+  NOTE option 88 (WINHTTP_OPTION_REDIRECT_POLICY) on request: query ok=0 err=87 val=0 len=0; set(5) ok=1 err=0
+OK   rs_option_probe_88_winhttp_redirect_policy
+RUN  rs_option_probe_89_winhttp_max_redirects
+  NOTE option 89 (WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS) on session: query ok=0 err=87 val=0 len=0; set(5) ok=1 err=0
+  NOTE option 89 (WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS) on connect: query ok=0 err=87 val=0 len=0; set(5) ok=0 err=12018
+  NOTE option 89 (WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS) on request: query ok=0 err=87 val=0 len=0; set(5) ok=0 err=12018
+OK   rs_option_probe_89_winhttp_max_redirects
+RUN  rs_async_loop_budget
+  NOTE async 302 GET loop=1: done=1 pending=1 ok=0 err=12156(ERROR_HTTP_REDIRECT_FAILED) reqs=11 redirects=10
+OK   rs_async_loop_budget
+RUN  rs_async_307_post_confirm
+  NOTE async 307 POST loop=0: done=1 pending=1 ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) reqs=1 redirects=1
+OK   rs_async_307_post_confirm
+RUN  rs_async_303_post
+  NOTE async 303 POST loop=0: done=1 pending=1 ok=1 err=0(0) reqs=2 redirects=1
+OK   rs_async_303_post
+RUN  rs_async_302_get
+  NOTE async 302 GET loop=0: done=1 pending=1 ok=1 err=0(0) reqs=2 redirects=1
+OK   rs_async_302_get
+RUN  rs_query_status_before_send
+  NOTE STATUS_CODE before send: ok=1 err=0(0) val=0 len=4
+  NOTE STATUS_TEXT before send: ok=0 err=12150 text='' len=32
+OK   rs_query_status_before_send
+RUN  rs_query_final_response_forms
+OK   rs_query_final_response_forms
+RUN  rs_host_header_caller_supplied
+  NOTE caller Host: req0=custom.i7test.example req1=localhost:49890
+OK   rs_host_header_caller_supplied
+RUN  rs_addheaders_survive_hop
+OK   rs_addheaders_survive_hop
+RUN  rs_cookie_not_sent_to_other_host
+OK   rs_cookie_not_sent_to_other_host
+RUN  rs_cookie_on_refused_redirect_stored
+OK   rs_cookie_on_refused_redirect_stored
+RUN  rs_cookie_on_noauto_302_stored
+OK   rs_cookie_on_noauto_302_stored
+RUN  rs_limit_url_after_failure
+  NOTE after 12156: url=http://127.0.0.1:49902/loop/10 reqs=11
+OK   rs_limit_url_after_failure
+RUN  rs_target_drops_connection
+  NOTE target drops: ok=0 err=12152(ERROR_HTTP_INVALID_SERVER_RESPONSE) reqs=3 conns=2 url=http://127.0.0.1:49904/dst
+OK   rs_target_drops_connection
+RUN  rs_target_503
+OK   rs_target_503
+RUN  rs_target_502
+OK   rs_target_502
+RUN  rs_target_500
+OK   rs_target_500
+RUN  rs_target_410
+OK   rs_target_410
+RUN  rs_target_404
+OK   rs_target_404
+RUN  rs_target_403
+OK   rs_target_403
+RUN  rs_target_401
+OK   rs_target_401
+RUN  rs_target_400
+OK   rs_target_400
+RUN  rs_target_204
+OK   rs_target_204
+RUN  rs_mixed_put_303_then_301
+OK   rs_mixed_put_303_then_301
+RUN  rs_mixed_post_302_then_307
+OK   rs_mixed_post_302_then_307
+RUN  rs_mixed_head_303_becomes_get
+OK   rs_mixed_head_303_becomes_get
+RUN  rs_mixed_get_all_codes
+OK   rs_mixed_get_all_codes
+RUN  rs_openurl_305_not_followed
+OK   rs_openurl_305_not_followed
+RUN  rs_openurl_304_not_followed
+OK   rs_openurl_304_not_followed
+RUN  rs_openurl_302_ftp_refused
+OK   rs_openurl_302_ftp_refused
+RUN  rs_openurl_302_dotdot_above_root
+OK   rs_openurl_302_dotdot_above_root
+RUN  rs_openurl_302_proto_rel
+OK   rs_openurl_302_proto_rel
+RUN  rs_openurl_308_full
+OK   rs_openurl_308_full
+RUN  rs_openurl_307_query
+OK   rs_openurl_307_query
+RUN  rs_openurl_303_dotdot
+OK   rs_openurl_303_dotdot
+RUN  rs_openurl_302_rel
+OK   rs_openurl_302_rel
+RUN  rs_openurl_301_abs
+OK   rs_openurl_301_abs
+RUN  rs_w_openurl_redirect
+OK   rs_w_openurl_redirect
+RUN  rs_w_sendrequest_redirect_url
+OK   rs_w_sendrequest_redirect_url
+RUN  rs_sendex_noauto_302_post
+OK   rs_sendex_noauto_302_post
+RUN  rs_sendex_302_put_confirm
+  NOTE SendRequestEx 302 PUT: sendex=1 write=1(10) end=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=302 reqs=1 url=http://127.0.0.1:49960/dst
+OK   rs_sendex_302_put_confirm
+RUN  rs_sendex_308_post_confirm
+  NOTE SendRequestEx 308 POST: sendex=1 write=1(10) end=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=308 reqs=1 url=http://127.0.0.1:49962/dst
+OK   rs_sendex_308_post_confirm
+RUN  rs_sendex_307_post_confirm
+  NOTE SendRequestEx 307 POST: sendex=1 write=1(10) end=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=307 reqs=1 url=http://127.0.0.1:49964/dst
+OK   rs_sendex_307_post_confirm
+RUN  rs_sendex_303_put_to_get
+  NOTE SendRequestEx 303 PUT: sendex=1 write=1(10) end=1 err=0(0) status=200 reqs=2 url=http://127.0.0.1:49966/dst
+OK   rs_sendex_303_put_to_get
+RUN  rs_sendex_303_post_to_get
+  NOTE SendRequestEx 303 POST: sendex=1 write=1(10) end=1 err=0(0) status=200 reqs=2 url=http://127.0.0.1:49968/dst
+OK   rs_sendex_303_post_to_get
+RUN  rs_sendex_301_post_to_get
+  NOTE SendRequestEx 301 POST: sendex=1 write=1(10) end=1 err=0(0) status=200 reqs=2 url=http://127.0.0.1:49970/dst
+OK   rs_sendex_301_post_to_get
+RUN  rs_sendex_302_post_to_get
+  NOTE SendRequestEx 302 POST: sendex=1 write=1(10) end=1 err=0(0) status=200 reqs=2 url=http://127.0.0.1:49972/dst
+OK   rs_sendex_302_post_to_get
+RUN  rs_option_flags_reflect_noauto
+  NOTE INTERNET_OPTION_REQUEST_FLAGS (NO_AUTO_REDIRECT request) = 0x8
+OK   rs_option_flags_reflect_noauto
+RUN  rs_option_enable_redirect_cache_read
+  NOTE ENABLE_REDIRECT_CACHE_READ on session: ok=0 err=12018
+  NOTE ENABLE_REDIRECT_CACHE_READ len 2: ok=0 err=12010
+OK   rs_option_enable_redirect_cache_read
+RUN  rs_option_88_is_not_redirect_policy
+  NOTE InternetSetOption(req, 88, 0): ok=1 err=0
+  NOTE InternetQueryOption(req, 88): ok=0 err=87 val=0
+OK   rs_option_88_is_not_redirect_policy
+RUN  rs_scheme_https_same_server
+  NOTE first HTTPS attempt aborted (12030, no request): retrying once
+OK   rs_scheme_https_same_server
+RUN  rs_scheme_http_to_https_resend_with_flag
+  NOTE resend after 12045: secflags=1 ok=1 err=0(0) status=200 src=1 dst=1
+OK   rs_scheme_http_to_https_resend_with_flag
+RUN  rs_scheme_http_to_https_untrusted_cert
+  NOTE http->https untrusted: ok=0 err=12045(ERROR_INTERNET_INVALID_CA) status=0 url=https://127.0.0.1:49986/landing
+OK   rs_scheme_http_to_https_untrusted_cert
+RUN  rs_scheme_http_to_https_ignore_flag
+  NOTE http->https IGNORE_TO_HTTPS: ok=0 err=12045(ERROR_INTERNET_INVALID_CA) status=0 src_reqs=1 dst_reqs=0 url=https://127.0.0.1:49990/landing
+OK   rs_scheme_http_to_https_ignore_flag
+RUN  rs_scheme_http_to_https_get
+  NOTE http->https GET: ok=0 err=12045(ERROR_INTERNET_INVALID_CA) status=0 src_reqs=1 dst_reqs=0 url=https://127.0.0.1:49994/landing
+OK   rs_scheme_http_to_https_get
+RUN  rs_scheme_https_to_http_ignore_flag
+  NOTE https->http IGNORE_TO_HTTP: ok=1 err=0(0) status=200 src_reqs=1 dst_reqs=1 url=http://127.0.0.1:49998/landing
+  NOTE https->http IGNORE_TO_HTTP: target Referer=(none)
+OK   rs_scheme_https_to_http_ignore_flag
+RUN  rs_scheme_https_to_http_post
+  NOTE https->http POST: ok=1 err=0(0) status=200 src_reqs=1 dst_reqs=1 url=http://127.0.0.1:50002/landing
+  NOTE https->http POST: target Referer=(none)
+OK   rs_scheme_https_to_http_post
+RUN  rs_scheme_https_to_http_get
+  NOTE https->http GET: ok=1 err=0(0) status=200 src_reqs=1 dst_reqs=1 url=http://127.0.0.1:50006/landing
+  NOTE https->http GET: target Referer=(none)
+OK   rs_scheme_https_to_http_get
+RUN  rs_hdr_custom_authorization_on_hop
+  NOTE hop Authorization=(none) Cookie=manual=1
+OK   rs_hdr_custom_authorization_on_hop
+RUN  rs_hdr_wininet_adds_no_referer
+  NOTE hop hdr[0] User-Agent: rs-agent/1.0
+  NOTE hop hdr[1] Host: 127.0.0.1:50012
+  NOTE hop hdr[2] Cache-Control: no-cache
+  NOTE hop hdr[3] Connection: Keep-Alive
+OK   rs_hdr_wininet_adds_no_referer
+RUN  rs_hdr_referer_kept_same_scheme
+OK   rs_hdr_referer_kept_same_scheme
+RUN  rs_hdr_if_modified_since_dropped
+OK   rs_hdr_if_modified_since_dropped
+RUN  rs_forms_submit_200_unaffected
+OK   rs_forms_submit_200_unaffected
+RUN  rs_forms_submit_307_get
+  NOTE FORMS_SUBMIT 307 GET: ok=0 err=12168 status=307 reqs=1
+OK   rs_forms_submit_307_get
+RUN  rs_forms_submit_301_get
+  NOTE FORMS_SUBMIT 301 GET: ok=0 err=12168 status=301 reqs=1
+OK   rs_forms_submit_301_get
+RUN  rs_forms_submit_303_post
+  NOTE FORMS_SUBMIT 303 POST: ok=0 err=12168 status=303 reqs=1
+OK   rs_forms_submit_303_post
+RUN  rs_forms_submit_302_post
+  NOTE FORMS_SUBMIT 302 POST: ok=0 err=12168 status=302 reqs=1
+OK   rs_forms_submit_302_post
+RUN  rs_forms_submit_302_get
+  NOTE FORMS_SUBMIT 302 GET: ok=0 err=12168 status=302 reqs=1
+OK   rs_forms_submit_302_get
+RUN  rs_confirm_resend_301_delete
+  NOTE 301 DELETE: ok=0 err=12168 url-after=http://127.0.0.1:50030/dst status=301
+OK   rs_confirm_resend_301_delete
+RUN  rs_confirm_resend_302_put
+  NOTE 302 PUT: ok=0 err=12168 url-after=http://127.0.0.1:50032/dst status=302
+OK   rs_confirm_resend_302_put
+RUN  rs_confirm_resend_307_put
+  NOTE 307 PUT: ok=0 err=12168 url-after=http://127.0.0.1:50034/dst status=307
+OK   rs_confirm_resend_307_put
+RUN  rs_confirm_resend_308_post
+  NOTE 308 POST: ok=0 err=12168 url-after=http://127.0.0.1:50036/dst status=308
+OK   rs_confirm_resend_308_post
+RUN  rs_confirm_resend_307_post
+  NOTE 307 POST: ok=0 err=12168 url-after=http://127.0.0.1:50038/dst status=307
+OK   rs_confirm_resend_307_post
+RUN  rs_noauto_manual_follow
+OK   rs_noauto_manual_follow
+RUN  rs_noauto_location_buffer_protocol
+OK   rs_noauto_location_buffer_protocol
+RUN  rs_noauto_302_put
+OK   rs_noauto_302_put
+RUN  rs_noauto_302_head
+OK   rs_noauto_302_head
+RUN  rs_noauto_308_post
+OK   rs_noauto_308_post
+RUN  rs_noauto_307_post
+OK   rs_noauto_307_post
+RUN  rs_noauto_303_post
+OK   rs_noauto_303_post
+RUN  rs_noauto_302_post
+OK   rs_noauto_302_post
+RUN  rs_noauto_301_post
+OK   rs_noauto_301_post
+RUN  rs_noauto_300_get
+OK   rs_noauto_300_get
+RUN  rs_noauto_308_get
+OK   rs_noauto_308_get
+RUN  rs_noauto_307_get
+OK   rs_noauto_307_get
+RUN  rs_noauto_303_get
+OK   rs_noauto_303_get
+RUN  rs_noauto_302_get
+OK   rs_noauto_302_get
+RUN  rs_noauto_301_get
+OK   rs_noauto_301_get
+RUN  rs_odd_location_userinfo
+  NOTE odd Location 'http://user:pw@127.0.0.1:%P/ui': ok=1 err=0(0) status=200 reqs=2 tgt1=/ui url=http://user:pw@127.0.0.1:50070/ui
+OK   rs_odd_location_userinfo
+RUN  rs_odd_location_backslash
+  NOTE odd Location '\back': ok=1 err=0(0) status=200 reqs=2 tgt1=/back url=http://127.0.0.1:50072/back
+OK   rs_odd_location_backslash
+RUN  rs_odd_location_utf8
+  NOTE odd Location '/café': ok=1 err=0(0) status=200 reqs=2 tgt1=/caf%C3%A9 url=http://127.0.0.1:50074/café
+OK   rs_odd_location_utf8
+RUN  rs_odd_location_space_in_path
+  NOTE odd Location '/a b': ok=1 err=0(0) status=200 reqs=2 tgt1=/a%20b url=http://127.0.0.1:50076/a%20b
+OK   rs_odd_location_space_in_path
+RUN  rs_odd_location_empty
+  NOTE odd Location '': ok=1 err=0(0) status=200 reqs=2 tgt1=/ url=http://127.0.0.1:50078/
+OK   rs_odd_location_empty
+RUN  rs_refuse_empty_host
+OK   rs_refuse_empty_host
+RUN  rs_refuse_ftp_scheme_303
+  NOTE Location 'ftp://127.0.0.1:%P/f.txt' (303): ok=1 err=0(0) status=303 reqs=1 url=http://127.0.0.1:50082/src body=
+OK   rs_refuse_ftp_scheme_303
+RUN  rs_refuse_ftp_scheme_307
+  NOTE Location 'ftp://127.0.0.1:%P/f.txt' (307): ok=1 err=0(0) status=307 reqs=1 url=http://127.0.0.1:50084/src body=
+OK   rs_refuse_ftp_scheme_307
+RUN  rs_refuse_ftp_scheme_301
+  NOTE Location 'ftp://127.0.0.1:%P/f.txt' (301): ok=1 err=0(0) status=301 reqs=1 url=http://127.0.0.1:50086/src body=
+OK   rs_refuse_ftp_scheme_301
+RUN  rs_refuse_unknown_scheme
+  NOTE Location 'i7x://127.0.0.1:%P/x' (302): ok=1 err=0(0) status=302 reqs=1 url=http://127.0.0.1:50088/src body=
+OK   rs_refuse_unknown_scheme
+RUN  rs_refuse_about_scheme
+  NOTE Location 'about:blank' (302): ok=1 err=0(0) status=302 reqs=1 url=http://127.0.0.1:50090/src body=
+OK   rs_refuse_about_scheme
+RUN  rs_refuse_gopher_scheme
+  NOTE Location 'gopher://127.0.0.1:%P/1' (302): ok=1 err=0(0) status=302 reqs=1 url=http://127.0.0.1:50092/src body=
+OK   rs_refuse_gopher_scheme
+RUN  rs_refuse_javascript_scheme
+OK   rs_refuse_javascript_scheme
+RUN  rs_refuse_mailto_scheme
+  NOTE Location 'mailto:nobody@i7test.example' (302): ok=1 err=0(0) status=302 reqs=1 url=http://127.0.0.1:50096/src body=
+OK   rs_refuse_mailto_scheme
+RUN  rs_refuse_file_scheme
+  NOTE Location 'file:///C:/Windows/win.ini' (302): ok=1 err=0(0) status=302 reqs=1 url=http://127.0.0.1:50098/src body=
+OK   rs_refuse_file_scheme
+RUN  rs_refuse_ftp_scheme
+  NOTE Location 'ftp://127.0.0.1:%P/f.txt' (302): ok=1 err=0(0) status=302 reqs=1 url=http://127.0.0.1:50100/src body=
+OK   rs_refuse_ftp_scheme
+RUN  rs_limit_budget_per_send
+  NOTE send1 ok=0 err=12156 n=11; send2 ok=0 err=12156 n=11
+OK   rs_limit_budget_per_send
+RUN  rs_limit_loop_noautoredirect
+OK   rs_limit_loop_noautoredirect
+RUN  rs_limit_two_cycle
+  NOTE a<->b: ok=0 err=12156 requests=11
+OK   rs_limit_two_cycle
+RUN  rs_limit_self_loop
+  NOTE self loop: ok=0 err=12156 requests=11
+OK   rs_limit_self_loop
+RUN  rs_limit_after_failure_state
+  NOTE after 12156: status=302 text=Found url=http://127.0.0.1:50110/loop/10 location=/loop/11 body=hopbody
+OK   rs_limit_after_failure_state
+RUN  rs_limit_loop_budget_exact
+  NOTE redirect budget: 11 requests before 12156
+OK   rs_limit_loop_budget_exact
+RUN  rs_limit_loop_budget
+  NOTE endless chain: ok=0 err=12156(ERROR_HTTP_REDIRECT_FAILED) status=302 requests=11 url=http://127.0.0.1:50114/loop/10
+OK   rs_limit_loop_budget
+RUN  rs_openurl_no_auto_redirect
+OK   rs_openurl_no_auto_redirect
+RUN  rs_openurl_follows
+OK   rs_openurl_follows
+RUN  rs_follow_body_is_target_body
+OK   rs_follow_body_is_target_body
+RUN  rs_drain_http10
+  NOTE drain flags=0x20 big=0: ok=1 status=200 reqs=2 conns=2
+OK   rs_drain_http10
+RUN  rs_drain_close_delimited
+  NOTE drain flags=0x2 big=0: ok=1 status=200 reqs=2 conns=2
+OK   rs_drain_close_delimited
+RUN  rs_drain_connection_close
+  NOTE drain flags=0x1 big=0: ok=1 status=200 reqs=2 conns=2
+OK   rs_drain_connection_close
+RUN  rs_drain_300k_body
+  NOTE drain flags=0x0 big=300000: ok=1 status=200 reqs=2 conns=1
+OK   rs_drain_300k_body
+RUN  rs_drain_64k_body
+  NOTE drain flags=0x0 big=65536: ok=1 status=200 reqs=2 conns=1
+OK   rs_drain_64k_body
+RUN  rs_drain_chunked_body
+  NOTE drain flags=0x4 big=0: ok=1 status=200 reqs=2 conns=1
+OK   rs_drain_chunked_body
+RUN  rs_drain_small_body_keepalive
+  NOTE drain flags=0x0 big=0: ok=1 status=200 reqs=2 conns=1
+OK   rs_drain_small_body_keepalive
+RUN  rs_chain_11_exceeds_budget
+OK   rs_chain_11_exceeds_budget
+RUN  rs_chain_10
+OK   rs_chain_10
+RUN  rs_chain_5
+OK   rs_chain_5
+RUN  rs_chain_2
+OK   rs_chain_2
+RUN  rs_loc_host_change_from_localhost
+  NOTE conn of req0=0 req1=1
+OK   rs_loc_host_change_from_localhost
+RUN  rs_loc_port_ping_pong
+OK   rs_loc_port_ping_pong
+RUN  rs_loc_other_port
+OK   rs_loc_other_port
+RUN  rs_loc_two_headers_first_wins
+OK   rs_loc_two_headers_first_wins
+RUN  rs_loc_header_name_case
+OK   rs_loc_header_name_case
+RUN  rs_loc_double_slash_path
+  NOTE Location '/x//y' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/x//y host=127.0.0.1:50162 url=http://127.0.0.1:50162/x//y
+OK   rs_loc_double_slash_path
+RUN  rs_loc_encoded_chars
+  NOTE Location '/p%20q' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/p%20q host=127.0.0.1:50164 url=http://127.0.0.1:50164/p%20q
+OK   rs_loc_encoded_chars
+RUN  rs_loc_same_path
+  NOTE Location '/src?again=1' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/src?again=1 host=127.0.0.1:50166 url=http://127.0.0.1:50166/src?again=1
+OK   rs_loc_same_path
+RUN  rs_loc_query_from_query
+  NOTE Location '/dst?b=2' from /src?a=1 -> ok=1 err=0 status=200 reqs=2 tgt=/dst?b=2 host=127.0.0.1:50168 url=http://127.0.0.1:50168/dst?b=2
+OK   rs_loc_query_from_query
+RUN  rs_loc_root
+  NOTE Location '/' from /deep/er/src -> ok=1 err=0 status=200 reqs=2 tgt=/ host=127.0.0.1:50170 url=http://127.0.0.1:50170/
+OK   rs_loc_root
+RUN  rs_loc_padded_whitespace
+  NOTE Location '   /ws   ' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/ws host=127.0.0.1:50172 url=http://127.0.0.1:50172/ws
+OK   rs_loc_padded_whitespace
+RUN  rs_loc_no_path
+  NOTE Location 'http://127.0.0.1:%P' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/ host=127.0.0.1:50174 url=http://127.0.0.1:50174/
+OK   rs_loc_no_path
+RUN  rs_loc_uppercase_scheme
+  NOTE Location 'HTTP://127.0.0.1:%P/up' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/up host=127.0.0.1:50176 url=http://127.0.0.1:50176/up
+OK   rs_loc_uppercase_scheme
+RUN  rs_loc_abs_fragment
+  NOTE Location 'http://127.0.0.1:%P/af?q=1#f' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/af?q=1 host=127.0.0.1:50178 url=http://127.0.0.1:50178/af?q=1
+OK   rs_loc_abs_fragment
+RUN  rs_loc_fragment_stripped
+  NOTE Location '/frag#section' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/frag host=127.0.0.1:50180 url=http://127.0.0.1:50180/frag
+OK   rs_loc_fragment_stripped
+RUN  rs_loc_with_query
+  NOTE Location '/dst?x=1&y=two' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/dst?x=1&y=two host=127.0.0.1:50182 url=http://127.0.0.1:50182/dst?x=1&y=two
+OK   rs_loc_with_query
+RUN  rs_loc_relative_query_only
+  NOTE Location '?k=v' from /q/src -> ok=1 err=0 status=200 reqs=2 tgt=/q/src?k=v host=127.0.0.1:50184 url=http://127.0.0.1:50184/q/src?k=v
+OK   rs_loc_relative_query_only
+RUN  rs_loc_relative_dot
+  NOTE Location './here' from /a/b/src -> ok=1 err=0 status=200 reqs=2 tgt=/a/b/here host=127.0.0.1:50186 url=http://127.0.0.1:50186/a/b/here
+OK   rs_loc_relative_dot
+RUN  rs_loc_relative_dotdot
+  NOTE Location '../up' from /a/b/src -> ok=1 err=0 status=200 reqs=2 tgt=/a/up host=127.0.0.1:50188 url=http://127.0.0.1:50188/a/up
+OK   rs_loc_relative_dotdot
+RUN  rs_loc_relative_no_slash
+  NOTE Location 'sib' from /dir/src -> ok=1 err=0 status=200 reqs=2 tgt=/dir/sib host=127.0.0.1:50190 url=http://127.0.0.1:50190/dir/sib
+OK   rs_loc_relative_no_slash
+RUN  rs_loc_protocol_relative
+  NOTE Location '//127.0.0.1:%P/pr' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/pr host=127.0.0.1:50192 url=http://127.0.0.1:50192/pr
+OK   rs_loc_protocol_relative
+RUN  rs_loc_absolute_ipv6
+  NOTE Location 'http://[::1]:%P/v6' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/v6 host=[::1]:50194 url=http://[::1]:50194/v6
+OK   rs_loc_absolute_ipv6
+RUN  rs_loc_absolute_localhost
+  NOTE Location 'http://localhost:%P/lh' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/lh host=localhost:50197 url=http://localhost:50197/lh
+OK   rs_loc_absolute_localhost
+RUN  rs_loc_absolute_same_host
+  NOTE Location 'http://127.0.0.1:%P/abs' from /src -> ok=1 err=0 status=200 reqs=2 tgt=/abs host=127.0.0.1:50200 url=http://127.0.0.1:50200/abs
+OK   rs_loc_absolute_same_host
+RUN  rs_follow_399_not_followed
+  NOTE 399 + Location: ok=1 err=0 status=399 reqs=1
+OK   rs_follow_399_not_followed
+RUN  rs_follow_309_not_followed
+  NOTE 309 + Location: ok=1 err=0 status=309 reqs=1
+OK   rs_follow_309_not_followed
+RUN  rs_follow_306_not_followed
+  NOTE 306 + Location: ok=1 err=0 status=306 reqs=1
+OK   rs_follow_306_not_followed
+RUN  rs_follow_305_not_followed
+  NOTE 305 + Location: ok=1 err=0 status=305 reqs=1
+OK   rs_follow_305_not_followed
+RUN  rs_follow_304_not_followed
+  NOTE 304 + Location: ok=1 err=0 status=304 reqs=1
+OK   rs_follow_304_not_followed
+RUN  rs_follow_308_no_location
+  NOTE 308 without Location: ok=1 err=0(0) status=308 reqs=1 body=nowhere
+OK   rs_follow_308_no_location
+RUN  rs_follow_307_no_location
+  NOTE 307 without Location: ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND) status=307 reqs=1 body=
+OK   rs_follow_307_no_location
+RUN  rs_follow_303_no_location
+  NOTE 303 without Location: ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND) status=303 reqs=1 body=
+OK   rs_follow_303_no_location
+RUN  rs_follow_302_no_location
+  NOTE 302 without Location: ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND) status=302 reqs=1 body=
+OK   rs_follow_302_no_location
+RUN  rs_follow_301_no_location
+  NOTE 301 without Location: ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND) status=301 reqs=1 body=
+OK   rs_follow_301_no_location
+RUN  rs_follow_300_without_location
+OK   rs_follow_300_without_location
+RUN  rs_follow_300_with_location
+  NOTE 300+Location: ok=1 err=0 status=200 reqs=2 body=chosen
+OK   rs_follow_300_with_location
+RUN  rs_follow_308_PATCH
+  NOTE 308 PATCH -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=308 url=http://127.0.0.1:50226/dst reqs=1
+OK   rs_follow_308_PATCH
+RUN  rs_follow_308_OPTIONS
+  NOTE 308 OPTIONS -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=308 url=http://127.0.0.1:50228/dst reqs=1
+OK   rs_follow_308_OPTIONS
+RUN  rs_follow_308_DELETE
+  NOTE 308 DELETE -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=308 url=http://127.0.0.1:50230/dst reqs=1
+OK   rs_follow_308_DELETE
+RUN  rs_follow_308_PUT
+  NOTE 308 PUT -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=308 url=http://127.0.0.1:50232/dst reqs=1
+OK   rs_follow_308_PUT
+RUN  rs_follow_308_POST
+  NOTE 308 POST -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=308 url=http://127.0.0.1:50234/dst reqs=1
+OK   rs_follow_308_POST
+RUN  rs_follow_308_HEAD
+  NOTE 308 HEAD -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50236/dst reqs=2
+OK   rs_follow_308_HEAD
+RUN  rs_follow_308_GET
+  NOTE 308 GET -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50238/dst reqs=2
+OK   rs_follow_308_GET
+RUN  rs_follow_307_PATCH
+  NOTE 307 PATCH -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=307 url=http://127.0.0.1:50240/dst reqs=1
+OK   rs_follow_307_PATCH
+RUN  rs_follow_307_OPTIONS
+  NOTE 307 OPTIONS -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=307 url=http://127.0.0.1:50242/dst reqs=1
+OK   rs_follow_307_OPTIONS
+RUN  rs_follow_307_DELETE
+  NOTE 307 DELETE -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=307 url=http://127.0.0.1:50244/dst reqs=1
+OK   rs_follow_307_DELETE
+RUN  rs_follow_307_PUT
+  NOTE 307 PUT -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=307 url=http://127.0.0.1:50246/dst reqs=1
+OK   rs_follow_307_PUT
+RUN  rs_follow_307_POST
+  NOTE 307 POST -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=307 url=http://127.0.0.1:50248/dst reqs=1
+OK   rs_follow_307_POST
+RUN  rs_follow_307_HEAD
+  NOTE 307 HEAD -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50250/dst reqs=2
+OK   rs_follow_307_HEAD
+RUN  rs_follow_307_GET
+  NOTE 307 GET -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50252/dst reqs=2
+OK   rs_follow_307_GET
+RUN  rs_follow_303_PATCH
+  NOTE 303 PATCH -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50254/dst reqs=2
+OK   rs_follow_303_PATCH
+RUN  rs_follow_303_OPTIONS
+  NOTE 303 OPTIONS -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50256/dst reqs=2
+OK   rs_follow_303_OPTIONS
+RUN  rs_follow_303_DELETE
+  NOTE 303 DELETE -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50258/dst reqs=2
+OK   rs_follow_303_DELETE
+RUN  rs_follow_303_PUT
+  NOTE 303 PUT -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50260/dst reqs=2
+OK   rs_follow_303_PUT
+RUN  rs_follow_303_POST
+  NOTE 303 POST -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50262/dst reqs=2
+OK   rs_follow_303_POST
+RUN  rs_follow_303_HEAD
+  NOTE 303 HEAD -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50264/dst reqs=2
+OK   rs_follow_303_HEAD
+RUN  rs_follow_303_GET
+  NOTE 303 GET -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50266/dst reqs=2
+OK   rs_follow_303_GET
+RUN  rs_follow_302_PATCH
+  NOTE 302 PATCH -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=302 url=http://127.0.0.1:50268/dst reqs=1
+OK   rs_follow_302_PATCH
+RUN  rs_follow_302_OPTIONS
+  NOTE 302 OPTIONS -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=302 url=http://127.0.0.1:50270/dst reqs=1
+OK   rs_follow_302_OPTIONS
+RUN  rs_follow_302_DELETE
+  NOTE 302 DELETE -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=302 url=http://127.0.0.1:50272/dst reqs=1
+OK   rs_follow_302_DELETE
+RUN  rs_follow_302_PUT
+  NOTE 302 PUT -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=302 url=http://127.0.0.1:50274/dst reqs=1
+OK   rs_follow_302_PUT
+RUN  rs_follow_302_POST
+  NOTE 302 POST -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50276/dst reqs=2
+OK   rs_follow_302_POST
+RUN  rs_follow_302_HEAD
+  NOTE 302 HEAD -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50278/dst reqs=2
+OK   rs_follow_302_HEAD
+RUN  rs_follow_302_GET
+  NOTE 302 GET -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50280/dst reqs=2
+OK   rs_follow_302_GET
+RUN  rs_follow_301_PATCH
+  NOTE 301 PATCH -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=301 url=http://127.0.0.1:50282/dst reqs=1
+OK   rs_follow_301_PATCH
+RUN  rs_follow_301_OPTIONS
+  NOTE 301 OPTIONS -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=301 url=http://127.0.0.1:50284/dst reqs=1
+OK   rs_follow_301_OPTIONS
+RUN  rs_follow_301_DELETE
+  NOTE 301 DELETE -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=301 url=http://127.0.0.1:50286/dst reqs=1
+OK   rs_follow_301_DELETE
+RUN  rs_follow_301_PUT
+  NOTE 301 PUT -> ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=301 url=http://127.0.0.1:50288/dst reqs=1
+OK   rs_follow_301_PUT
+RUN  rs_follow_301_POST
+  NOTE 301 POST -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50290/dst reqs=2
+OK   rs_follow_301_POST
+RUN  rs_follow_301_HEAD
+  NOTE 301 HEAD -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50292/dst reqs=2
+OK   rs_follow_301_HEAD
+RUN  rs_follow_301_GET
+  NOTE 301 GET -> ok=1 err=0(0) status=200 url=http://127.0.0.1:50294/dst reqs=2
+OK   rs_follow_301_GET
+RUN  rs_x_retry_after_systemtime
+  NOTE RETRY_AFTER|SYSTEMTIME: ok=1 err=0 2015-10-21 07:28:00 len=16
+OK   rs_x_retry_after_systemtime
+RUN  rs_x_line_extra_space
+OK   rs_x_line_extra_space
+RUN  rs_x_line_lowercase
+OK   rs_x_line_lowercase
+RUN  rs_x_line_http2
+OK   rs_x_line_http2
+RUN  rs_x_line_four_digit
+OK   rs_x_line_four_digit
+RUN  rs_x_line_two_digit
+OK   rs_x_line_two_digit
+RUN  rs_x_url_option_short_buffer_after_redirect
+OK   rs_x_url_option_short_buffer_after_redirect
+RUN  rs_x_target_http10_version
+OK   rs_x_target_http10_version
+RUN  rs_x_openurl_cookie_on_302
+OK   rs_x_openurl_cookie_on_302
+RUN  rs_x_async_refused_port
+  NOTE async port 25 Location: done=1 ok=1 err=0(0) status=302
+OK   rs_x_async_refused_port
+RUN  rs_x_async_no_location
+  NOTE async 302 without Location: done=1 ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND)
+OK   rs_x_async_no_location
+RUN  rs_x_async_noauto
+OK   rs_x_async_noauto
+RUN  rs_x_async_chain_three
+  NOTE async chain: done=1 ok=1 err=0 redirects=3 completes=1 reqs=4
+OK   rs_x_async_chain_three
+RUN  rs_x_cb_redirect_after_interim
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,120,110,80,30,31,40,41,70,70
+OK   rs_x_cb_redirect_after_interim
+RUN  rs_x_cb_sequence_new_connection
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,50,51,110,80,20,21,30,31,40,41,40,41,70,70
+  FAIL tests/http_redirect_status/rs_extra.c:335: seq == "20,21,30,31,40,41,110,20,21,30,31,40,41" (got "20,21,30,31,40,41,110,20,21,30,31,40,41,40,41" want "20,21,30,31,40,41,110,20,21,30,31,40,41")
+FAIL rs_x_cb_sequence_new_connection
+RUN  rs_x_cb_sequence_reused_connection
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,40,41,70,70
+  FAIL tests/http_redirect_status/rs_extra.c:320: seq == "20,21,30,31,40,41,110,30,31,40,41" (got "20,21,30,31,40,41,110,30,31,40,41,40,41" want "20,21,30,31,40,41,110,30,31,40,41")
+FAIL rs_x_cb_sequence_reused_connection
+RUN  rs_x_long_location
+OK   rs_x_long_location
+RUN  rs_x_auth_header_sendreq_other_host
+  NOTE Authorization addreq=0 other_host=1: req0=Bearer i7-dummy req1=(none) cookie1=manual=2
+OK   rs_x_auth_header_sendreq_other_host
+RUN  rs_x_auth_header_addreq_same_host
+  NOTE Authorization addreq=1 other_host=0: req0=Bearer i7-dummy req1=(none) cookie1=manual=2
+OK   rs_x_auth_header_addreq_same_host
+RUN  rs_x_auth_header_sendreq_same_host
+  NOTE Authorization addreq=0 other_host=0: req0=Bearer i7-dummy req1=(none) cookie1=manual=2
+OK   rs_x_auth_header_sendreq_same_host
+RUN  rs_x_hop_caller_header_order
+  NOTE req0 header order: X-Alpha;X-Beta;X-Gamma;User-Agent;Host;Cache-Control;
+  NOTE req1 header order: X-Alpha;X-Beta;X-Gamma;User-Agent;Host;Cache-Control;Connection;
+OK   rs_x_hop_caller_header_order
+RUN  rs_x_noauto_resend_same_url
+OK   rs_x_noauto_resend_same_url
+RUN  rs_x_confirm_resend_sendex
+  NOTE sendex resend: #1 ex=1/0 end=0/12168; #2 ex=1/0 end=1/0; status=200 reqs=2 line1=POST /dst HTTP/1.1
+OK   rs_x_confirm_resend_sendex
+RUN  rs_x_confirm_resend_without_body
+  NOTE resend without body: ok=1 err=0(0) status=200 reqs=2 line=POST /dst HTTP/1.1 CL=10
+OK   rs_x_confirm_resend_without_body
+RUN  rs_x_confirm_handle_view
+  NOTE after 12168: status=307 location=/dst url=http://127.0.0.1:50346/dst nbody=0 read_ok=1 raw=HTTP/1.1 307 Temporary Redirect
+Location: /dst
+X-Src: 1
+C
+OK   rs_x_confirm_handle_view
+RUN  rs_x_target_port_closed
+  NOTE closed target: ok=0 err=12029(ERROR_INTERNET_CANNOT_CONNECT) status=0 url=http://127.0.0.1:50348/gone 2031ms
+OK   rs_x_target_port_closed
+RUN  rs_x_port_993_refused
+  NOTE Location port 993: ok=1 err=0(0) status=302 url=http://127.0.0.1:50352/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
+OK   rs_x_port_993_refused
+RUN  rs_x_port_143_refused
+  NOTE Location port 143: ok=1 err=0(0) status=302 url=http://127.0.0.1:50354/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
+OK   rs_x_port_143_refused
+RUN  rs_x_port_119_refused
+  NOTE Location port 119: ok=1 err=0(0) status=302 url=http://127.0.0.1:50356/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
+OK   rs_x_port_119_refused
+RUN  rs_x_port_110_refused
+  NOTE Location port 110: ok=1 err=0(0) status=302 url=http://127.0.0.1:50358/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
+OK   rs_x_port_110_refused
+RUN  rs_x_port_25_refused
+  NOTE Location port 25: ok=1 err=0(0) status=302 url=http://127.0.0.1:50360/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
+OK   rs_x_port_25_refused
+RUN  rs_x_port_21_refused
+  NOTE Location port 21: ok=1 err=0(0) status=302 url=http://127.0.0.1:50362/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
+OK   rs_x_port_21_refused
+RUN  rs_x_308_post_no_location
+  NOTE 308 POST without Location: ok=1 err=0(0) status=308 reqs=1 nbody=7
+OK   rs_x_308_post_no_location
+RUN  rs_x_307_post_no_location
+  NOTE 307 POST without Location: ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND) status=307 reqs=1 nbody=0
+OK   rs_x_307_post_no_location
+RUN  rs_x_301_post_no_location
+  NOTE 301 POST without Location: ok=0 err=12150(ERROR_HTTP_HEADER_NOT_FOUND) status=301 reqs=1 nbody=0
+OK   rs_x_301_post_no_location
+RUN  rs_x_300_delete_confirm
+  NOTE 300 DELETE: ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=300 reqs=1 line1=-
+OK   rs_x_300_delete_confirm
+RUN  rs_x_300_put_confirm
+  NOTE 300 PUT: ok=0 err=12168(ERROR_HTTP_REDIRECT_NEEDS_CONFIRMATION) status=300 reqs=1 line1=-
+OK   rs_x_300_put_confirm
+RUN  rs_x_300_head_kept
+  NOTE 300 HEAD: ok=1 err=0(0) status=200 reqs=2 line1=HEAD /dst HTTP/1.1
+OK   rs_x_300_head_kept
+RUN  rs_x_300_post_becomes_get
+  NOTE 300 POST: ok=1 err=0(0) status=200 reqs=2 line1=GET /dst HTTP/1.1
+OK   rs_x_300_post_becomes_get
+RUN  rs_cache_redirect_301_note
+  NOTE req0: GET /wininet_7456_5_c301.src HTTP/1.1
+  NOTE req1: GET /wininet_7456_5_c301.src.dst HTTP/1.1
+  NOTE req2: GET /wininet_7456_5_c301.src HTTP/1.1
+  NOTE cached 301: second fetch status=200 body=cached-target new server requests=2
+OK   rs_cache_redirect_301_note
+RUN  rs_cache_304_without_entry_is_data
+OK   rs_cache_304_without_entry_is_data
+RUN  rs_cache_304_status_query_detail
+  NOTE 304-revalidated view: status=200 text=OK raw0=HTTP/1.1 200 OK
+ETag: "rs-q"
+Content-L body=body-q
+  NOTE INTERNET_OPTION_REQUEST_FLAGS = 0x1 (FROM_CACHE=0x1)
+OK   rs_cache_304_status_query_detail
+RUN  rs_cache_304_revalidation
+  NOTE req0: GET /wininet_7456_8_c304.txt HTTP/1.1 INM=-
+  NOTE req1: GET /wininet_7456_8_c304.txt HTTP/1.1 INM="rs-v1"
+  NOTE req2: GET /wininet_7456_8_c304.txt HTTP/1.1 INM="rs-v1"
+  NOTE revalidation: err=0 status=200 body=cached-v1 requests=3 INM="rs-v1" IMS=Wed, 21 Oct 2015 07:28:00 GMT
+OK   rs_cache_304_revalidation
+RUN  rs_keep_connection_flag_visible
+  NOTE flags with KEEP_CONNECTION: 0x8
+OK   rs_keep_connection_flag_visible
+RUN  rs_keep_connection_across_redirect
+  NOTE req0 Connection: Keep-Alive
+  NOTE req1 Connection: Keep-Alive
+  NOTE req2 Connection: Keep-Alive
+OK   rs_keep_connection_across_redirect
+RUN  rs_cookie_two_from_chain
+  NOTE third request Cookie: rsa=1; rsb=2
+OK   rs_cookie_two_from_chain
+RUN  rs_cookie_from_302_other_path_not_sent
+OK   rs_cookie_from_302_other_path_not_sent
+RUN  rs_cookie_from_302_no_cookies_flag
+OK   rs_cookie_from_302_no_cookies_flag
+RUN  rs_cookie_from_302_sent_on_hop
+  NOTE cookie callbacks: received=1 sent=1
+OK   rs_cookie_from_302_sent_on_hop
+RUN  rs_option_url_before_send
+OK   rs_option_url_before_send
+RUN  rs_reqhdr_view_after_redirect
+  NOTE request headers after hop: GET /dst?z=1 HTTP/1.1
+User-Agent: rs-agent/1.0
+Cache-Control: no-cache
+Host: localhost:50399
+Connection: Keep-Alive
+
+
+OK   rs_reqhdr_view_after_redirect
+RUN  rs_cb_zero_context_silent
+OK   rs_cb_zero_context_silent
+RUN  rs_cb_loop_redirect_count
+  NOTE loop: requests=11 REDIRECT callbacks=10 SENDING=11
+OK   rs_cb_loop_redirect_count
+RUN  rs_cb_redirect_before_confirmation
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,70,70
+OK   rs_cb_redirect_before_confirmation
+RUN  rs_cb_no_redirect_for_refused_scheme
+  NOTE ftp Location: ok=1 err=0 redirect_cbs=0
+OK   rs_cb_no_redirect_for_refused_scheme
+RUN  rs_cb_no_redirect_when_noauto
+OK   rs_cb_no_redirect_when_noauto
+RUN  rs_cb_redirect_fragment_in_string
+OK   rs_cb_redirect_fragment_in_string
+RUN  rs_cb_redirect_absolute_other_port
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,20,21,30,31,40,41,40,41,70,70
+  NOTE cb 21 '127.0.0.1'
+  NOTE cb 21 '[::1]'
+OK   rs_cb_redirect_absolute_other_port
+RUN  rs_cb_redirect_chain_urls
+OK   rs_cb_redirect_chain_urls
+RUN  rs_cb_redirect_wide
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,70,70
+  NOTE REDIRECT info='http://127.0.0.1:50420/dst' len=26 ctx=2
+OK   rs_cb_redirect_wide
+RUN  rs_cb_redirect_ansi
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,70,70
+  NOTE REDIRECT info='http://127.0.0.1:50422/dst' len=27 ctx=2
+OK   rs_cb_redirect_ansi
+SUMMARY tests=358 failed=2 skipped=0 checks_pass=2848 checks_fail=2
+@@I7 END http_redirect_status exit=0x1 ms=344738 timeout=0 bytes=43819

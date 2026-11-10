@@ -1,0 +1,1022 @@
+RUN  pc_wire2_ftp_proxy_entry_used_for_ftp_urls
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE OBS ftp= proxy entry: handle 1 err 0 requests 1 line "GET ftp://pc-ftpe.invalid/file.txt HTTP/1.1"
+OK   pc_wire2_ftp_proxy_entry_used_for_ftp_urls
+RUN  pc_wire2_ftp_urls_via_cern_proxy
+  NOTE OBS ftp via proxy ftp://pc-ftp2.invalid/dir/ -> handle 1 err 0 line "GET ftp://pc-ftp2.invalid/dir/ HTTP/1.1" Host "pc-ftp2.invalid:21" Authorization "-"
+  NOTE OBS ftp via proxy ftp://pc-ftp2.invalid:2121/f.bin -> handle 1 err 0 line "GET ftp://pc-ftp2.invalid:2121/f.bin HTTP/1.1" Host "pc-ftp2.invalid:2121" Authorization "-"
+  NOTE OBS ftp via proxy ftp://u:pw@pc-ftp2.invalid/priv.txt -> handle 1 err 0 line "GET ftp://u:pw@pc-ftp2.invalid/priv.txt HTTP/1.1" Host "pc-ftp2.invalid:21" Authorization "-"
+  NOTE OBS ftp via proxy ftp://pc-ftp2.invalid/a%20b.txt -> handle 1 err 0 line "GET ftp://pc-ftp2.invalid/a%20b.txt HTTP/1.1" Host "pc-ftp2.invalid:21" Authorization "-"
+OK   pc_wire2_ftp_urls_via_cern_proxy
+RUN  pc_wire2_bypass_set_option_table
+OK   pc_wire2_bypass_set_option_table
+RUN  pc_wire2_bypass_local_matching_table
+  NOTE OBS <local> http://pcplainname/x -> via 0 st 0 err 12007
+  NOTE OBS <local> http://pcplainname:8080/x -> via 0 st 0 err 12007
+  NOTE OBS <local> http://pc.dotted.invalid/x -> via 1 st 200 err 0
+  NOTE OBS <local> http://192.0.2.12/x -> via 1 st 200 err 0
+  NOTE OBS <local> http://PCUPPERPLAIN/x -> via 0 st 0 err 12007
+OK   pc_wire2_bypass_local_matching_table
+RUN  pc_wire2_bypass_whitespace_and_empty_entries
+  NOTE OBS bypass "  pc-ws.invalid  " http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass ";;pc-ws.invalid;;" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "a.invalid ;  pc-ws.invalid" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "	pc-ws.invalid" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass ";" http://pc-ws.invalid/x -> via 1 st 200 err 0
+  NOTE OBS bypass " " http://pc-ws.invalid/x -> via 1 st 200 err 0
+  NOTE OBS bypass "pc-ws.invalid." http://pc-ws.invalid/x -> via 1 st 200 err 0
+  NOTE OBS bypass "PC-WS.Invalid" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "pc-ws.invalid" http://PC-WS.INVALID/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "*.*" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "*.*" http://pcwsplain/x -> via 1 st 200 err 0
+  NOTE OBS bypass "pc-ws.*" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "*ws*" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "*nomatch*" http://pc-ws.invalid/x -> via 1 st 200 err 0
+  NOTE OBS bypass "**" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "http://*.invalid" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "ftp://*.invalid" http://pc-ws.invalid/x -> via 1 st 200 err 0
+  NOTE OBS bypass "*.invalid:80" http://pc-ws.invalid/x -> via 0 st 0 err 12007
+  NOTE OBS bypass "*.invalid:81" http://pc-ws.invalid/x -> via 1 st 200 err 0
+  NOTE OBS bypass "*:8080" http://pc-ws.invalid:8080/x -> via 0 st 0 err 12007
+OK   pc_wire2_bypass_whitespace_and_empty_entries
+RUN  pc_wire2_bypass_long_list
+  NOTE OBS 7105-byte bypass list, last entry matches: via 0 st 0 err 12007
+OK   pc_wire2_bypass_long_list
+RUN  pc_wire2_connect_https_scheme_proxy_entry_uppercase
+  FAIL tests/proxy_connectivity/pc_proxy_wire2.c:626: pc_request(e.h, "pc-up.invalid", 443, "/u", &o, &err) == 200 (got 0x0 want 0xc8)
+FAIL pc_wire2_connect_https_scheme_proxy_entry_uppercase
+RUN  pc_wire2_connect_ip_literal_targets
+  NOTE OBS CONNECT to 192.0.2.10:443 -> status 200 err 0 line "CONNECT 192.0.2.10:443 HTTP/1.0" Host "192.0.2.10:443"
+  NOTE OBS CONNECT to 192.0.2.11:9443 -> status 200 err 0 line "CONNECT 192.0.2.11:9443 HTTP/1.0" Host "192.0.2.11:9443"
+  NOTE OBS CONNECT to [2001:db8::5]:443 -> status 200 err 0 line "CONNECT [2001:db8::5]:443 HTTP/1.0" Host "[2001:db8::5]:443"
+OK   pc_wire2_connect_ip_literal_targets
+RUN  pc_wire2_connect_custom_headers_not_on_connect
+OK   pc_wire2_connect_custom_headers_not_on_connect
+RUN  pc_wire2_connect_origin_credentials_stay_inside_tunnel
+OK   pc_wire2_connect_origin_credentials_stay_inside_tunnel
+RUN  pc_wire2_connect_second_request_new_tunnel_or_reuse
+  NOTE OBS two https requests via proxy: CONNECT heads 2 relay conns 2, origin reqs 2 conns 2
+OK   pc_wire2_connect_second_request_new_tunnel_or_reuse
+RUN  pc_wire2_connect_reply_variants
+OK   pc_wire2_connect_reply_variants
+RUN  pc_wire2_http_only_proxy_https_goes_direct
+  NOTE OBS http= only proxy, https request: status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) proxy reqs 0
+OK   pc_wire2_http_only_proxy_https_goes_direct
+RUN  pc_wire2_per_scheme_http_and_https_split
+OK   pc_wire2_per_scheme_http_and_https_split
+RUN  pc_wire2_switch_session_proxy_between_requests
+OK   pc_wire2_switch_session_proxy_between_requests
+RUN  pc_wire2_two_sessions_two_proxies
+OK   pc_wire2_two_sessions_two_proxies
+RUN  pc_wire2_proxy_chunked_gzip_response
+  NOTE OBS gzip via proxy with session HTTP_DECODING: decoded 0 raw 1
+  NOTE OBS Accept-Encoding via proxy with decoding: "-"
+OK   pc_wire2_proxy_chunked_gzip_response
+RUN  pc_wire2_proxy_http10_close_delimited
+OK   pc_wire2_proxy_http10_close_delimited
+RUN  pc_wire2_proxy_connection_close_via_proxy_connection_header
+  NOTE OBS Proxy-Connection: close -> conns 2 (req conns 0, 1)
+OK   pc_wire2_proxy_connection_close_via_proxy_connection_header
+RUN  pc_wire2_proxy_connection_close_forces_new_connection
+OK   pc_wire2_proxy_connection_close_forces_new_connection
+RUN  pc_wire2_proxy_error_statuses_returned
+OK   pc_wire2_proxy_error_statuses_returned
+RUN  pc_wire2_407_post_body_resent
+OK   pc_wire2_407_post_body_resent
+RUN  pc_wire2_407_with_body_and_keepalive_same_connection
+OK   pc_wire2_407_with_body_and_keepalive_same_connection
+RUN  pc_wire2_407_creds_on_connect_handle
+  NOTE OBS 407 with connect-level proxy creds -> 200, requests 2
+OK   pc_wire2_407_creds_on_connect_handle
+RUN  pc_wire2_407_connection_close_resend_on_new_connection
+OK   pc_wire2_407_connection_close_resend_on_new_connection
+RUN  pc_wire2_407_wrong_creds_returns_407
+  NOTE OBS 407 always + creds: status 407 err 0 requests 2
+OK   pc_wire2_407_wrong_creds_returns_407
+RUN  pc_wire2_407_creds_reused_on_next_request
+  NOTE OBS req 0 conn 0 GET http://pc-r407.invalid/1 HTTP/1.1 Proxy-Authorization "-"
+  NOTE OBS req 1 conn 0 GET http://pc-r407.invalid/1 HTTP/1.1 Proxy-Authorization "Basic cnU6cnA="
+  NOTE OBS req 2 conn 0 GET http://pc-r407.invalid/2 HTTP/1.1 Proxy-Authorization "Basic cnU6cnA="
+  NOTE OBS req 3 conn 0 GET http://pc-other407.invalid/3 HTTP/1.1 Proxy-Authorization "Basic cnU6cnA="
+OK   pc_wire2_407_creds_reused_on_next_request
+RUN  pc_wire2_set_cookie_from_proxied_response_stored_for_origin
+OK   pc_wire2_set_cookie_from_proxied_response_stored_for_origin
+RUN  pc_wire2_cookie_sent_for_proxied_origin
+OK   pc_wire2_cookie_sent_for_proxied_origin
+RUN  pc_wire2_redirect_noauto_returns_302
+OK   pc_wire2_redirect_noauto_returns_302
+RUN  pc_wire2_redirect_to_bypassed_name
+  NOTE OBS redirect to bypassed host: status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) proxy reqs 1
+OK   pc_wire2_redirect_to_bypassed_name
+RUN  pc_wire2_redirect_to_loopback_origin_goes_direct
+  NOTE OBS redirect to loopback: body "proxied" proxy reqs 1 origin reqs 1
+OK   pc_wire2_redirect_to_loopback_origin_goes_direct
+RUN  pc_wire2_redirect_relative_through_proxy
+OK   pc_wire2_redirect_relative_through_proxy
+RUN  pc_wire2_redirect_absolute_through_proxy
+  NOTE req 1: GET http://pc-dst.invalid:8082/landed?z=1 HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Pragma: no-cache
+  NOTE   hdr[2] Host: pc-dst.invalid:8082
+  NOTE   hdr[3] Proxy-Connection: Keep-Alive
+OK   pc_wire2_redirect_absolute_through_proxy
+RUN  pc_wire2_user_agent_forms
+  NOTE OBS agent "Mozilla/4.0 (compatible; pc test)" -> User-Agent "Mozilla/4.0 (compatible; pc test)"
+  NOTE OBS agent "a" -> User-Agent "a"
+  NOTE OBS agent "UA with  two  spaces" -> User-Agent "UA with  two  spaces"
+  NOTE OBS agent "" -> User-Agent (absent)
+OK   pc_wire2_user_agent_forms
+RUN  pc_wire2_extra_headers_passed_verbatim
+  NOTE req 0: GET http://pc-xh.invalid/xh HTTP/1.1
+  NOTE   hdr[0] X-Pc-Test: one
+  NOTE   hdr[1] Proxy-Connection: Keep-Alive
+  NOTE   hdr[2] x-lower: two
+  NOTE   hdr[3] User-Agent: pc_agent
+  NOTE   hdr[4] Host: pc-xh.invalid
+  NOTE   hdr[5] Pragma: no-cache
+OK   pc_wire2_extra_headers_passed_verbatim
+RUN  pc_wire2_keep_connection_flag_headers
+  NOTE req 0: GET http://pc-kc.invalid/kc HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Host: pc-kc.invalid
+  NOTE   hdr[2] Proxy-Connection: Keep-Alive
+  NOTE   hdr[3] Pragma: no-cache
+OK   pc_wire2_keep_connection_flag_headers
+RUN  pc_wire2_http10_request_through_proxy
+  NOTE req 0: GET http://pc-10.invalid/ten HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Host: pc-10.invalid
+  NOTE   hdr[2] Pragma: no-cache
+  NOTE OBS HttpOpenRequest("HTTP/1.0") via proxy -> "GET http://pc-10.invalid/ten HTTP/1.1"
+  NOTE OBS HTTP/1.0 proxied: Proxy-Connection "-" Connection "-"
+OK   pc_wire2_http10_request_through_proxy
+RUN  pc_wire2_option_url_on_proxied_request
+  NOTE OBS request headers first line: "GET http://pc-url.invalid:8081/p?x=1 HTTP/1.1"
+OK   pc_wire2_option_url_on_proxied_request
+RUN  pc_wire2_request_line_url_forms
+  NOTE OBS url http://pc-f.invalid/a#frag -> st 200 err 0 line "GET http://pc-f.invalid/a#frag HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid/a?q=1#frag -> st 200 err 0 line "GET http://pc-f.invalid/a?q=1#frag HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid -> st 200 err 0 line "GET http://pc-f.invalid/ HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid:8080 -> st 200 err 0 line "GET http://pc-f.invalid:8080/ HTTP/1.1" Host "pc-f.invalid:8080" Authorization "-"
+  NOTE OBS url http://pc-f.invalid/A/B/C.TXT -> st 200 err 0 line "GET http://pc-f.invalid/A/B/C.TXT HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://PC-UPPER.INVALID/Up -> st 200 err 0 line "GET http://pc-upper.invalid/Up HTTP/1.1" Host "PC-UPPER.INVALID" Authorization "-"
+  NOTE OBS url http://[2001:db8::1]:8080/v6 -> st 200 err 0 line "GET http://[2001:db8::1]:8080/v6 HTTP/1.1" Host "[2001:db8::1]:8080" Authorization "-"
+  NOTE OBS url http://[2001:db8::2]/v6 -> st 200 err 0 line "GET http://[2001:db8::2]/v6 HTTP/1.1" Host "[2001:db8::2]" Authorization "-"
+  NOTE OBS url http://pc-f.invalid/a%20b -> st 200 err 0 line "GET http://pc-f.invalid/a%20b HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid/a b -> st 200 err 0 line "GET http://pc-f.invalid/a%20b HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid/dir/../x -> st 200 err 0 line "GET http://pc-f.invalid/x HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid/x?a=b&c=d%26e -> st 200 err 0 line "GET http://pc-f.invalid/x?a=b&c=d%26e HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://user:pw@pc-f.invalid/cred -> st 200 err 0 line "GET http://pc-f.invalid/cred HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://pc-f.invalid:80/eighty -> st 200 err 0 line "GET http://pc-f.invalid/eighty HTTP/1.1" Host "pc-f.invalid" Authorization "-"
+  NOTE OBS url http://192.0.2.9/ip -> st 200 err 0 line "GET http://192.0.2.9/ip HTTP/1.1" Host "192.0.2.9" Authorization "-"
+OK   pc_wire2_request_line_url_forms
+RUN  pc_wire_connect_bypassed_https_goes_direct
+OK   pc_wire_connect_bypassed_https_goes_direct
+RUN  pc_wire_connect_proxy_closes
+  NOTE CONNECT 502: status 502 err 0 (?)
+OK   pc_wire_connect_proxy_closes
+RUN  pc_wire_connect_refused_403
+  NOTE CONNECT 403: status 403 err 0 (?) body ""
+OK   pc_wire_connect_refused_403
+RUN  pc_wire_connect_407_without_creds
+  NOTE CONNECT 407 no creds: status 407 err 0 (?) body "" heads 1
+OK   pc_wire_connect_407_without_creds
+RUN  pc_wire_connect_407_then_200_with_creds
+  NOTE CONNECT 407->200: status 200 err 0 heads 2 conns 2
+OK   pc_wire_connect_407_then_200_with_creds
+RUN  pc_wire_connect_https_only_proxy_entry
+  NOTE https-only proxy head 0: CONNECT pc-tls.invalid:443 HTTP/1.0
+OK   pc_wire_connect_https_only_proxy_entry
+RUN  pc_wire_connect_tunnel_openurl
+  NOTE openurl https via proxy: status 0 err 12045 (ERROR_INTERNET_INVALID_CA)
+OK   pc_wire_connect_tunnel_openurl
+RUN  pc_wire_connect_tunnel_nondefault_port
+OK   pc_wire_connect_tunnel_nondefault_port
+RUN  pc_wire_connect_tunnel_https
+  NOTE CONNECT tunnel: status 200 err 0 (?) 31 ms heads 1 tunnel bytes 492
+OK   pc_wire_connect_tunnel_https
+RUN  pc_wire_ftp_url_via_cern_proxy
+  NOTE ftp via proxy: handle 0000000000cc000c err 0 (?) requests 1
+  NOTE ftp via proxy body "ftp-via-proxy" n=13
+  NOTE req 0: GET ftp://pc-ftp.invalid/pub/file.txt HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Host: pc-ftp.invalid:21
+  NOTE   hdr[2] Pragma: no-cache
+OK   pc_wire_ftp_url_via_cern_proxy
+RUN  pc_wire_set_proxy_bypass_option
+OK   pc_wire_set_proxy_bypass_option
+RUN  pc_wire_set_proxy_option_routes_session
+  NOTE   req 0 conn 0: GET http://pc-sw.invalid/b HTTP/1.1
+OK   pc_wire_set_proxy_option_routes_session
+RUN  pc_wire_loopback_override_request_line
+OK   pc_wire_loopback_override_request_line
+RUN  pc_wire_loopback_implicit_bypass
+  NOTE loopback bypass "(null)" host 127.0.0.1 -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
+  NOTE loopback bypass "(null)" host localhost -> status 200 body "direct" proxy 0 origin 1 err 0 16 ms
+  NOTE loopback bypass "(null)" host [::1] -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
+  NOTE loopback bypass "<-loopback>" host 127.0.0.1 -> status 200 body "proxied" proxy 1 origin 0 err 0 0 ms
+  NOTE   proxied line: GET http://127.0.0.1:49853/lb HTTP/1.1
+  NOTE loopback bypass "<-loopback>" host localhost -> status 200 body "proxied" proxy 1 origin 0 err 0 15 ms
+  NOTE   proxied line: GET http://localhost:49853/lb HTTP/1.1
+  NOTE loopback bypass "<local>" host 127.0.0.1 -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
+  NOTE loopback bypass "<local>;<-loopback>" host 127.0.0.1 -> status 200 body "proxied" proxy 1 origin 0 err 0 0 ms
+  NOTE   proxied line: GET http://127.0.0.1:49853/lb HTTP/1.1
+  NOTE loopback bypass "127.0.0.1" host 127.0.0.1 -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
+  NOTE loopback bypass "<-LOOPBACK>" host 127.0.0.1 -> status 200 body "proxied" proxy 1 origin 0 err 0 0 ms
+  NOTE   proxied line: GET http://127.0.0.1:49853/lb HTTP/1.1
+OK   pc_wire_loopback_implicit_bypass
+RUN  pc_wire_bypass_table
+  NOTE bypass "(null)" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "<local>" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "<local>" http://pcbplain/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 2281 ms
+  NOTE bypass "(null)" http://pcbplain/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "*.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "pc-b.invalid" http://pc-c.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "PC-B.INVALID" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "pc-*" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 16 ms
+  NOTE bypass "*b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "*c.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "pc-?.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "a.invalid;pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "a.invalid pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "a.invalid,pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "*" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "<-loopback>" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "http://pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "https://pc-b.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "pc-b.invalid:8080" http://pc-b.invalid:8080/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "pc-b.invalid:8080" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "pc-b" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "*.pc-b.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "*.pc-b.invalid" http://www.pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "192.0.2.*" http://192.0.2.7/x -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) via-proxy 0 0 ms
+  NOTE bypass "192.0.2.7" http://192.0.2.7/x -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) via-proxy 0 0 ms
+  NOTE bypass "192.0.2.8" http://192.0.2.7/x -> status 200 err 0 (?) via-proxy 1 0 ms
+OK   pc_wire_bypass_table
+RUN  pc_wire_proxy_list_syntax
+  NOTE proxy "127.0.0.1:49862" http://pc-s1.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "http=127.0.0.1:49862" http://pc-s2.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "HTTP=127.0.0.1:49862" http://pc-s3.invalid/a -> status 200 err 0 (?) via-proxy 1 16 ms
+  NOTE proxy "http://127.0.0.1:49862" http://pc-s4.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "http=http://127.0.0.1:49862" http://pc-s5.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "https=127.0.0.1:49862" http://pc-s6.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE proxy "ftp=127.0.0.1:49862" http://pc-s7.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 15 ms
+  NOTE proxy "http=127.0.0.1:49862;https=127.0.0.1:1" http://pc-s8.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "https=127.0.0.1:1;http=127.0.0.1:49862" http://pc-s9.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "https=127.0.0.1:1 http=127.0.0.1:49862" http://pc-s10.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "socks=127.0.0.1:49862" http://pc-s11.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE proxy "  127.0.0.1:49862  " http://pc-s12.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE proxy "http=127.0.0.1:49862;" http://pc-s13.invalid/a -> status 200 err 0 (?) via-proxy 1 16 ms
+OK   pc_wire_proxy_list_syntax
+RUN  pc_wire_origin_basic_creds_cached_across_sessions
+OK   pc_wire_origin_basic_creds_cached_across_sessions
+RUN  pc_wire_origin_401_through_proxy
+OK   pc_wire_origin_401_through_proxy
+RUN  pc_wire_407_creds_set_after_challenge_resend
+OK   pc_wire_407_creds_set_after_challenge_resend
+RUN  pc_wire_407_query_proxy_authenticate
+OK   pc_wire_407_query_proxy_authenticate
+RUN  pc_wire_407_without_creds_returned_to_caller
+OK   pc_wire_407_without_creds_returned_to_caller
+RUN  pc_wire_407_basic_with_proxy_creds
+  NOTE 407 with creds -> status 200 err 0 body "granted" requests 2
+OK   pc_wire_407_basic_with_proxy_creds
+RUN  pc_wire_proxy_keepalive_reuse
+  NOTE proxy connections 1 for 3 InternetOpenUrl calls, 3 requests
+  NOTE   req 0 conn 0: GET http://pc-one.invalid/1 HTTP/1.1
+  NOTE   req 1 conn 0: GET http://pc-one.invalid/2 HTTP/1.1
+  NOTE   req 2 conn 0: GET http://pc-two.invalid/3 HTTP/1.1
+  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=102 [GET http://pc-one.invalid/1 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: pc-one.invalid\r\nPragma: no-cache\r\n\r\n]
+  NOTE srv ev 2 t=0 conn=0 req=0 BODY n=0 []
+  NOTE srv ev 3 t=0 conn=0 req=-1 SENT n=64 [HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 7\r\n\r\n]
+  NOTE srv ev 4 t=0 conn=0 req=1 HEAD n=102 [GET http://pc-one.invalid/2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: pc-one.invalid\r\nPragma: no-cache\r\n\r\n]
+  NOTE srv ev 5 t=0 conn=0 req=1 BODY n=0 []
+  NOTE srv ev 6 t=0 conn=0 req=-1 SENT n=64 [HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 7\r\n\r\n]
+  NOTE srv ev 7 t=0 conn=0 req=2 HEAD n=102 [GET http://pc-two.invalid/3 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: pc-two.invalid\r\nPragma: no-cache\r\n\r\n]
+  NOTE srv ev 8 t=0 conn=0 req=2 BODY n=0 []
+  NOTE srv ev 9 t=0 conn=0 req=-1 SENT n=64 [HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 7\r\n\r\n]
+OK   pc_wire_proxy_keepalive_reuse
+RUN  pc_wire_no_proxy_authorization_without_challenge
+  NOTE Proxy-Authorization before any challenge: (none)
+OK   pc_wire_no_proxy_authorization_without_challenge
+RUN  pc_wire_header_set_note
+  NOTE req 0: GET http://pc-hdrs.invalid/hdrs HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Host: pc-hdrs.invalid
+  NOTE   hdr[2] Pragma: no-cache
+  NOTE req 1: GET http://pc-hdrs.invalid/hdrs2 HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Host: pc-hdrs.invalid
+  NOTE   hdr[2] Pragma: no-cache
+  NOTE requests 2 conns 1
+  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=107 [GET http://pc-hdrs.invalid/hdrs HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: pc-hdrs.invalid\r\nPragma: no-cache\r\n\r\n]
+  NOTE srv ev 2 t=0 conn=0 req=0 BODY n=0 []
+  NOTE srv ev 3 t=0 conn=0 req=-1 SENT n=64 [HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 7\r\n\r\n]
+  NOTE srv ev 4 t=0 conn=0 req=1 HEAD n=108 [GET http://pc-hdrs.invalid/hdrs2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: pc-hdrs.invalid\r\nPragma: no-cache\r\n\r\n]
+  NOTE srv ev 5 t=0 conn=0 req=1 BODY n=0 []
+  NOTE srv ev 6 t=0 conn=0 req=-1 SENT n=64 [HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 7\r\n\r\n]
+OK   pc_wire_header_set_note
+RUN  pc_wire_head_verb_through_proxy
+OK   pc_wire_head_verb_through_proxy
+RUN  pc_wire_post_through_proxy
+OK   pc_wire_post_through_proxy
+RUN  pc_wire_absolute_uri_ip_literal_origin_with_loopback_override
+OK   pc_wire_absolute_uri_ip_literal_origin_with_loopback_override
+RUN  pc_wire_absolute_uri_httpopenrequest
+OK   pc_wire_absolute_uri_httpopenrequest
+RUN  pc_wire_absolute_uri_explicit_port_80
+  NOTE explicit :80 -> GET http://pc-origin.invalid/p80 HTTP/1.1 / Host pc-origin.invalid
+OK   pc_wire_absolute_uri_explicit_port_80
+RUN  pc_wire_absolute_uri_nondefault_port
+OK   pc_wire_absolute_uri_nondefault_port
+RUN  pc_wire_absolute_uri_openurl
+  NOTE req 0: GET http://pc-origin.invalid/path/x.txt?q=1&r=2 HTTP/1.1
+  NOTE   hdr[0] User-Agent: pc_agent
+  NOTE   hdr[1] Host: pc-origin.invalid
+  NOTE   hdr[2] Pragma: no-cache
+OK   pc_wire_absolute_uri_openurl
+RUN  pc_opt2_autodial_connection_query
+  NOTE OBS AUTODIAL_CONNECTION -> 1 len 0 b0 0 err 0
+OK   pc_opt2_autodial_connection_query
+RUN  pc_opt2_bypass_edited_entry_read
+  NOTE OBS BYPASS_EDITED_ENTRY -> 1 value 0 len 4 err 0
+OK   pc_opt2_bypass_edited_entry_read
+RUN  pc_opt2_connectivity_option_table
+  NOTE OBS query CONNECTED_STATE(50) on NULL -> 1 err 0 len 4 dword 0x1
+  NOTE OBS query CONNECTED_STATE(50) on session -> 1 err 0 len 4 dword 0x1
+  NOTE OBS query IDLE_STATE(51) on NULL -> 1 err 0 len 4 dword 0x0
+  NOTE OBS query IDLE_STATE(51) on session -> 1 err 0 len 4 dword 0x0
+  NOTE OBS query OFFLINE_SEMANTICS(52) on NULL -> 1 err 0 len 4 dword 0x0
+  NOTE OBS query OFFLINE_SEMANTICS(52) on session -> 1 err 0 len 4 dword 0x0
+  NOTE OBS query BYPASS_EDITED_ENTRY(64) on NULL -> 1 err 0 len 4 dword 0x0
+  NOTE OBS query BYPASS_EDITED_ENTRY(64) on session -> 1 err 0 len 4 dword 0x0
+  NOTE OBS query DISABLE_AUTODIAL(70) on NULL -> 0 err 50 len 0 dword 0xcccccccc
+  NOTE OBS query DISABLE_AUTODIAL(70) on session -> 0 err 50 len 0 dword 0xcccccccc
+  NOTE OBS query AUTODIAL_MODE(82) on NULL -> 1 err 0 len 4 dword 0x1
+  NOTE OBS query AUTODIAL_MODE(82) on session -> 1 err 0 len 4 dword 0x1
+  NOTE OBS query AUTODIAL_CONNECTION(83) on NULL -> 1 err 0 len 0 dword 0xcccccc00
+  NOTE OBS query AUTODIAL_CONNECTION(83) on session -> 1 err 0 len 0 dword 0xcccccc00
+  NOTE OBS query AUTODIAL_HWND(85) on NULL -> 0 err 12018 len 0 dword 0xcccccccc
+  NOTE OBS query AUTODIAL_HWND(85) on session -> 0 err 87 len 0 dword 0xcccccccc
+  NOTE OBS query MAX_CONNS_PER_PROXY(103) on NULL -> 1 err 0 len 4 dword 0x4
+  NOTE OBS query MAX_CONNS_PER_PROXY(103) on session -> 0 err 12016 len 4 dword 0xcccccccc
+  NOTE OBS query CALLBACK_FILTER(0x36)(54) on NULL -> 0 err 12018 len 0 dword 0xcccccccc
+  NOTE OBS query CALLBACK_FILTER(0x36)(54) on session -> 0 err 50 len 0 dword 0xcccccccc
+  NOTE OBS query CONNECT_TIME(0x37)(55) on NULL -> 0 err 12018 len 0 dword 0xcccccccc
+  NOTE OBS query CONNECT_TIME(0x37)(55) on session -> 0 err 50 len 0 dword 0xcccccccc
+  NOTE OBS query SEND_THROUGHPUT(0x38)(56) on NULL -> 0 err 12018 len 0 dword 0xcccccccc
+  NOTE OBS query SEND_THROUGHPUT(0x38)(56) on session -> 0 err 50 len 0 dword 0xcccccccc
+  NOTE OBS query RECEIVE_THROUGHPUT(0x39)(57) on NULL -> 0 err 12018 len 0 dword 0xcccccccc
+  NOTE OBS query RECEIVE_THROUGHPUT(0x39)(57) on session -> 0 err 50 len 0 dword 0xcccccccc
+OK   pc_opt2_connectivity_option_table
+RUN  pc_opt2_settings_changed_purges_keepalive
+  NOTE OBS after SETTINGS_CHANGED: req conns 0 0 1 (connections 2)
+OK   pc_opt2_settings_changed_purges_keepalive
+RUN  pc_opt2_settings_changed_options
+  NOTE OBS PROXY_SETTINGS_CHANGED -> 1 err 0
+OK   pc_opt2_settings_changed_options
+RUN  pc_opt2_refresh_on_null_and_session
+  NOTE OBS REFRESH on PRECONFIG session -> 1 err 0
+  NOTE OBS REFRESH on PROXY session -> 1 err 0
+OK   pc_opt2_refresh_on_null_and_session
+RUN  pc_opt2_perconn_set_bad_args_on_null_handle
+OK   pc_opt2_perconn_set_bad_args_on_null_handle
+RUN  pc_opt2_perconn_error_index_positions
+OK   pc_opt2_perconn_error_index_positions
+RUN  pc_opt2_perconn_named_connection
+  NOTE OBS perconn connection "pc-no-such-connectoid" -> 1 err 0 FLAGS 0x1 server (null)
+OK   pc_opt2_perconn_named_connection
+RUN  pc_opt2_perconn_dwsize_variants
+  NOTE OBS perconn list.dwSize 0x0 -> 1 err 0 value 0x9 l 32
+  NOTE OBS perconn list.dwSize 0x4 -> 1 err 0 value 0x9 l 32
+  NOTE OBS perconn list.dwSize 0x1f -> 1 err 0 value 0x9 l 32
+  NOTE OBS perconn list.dwSize 0x20 -> 1 err 0 value 0x9 l 32
+  NOTE OBS perconn list.dwSize 0x21 -> 1 err 0 value 0x9 l 32
+  NOTE OBS perconn list.dwSize 0x40 -> 1 err 0 value 0x9 l 32
+  NOTE OBS perconn list.dwSize 0xffffffff -> 1 err 0 value 0x9 l 32
+OK   pc_opt2_perconn_dwsize_variants
+RUN  pc_opt2_perconn_session_vs_null_flags
+  NOTE OBS access 1: session FLAGS 0x9, NULL handle FLAGS 0x9
+  NOTE OBS access 0: session FLAGS 0x9, NULL handle FLAGS 0x9
+  NOTE OBS access 4: session FLAGS 0x9, NULL handle FLAGS 0x9
+OK   pc_opt2_perconn_session_vs_null_flags
+RUN  pc_opt2_perconn_a_w_agree
+OK   pc_opt2_perconn_a_w_agree
+RUN  pc_opt2_perconn_flags_ui_equals_flags
+  NOTE FLAGS 0x9 FLAGS_UI 0x9
+OK   pc_opt2_perconn_flags_ui_equals_flags
+RUN  pc_opt2_perconn_each_option_alone
+  NOTE OBS perconn 1 = 0x9
+  NOTE OBS perconn 2 = (null)
+  NOTE OBS perconn 3 = (null)
+  NOTE OBS perconn 4 = (null)
+  NOTE OBS perconn 5 = 0x0
+  NOTE OBS perconn 6 = (null)
+  NOTE OBS perconn 7 = 0x0
+  NOTE OBS perconn 8 (LAST_DETECT_TIME) = 0000000000000000
+  NOTE OBS perconn 9 = (null)
+  NOTE OBS perconn 10 = 0x9
+OK   pc_opt2_perconn_each_option_alone
+RUN  pc_opt2_proxy_creds_w_unicode
+OK   pc_opt2_proxy_creds_w_unicode
+RUN  pc_opt2_proxy_creds_request_inherits_connect
+  NOTE OBS request after connect-level proxy creds: user 1 "cu" (2) pass 1 "cp" (2)
+OK   pc_opt2_proxy_creds_request_inherits_connect
+RUN  pc_opt2_proxy_creds_length_arg
+  NOTE OBS set PROXY_USERNAME "abcdef" len 0 -> 0 err 87; read "" (0) q=1
+  NOTE OBS set PROXY_USERNAME "abcdef" len 1 -> 1 err 0; read "abcdef" (6) q=1
+  NOTE OBS set PROXY_USERNAME "abcdef" len 3 -> 1 err 0; read "abcdef" (6) q=1
+  NOTE OBS set PROXY_USERNAME "abcdef" len 100 -> 1 err 0; read "abcdef" (6) q=1
+OK   pc_opt2_proxy_creds_length_arg
+RUN  pc_opt2_proxy_creds_empty_and_overwrite
+  NOTE OBS set empty PROXY_PASSWORD -> 1 err 0
+  NOTE OBS after empty set: query 1 len 0 out0 0
+OK   pc_opt2_proxy_creds_empty_and_overwrite
+RUN  pc_opt2_proxy_creds_long_values
+OK   pc_opt2_proxy_creds_long_values
+RUN  pc_opt2_set_proxy_long_string
+  NOTE OBS set 4011-char proxy list -> 1 err 0, need 8048
+OK   pc_opt2_set_proxy_long_string
+RUN  pc_opt2_set_proxy_many_times
+OK   pc_opt2_set_proxy_many_times
+RUN  pc_opt2_set_proxy_direct_ignores_strings
+OK   pc_opt2_set_proxy_direct_ignores_strings
+RUN  pc_opt2_set_proxy_replaces_bypass
+OK   pc_opt2_set_proxy_replaces_bypass
+RUN  pc_opt2_set_proxy_preconfig_on_session
+  NOTE OBS set PRECONFIG on PROXY session -> 1 err 0; read back access 1 proxy "(null)" len 24
+OK   pc_opt2_set_proxy_preconfig_on_session
+RUN  pc_opt2_proxy_on_ftp_and_url_handles
+  NOTE OBS offline FTP connect handle 0000000000cc0008 err 0
+OK   pc_opt2_proxy_on_ftp_and_url_handles
+RUN  pc_opt2_proxy_query_closed_handle
+  NOTE OBS query PROXY on closed session -> 0 err 6
+OK   pc_opt2_proxy_query_closed_handle
+RUN  pc_opt2_proxy_query_exact_len_grows_with_input
+OK   pc_opt2_proxy_query_exact_len_grows_with_input
+RUN  pc_opt2_proxy_query_partial_buffer_direct
+OK   pc_opt2_proxy_query_partial_buffer_direct
+RUN  pc_opt2_proxy_query_partial_buffer_named
+OK   pc_opt2_proxy_query_partial_buffer_named
+RUN  pc_opt2_open_w_readback
+OK   pc_opt2_open_w_readback
+RUN  pc_opt2_bypass_empty_vs_null
+  NOTE OBS bypass NULL -> len 48 "p.invalid:1"; bypass "" -> len 48 "p.invalid:1"
+OK   pc_opt2_bypass_empty_vs_null
+RUN  pc_opt2_bypass_readback_normalised
+OK   pc_opt2_bypass_readback_normalised
+RUN  pc_opt2_proxy_readback_whitespace
+OK   pc_opt2_proxy_readback_whitespace
+RUN  pc_opt2_proxy_readback_normalised
+OK   pc_opt2_proxy_readback_normalised
+RUN  pc_option_max_conns_per_proxy_read
+OK   pc_option_max_conns_per_proxy_read
+RUN  pc_option_offline_mode_not_implemented
+OK   pc_option_offline_mode_not_implemented
+RUN  pc_option_connected_state_set_bad_length
+OK   pc_option_connected_state_set_bad_length
+RUN  pc_option_connected_state_on_session
+OK   pc_option_connected_state_on_session
+RUN  pc_option_connected_state_query
+OK   pc_option_connected_state_query
+RUN  pc_perconn_set_arg_errors_only
+OK   pc_perconn_set_arg_errors_only
+RUN  pc_perconn_query_W
+  NOTE W: FLAGS=0x9 server=(null) autoconfig=(null)
+OK   pc_perconn_query_W
+RUN  pc_perconn_query_zero_options
+OK   pc_perconn_query_zero_options
+RUN  pc_perconn_query_proxy_session_reports_global
+  NOTE PROXY session: FLAGS=0x9 server=(null) bypass=(null) autoconfig=(null) autodisc=0x0 reload=0 lastdetecturl=(null) flags_ui=0x9
+OK   pc_perconn_query_proxy_session_reports_global
+RUN  pc_perconn_query_all_global
+  NOTE NULL handle (registry): FLAGS=0x9 server=(null) bypass=(null) autoconfig=(null) autodisc=0x0 reload=0 lastdetecturl=(null) flags_ui=0x9
+OK   pc_perconn_query_all_global
+RUN  pc_perconn_query_all_session
+  NOTE direct session: FLAGS=0x9 server=(null) bypass=(null) autoconfig=(null) autodisc=0x0 reload=0 lastdetecturl=(null) flags_ui=0x9
+OK   pc_perconn_query_all_session
+RUN  pc_perconn_query_invalid_option_id
+OK   pc_perconn_query_invalid_option_id
+RUN  pc_perconn_query_arg_errors
+OK   pc_perconn_query_arg_errors
+RUN  pc_proxy_creds_connect_not_inherited_after_open
+  NOTE request after connect set: ok=1 user="cuser" len=5
+OK   pc_proxy_creds_connect_not_inherited_after_open
+RUN  pc_proxy_creds_on_request_handle
+  NOTE request: fresh PROXY_USERNAME ok=1 err=0 len=0 buf0=0
+OK   pc_proxy_creds_on_request_handle
+RUN  pc_proxy_creds_on_connect_handle
+  NOTE connect: fresh PROXY_USERNAME ok=1 err=0 len=0 buf0=0
+OK   pc_proxy_creds_on_connect_handle
+RUN  pc_proxy_creds_wrong_handles
+OK   pc_proxy_creds_wrong_handles
+RUN  pc_set_proxy_W_option
+  NOTE InternetSetOptionW(PROXY, ANSI strings) -> 1 err 0
+  NOTE read back: access 3 proxy "127.0.0.1:4321"
+OK   pc_set_proxy_W_option
+RUN  pc_set_proxy_bad_access_type
+OK   pc_set_proxy_bad_access_type
+RUN  pc_set_proxy_bad_length
+OK   pc_set_proxy_bad_length
+RUN  pc_set_proxy_session_does_not_leak_to_other_sessions
+OK   pc_set_proxy_session_does_not_leak_to_other_sessions
+RUN  pc_set_proxy_on_session_roundtrip
+OK   pc_set_proxy_on_session_roundtrip
+RUN  pc_query_proxy_preconfig_session
+  NOTE access 0: proxy access 1 len 24 proxy "(null)"
+  NOTE access 4: proxy access 1 len 24 proxy "(null)"
+OK   pc_query_proxy_preconfig_session
+RUN  pc_query_proxy_global_read_only
+  NOTE global proxy: access 1 proxy "(null)" bypass "(null)" len 24 (ProxyEnable=0 AutoConfigURL=unset)
+OK   pc_query_proxy_global_read_only
+RUN  pc_query_proxy_wrong_handle_types
+OK   pc_query_proxy_wrong_handle_types
+RUN  pc_query_proxy_W_returns_ansi_struct
+OK   pc_query_proxy_W_returns_ansi_struct
+RUN  pc_query_proxy_named_size_query
+  NOTE size query "127.0.0.1:3128"/"<local>": need 62
+  NOTE size query "a.invalid:1"/"(null)": need 48
+  NOTE size query "x:1"/"y": need 34
+  NOTE size query "http=127.0.0.1:1;https=127.0.0.1:2"/"*.invalid;<local>": need 112
+OK   pc_query_proxy_named_size_query
+RUN  pc_query_proxy_named_per_scheme
+  NOTE per-scheme proxy reads back as "http=127.0.0.1:1 https=127.0.0.1:2"
+OK   pc_query_proxy_named_per_scheme
+RUN  pc_query_proxy_named_lowercased
+  NOTE proxy "PROXY.INVALID:3128" bypass "(null)" -> len 62 proxy "proxy.invalid:3128" bypass "proxy.invalid:3128"
+  NOTE proxy "Mixed.Case.Invalid:1" bypass "A.INVALID" -> len 76 proxy "mixed.case.invalid:1" bypass "mixed.case.invalid:1 a.invalid"
+OK   pc_query_proxy_named_lowercased
+RUN  pc_query_proxy_named_session
+  NOTE proxy "127.0.0.1:3128" bypass "<local>" -> len 62 proxy "127.0.0.1:3128" bypass "127.0.0.1:3128 <local>"
+  NOTE proxy "np:3128" bypass "<local>" -> len 48 proxy "np:3128" bypass "np:3128 <local>"
+  NOTE proxy "127.0.0.1:3128" bypass "(null)" -> len 54 proxy "127.0.0.1:3128" bypass "127.0.0.1:3128"
+OK   pc_query_proxy_named_session
+RUN  pc_query_proxy_direct_short_buffer
+OK   pc_query_proxy_direct_short_buffer
+RUN  pc_query_proxy_direct_ignores_proxy_args
+OK   pc_query_proxy_direct_ignores_proxy_args
+RUN  pc_query_proxy_direct_session
+OK   pc_query_proxy_direct_session
+RUN  pc_open_bypass_forms_accepted
+OK   pc_open_bypass_forms_accepted
+RUN  pc_open_proxy_string_forms_accepted
+OK   pc_open_proxy_string_forms_accepted
+RUN  pc_open_proxy_requires_proxy_name
+OK   pc_open_proxy_requires_proxy_name
+RUN  pc_open_access_types_invalid
+OK   pc_open_access_types_invalid
+RUN  pc_open_access_types_valid
+OK   pc_open_access_types_valid
+RUN  pc_fail2_last_response_info_after_refusal
+  NOTE OBS last response info after refusal: ok 1 err 0 len 0
+OK   pc_fail2_last_response_info_after_refusal
+RUN  pc_fail2_errname_helper_covers_codes
+OK   pc_fail2_errname_helper_covers_codes
+RUN  pc_fail2_error_message_texts
+  NOTE OBS message 12002: "The operation timed out"
+  NOTE OBS message 12007: "The server name or address could not be resolved"
+  NOTE OBS message 12029: "A connection with the server could not be established"
+  NOTE OBS message 12030: "The connection with the server was terminated abnormally"
+  NOTE OBS message 12031: "The connection with the server was reset"
+  NOTE OBS message 12152: "The server returned an invalid or unrecognized response"
+  NOTE OBS message 12005: "The URL is invalid"
+  NOTE OBS message 12006: "The URL does not use a recognized protocol"
+  NOTE OBS message 12018: "The supplied handle is the wrong type for the requested operation"
+  NOTE OBS message 12010: "The length is incorrect for the option type"
+  NOTE OBS message 12009: "The option is invalid"
+  NOTE OBS message 12045: "The certificate authority is invalid or incorrect"
+  NOTE OBS message 12165: "The proxy server is unreachable"
+  NOTE OBS message 12163: "The computer is disconnected from the network"
+  NOTE OBS message 12020: "The request cannot be made on a Proxy session"
+  NOTE OBS message 12033: "The proxy request is invalid"
+  NOTE OBS message 12166: "The proxy auto-configuration script is in error"
+  NOTE OBS message 12167: "Could not download the proxy auto-configuration script file"
+  NOTE OBS message 12164: "The server is unreachable"
+  NOTE OBS message 12019: "The handle is in the wrong state for the requested operation"
+OK   pc_fail2_error_message_texts
+RUN  pc_fail2_connect_retries_one_refused
+  NOTE refused with CONNECT_RETRIES=1: 2047 ms
+OK   pc_fail2_connect_retries_one_refused
+RUN  pc_fail2_connect_timeout_inherited_by_children
+OK   pc_fail2_connect_timeout_inherited_by_children
+RUN  pc_fail2_timeout_option_roundtrip
+  NOTE OBS PROXY session option 2 default -> 1 value 60000
+  NOTE OBS PROXY session option 5 default -> 1 value 30000
+  NOTE OBS PROXY session option 6 default -> 1 value 30000
+  NOTE OBS PROXY session option 7 default -> 1 value 30000
+  NOTE OBS PROXY session option 8 default -> 1 value 30000
+  NOTE OBS PROXY session option 3 default -> 1 value 5
+OK   pc_fail2_timeout_option_roundtrip
+RUN  pc_fail2_bad_port_urls
+  NOTE OBS http://127.0.0.1:0/ -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2046 ms
+  NOTE OBS http://127.0.0.1:65536/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
+  NOTE OBS http://127.0.0.1:99999/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
+  NOTE OBS http://127.0.0.1:-1/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
+  NOTE OBS http://127.0.0.1:abc/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
+  NOTE OBS http://127.0.0.1:/ -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2047 ms
+OK   pc_fail2_bad_port_urls
+RUN  pc_fail2_dns_invalid_variants
+  NOTE OBS http://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 12047 ms
+  NOTE slow resolver (12047 ms): not asserting
+  NOTE OBS http://a.b.c.pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE OBS http://PC-DNS-UP.INVALID/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE OBS http://pc-dns.invalid:65535/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 15 ms
+  NOTE OBS https://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 16 ms
+  NOTE OBS http://pc-dns.invalid./ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE OBS http://xn--pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+OK   pc_fail2_dns_invalid_variants
+RUN  pc_fail2_proxy_session_recovers_after_proxy_change
+OK   pc_fail2_proxy_session_recovers_after_proxy_change
+RUN  pc_fail2_session_recovers_after_refusal
+OK   pc_fail2_session_recovers_after_refusal
+RUN  pc_fail2_request_handle_after_refused_send
+  NOTE OBS status query after refused send -> 1 err 0 value 0
+  NOTE OBS InternetReadFile after refused send -> 1 err 0 read 0
+OK   pc_fail2_request_handle_after_refused_send
+RUN  pc_fail2_early_and_malformed_via_proxy
+  NOTE OBS proxy "close at accept": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" heads 0 conns 1 0 ms
+  NOTE OBS proxy "reset at accept": status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" heads 0 conns 1 0 ms
+  NOTE OBS proxy "response before request": status 200 err 0 (?) body "early" heads 1 conns 1 0 ms
+  NOTE OBS proxy "100 then close": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" heads 1 conns 1 0 ms
+  NOTE OBS proxy "status line only": status 200 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS proxy "one byte": status 200 err 0 (?) body "H" heads 1 conns 1 0 ms
+  NOTE OBS proxy "LF-only head": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS proxy "unknown status 999": status 999 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS proxy "chunked truncated": status 200 err 0 (?) body "ab" heads 1 conns 1 0 ms
+  NOTE OBS proxy "chunked bad size": status 0 err 12004 (ERROR_INTERNET_INTERNAL_ERROR) body "" heads 1 conns 1 0 ms
+  NOTE OBS proxy "Content-Length negative": status 200 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS proxy "Content-Length garbage": status 200 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS proxy "HTTP/2 status line": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS proxy "HTTP/1.1 no reason": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS proxy "lowercase http": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS proxy "slow head 3 pieces": status 200 err 0 (?) body "slow" heads 1 conns 1 328 ms
+OK   pc_fail2_early_and_malformed_via_proxy
+RUN  pc_fail2_early_and_malformed_direct
+  NOTE OBS "close at accept": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" heads 0 conns 1 0 ms
+  NOTE OBS "reset at accept": status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" heads 0 conns 1 0 ms
+  NOTE OBS "response before request": status 200 err 0 (?) body "early" heads 1 conns 1 0 ms
+  NOTE OBS "100 then close": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" heads 1 conns 1 0 ms
+  NOTE OBS "status line only": status 200 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS "one byte": status 200 err 0 (?) body "H" heads 1 conns 1 0 ms
+  NOTE OBS "LF-only head": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS "unknown status 999": status 999 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS "chunked truncated": status 200 err 0 (?) body "ab" heads 1 conns 1 0 ms
+  NOTE OBS "chunked bad size": status 0 err 12004 (ERROR_INTERNET_INTERNAL_ERROR) body "" heads 1 conns 1 0 ms
+  NOTE OBS "Content-Length negative": status 200 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS "Content-Length garbage": status 200 err 0 (?) body "" heads 1 conns 1 0 ms
+  NOTE OBS "HTTP/2 status line": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS "HTTP/1.1 no reason": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS "lowercase http": status 200 err 0 (?) body "ok" heads 1 conns 1 0 ms
+  NOTE OBS "slow head 3 pieces": status 200 err 0 (?) body "slow" heads 1 conns 1 328 ms
+OK   pc_fail2_early_and_malformed_direct
+RUN  pc_fail2_connect_proxy_refused
+  NOTE CONNECT proxy refused: 2046 ms
+OK   pc_fail2_connect_proxy_refused
+RUN  pc_fail2_connect_stage_table
+  NOTE OBS CONNECT stage "close without reply": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "reset without reply": status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "garbage reply then close": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "200 then close": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "200 then reset": status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) 109 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "200 then plaintext": status 0 err 12157 (ERROR_INTERNET_SECURITY_CHANNEL_ERROR) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "partial status line": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "407 without auth header": status 407 err 0 (?) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "301 to CONNECT": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "HTTP/1.0 403 close": status 403 err 0 (?) 31 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "100 then close": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+OK   pc_fail2_connect_stage_table
+RUN  pc_fail_last_response_info_after_failure
+  NOTE last response info: ok 1 err 0 len 0
+OK   pc_fail_last_response_info_after_failure
+RUN  pc_fail_error_text_available
+  NOTE 12002: The operation timed out
+
+  NOTE 12007: The server name or address could not be resolved
+
+  NOTE 12029: A connection with the server could not be established
+
+OK   pc_fail_error_text_available
+RUN  pc_fail_stale_keepalive_retried
+  NOTE stale keep-alive first body "first"
+  NOTE stale keep-alive: requests 3 conns 2
+  NOTE   req 0 conn 0: GET /1 HTTP/1.1
+  NOTE   req 1 conn 0: GET /2 HTTP/1.1
+  NOTE   req 2 conn 1: GET /2 HTTP/1.1
+  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=89 [GET /1 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 2 t=0 conn=0 req=-1 SENT n=62 [HTTP/1.1 200 OK\r\nContent-Length: 5\r\nConnection: Keep-Alive\r\n\r\n]
+  NOTE srv ev 3 t=0 conn=0 req=1 HEAD n=89 [GET /2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 4 t=0 conn=0 req=-1 SCRIPT_DONE n=4 [pc=4]
+  NOTE srv ev 5 t=0 conn=0 req=-1 CLOSED n=0 []
+  NOTE srv ev 6 t=0 conn=1 req=-1 ACCEPT n=0 []
+  NOTE srv ev 7 t=0 conn=1 req=2 HEAD n=89 [GET /2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 8 t=0 conn=1 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 6\r\n\r\n]
+OK   pc_fail_stale_keepalive_retried
+RUN  pc_fail_reset_mid_body_read_error
+  NOTE reset mid body: ok 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) total 0
+OK   pc_fail_reset_mid_body_read_error
+RUN  pc_fail_stages_via_proxy
+  NOTE proxy close without response: status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" requests 1 conns 1 0 ms
+  NOTE proxy reset without response: status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" requests 1 conns 1 0 ms
+  NOTE proxy close mid status line: status 200 err 0 (?) body "HTTP/1.1 2" requests 1 conns 1 0 ms
+  NOTE proxy close mid headers: status 200 err 0 (?) body "" requests 1 conns 1 0 ms
+  NOTE proxy close after header line: status 200 err 0 (?) body "" requests 1 conns 1 0 ms
+  NOTE proxy reset mid headers: status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" requests 1 conns 1 0 ms
+  NOTE proxy headers then close (no length): status 200 err 0 (?) body "body" requests 1 conns 1 0 ms
+  NOTE proxy garbage instead of status line: status 200 err 0 (?) body "garbage here
+
+" requests 1 conns 1 0 ms
+  NOTE proxy truncated body: status 200 err 0 (?) body "01234" requests 1 conns 1 0 ms
+  NOTE proxy reset mid body: status 200 err 0 (?) body "" requests 1 conns 1 203 ms
+  NOTE proxy HTTP/1.0 close-delimited: status 200 err 0 (?) body "ten bytes!" requests 1 conns 1 0 ms
+OK   pc_fail_stages_via_proxy
+RUN  pc_fail_stages_direct
+  NOTE close without response: status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" requests 1 conns 1 0 ms
+  NOTE reset without response: status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" requests 1 conns 1 0 ms
+  NOTE close mid status line: status 200 err 0 (?) body "HTTP/1.1 2" requests 1 conns 1 0 ms
+  NOTE close mid headers: status 200 err 0 (?) body "" requests 1 conns 1 47 ms
+  NOTE close after header line: status 200 err 0 (?) body "" requests 1 conns 1 0 ms
+  NOTE reset mid headers: status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" requests 1 conns 1 0 ms
+  NOTE headers then close (no length): status 200 err 0 (?) body "body" requests 1 conns 1 0 ms
+  NOTE garbage instead of status line: status 200 err 0 (?) body "garbage here
+
+" requests 1 conns 1 0 ms
+  NOTE truncated body: status 200 err 0 (?) body "01234" requests 1 conns 1 0 ms
+  NOTE reset mid body: status 200 err 0 (?) body "" requests 1 conns 1 203 ms
+  NOTE HTTP/1.0 close-delimited: status 200 err 0 (?) body "ten bytes!" requests 1 conns 1 0 ms
+OK   pc_fail_stages_direct
+RUN  pc_fail_receive_timeout_via_proxy
+  NOTE receive timeout via proxy: status 200 err 0 3016 ms requests 1
+OK   pc_fail_receive_timeout_via_proxy
+RUN  pc_fail_receive_timeout_on_request_handle
+  NOTE request-handle receive timeout 800: ok 1 err 0 (?) 3000 ms requests 1 conns 1
+  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=95 [GET /slowreq HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50057\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 2 t=3000 conn=0 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n]
+  NOTE srv ev 3 t=3000 conn=0 req=-1 SCRIPT_DONE n=4 [pc=3]
+OK   pc_fail_receive_timeout_on_request_handle
+RUN  pc_fail_receive_timeout_mid_body
+  NOTE mid-body stall: ok 1 err 0 (?) total 10
+OK   pc_fail_receive_timeout_mid_body
+RUN  pc_fail_receive_timeout
+  NOTE receive timeout 800 ms: status 200 err 0 (?) 3016 ms, requests 1 conns 1
+  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=92 [GET /slow HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50061\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 2 t=3016 conn=0 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n]
+  NOTE srv ev 3 t=3016 conn=0 req=-1 SCRIPT_DONE n=4 [pc=3]
+  NOTE srv ev 4 t=3016 conn=0 req=-1 CLOSED n=0 []
+OK   pc_fail_receive_timeout
+RUN  pc_fail_dns_invalid_ftp
+OK   pc_fail_dns_invalid_ftp
+RUN  pc_fail_dns_invalid_httpopenrequest
+OK   pc_fail_dns_invalid_httpopenrequest
+RUN  pc_fail_dns_invalid_direct
+  NOTE http://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE http://pc-dns-2.invalid:8080/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE https://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE http://pcdnsplain/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 2266 ms
+OK   pc_fail_dns_invalid_direct
+RUN  pc_fail_connect_timeout_vs_refused
+  NOTE connect timeout 300 ms vs refused port: err 12002 (ERROR_INTERNET_TIMEOUT) 2031 ms
+OK   pc_fail_connect_timeout_vs_refused
+RUN  pc_fail_refused_ftp_connect
+OK   pc_fail_refused_ftp_connect
+RUN  pc_fail_refused_https
+  NOTE refused https: 2063 ms
+OK   pc_fail_refused_https
+RUN  pc_fail_proxy_list_failover
+  NOTE proxy list "127.0.0.1:50069;127.0.0.1:50070": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) second-proxy requests 0 2046 ms
+OK   pc_fail_proxy_list_failover
+RUN  pc_fail_proxy_name_unresolvable
+  NOTE unresolvable proxy: status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+OK   pc_fail_proxy_name_unresolvable
+RUN  pc_fail_refused_via_proxy
+  NOTE proxy refused: status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2047 ms
+OK   pc_fail_refused_via_proxy
+RUN  pc_fail_refused_httpopenrequest
+  NOTE refused HttpSendRequest: 2062 ms
+OK   pc_fail_refused_httpopenrequest
+RUN  pc_fail_refused_direct
+  NOTE refused direct: err 12029 2031 ms
+  NOTE EXTENDED_ERROR after refusal: 997
+OK   pc_fail_refused_direct
+RUN  pc_dial_is_host_in_bypass_list_lengths
+  NOTE OBS IsHostInProxyBypassList(http, "pc-len.invalid", 0) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "pc-len.invalid", 3) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "pc-len.invalid", 14) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "pc-len.invalid", 1000) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "<local>", 7) -> 0 err 12005
+  NOTE OBS IsHostInProxyBypassList(http, "pclocalname", 11) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "[::1]", 5) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "::1", 3) -> 0 err 0
+  NOTE OBS IsHostInProxyBypassList(http, "PC-LEN.INVALID", 14) -> 0 err 0
+OK   pc_dial_is_host_in_bypass_list_lengths
+RUN  pc_dial_detect_auto_proxy_url_flag_values
+  NOTE OBS DetectAutoProxyUrl(flags 0x0) -> 0 err 87 buf0 0
+  NOTE OBS DetectAutoProxyUrl(flags 0x4) -> 0 err 87 buf0 0
+  NOTE OBS DetectAutoProxyUrl(flags 0x8) -> 0 err 87 buf0 0
+  NOTE OBS DetectAutoProxyUrl(flags 0x80000000) -> 0 err 87 buf0 0
+OK   pc_dial_detect_auto_proxy_url_flag_values
+RUN  pc_dial_detect_auto_proxy_url_buffer_sizes
+  NOTE OBS DetectAutoProxyUrl(len 1) -> 0 err 12180 buf0 0 buf[len] 120
+  NOTE OBS DetectAutoProxyUrl(len 2) -> 0 err 12180 buf0 0 buf[len] 120
+  NOTE OBS DetectAutoProxyUrl(len 16) -> 0 err 12180 buf0 0 buf[len] 120
+  NOTE OBS DetectAutoProxyUrl(len 2048) -> 0 err 12180 buf0 0 buf[len] -1
+OK   pc_dial_detect_auto_proxy_url_buffer_sizes
+RUN  pc_dial_get_proxy_for_url_free_twice_safe
+OK   pc_dial_get_proxy_for_url_free_twice_safe
+RUN  pc_dial_get_proxy_for_url_scheme_table
+  NOTE OBS GetProxyForUrl(NULL, http://pc-gp.invalid/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, https://pc-gp.invalid/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, ftp://pc-gp.invalid/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, HTTP://PC-GP.INVALID/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, http://[::1]:8080/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, http://127.0.0.1/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, ws://pc-gp.invalid/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, wss://pc-gp.invalid/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, gopher://pc-gp.invalid/) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+  NOTE OBS GetProxyForUrl(NULL, file:///c:/x.txt) -> 12005 count 0 fProxy -1 fBypass -1 scheme -1 port 0
+  NOTE OBS GetProxyForUrl(NULL, not a url) -> 12006 count 0 fProxy -1 fBypass -1 scheme -1 port 0
+  NOTE OBS GetProxyForUrl(NULL, pc-gp.invalid) -> 12006 count 0 fProxy -1 fBypass -1 scheme -1 port 0
+  NOTE OBS GetProxyForUrl(NULL, http://) -> 12005 count 0 fProxy -1 fBypass -1 scheme -1 port 0
+  NOTE OBS GetProxyForUrl(NULL, mailto:a@b.invalid) -> 0 count 1 fProxy 0 fBypass 0 scheme 0 port 0
+OK   pc_dial_get_proxy_for_url_scheme_table
+RUN  pc_dial_check_connection_long_host
+  NOTE ICC long host (300 chars) -> 1 err 0 (?) 0 ms
+OK   pc_dial_check_connection_long_host
+RUN  pc_dial_check_connection_closed_port_schemes
+  NOTE ICC closed http://127.0.0.1:50078/ -> err 12029 2063 ms
+  NOTE ICC closed https://127.0.0.1:50078/ -> err 12029 2015 ms
+  NOTE ICC closed ftp://127.0.0.1:50078/ -> err 12029 2032 ms
+OK   pc_dial_check_connection_closed_port_schemes
+RUN  pc_dial_check_connection_bad_url_table
+  NOTE ICC FORCE "not a url" -> 0 err 12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME) 0 ms
+  NOTE ICC FORCE "http//x" -> 0 err 12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME) 0 ms
+  NOTE ICC FORCE "mailto:a@b" -> 0 err 87 (?) 0 ms
+  NOTE ICC FORCE "" -> 0 err 12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME) 0 ms
+  NOTE ICC FORCE "http://" -> 0 err 12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME) 0 ms
+  NOTE ICC FORCE "http:///path" -> 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
+  NOTE ICC FORCE "file:///c:/x" -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE "about:blank" -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE "javascript:1" -> 0 err 87 (?) 0 ms
+  NOTE ICC FORCE "http://127.0.0.1:99999/" -> 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
+  NOTE ICC FORCE "http://127.0.0.1:0/" -> 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2062 ms
+OK   pc_dial_check_connection_bad_url_table
+RUN  pc_dial_check_connection_reserved_table
+OK   pc_dial_check_connection_reserved_table
+RUN  pc_dial_check_connection_w_forms
+OK   pc_dial_check_connection_w_forms
+RUN  pc_dial_check_connection_flag_bits
+OK   pc_dial_check_connection_flag_bits
+RUN  pc_dial_check_connection_force_scheme_forms
+  NOTE ICC FORCE http://127.0.0.1:50091/ -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE http://127.0.0.1:50091 -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE https://127.0.0.1:50091/ -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE ftp://127.0.0.1:50091/ -> 0 err 12111 (ERROR_FTP_DROPPED) 5032 ms
+  NOTE ICC FORCE HTTP://127.0.0.1:50091/x?y#z -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE http://user:pw@127.0.0.1:50091/p -> 1 err 0 (?) 0 ms
+  NOTE ICC FORCE gopher://127.0.0.1:50091/ -> 0 err 87 (?) 0 ms
+  NOTE ICC FORCE http://localhost:50091/ -> 1 err 0 (?) 0 ms
+  NOTE server saw 0 requests, 7 connections
+OK   pc_dial_check_connection_force_scheme_forms
+RUN  pc_dial_connected_state_flags_consistent
+OK   pc_dial_connected_state_flags_consistent
+RUN  pc_dial_connected_state_ex_reserved_table
+OK   pc_dial_connected_state_ex_reserved_table
+RUN  pc_dial_connected_state_ex_null_flags
+OK   pc_dial_connected_state_ex_null_flags
+RUN  pc_dial_connected_state_ex_a_truncation
+OK   pc_dial_connected_state_ex_a_truncation
+RUN  pc_dial_connected_state_ex_w_truncation
+  NOTE connection name "LAN Connection" (14 chars) flags 0x12
+OK   pc_dial_connected_state_ex_w_truncation
+RUN  pc_dial_get_proxy_dll_info
+  NOTE proxy dll CLSID {057eee47-2572-4aa1-...}
+  NOTE proxy file list entries: 2
+OK   pc_dial_get_proxy_dll_info
+RUN  pc_dial_autodial_callback_is_noop
+OK   pc_dial_autodial_callback_is_noop
+RUN  pc_dial_set_dial_state_always_fails
+OK   pc_dial_set_dial_state_always_fails
+RUN  pc_dial_hangup
+OK   pc_dial_hangup
+RUN  pc_dial_internetdial_plain_is_a
+OK   pc_dial_internetdial_plain_is_a
+RUN  pc_dial_internetdial_w
+OK   pc_dial_internetdial_w
+RUN  pc_dial_internetdial_a
+OK   pc_dial_internetdial_a
+RUN  pc_dial_autodial_hangup
+OK   pc_dial_autodial_hangup
+RUN  pc_dial_autodial_hwnd_ignored
+OK   pc_dial_autodial_hwnd_ignored
+RUN  pc_dial_autodial_flags
+OK   pc_dial_autodial_flags
+RUN  pc_is_host_in_bypass_list_direct_config
+  NOTE IsHostInProxyBypassList(3, pc-bypass.invalid) -> 0 err 0
+  NOTE IsHostInProxyBypassList(4, pc-bypass.invalid) -> 0 err 0
+  NOTE IsHostInProxyBypassList(1, pc-bypass.invalid) -> 0 err 0
+  NOTE IsHostInProxyBypassList(0, pc-bypass.invalid) -> 0 err 0
+  NOTE IsHostInProxyBypassList(3, 127.0.0.1) -> 0 err 0
+  NOTE IsHostInProxyBypassList(3, localhost) -> 0 err 0
+  NOTE IsHostInProxyBypassList(3, intranethost) -> 0 err 0
+OK   pc_is_host_in_bypass_list_direct_config
+RUN  pc_is_host_in_bypass_list_args
+OK   pc_is_host_in_bypass_list_args
+RUN  pc_get_proxy_for_url_ignores_session_proxy
+  NOTE PROXY session -> 0 count 1 fProxy 0
+OK   pc_get_proxy_for_url_ignores_session_proxy
+RUN  pc_get_proxy_for_url_direct_config
+  NOTE GetProxyForUrl(NULL, http://pc-gpfu.invalid/a) -> 0 count 1 fProxy 0 proxy (null) 15 ms
+  NOTE GetProxyForUrl(NULL, https://pc-gpfu.invalid:8443/b) -> 0 count 1 fProxy 0 proxy (null) 0 ms
+  NOTE GetProxyForUrl(NULL, http://127.0.0.1:1/) -> 0 count 1 fProxy 0 proxy (null) 0 ms
+  NOTE GetProxyForUrl(session, http://pc-gpfu.invalid/a) -> 0 count 1 fProxy 0 proxy (null) 0 ms
+  NOTE GetProxyForUrl(session, https://pc-gpfu.invalid:8443/b) -> 0 count 1 fProxy 0 proxy (null) 0 ms
+  NOTE GetProxyForUrl(session, http://127.0.0.1:1/) -> 0 count 1 fProxy 0 proxy (null) 0 ms
+OK   pc_get_proxy_for_url_direct_config
+RUN  pc_get_proxy_for_url_closed_handle
+  NOTE closed handle -> 6
+OK   pc_get_proxy_for_url_closed_handle
+RUN  pc_get_proxy_for_url_args
+OK   pc_get_proxy_for_url_args
+RUN  pc_init_autoproxy_dll_sync
+  NOTE InternetInitializeAutoProxyDll(2) -> 1 err 0 0 ms
+OK   pc_init_autoproxy_dll_sync
+RUN  pc_init_autoproxy_dll_async_flags
+  NOTE InternetInitializeAutoProxyDll(0x0) -> 1 err 0 0 ms
+  NOTE InternetInitializeAutoProxyDll(0x1) -> 1 err 0 0 ms
+  NOTE InternetInitializeAutoProxyDll(0x4) -> 1 err 0 0 ms
+  NOTE InternetInitializeAutoProxyDll(0x8) -> 1 err 0 0 ms
+  NOTE InternetInitializeAutoProxyDll(0xc) -> 1 err 0 0 ms
+  NOTE InternetInitializeAutoProxyDll(0x5) -> 1 err 0 0 ms
+OK   pc_init_autoproxy_dll_async_flags
+RUN  pc_init_autoproxy_dll_bad_flags
+OK   pc_init_autoproxy_dll_bad_flags
+RUN  pc_detect_auto_proxy_url_no_wpad
+  NOTE DetectAutoProxyUrl(1) -> 0 err 12180 (?) 0 ms url0=0
+  NOTE DetectAutoProxyUrl(2) -> 0 err 12180 (?) 0 ms url0=0
+  NOTE DetectAutoProxyUrl(3) -> 0 err 12180 (?) 0 ms url0=0
+OK   pc_detect_auto_proxy_url_no_wpad
+RUN  pc_detect_auto_proxy_url_args
+OK   pc_detect_auto_proxy_url_args
+RUN  pc_check_connection_fresh_process
+child: noforce r=0 e=2250 force r=0 e=12016
+  NOTE child exit 0x103
+OK   pc_check_connection_fresh_process
+RUN  pc_check_connection_noforce_after_traffic
+OK   pc_check_connection_noforce_after_traffic
+RUN  pc_check_connection_bad_url
+  NOTE check "not a url": 0 err 12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME)
+  NOTE check "http//x": 0 err 12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME)
+  NOTE check "mailto:a@b": 0 err 87 (?)
+OK   pc_check_connection_bad_url
+RUN  pc_check_connection_force_unresolvable
+  NOTE check .invalid: 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 12047 ms (forced check resolves through a slower path than HttpSendRequest)
+OK   pc_check_connection_force_unresolvable
+RUN  pc_check_connection_force_closed_port
+  NOTE check closed port 50101: 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2047 ms
+OK   pc_check_connection_force_closed_port
+RUN  pc_check_connection_force_listening_W
+OK   pc_check_connection_force_listening_W
+RUN  pc_check_connection_force_listening
+  NOTE check listening: 1 err 0 0 ms
+OK   pc_check_connection_force_listening
+RUN  pc_check_connection_reserved
+OK   pc_check_connection_reserved
+RUN  pc_do_connectoids_exist
+  NOTE DoConnectoidsExist -> 0 err 3
+OK   pc_do_connectoids_exist
+RUN  pc_go_online_url_ignored
+OK   pc_go_online_url_ignored
+RUN  pc_go_online_flags
+OK   pc_go_online_flags
+RUN  pc_connected_state_repeatable
+OK   pc_connected_state_repeatable
+RUN  pc_connected_state_ex_a
+  NOTE ExA -> 1 flags 0x12 name "LAN Connection"
+OK   pc_connected_state_ex_a
+RUN  pc_connected_state_ex_w
+  NOTE ExW -> 1 flags 0x12 name "LAN Connection"
+OK   pc_connected_state_ex_w
+RUN  pc_connected_state_reserved_nonzero
+OK   pc_connected_state_reserved_nonzero
+RUN  pc_connected_state_null_flags
+OK   pc_connected_state_null_flags
+RUN  pc_connected_state_basic
+  NOTE InternetGetConnectedState -> 1 flags 0x12 err 0
+OK   pc_connected_state_basic
+RUN  pc_attempt_connect
+OK   pc_attempt_connect
+RUN  pc_aliases_share_code
+OK   pc_aliases_share_code
+RUN  pc_exports_absent
+OK   pc_exports_absent
+RUN  pc_exports_present
+OK   pc_exports_present
+SUMMARY tests=239 failed=1 skipped=0 checks_pass=2871 checks_fail=1
+@@I7 END proxy_connectivity exit=0x1 ms=396451 timeout=0 bytes=63999

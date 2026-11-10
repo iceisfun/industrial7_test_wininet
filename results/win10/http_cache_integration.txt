@@ -1,0 +1,938 @@
+RUN  hci_store_refetch_replaces_content
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   hci_store_refetch_replaces_content
+RUN  hci_store_two_urls_two_files
+OK   hci_store_two_urls_two_files
+RUN  hci_store_empty_200_body
+  NOTE empty 200: type=0x41 size=0 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_4_empty[1].txt hdrsize=64 exp=1dd51167a8adca1 lm=0 sync=1dd510e18c674a1 acc=1dd510e18c674a1 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n]
+OK   hci_store_empty_200_body
+RUN  hci_store_entry_survives_session_close
+OK   hci_store_entry_survives_session_close
+RUN  hci_store_url_option_is_cache_key
+OK   hci_store_url_option_is_cache_key
+RUN  hci_store_fragment_not_part_of_key
+  NOTE fragment: request target /wininet_7372_7_frag#section
+  NOTE fragment: entry with #=1 without=0
+OK   hci_store_fragment_not_part_of_key
+RUN  hci_store_query_string_url_cached
+OK   hci_store_query_string_url_cached
+RUN  hci_store_partial_read_then_close
+  NOTE partial read (100 of 200000) then close: entry=0 err=2 size=0
+OK   hci_store_partial_read_then_close
+RUN  hci_store_truncated_body_not_committed
+  NOTE truncated: read 10 bytes ok=1
+  NOTE truncated: no entry
+OK   hci_store_truncated_body_not_committed
+RUN  hci_store_close_delimited_body_stored
+OK   hci_store_close_delimited_body_stored
+RUN  hci_store_chunked_body_stored_whole
+  NOTE chunked: Transfer-Encoding kept in header info: 1
+OK   hci_store_chunked_body_stored_whole
+RUN  hci_store_multipart_mixed_replace_not_cached
+  NOTE multipart/x-mixed-replace; boundary=b cached=1
+  NOTE multipart/mixed; boundary=b cached=1
+  NOTE multipart/x-byteranges; boundary=b cached=1
+OK   hci_store_multipart_mixed_replace_not_cached
+RUN  hci_store_need_file_no_store_gives_datafile
+  NOTE needfile no-store: no entry
+  NOTE NEED_FILE no-store datafile=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_16_needfilens[1].txt err=0 exists-after-close=0
+OK   hci_store_need_file_no_store_gives_datafile
+RUN  hci_store_need_file_forces_404_entry
+  NOTE needfile 404: no entry
+OK   hci_store_need_file_forces_404_entry
+RUN  hci_store_non_200_status_not_cached
+OK   hci_store_non_200_status_not_cached
+RUN  hci_store_content_disposition_filename
+  NOTE Content-Disposition: local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\report[1].csv ext=
+OK   hci_store_content_disposition_filename
+RUN  hci_store_extension_from_url
+  NOTE url .txt ctype text/plain -> lpszFileExtension= local ext=txt
+  NOTE url .html ctype text/html -> lpszFileExtension= local ext=htm
+  NOTE url .png ctype image/png -> lpszFileExtension= local ext=png
+  NOTE url .dat ctype application/octet-stream -> lpszFileExtension= local ext=dat
+  NOTE url .txt ctype text/html -> lpszFileExtension= local ext=htm
+  NOTE url .css ctype image/png -> lpszFileExtension= local ext=png
+  NOTE url .js ctype (none) -> lpszFileExtension= local ext=js
+OK   hci_store_extension_from_url
+RUN  hci_store_extension_from_content_type
+  NOTE ctype text/html                        -> lpszFileExtension= local ext=htm
+  NOTE ctype text/plain                       -> lpszFileExtension= local ext=txt
+  NOTE ctype image/png                        -> lpszFileExtension= local ext=png
+  NOTE ctype image/gif                        -> lpszFileExtension= local ext=gif
+  NOTE ctype image/jpeg                       -> lpszFileExtension= local ext=jpg
+  NOTE ctype text/css                         -> lpszFileExtension= local ext=css
+  NOTE ctype text/xml                         -> lpszFileExtension= local ext=xml
+  NOTE ctype application/x-javascript         -> lpszFileExtension= local ext=js
+  NOTE ctype image/bmp                        -> lpszFileExtension= local ext=bmp
+  NOTE ctype video/mpeg                       -> lpszFileExtension= local ext=mpeg
+  NOTE ctype audio/wav                        -> lpszFileExtension= local ext=wav
+  NOTE ctype application/x-zip-compressed     -> lpszFileExtension= local ext=zip
+  NOTE ctype text/html; charset=utf-8         -> lpszFileExtension= local ext=htm
+  NOTE ctype TEXT/PLAIN                       -> lpszFileExtension= local ext=txt
+OK   hci_store_extension_from_content_type
+RUN  hci_store_expires_in_past_still_stored
+OK   hci_store_expires_in_past_still_stored
+RUN  hci_store_no_validators_times_zero
+  NOTE novalid: type=0x41 size=2 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\5330XK9A\wininet_7372_52_novalid[1].txt hdrsize=64 exp=0 lm=0 sync=1dd510e22dcad69 acc=1dd510e22dcad69 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 2\r\n\r\n]
+OK   hci_store_no_validators_times_zero
+RUN  hci_store_max_age_beats_expires
+OK   hci_store_max_age_beats_expires
+RUN  hci_store_max_age_sets_expire_time
+OK   hci_store_max_age_sets_expire_time
+RUN  hci_store_last_modified_and_expires_parsed
+OK   hci_store_last_modified_and_expires_parsed
+RUN  hci_store_set_cookie_in_header_info
+OK   hci_store_set_cookie_in_header_info
+RUN  hci_store_header_info_contents
+  NOTE hdrinfo: type=0x41 size=4 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_57_hdrinfo[1].txt hdrsize=94 exp=1dd5116859420bb lm=0 sync=1dd510e23cfb8bb acc=1dd510e23cfb8bb hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nX-Hci-Custom: v1\r\nETag: "e1"\r\nContent-Length: 4\r\n\r\n]
+  NOTE header blob ends with 0d 0a 0d 0a
+OK   hci_store_header_info_contents
+RUN  hci_store_sizes_table
+OK   hci_store_sizes_table
+RUN  hci_store_local_file_equals_body
+  NOTE local file C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_67_file[1].txt
+OK   hci_store_local_file_equals_body
+RUN  hci_store_get_creates_entry
+  NOTE basic: type=0x41 size=11 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\5330XK9A\wininet_7372_68_basic[1].txt hdrsize=65 exp=1dd511687a30bba lm=0 sync=1dd510e25e107ec acc=1dd510e25e107ec hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 11\r\n\r\n]
+OK   hci_store_get_creates_entry
+RUN  hci_seed_cached_response_headers_equal_stored
+  NOTE stored=84 raw(cache)=124 raw(net)=113
+OK   hci_seed_cached_response_headers_equal_stored
+RUN  hci_seed_httpopenrequest_get_cached_like_openurl
+OK   hci_seed_httpopenrequest_get_cached_like_openurl
+RUN  hci_seed_set_entry_info_expire_makes_fresh
+OK   hci_seed_set_entry_info_expire_makes_fresh
+RUN  hci_seed_set_entry_info_expire_makes_stale
+OK   hci_seed_set_entry_info_expire_makes_stale
+RUN  hci_seed_info_ex_of_http_entry
+OK   hci_seed_info_ex_of_http_entry
+RUN  hci_seed_wide_info_of_http_entry
+OK   hci_seed_wide_info_of_http_entry
+RUN  hci_seed_network_handle_set_file_pointer
+  NOTE SetFilePointer on NO_CACHE_WRITE handle after full read: -1 err=12016
+OK   hci_seed_network_handle_set_file_pointer
+RUN  hci_seed_cached_handle_set_file_pointer
+  NOTE cache handle: FILE_CURRENT -5 -> -1 err 131; FILE_END -2 -> -1 err 131
+OK   hci_seed_cached_handle_set_file_pointer
+RUN  hci_seed_cached_handle_query_info
+  NOTE cache-served QueryDataAvailable=15
+OK   hci_seed_cached_handle_query_info
+RUN  hci_seed_reload_ignores_seeded_entry
+OK   hci_seed_reload_ignores_seeded_entry
+RUN  hci_seed_no_headers_entry
+  NOTE seeded entry without headers: ok=1 err=0 status=0 body=headerless requests=0
+OK   hci_seed_no_headers_entry
+RUN  hci_seed_status_from_stored_headers
+OK   hci_seed_status_from_stored_headers
+RUN  hci_seed_from_cache_serves_seeded_entry
+OK   hci_seed_from_cache_serves_seeded_entry
+RUN  hci_seed_expired_no_validators_unconditional
+OK   hci_seed_expired_no_validators_unconditional
+RUN  hci_seed_expired_entry_lm_if_modified_since
+  NOTE seeded expired entry with LastModifiedTime: If-Modified-Since=Thu, 04 Jan 2024 19:01:53 GMT; length=9
+OK   hci_seed_expired_entry_lm_if_modified_since
+RUN  hci_seed_expired_entry_with_etag_revalidated
+OK   hci_seed_expired_entry_with_etag_revalidated
+RUN  hci_seed_fresh_entry_served_without_network
+OK   hci_seed_fresh_entry_served_without_network
+RUN  hci_more_misc_flags_still_cache
+OK   hci_more_misc_flags_still_cache
+RUN  hci_more_app_range_206_not_cached
+  NOTE 206 to an app Range request: entry=0 type=0x0
+OK   hci_more_app_range_206_not_cached
+RUN  hci_more_redirect_chain_cache_read
+  NOTE cached 301 chain with REDIRECT_CACHE_READ: requests=3 second=chain-end url=http://127.0.0.1:49849/wininet_7372_94_ch3 from_cache=1
+OK   hci_more_redirect_chain_cache_read
+RUN  hci_more_secondary_key_empty
+  NOTE SECONDARY_CACHE_KEY empty: ok=0 err=87
+OK   hci_more_secondary_key_empty
+RUN  hci_more_secondary_key_after_send
+  NOTE SECONDARY_CACHE_KEY after send: ok=1 err=0; entries plain=0 keyed=1
+OK   hci_more_secondary_key_after_send
+RUN  hci_more_secondary_key_wide_set
+  NOTE SECONDARY_CACHE_KEY via W (2 chars): ok=1 err=0
+  NOTE W query length 2
+OK   hci_more_secondary_key_wide_set
+RUN  hci_more_offline_redirect_entry
+  NOTE FROM_CACHE on a cached 301 source: ok=1 err=0 status=200 body=offline-target url=http://127.0.0.1:49857/wininet_7372_99_off301dst requests=2
+OK   hci_more_offline_redirect_entry
+RUN  hci_more_offline_session_stale_entry_served
+OK   hci_more_offline_session_stale_entry_served
+RUN  hci_more_offline_session_ignore_offline_request
+  NOTE offline session: miss err=2; RELOAD on offline session ok=0 err=2 requests=0
+OK   hci_more_offline_session_ignore_offline_request
+RUN  hci_more_app_authorization_header_cached
+  NOTE app Authorization header: stored=1 second requests=1 body=auth-body
+OK   hci_more_app_authorization_header_cached
+RUN  hci_more_no_store_with_translate_keeps_entry
+  NOTE no-store response to a request with Translate: f -> entry kept=1
+OK   hci_more_no_store_with_translate_keeps_entry
+RUN  hci_more_userinfo_url_key
+  NOTE URL with userinfo: status=200 url opt=http://127.0.0.1:49866/wininet_7372_104_uinfo entry(plain)=1 entry(userinfo)=0 Authorization=-
+OK   hci_more_userinfo_url_key
+RUN  hci_more_query_order_separate_entries
+OK   hci_more_query_order_separate_entries
+RUN  hci_more_empty_query_key
+  NOTE URL then URL?: requests=2 second=empty-q entries 1/1
+OK   hci_more_empty_query_key
+RUN  hci_more_escaped_path_keys
+  NOTE ~ vs %7E: requests=2 second=tilde-2 targets [/wininet_7372_107_esc/~x] [/wininet_7372_107_esc/%7Ex] entries 1/1
+OK   hci_more_escaped_path_keys
+RUN  hci_more_host_case_same_entry
+  NOTE localhost then LOCALHOST: requests=1 second=lc-host url opt=http://localhost:49874/wininet_7372_108_hostcase entry(UC)=0
+OK   hci_more_host_case_same_entry
+RUN  hci_more_path_case_separate_entries
+OK   hci_more_path_case_separate_entries
+RUN  hci_more_status_callbacks_revalidation
+  NOTE revalidation callbacks: 60 80 30 31 40 41 70 
+OK   hci_more_status_callbacks_revalidation
+RUN  hci_more_status_callbacks_cache_hit
+  NOTE network GET callbacks: 60 80 20 21 30 31 40 41 40 41 70 
+  NOTE cache hit callbacks: 60 70 
+OK   hci_more_status_callbacks_cache_hit
+RUN  hci_more_decoding_on_identity_response
+OK   hci_more_decoding_on_identity_response
+RUN  hci_more_decoded_entry_read_without_decoding
+  NOTE decoded entry read without decoding: requests=1 len=900 plain=1 gzip=0 CE header in response=0
+OK   hci_more_decoded_entry_read_without_decoding
+RUN  hci_more_decoding_stored_form_table
+  NOTE decoding=0 gzip(mode 0): app got plain=0 len=72; stored plain=0 compressed=1 size=72 CE kept=1; second len=72 requests=1
+  NOTE decoding=0 deflate(mode 1): app got plain=0 len=60; stored plain=0 compressed=1 size=60 CE kept=1; second len=60 requests=1
+  NOTE decoding=0 deflate(mode 2): app got plain=0 len=54; stored plain=0 compressed=1 size=54 CE kept=1; second len=54 requests=1
+  NOTE decoding=0 x-gzip(mode 0): app got plain=0 len=72; stored plain=0 compressed=1 size=72 CE kept=1; second len=72 requests=1
+  NOTE decoding=1 gzip(mode 0): app got plain=1 len=49; stored plain=1 compressed=0 size=49 CE kept=0; second len=49 requests=1
+  NOTE decoding=1 deflate(mode 1): app got plain=0 len=0; stored plain=0 compressed=0 size=7 CE kept=0; second len=7 requests=2
+  NOTE decoding=1 deflate(mode 2): app got plain=1 len=49; stored plain=1 compressed=0 size=49 CE kept=0; second len=49 requests=1
+  NOTE decoding=1 x-gzip(mode 0): app got plain=1 len=49; stored plain=1 compressed=0 size=49 CE kept=0; second len=49 requests=1
+OK   hci_more_decoding_stored_form_table
+RUN  hci_more_unsafe_methods_vs_get_entry
+  NOTE POST between two GETs: requests=3 entry=1 third=get-again
+  NOTE PUT between two GETs: requests=3 entry=1 third=get-again
+  NOTE DELETE between two GETs: requests=3 entry=1 third=get-again
+  NOTE PATCH between two GETs: requests=3 entry=1 third=get-again
+OK   hci_more_unsafe_methods_vs_get_entry
+RUN  hci_more_post_with_key_303
+  NOTE POST 303 keyed source: src=0 keyed=0 dst=1
+OK   hci_more_post_with_key_303
+RUN  hci_more_post_303_target_cached
+  NOTE POST -> 303 -> GET target: target cached=1
+OK   hci_more_post_303_target_cached
+RUN  hci_more_head_then_get
+OK   hci_more_head_then_get
+RUN  hci_more_post_invalidates_get_entry
+  NOTE GET, POST, GET: requests=3 third=get-2 from_cache=0
+OK   hci_more_post_invalidates_get_entry
+RUN  hci_misc_find_entry_enumeration
+  NOTE enumeration saw 84 entries before finding ours
+OK   hci_misc_find_entry_enumeration
+RUN  hci_misc_retrieve_file_after_http
+OK   hci_misc_retrieve_file_after_http
+RUN  hci_misc_use_count_while_reading
+  NOTE use count with an open cache-read handle: 1
+  NOTE use count after close: 0
+OK   hci_misc_use_count_while_reading
+RUN  hci_misc_hit_rate_and_use_count
+  NOTE hit rate after download=1 after 3 cache hits=4; use count 0 -> 0; access 1dd510e2ff978b7 -> 1dd510e2ff978b7
+OK   hci_misc_hit_rate_and_use_count
+RUN  hci_misc_deleted_file_behind_wininet
+  NOTE cache file deleted behind wininet: second body=refetched requests=2
+OK   hci_misc_deleted_file_behind_wininet
+RUN  hci_misc_deleted_entry_refetched
+OK   hci_misc_deleted_entry_refetched
+RUN  hci_misc_delete_entry_removes_file
+OK   hci_misc_delete_entry_removes_file
+RUN  hci_misc_datafile_share_mode_while_open
+  NOTE cache file during download: open(share all)=1 err=0 open(share read only)=0 err=32
+OK   hci_misc_datafile_share_mode_while_open
+RUN  hci_misc_entry_locked_while_handle_open
+  NOTE DeleteUrlCacheEntry while a cache-read handle is open: ok=0 err=32; file exists=1 entry exists=1
+  NOTE   read after delete: ok=1 lock-me
+  NOTE   after close: file exists=1 entry exists=0
+OK   hci_misc_entry_locked_while_handle_open
+RUN  hci_misc_datafile_wrong_handle_types
+OK   hci_misc_datafile_wrong_handle_types
+RUN  hci_misc_datafile_name_buffer_too_small
+  NOTE DATAFILE_NAME: needed=109, success len=108 strlen=108
+  NOTE DATAFILE_NAME W len=108 (wcslen 108)
+OK   hci_misc_datafile_name_buffer_too_small
+RUN  hci_misc_datafile_name_from_cache
+OK   hci_misc_datafile_name_from_cache
+RUN  hci_misc_datafile_name_during_read
+  NOTE DATAFILE_NAME: early=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\PQKT26YC\wininet_7372_143_datafile[1].txt (err 0) after read=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\PQKT26YC\wininet_7372_143_datafile[1].txt (err 0)
+OK   hci_misc_datafile_name_during_read
+RUN  hci_misc_gzip_stored_form_with_decoding
+  NOTE decoding on: cached size=900 file=900 (gzip 73, plain 900) first bytes 54 68; blob keeps Content-Encoding=0
+  NOTE decoding on, second GET: requests=1 len=900
+OK   hci_misc_gzip_stored_form_with_decoding
+RUN  hci_misc_gzip_stored_form_no_decoding
+OK   hci_misc_gzip_stored_form_no_decoding
+RUN  hci_misc_vary_table
+  NOTE Vary: Accept-Encoding              stored=1 requests=1 second=vary1
+  NOTE Vary: User-Agent                   stored=1 requests=1 second=vary1
+  NOTE Vary: *                            stored=0 requests=2 second=vary2
+  NOTE Vary: Cookie                       stored=0 requests=2 second=vary2
+  NOTE Vary: X-Custom                     stored=1 requests=1 second=vary1
+  NOTE Vary: Accept-Language              stored=1 requests=1 second=vary1
+  NOTE Vary: Accept-Encoding, User-Agent  stored=1 requests=1 second=vary1
+  NOTE Vary: accept-encoding              stored=1 requests=1 second=vary1
+OK   hci_misc_vary_table
+RUN  hci_misc_https_cache_hit
+  NOTE https entry: type=0x41 size=10 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_154_httpshit[1].txt hdrsize=65 exp=1dd5116958115e9 lm=0 sync=1dd510e33bcade9 acc=1dd510e33bcade9 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 10\r\n\r\n]
+  NOTE HTTPS second GET: requests=2 from_cache=0 reqflags=0x0 handshakes=2; FROM_CACHE: ok=0 err=2 body= requests=2
+OK   hci_misc_https_cache_hit
+RUN  hci_misc_https_cache_table
+  NOTE HTTPS [Content-Type: text/plain  Cache-Control: max-age=3600  ] -> cached=1
+  NOTE HTTPS [Content-Type: text/plain  Cache-Control: public, max-age=3600  ] -> cached=1
+  NOTE HTTPS [Content-Type: text/plain  Cache-Control: no-store  ] -> cached=0
+  NOTE HTTPS [Content-Type: text/plain  Pragma: no-cache  ] -> cached=0
+  NOTE HTTPS [Content-Type: text/plain  Cache-Control: private, max-age=3600  ] -> cached=1
+  NOTE HTTPS [Content-Type: text/plain  ] -> cached=1
+OK   hci_misc_https_cache_table
+RUN  hci_misc_redirect_cache_read_follow
+  NOTE ENABLE_REDIRECT_CACHE_READ=0: first=200/target second=200/network-again from_cache=0 requests=3 url=http://127.0.0.1:49977/wininet_7372_161_rcr
+  NOTE ENABLE_REDIRECT_CACHE_READ=1: first=200/target second=200/target from_cache=1 requests=2 url=http://127.0.0.1:49979/wininet_7372_164_rcrdst
+OK   hci_misc_redirect_cache_read_follow
+RUN  hci_misc_redirect_cache_read_option_validation
+  NOTE ENABLE_REDIRECT_CACHE_READ query: ok=0 err=87 val=85
+  NOTE ENABLE_REDIRECT_CACHE_READ on NULL handle: ok=0 err=12018
+OK   hci_misc_redirect_cache_read_option_validation
+RUN  hci_misc_redirect_no_auto_redirect_not_followed_entry
+  NOTE 301 with NO_AUTO_REDIRECT: source cached=0 body=moved
+OK   hci_misc_redirect_no_auto_redirect_not_followed_entry
+RUN  hci_misc_redirect_status_table
+  NOTE 301                                              -> source cached=1 type=0x841
+  NOTE 308                                              -> source cached=1 type=0x841
+  NOTE 302                                              -> source cached=0 type=0x0
+  NOTE 303                                              -> source cached=0 type=0x0
+  NOTE 307                                              -> source cached=0 type=0x0
+  NOTE 302 Cache-Control: max-age=600
+                 -> source cached=1 type=0x841
+  NOTE 307 Cache-Control: max-age=600
+                 -> source cached=1 type=0x841
+  NOTE 303 Cache-Control: max-age=600
+                 -> source cached=1 type=0x841
+  NOTE 302 Expires: Thu, 01 Dec 2033 16:00:00 GMT
+     -> source cached=1 type=0x841
+  NOTE 301 Cache-Control: no-cache
+                    -> source cached=0 type=0x0
+  NOTE 301 Cache-Control: no-store
+                    -> source cached=0 type=0x0
+  NOTE 302 Cache-Control: max-age=600, no-cache
+       -> source cached=0 type=0x0
+OK   hci_misc_redirect_status_table
+RUN  hci_misc_redirect_301_cached
+  NOTE 301 source: type=0x841 size=0 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\5330XK9A\wininet_7372_191_r301src[1] hdrsize=112 exp=7fffffffffffffff lm=0 sync=1dd510e370d758a acc=1dd510e370d758a hdrs=[HTTP/1.1 301 Moved Permanently\r\nLocation: http://127.0.0.1:50007/wininet_7372_192_r301dst\r\nContent-Length: 0\r\n\r\n]
+  NOTE 301 target: type=0x41 size=6 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_192_r301dst[1].txt hdrsize=64 exp=1dd511698d1dd8a lm=0 sync=1dd510e370fda51 acc=1dd510e370fda51 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 6\r\n\r\n]
+  NOTE second GET of 301 source: requests=3 body=again url=http://127.0.0.1:50007/wininet_7372_191_r301src
+OK   hci_misc_redirect_301_cached
+RUN  hci_misc_put_invalidates_entry
+  NOTE GET entry after PUT to the same URL: exists=1
+OK   hci_misc_put_invalidates_entry
+RUN  hci_misc_other_methods_not_cached
+OK   hci_misc_other_methods_not_cached
+RUN  hci_misc_head_ignores_and_keeps_get_entry
+OK   hci_misc_head_ignores_and_keeps_get_entry
+RUN  hci_misc_head_not_cached
+OK   hci_misc_head_not_cached
+RUN  hci_misc_secondary_key_query_before_set
+  NOTE SECONDARY_CACHE_KEY query before set: ok=1 err=0 len=0 val=
+  NOTE SECONDARY_CACHE_KEY query after set: len=3
+  NOTE URL option after two keys: http://127.0.0.1/xabc
+OK   hci_misc_secondary_key_query_before_set
+RUN  hci_misc_secondary_key_wrong_handle_types
+OK   hci_misc_secondary_key_wrong_handle_types
+RUN  hci_misc_get_with_secondary_key
+  NOTE GET + secondary key: url option=http://127.0.0.1:50025/wininet_7372_201_getkey exists(url)=0 exists(url+key)=1
+OK   hci_misc_get_with_secondary_key
+RUN  hci_misc_post_with_secondary_key_cached
+  NOTE POST + secondary key: url option=http://127.0.0.1:50027/wininet_7372_202_postkey datafile=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_202_postkeyKEY123[1].txt exists(url)=0 exists(url+key)=1
+OK   hci_misc_post_with_secondary_key_cached
+RUN  hci_misc_post_does_not_serve_get_entry
+OK   hci_misc_post_does_not_serve_get_entry
+RUN  hci_misc_post_not_cached_under_url
+  NOTE POST without secondary key: datafile= err=12028 reqflags=0x40
+OK   hci_misc_post_not_cached_under_url
+RUN  hci_fresh_cache_timestamps_option
+  NOTE CACHE_TIMESTAMPS returned length 0
+OK   hci_fresh_cache_timestamps_option
+RUN  hci_fresh_request_cache_control_header_from_app
+  NOTE app-supplied Cache-Control/Pragma no-cache request headers: requests=1 second=first
+OK   hci_fresh_request_cache_control_header_from_app
+RUN  hci_fresh_304_without_entry_returned_to_app
+OK   hci_fresh_304_without_entry_returned_to_app
+RUN  hci_fresh_app_conditional_header_passthrough
+OK   hci_fresh_app_conditional_header_passthrough
+RUN  hci_fresh_resynchronize_without_entry_plain_get
+OK   hci_fresh_resynchronize_without_entry_plain_get
+RUN  hci_fresh_resynchronize_200_replaces
+OK   hci_fresh_resynchronize_200_replaces
+RUN  hci_fresh_resynchronize_sends_conditional
+OK   hci_fresh_resynchronize_sends_conditional
+RUN  hci_fresh_no_validators_same_session
+  NOTE no Expires/LM, same process: requests=1 second=nov1 from_cache=1
+OK   hci_fresh_no_validators_same_session
+RUN  hci_fresh_heuristic_recent_last_modified
+  NOTE LM 2 s old: requests=2 cond=1 (heuristic window (download-LM)/10)
+OK   hci_fresh_heuristic_recent_last_modified
+RUN  hci_fresh_heuristic_old_last_modified_is_fresh
+OK   hci_fresh_heuristic_old_last_modified_is_fresh
+RUN  hci_fresh_pragma_no_cache_http_response
+  NOTE HTTP Pragma: no-cache response: stored=1 requests=1
+OK   hci_fresh_pragma_no_cache_http_response
+RUN  hci_fresh_no_cache_variants_table
+  NOTE Cache-Control: no-cache                             stored=1 requests=2 second=v2
+  NOTE Cache-Control: No-Cache                             stored=1 requests=2 second=v2
+  NOTE Cache-Control: public, no-cache                     stored=1 requests=2 second=v2
+  NOTE Cache-Control: no-cache="Set-Cookie"                stored=1 requests=2 second=v2
+  NOTE Cache-Control: private                              stored=1 requests=1 second=v1
+  NOTE Cache-Control: public                               stored=1 requests=1 second=v1
+  NOTE Cache-Control: public, max-age=3600                 stored=1 requests=1 second=v1
+  NOTE Cache-Control: must-revalidate, max-age=3600        stored=1 requests=1 second=v1
+  NOTE Cache-Control: max-age=3600, must-revalidate        stored=1 requests=1 second=v1
+  NOTE Cache-Control: MAX-AGE=3600                         stored=1 requests=1 second=v1
+OK   hci_fresh_no_cache_variants_table
+RUN  hci_fresh_no_store_deletes_existing_entry
+OK   hci_fresh_no_store_deletes_existing_entry
+RUN  hci_fresh_no_store_in_second_header_line
+OK   hci_fresh_no_store_in_second_header_line
+RUN  hci_fresh_no_store_not_stored
+OK   hci_fresh_no_store_not_stored
+RUN  hci_fresh_no_cache_stored_but_revalidated
+OK   hci_fresh_no_cache_stored_but_revalidated
+RUN  hci_fresh_304_merges_new_headers
+  NOTE 304 merge: X-Fresh-Header stored=1; response headers after 304 contain it=1
+OK   hci_fresh_304_merges_new_headers
+RUN  hci_fresh_304_updates_expiry_then_cache_hit
+  NOTE before 304: type=0x41 size=4 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_235_304exp[1].txt hdrsize=75 exp=1dd5105dde40f02 lm=0 sync=1dd510e3fa87702 acc=1dd510e3fa87702 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nETag: "k"\r\nContent-Length: 4\r\n\r\n]
+  NOTE after 304: type=0x41 size=4 use=0 hit=2 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_235_304exp[1].txt hdrsize=75 exp=1dd5116a16cdf02 lm=0 sync=1dd510e3fa87702 acc=1dd510e3fa87702 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nETag: "k"\r\nContent-Length: 4\r\n\r\n]
+OK   hci_fresh_304_updates_expiry_then_cache_hit
+RUN  hci_fresh_revalidation_200_replaces_entry
+OK   hci_fresh_revalidation_200_replaces_entry
+RUN  hci_fresh_both_validators_sent
+  NOTE conditional header order: IMS@2 INM@3; line=GET /wininet_7372_237_bothval HTTP/1.1
+  NOTE   cond hdr 0: User-Agent: hci-agent
+  NOTE   cond hdr 1: Host: 127.0.0.1:50097
+  NOTE   cond hdr 2: If-Modified-Since: Tue, 15 Nov 1994 08:12:31 GMT
+  NOTE   cond hdr 3: If-None-Match: "b"
+OK   hci_fresh_both_validators_sent
+RUN  hci_fresh_last_modified_revalidation_304
+  NOTE If-Modified-Since sent: Tue, 15 Nov 1994 08:12:31 GMT
+OK   hci_fresh_last_modified_revalidation_304
+RUN  hci_fresh_weak_etag_sent_verbatim
+OK   hci_fresh_weak_etag_sent_verbatim
+RUN  hci_fresh_etag_revalidation_304
+  NOTE after 304: reqflags=0x1 raw=HTTP/1.1 200 OK
+Content-Type: text/plain
+ETag: "v1"
+Conte
+OK   hci_fresh_etag_revalidation_304
+RUN  hci_fresh_expires_zero_is_expired
+  NOTE Expires: 0 -> requests=2 second body=b
+  NOTE expires 0: type=0x41 size=1 use=0 hit=3 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\PQKT26YC\wininet_7372_241_expzero[1].txt hdrsize=64 exp=0 lm=0 sync=1dd510e4070b738 acc=1dd510e4070b738 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 1\r\n\r\n]
+OK   hci_fresh_expires_zero_is_expired
+RUN  hci_fresh_expires_equal_date_is_expired
+OK   hci_fresh_expires_equal_date_is_expired
+RUN  hci_fresh_expires_past_goes_to_network
+  NOTE expired, no validators: If-Modified-Since=(none) If-None-Match=(none)
+OK   hci_fresh_expires_past_goes_to_network
+RUN  hci_fresh_expires_future_served_from_cache
+OK   hci_fresh_expires_future_served_from_cache
+RUN  hci_fresh_max_age_served_from_cache
+OK   hci_fresh_max_age_served_from_cache
+RUN  hci_flags_cache_hit_no_connection_made
+OK   hci_flags_cache_hit_no_connection_made
+RUN  hci_flags_from_cache_and_reload_together
+  NOTE FROM_CACHE|RELOAD with entry: ok=1 err=0 body=both requests=1
+OK   hci_flags_from_cache_and_reload_together
+RUN  hci_flags_request_flags_option_bits
+  NOTE REQUEST_FLAGS: net=0x0 cache=0x1 reload+ncw=0x40
+OK   hci_flags_request_flags_option_bits
+RUN  hci_flags_need_file_datafile_exists_during_read
+OK   hci_flags_need_file_datafile_exists_during_read
+RUN  hci_flags_forms_submit_get
+  NOTE FORMS_SUBMIT GET with query: stored=1 requests=1 second=f1
+OK   hci_flags_forms_submit_get
+RUN  hci_flags_hyperlink_with_old_last_modified
+  NOTE HYPERLINK with old LM: requests=1 body=hl1
+OK   hci_flags_hyperlink_with_old_last_modified
+RUN  hci_flags_hyperlink_with_expires_uses_cache
+OK   hci_flags_hyperlink_with_expires_uses_cache
+RUN  hci_flags_hyperlink_no_validators_reloads
+  NOTE HYPERLINK, entry without Expires/LM: requests=2 body=h2
+OK   hci_flags_hyperlink_no_validators_reloads
+RUN  hci_flags_cache_if_net_fail_no_entry
+OK   hci_flags_cache_if_net_fail_no_entry
+RUN  hci_flags_cache_if_net_fail_serves_entry
+  NOTE CACHE_IF_NET_FAIL: reqflags=0x81
+OK   hci_flags_cache_if_net_fail_serves_entry
+RUN  hci_flags_from_cache_head_request
+  NOTE HEAD + FROM_CACHE with entry: ok=0 err=2 status=0 len=0 requests=1
+OK   hci_flags_from_cache_head_request
+RUN  hci_flags_offline_session_flag
+OK   hci_flags_offline_session_flag
+RUN  hci_flags_from_cache_miss_httpsendrequest
+OK   hci_flags_from_cache_miss_httpsendrequest
+RUN  hci_flags_from_cache_miss_fails
+OK   hci_flags_from_cache_miss_fails
+RUN  hci_flags_from_cache_stale_entry_still_served
+OK   hci_flags_from_cache_stale_entry_still_served
+RUN  hci_flags_from_cache_hit
+OK   hci_flags_from_cache_hit
+RUN  hci_flags_pragma_nocache_reads_cache
+  NOTE PRAGMA_NOCACHE with fresh entry: requests=1 body=cached
+OK   hci_flags_pragma_nocache_reads_cache
+RUN  hci_flags_nocache_request_header_table
+  NOTE flags 0                -> Cache-Control=- Pragma=- nhdrs=2
+  NOTE flags RELOAD           -> Cache-Control=no-cache Pragma=- nhdrs=3
+  NOTE flags PRAGMA_NOCACHE   -> Cache-Control=no-cache Pragma=- nhdrs=3
+  NOTE flags NO_CACHE_WRITE   -> Cache-Control=- Pragma=- nhdrs=2
+  NOTE flags RESYNCHRONIZE    -> Cache-Control=- Pragma=- nhdrs=2
+  NOTE flags RELOAD|PRAGMA    -> Cache-Control=no-cache Pragma=- nhdrs=3
+  NOTE flags HYPERLINK        -> Cache-Control=- Pragma=- nhdrs=2
+  NOTE flags NEED_FILE        -> Cache-Control=- Pragma=- nhdrs=2
+  NOTE flags FORMS_SUBMIT     -> Cache-Control=- Pragma=- nhdrs=2
+OK   hci_flags_nocache_request_header_table
+RUN  hci_flags_tfresh_header_set
+OK   hci_flags_tfresh_header_set
+RUN  hci_flags_reload_no_cache_write_keeps_old_entry
+  NOTE RELOAD|NO_CACHE_WRITE over an existing entry: entry=1
+  NOTE   entry content now: old-entry
+OK   hci_flags_reload_no_cache_write_keeps_old_entry
+RUN  hci_flags_no_cache_write_reads_existing_entry
+  NOTE NO_CACHE_WRITE with fresh entry: requests=1 body=primed from_cache=1
+OK   hci_flags_no_cache_write_reads_existing_entry
+RUN  hci_flags_no_cache_write_no_entry
+  NOTE NO_CACHE_WRITE: reqflags=0x40 datafile err=12028 early err=12028
+OK   hci_flags_no_cache_write_no_entry
+RUN  hci_flags_reload_still_writes_cache
+OK   hci_flags_reload_still_writes_cache
+RUN  hci_flags_reload_bypasses_fresh_entry
+  NOTE RELOAD request: Cache-Control=no-cache Pragma=(none)
+OK   hci_flags_reload_bypasses_fresh_entry
+RUN  hci_extra_cached_entry_after_redirect_target_url_option
+OK   hci_extra_cached_entry_after_redirect_target_url_option
+RUN  hci_extra_cache_hit_keeps_handle_type_and_url
+OK   hci_extra_cache_hit_keeps_handle_type_and_url
+RUN  hci_extra_many_headers_stored
+OK   hci_extra_many_headers_stored
+RUN  hci_extra_request_flags_before_send
+  NOTE before send GET flags 0x0: REQUEST_FLAGS ok=1 err=0 val=0x8
+  NOTE before send GET flags 0x4000000: REQUEST_FLAGS ok=1 err=0 val=0x8
+  NOTE before send HEAD flags 0x0: REQUEST_FLAGS ok=1 err=0 val=0x8
+  NOTE before send POST flags 0x0: REQUEST_FLAGS ok=1 err=0 val=0x8
+  NOTE before send PUT flags 0x0: REQUEST_FLAGS ok=1 err=0 val=0x8
+  NOTE before send GET flags 0x80000000: REQUEST_FLAGS ok=1 err=0 val=0x8
+OK   hci_extra_request_flags_before_send
+RUN  hci_extra_secondary_key_post_from_cache
+  NOTE POST FROM_CACHE with key: ok=1 err=0 body=post-resp requests=1
+OK   hci_extra_secondary_key_post_from_cache
+RUN  hci_extra_secondary_key_post_reuse
+  NOTE POST key reuse: bodies k1/k1/k2 requests=2 existsA=1 existsB=1
+OK   hci_extra_secondary_key_post_reuse
+RUN  hci_extra_cache_stream_handle_option
+  NOTE CACHE_STREAM_HANDLE on cache-served handle: ok=0 err=122 h=0000000000000000 len=8
+  NOTE CACHE_STREAM_HANDLE on NO_CACHE_WRITE handle: ok=0 err=1
+OK   hci_extra_cache_stream_handle_option
+RUN  hci_extra_http10_response_cached
+OK   hci_extra_http10_response_cached
+RUN  hci_extra_http09_response_not_cached
+  NOTE HTTP/0.9: ok=1 err=0 status=200 body=raw http/0.9 bytes
+OK   hci_extra_http09_response_not_cached
+RUN  hci_exp_max_age_in_second_header
+OK   hci_exp_max_age_in_second_header
+RUN  hci_exp_duplicate_expires_first_wins
+  NOTE two Expires headers -> first
+OK   hci_exp_duplicate_expires_first_wins
+RUN  hci_exp_far_future_expires
+  NOTE Expires 2099 -> 22f716376cb6980 (want 22f716376cb6980)
+OK   hci_exp_far_future_expires
+RUN  hci_exp_304_without_freshness_headers
+  NOTE 304 without Cache-Control/Expires: expire now-60 (0 = 0)
+  NOTE third GET after a bare 304: requests=3 cond=2
+OK   hci_exp_304_without_freshness_headers
+RUN  hci_exp_304_moves_sync_time
+  NOTE after 304: sync now+0 expire now+600
+OK   hci_exp_304_moves_sync_time
+RUN  hci_exp_reload_moves_sync_time
+OK   hci_exp_reload_moves_sync_time
+RUN  hci_exp_cache_hit_keeps_sync_time
+  NOTE access time 1dd510e4ccc8aac -> 1dd510e4ccc8aac
+OK   hci_exp_cache_hit_keeps_sync_time
+RUN  hci_exp_sync_and_access_time_now
+OK   hci_exp_sync_and_access_time_now
+RUN  hci_exp_refetch_updates_times
+OK   hci_exp_refetch_updates_times
+RUN  hci_exp_no_cache_entry_made_fresh_by_api
+  NOTE no-cache entry with future ExpireTime: requests=1 body=nc-api
+OK   hci_exp_no_cache_entry_made_fresh_by_api
+RUN  hci_exp_no_cache_entry_expire_minus_hour
+OK   hci_exp_no_cache_entry_expire_minus_hour
+RUN  hci_exp_hyperlink_expires_future_fresh_past_stale
+OK   hci_exp_hyperlink_expires_future_fresh_past_stale
+RUN  hci_exp_hyperlink_with_api_lm_heuristic_fresh
+OK   hci_exp_hyperlink_with_api_lm_heuristic_fresh
+RUN  hci_exp_session_rule_etag_revalidates_old_sync
+OK   hci_exp_session_rule_etag_revalidates_old_sync
+RUN  hci_exp_session_rule_current_sync_is_fresh
+OK   hci_exp_session_rule_current_sync_is_fresh
+RUN  hci_exp_session_rule_old_sync_is_stale
+OK   hci_exp_session_rule_old_sync_is_stale
+RUN  hci_exp_api_lm_drives_if_modified_since
+OK   hci_exp_api_lm_drives_if_modified_since
+RUN  hci_exp_heuristic_sync_table
+OK   hci_exp_heuristic_sync_table
+RUN  hci_exp_set_expire_offsets_table
+OK   hci_exp_set_expire_offsets_table
+RUN  hci_exp_fwd_back_without_entry_downloads
+OK   hci_exp_fwd_back_without_entry_downloads
+RUN  hci_exp_fwd_back_no_cache_entry
+  NOTE FWD_BACK over a no-cache entry: body=nc-history requests=1
+OK   hci_exp_fwd_back_no_cache_entry
+RUN  hci_exp_fwd_back_serves_expired_entry
+  NOTE FWD_BACK over an expired entry: ok=1 err=0 body=history-copy requests=1 reqflags=0x1
+OK   hci_exp_fwd_back_serves_expired_entry
+RUN  hci_exp_last_modified_formats_table
+  NOTE Last-Modified [Tue, 15 Nov 1994 08:12:31 GMT] -> 1b99460a37c4180 (want 1b99460a37c4180)
+  NOTE Last-Modified [Tue Nov 15 08:12:31 1994] -> 1b99460a37c4180 (want 1b99460a37c4180)
+  NOTE Last-Modified [Tuesday, 15-Nov-94 08:12:31 GMT] -> 1b99460a37c4180 (want 1b99460a37c4180)
+  NOTE Last-Modified [Sat, 29 Feb 2020 23:59:59 GMT] -> 1d5ef5c59356980 (want 1d5ef5c59356980)
+  NOTE Last-Modified [Mon, 01 Jan 2001 00:00:00 GMT] -> 1c07385c89dc000 (want 1c07385c89dc000)
+  NOTE Last-Modified [garbage] -> 1dd510e53693a20 (want 0)
+  NOTE Last-Modified [] -> 1dd510e5398d5a0 (want 0)
+OK   hci_exp_last_modified_formats_table
+RUN  hci_exp_expires_past_with_date_past
+OK   hci_exp_expires_past_with_date_past
+RUN  hci_exp_expires_after_date_kept
+OK   hci_exp_expires_after_date_kept
+RUN  hci_exp_expires_not_after_date_is_past
+OK   hci_exp_expires_not_after_date_is_past
+RUN  hci_exp_expires_formats_table
+  NOTE Expires [Thu, 01 Dec 2033 16:00:00 GMT] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270612 s) second GET requests=1
+  NOTE Expires [Fri, 31 Dec 2032 23:59:59 GMT] -> ExpireTime 1e453fe342b2980 (want 1e453fe342b2980, now+197355410 s) second GET requests=1
+  NOTE Expires [Thu Dec  1 16:00:00 2033] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270611 s) second GET requests=1
+  NOTE Expires [Thursday, 01-Dec-33 16:00:00 GMT] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270611 s) second GET requests=1
+  NOTE Expires [thu, 01 dec 2033 16:00:00 gmt] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270611 s) second GET requests=1
+  NOTE Expires [Thu, 01 Dec 2033 16:00:00] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270610 s) second GET requests=1
+  NOTE Expires [Thu, 1 Dec 2033 16:00:00 GMT] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270610 s) second GET requests=1
+  NOTE Expires [Thu, 01 Dec 2033 16:00:00 UTC] -> ExpireTime 1e55af9a702c000 (want 1e55af9a702c000, now+226270610 s) second GET requests=1
+  NOTE Expires [Mon, 01 Jan 2001 00:00:00 GMT] -> ExpireTime 1c07385c89dc000 (want 1c07385c89dc000, now-812487790 s) second GET requests=2
+  NOTE Expires [Thu, 01 Jan 1970 00:00:00 GMT] -> ExpireTime 19db1ded53e8000 (want 19db1ded53e8000, now-1790794990 s) second GET requests=2
+  NOTE Expires [garbage] -> ExpireTime 1dd510e56348f20 (want 0, now+0 s) second GET requests=2
+  NOTE Expires [0] -> ExpireTime 1dd510e5647a1f0 (want 0, now+0 s) second GET requests=2
+  NOTE Expires [-1] -> ExpireTime 1dd510e56773d70 (want 0, now+0 s) second GET requests=2
+  NOTE Expires [] -> ExpireTime 1dd510e56a70000 (want 0, now+0 s) second GET requests=2
+OK   hci_exp_expires_formats_table
+RUN  hci_exp_expire_time_table
+  NOTE CC [max-age=60] extra [] date 0 -> ExpireTime  now+60 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=86400] extra [] date 0 -> ExpireTime  now+86400 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age = 600] extra [] date 0 -> ExpireTime  now+600 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=	900] extra [] date 0 -> ExpireTime  now+900 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [MAX-AGE=1200] extra [] date 0 -> ExpireTime  now+1200 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [Max-Age=1300] extra [] date 0 -> ExpireTime  now+1300 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=0] extra [] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [max-age=1] extra [] date 0 -> ExpireTime  now+1 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=99999999999] extra [] date 0 -> ExpireTime  now+2147483647 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [public, max-age=300] extra [] date 0 -> ExpireTime  now+300 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=300, private] extra [] date 0 -> ExpireTime  now+300 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=7200] extra [Age: 3600
+] date 0 -> ExpireTime  now+3600 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=7200] extra [Age: 9000
+] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [max-age=7200] extra [Age: 7200
+] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [max-age=7200] extra [] date -1800 -> ExpireTime  now+5400 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=7200] extra [] date 1800 -> ExpireTime  now+7200 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=7200] extra [Age: 600
+] date -1800 -> ExpireTime  now+5400 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=7200] extra [Age: 2400
+] date -1800 -> ExpireTime  now+4800 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=7200] extra [] date -9000 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [max-age=3600, stale-while-revalidate=1800] extra [] date 0 -> ExpireTime  now+5400 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=abc] extra [] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [max-age] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [no-cache] extra [] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [no-cache="Set-Cookie"] extra [] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [max-age=600, no-cache] extra [] date 0 -> ExpireTime  now-3600 s
+  NOTE   second GET: requests=2 body=net-two
+  NOTE CC [no-cache, max-age=600] extra [] date 0 -> ExpireTime  now+600 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [nocache] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [no-cachex] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [s-maxage=600] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [immutable] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [must-revalidate] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=600, immutable] extra [] date 0 -> ExpireTime  now+600 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [pre-check=600, post-check=300] extra [] date 0 -> ExpireTime  now+600 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [post-check=0, pre-check=0] extra [] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [max-age=900] extra [Expires: Thu, 01 Dec 2033 16:00:00 GMT
+] date 0 -> ExpireTime  now+900 s
+  NOTE   second GET: requests=1 body=exp-row
+  NOTE CC [-] extra [Age: 100000
+] date 0 -> ExpireTime 0 now+0 s
+  NOTE   second GET: requests=1 body=exp-row
+OK   hci_exp_expire_time_table
+RUN  hci_cond_pragma_nocache_stale_entry
+  NOTE PRAGMA_NOCACHE over stale entry: INM="p" Cache-Control=no-cache body=pnc
+OK   hci_cond_pragma_nocache_stale_entry
+RUN  hci_cond_no_cache_write_still_revalidates
+  NOTE NO_CACHE_WRITE over stale entry: requests=2 INM="w" cond=1 body=ncw304
+OK   hci_cond_no_cache_write_still_revalidates
+RUN  hci_cond_304_connection_close
+OK   hci_cond_304_connection_close
+RUN  hci_cond_same_connection_reused
+OK   hci_cond_same_connection_reused
+RUN  hci_cond_full_200_same_etag_replaces
+OK   hci_cond_full_200_same_etag_replaces
+RUN  hci_cond_cleared_http_bit_drops_etag
+  NOTE SetUrlCacheEntryInfo(ATTRIBUTE, 1) ok=1 -> type 0x1
+  NOTE type bit cleared=1 -> INM [-] IMS [Mon, 01 Jan 2001 00:00:00 GMT; length=3]
+OK   hci_cond_cleared_http_bit_drops_etag
+RUN  hci_cond_seeded_type_table
+  NOTE seeded type 0x1 etag=1 lm=1 -> INM [-] IMS [Tue, 26 Aug 2025 19:03:22 GMT; length=9] body=seed-body
+  NOTE seeded type 0x41 etag=1 lm=1 -> INM ["sd"] IMS [Tue, 26 Aug 2025 19:03:22 GMT] body=seed-body
+  NOTE seeded type 0x1 etag=1 lm=0 -> INM [-] IMS [-] body=network
+  NOTE seeded type 0x41 etag=1 lm=0 -> INM ["sd"] IMS [-] body=seed-body
+  NOTE seeded type 0x1 etag=0 lm=1 -> INM [-] IMS [Tue, 26 Aug 2025 19:03:23 GMT; length=9] body=seed-body
+  NOTE seeded type 0x41 etag=0 lm=1 -> INM [-] IMS [Tue, 26 Aug 2025 19:03:23 GMT] body=seed-body
+OK   hci_cond_seeded_type_table
+RUN  hci_cond_request_headers_query_after_304
+  NOTE request headers after 304: ok=1 [GET /wininet_7372_399_rqhdr HTTP/1.1
+User-Agent: hci-agent
+Host: 127.0.0.1:50415
+If-None-Match: "q"
+
+]
+OK   hci_cond_request_headers_query_after_304
+RUN  hci_cond_resync_httpsendrequest
+OK   hci_cond_resync_httpsendrequest
+RUN  hci_cond_resync_lm_only
+OK   hci_cond_resync_lm_only
+RUN  hci_cond_resync_no_validators
+  NOTE RESYNCHRONIZE without validators: requests=2 body=second
+OK   hci_cond_resync_no_validators
+RUN  hci_cond_app_if_modified_since_on_fresh_entry
+  NOTE app IMS + fresh entry: requests=2 status=304 body= from_cache=0
+OK   hci_cond_app_if_modified_since_on_fresh_entry
+RUN  hci_cond_app_if_none_match_on_stale_entry
+  NOTE app INM + stale entry: sent ["app"] occurrences=1 status=304 body=
+OK   hci_cond_app_if_none_match_on_stale_entry
+RUN  hci_cond_conditional_answered_with_error_status
+  NOTE conditional answered 404: app status=404 body= entry exists=0
+  NOTE conditional answered 500: app status=500 body= entry exists=1
+  NOTE conditional answered 412: app status=412 body= entry exists=1
+  NOTE conditional answered 410: app status=410 body= entry exists=0
+OK   hci_cond_conditional_answered_with_error_status
+RUN  hci_cond_304_with_no_store
+  NOTE 304 + no-store: status=200 body=ns304 entry exists=1
+OK   hci_cond_304_with_no_store
+RUN  hci_cond_304_content_type_change
+  NOTE 304 Content-Type: blob plain=1 html=0 local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\PQKT26YC\wininet_7372_410_ct304[1].txt
+OK   hci_cond_304_content_type_change
+RUN  hci_cond_304_header_replaces_stored_value
+  NOTE 304 X-Val: blob old=0 new=1; response raw has old=0 new=1
+OK   hci_cond_304_header_replaces_stored_value
+RUN  hci_cond_304_new_etag_stored
+  NOTE after 304 with a new ETag: blob has one=1 two=0
+  NOTE third request If-None-Match "one"
+OK   hci_cond_304_new_etag_stored
+RUN  hci_cond_304_keeps_local_file
+OK   hci_cond_304_keeps_local_file
+RUN  hci_cond_304_rounds_hit_rate
+OK   hci_cond_304_rounds_hit_rate
+RUN  hci_cond_304_response_view
+  NOTE after 304: X-From-304 visible=1 (yes)
+OK   hci_cond_304_response_view
+RUN  hci_cond_if_modified_since_format_table
+  NOTE LM [Tue, 15 Nov 1994 08:12:31 GMT] -> IMS [Tue, 15 Nov 1994 08:12:31 GMT]
+  NOTE LM [Tue Nov 15 08:12:31 1994] -> IMS [Tue, 15 Nov 1994 08:12:31 GMT]
+  NOTE LM [Sat, 29 Feb 2020 23:59:59 GMT] -> IMS [Sat, 29 Feb 2020 23:59:59 GMT]
+  NOTE LM [Mon, 01 Jan 2001 00:00:00 GMT] -> IMS [Mon, 01 Jan 2001 00:00:00 GMT]
+  NOTE LM [Wed, 31 Dec 2025 12:00:00 GMT] -> IMS [Wed, 31 Dec 2025 12:00:00 GMT]
+  NOTE LM [Sun, 06 Nov 1994 08:49:37 GMT] -> IMS [Sun, 06 Nov 1994 08:49:37 GMT]
+  NOTE LM [garbage] -> IMS [Wed, 30 Sep 2026 19:03:28 GMT]
+OK   hci_cond_if_modified_since_format_table
+RUN  hci_cond_long_etag
+  NOTE ETag of 102 chars -> If-None-Match sent (len 102)
+  NOTE ETag of 402 chars -> If-None-Match sent (len 402)
+  NOTE ETag of 511 chars -> If-None-Match sent (len 511)
+  NOTE ETag of 602 chars -> If-None-Match absent (len 0)
+  NOTE ETag of 1002 chars -> If-None-Match absent (len 0)
+OK   hci_cond_long_etag
+RUN  hci_cond_etag_values_table
+  NOTE ETag ["a"] -> If-None-Match ["a"] requests=2 body=etagged
+  NOTE ETag [W/"weak"] -> If-None-Match [W/"weak"] requests=2 body=etagged
+  NOTE ETag ["with space"] -> If-None-Match ["with space"] requests=2 body=etagged
+  NOTE ETag [""] -> If-None-Match [""] requests=2 body=etagged
+  NOTE ETag [unquoted-tag] -> If-None-Match [unquoted-tag] requests=2 body=etagged
+  NOTE ETag ["123456789012345678901234567890123456789012345678901234567890"] -> If-None-Match ["123456789012345678901234567890123456789012345678901234567890"] requests=2 body=etagged
+  NOTE ETag ["a,b"] -> If-None-Match ["a,b"] requests=2 body=etagged
+  NOTE ETag ["x", "y"] -> If-None-Match ["x", "y"] requests=2 body=etagged
+  NOTE ETag ["UPPER-lower-09"] -> If-None-Match ["UPPER-lower-09"] requests=2 body=etagged
+  NOTE ETag [w/"lowerweak"] -> If-None-Match [w/"lowerweak"] requests=2 body=etagged
+OK   hci_cond_etag_values_table
+RUN  hci_cond_request_header_order
+OK   hci_cond_request_header_order
+RUN  hci_api_localhost_separate_entry
+OK   hci_api_localhost_separate_entry
+RUN  hci_api_key_includes_port
+  NOTE cache key lookups: upper-case scheme exists=0
+OK   hci_api_key_includes_port
+RUN  hci_api_commit_over_http_entry
+OK   hci_api_commit_over_http_entry
+RUN  hci_api_set_header_info_affects_cache_response
+  NOTE SetUrlCacheEntryInfo(HEADERINFO_FC): ok=1 err=0; next response X-Swapped=0 X-Orig=1
+OK   hci_api_set_header_info_affects_cache_response
+RUN  hci_api_hit_rate_by_flag
+OK   hci_api_hit_rate_by_flag
+RUN  hci_api_redirect_entry_fields
+  NOTE redirect: type=0x841 size=0 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_448_rfld[1] hdrsize=112 exp=7fffffffffffffff lm=0 sync=1dd510e6e58660a acc=1dd510e6e58660a hdrs=[HTTP/1.1 301 Moved Permanently\r\nLocation: http://127.0.0.1:50515/wininet_7372_449_rflddst\r\nContent-Length: 0\r\n\r\n]
+  NOTE redirect: type=0x841 size=0 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_450_rfld[1] hdrsize=113 exp=7fffffffffffffff lm=0 sync=1dd510e6e881417 acc=1dd510e6e881417 hdrs=[HTTP/1.1 308 Permanent Redirect\r\nLocation: http://127.0.0.1:50517/wininet_7372_451_rflddst\r\nContent-Length: 0\r\n\r\n]
+  NOTE redirect: type=0x841 size=0 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_452_rfld[1] hdrsize=100 exp=1dd510fd458816c lm=0 sync=1dd510e6eb7c56c acc=1dd510e6eb7c56c hdrs=[HTTP/1.1 302 Found\r\nLocation: http://127.0.0.1:50519/wininet_7372_453_rflddst\r\nContent-Length: 0\r\n\r\n]
+  NOTE redirect: type=0x841 size=0 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_454_rfld[1] hdrsize=113 exp=1e55af9a702c000 lm=0 sync=1dd510e6ee771f6 acc=1dd510e6ee771f6 hdrs=[HTTP/1.1 307 Temporary Redirect\r\nLocation: http://127.0.0.1:50521/wininet_7372_455_rflddst\r\nContent-Length: 0\r\n\r\n]
+OK   hci_api_redirect_entry_fields
+RUN  hci_api_info_ex_redirect_entry
+  NOTE GetUrlCacheEntryInfoEx(301 source): ok=1 err=0 url=http://127.0.0.1:50523/wininet_7372_456_ix301 type=0x841
+OK   hci_api_info_ex_redirect_entry
+RUN  hci_api_empty_body_entry_file
+  NOTE second GET of an empty cached body: requests=1 status=200 len=0
+OK   hci_api_empty_body_entry_file
+RUN  hci_api_interrupted_download_resume
+  NOTE interrupted download: no entry
+  NOTE interrupted download (Accept-Ranges + ETag): entry=0 type=0x0 size=0
+  NOTE second GET: requests=2 Range=bytes=4096- If-Range="rng" status=200 len=16383
+OK   hci_api_interrupted_download_resume
+RUN  hci_api_datafile_name_wide_matches
+  NOTE DATAFILE_NAME W too small: needed=216 (wcslen 107)
+OK   hci_api_datafile_name_wide_matches
+RUN  hci_api_cache_timestamps_no_headers
+  NOTE CACHE_TIMESTAMPS without Expires/LM: ok=1 err=0 len=0 exp=0 lm=0
+OK   hci_api_cache_timestamps_no_headers
+RUN  hci_api_cache_timestamps_on_handles
+  NOTE CACHE_TIMESTAMPS (net): ok=1 err=0 len=0 exp=1e55af9a702c000 lm=1c07385c89dc000
+  NOTE CACHE_TIMESTAMPS (cache): ok=1 err=0 len=0 exp=1e55af9a702c000 lm=1c07385c89dc000
+OK   hci_api_cache_timestamps_on_handles
+RUN  hci_api_cache_handle_read_ex
+OK   hci_api_cache_handle_read_ex
+RUN  hci_api_cache_read_large_body
+  NOTE cache-served 150000-byte body: first QueryDataAvailable=150000
+OK   hci_api_cache_read_large_body
+RUN  hci_api_cache_read_small_pieces
+OK   hci_api_cache_read_small_pieces
+RUN  hci_api_unlock_without_lock
+  NOTE UnlockUrlCacheEntryFile on an unlocked HTTP entry: ok=1 err=0
+OK   hci_api_unlock_without_lock
+RUN  hci_api_retrieve_during_cache_read
+OK   hci_api_retrieve_during_cache_read
+RUN  hci_api_use_count_during_download
+  NOTE entry while the download is in progress: exists=0 err=2
+  NOTE DeleteUrlCacheEntry during the download: ok=0 err=2
+  NOTE after a delete during the download, entry exists=1
+OK   hci_api_use_count_during_download
+RUN  hci_api_use_count_two_cache_handles
+  NOTE use count with two cache-read handles: 2
+OK   hci_api_use_count_two_cache_handles
+RUN  hci_api_lock_request_file_bad_handles
+  NOTE InternetLockRequestFile: session err=6 connect err=6 unsent request ok=0 err=2
+OK   hci_api_lock_request_file_bad_handles
+RUN  hci_api_lock_request_file_cache_hit
+  NOTE two request-file locks after close: use count 0
+OK   hci_api_lock_request_file_cache_hit
+RUN  hci_api_lock_request_file_no_cache_write
+  NOTE lock on NO_CACHE_WRITE handle: ok=0 err=2 lock=0000000000000001
+OK   hci_api_lock_request_file_no_cache_write
+RUN  hci_api_lock_request_file_before_read
+  NOTE lock before reading: ok=1 err=0
+OK   hci_api_lock_request_file_before_read
+RUN  hci_api_lock_request_file_network
+  NOTE use count with a request-file lock after close: 0
+  NOTE DeleteUrlCacheEntry with a request-file lock: ok=1 err=0; entry=0 file=1
+  NOTE after unlock: entry=0 file=0
+OK   hci_api_lock_request_file_network
+RUN  hci_api_refetch_new_local_file
+  NOTE refetch: C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_474_regen[1].txt -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\PQKT26YC\wininet_7372_474_regen[1].txt; old file exists=0
+OK   hci_api_refetch_new_local_file
+RUN  hci_api_same_leaf_two_urls
+  NOTE same leaf: C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\UX9IOVB0\wininet_7372_475_leaf[1].txt | C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\5330XK9A\wininet_7372_475_leaf[1].txt
+OK   hci_api_same_leaf_two_urls
+RUN  hci_api_local_file_name_table
+  NOTE path /d1/wininet_7372_476_nm.txt  ctype text/plain                   -> leaf wininet_7372_476_nm[1].txt
+  NOTE path /d1/d2/wininet_7372_477_nm.htm ctype text/html                    -> leaf wininet_7372_477_nm[1].htm
+  NOTE path /wininet_7372_478_nm.TXT     ctype text/plain                   -> leaf wininet_7372_478_nm[1].TXT
+  NOTE path /wininet_7372_479_nm.tar.gz  ctype application/octet-stream     -> leaf wininet_7372_479_nm.tar[1].gz
+  NOTE path /wininet_7372_480_nm         ctype application/octet-stream     -> leaf wininet_7372_480_nm[1]
+  NOTE path /wininet_7372_481_nm/        ctype text/html                    -> leaf wininet_7372_481_nm[1].htm
+  NOTE path /wininet_7372_482_nm?x=1&y=2 ctype text/plain                   -> leaf wininet_7372_482_nm[1].txt
+  NOTE path /wininet_7372_483_nm.txt?x=1 ctype text/plain                   -> leaf wininet_7372_483_nm[1].txt
+  NOTE path /a%20bwininet_7372_484_nm.txt ctype text/plain                   -> leaf a%20bwininet_7372_484_nm[1].txt
+  NOTE path /wininet_7372_485_nm.json    ctype application/json             -> leaf wininet_7372_485_nm[1].json
+  NOTE path /wininet_7372_486_nm.unknownext ctype application/x-unknown-i7     -> leaf wininet_7372_486_nm[1].unknownext
+OK   hci_api_local_file_name_table
+RUN  hci_api_blob_content_length_regenerated
+  NOTE close-delimited: type=0x41 size=11 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\5330XK9A\wininet_7372_487_cdlen[1].txt hdrsize=45 exp=1dd5116d65f0049 lm=0 sync=1dd510e749f54e3 acc=1dd510e749f54e3 hdrs=[HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n]
+  NOTE close-delimited blob has Content-Length: 11 -> 0
+OK   hci_api_blob_content_length_regenerated
+RUN  hci_api_blob_kept_headers_table
+  NOTE blob keeps [X-Custom: c]: 1
+  NOTE blob keeps [ETag: "b"]: 1
+  NOTE blob keeps [Last-Modified: Mon, 01 Jan 2001 00:00:00 GMT]: 0
+  NOTE blob keeps [Expires: Thu, 01 Dec 2033 16:00:00 GMT]: 0
+  NOTE blob keeps [Date: Mon, 01 Jan 2001 00:00:00 GMT]: 0
+  NOTE blob keeps [Server: i7]: 0
+  NOTE blob keeps [Pragma: x-private]: 1
+  NOTE blob keeps [Age: 5]: 0
+  NOTE blob keeps [Vary: X-Something]: 1
+  NOTE blob keeps [Set-Cookie: hcib=1; Path=/blobtest]: 0
+  NOTE blob keeps [Set-Cookie2: x=1]: 1
+  NOTE blob keeps [Keep-Alive: timeout=5]: 1
+  NOTE blob keeps [Accept-Ranges: bytes]: 0
+  NOTE blob keeps [P3P: CP="x"]: 1
+  NOTE blob keeps [Strict-Transport-Security: max-age=1]: 1
+  NOTE blob keeps [X-Frame-Options: DENY]: 1
+  NOTE blob keeps [WWW-Authenticate: Basic realm="r"]: 1
+  NOTE blob keeps [Proxy-Connection: keep-alive]: 0
+  NOTE blob keeps [Content-Language: en]: 1
+  NOTE blob keeps [Content-Location: /x]: 1
+  NOTE blob keeps [Location: /elsewhere]: 1
+  NOTE blob keeps [Refresh: 5]: 1
+  NOTE blob keeps [Link: </s.css>; rel=preload]: 1
+  NOTE blob keeps [Content-Disposition: inline]: 1
+OK   hci_api_blob_kept_headers_table
+RUN  hci_api_blob_header_order_and_case
+  NOTE order: type=0x41 size=3 use=0 hit=1 ext= local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\Z7ODQGPZ\wininet_7372_512_blobord[1].txt hdrsize=116 exp=1dd5116dae81053 lm=0 sync=1dd510e7923a853 acc=1dd510e7923a853 hdrs=[HTTP/1.1 200 OK\r\nx-lower: 1\r\nX-UPPER: 2\r\nContent-Type: text/plain\r\nX-Mixed-Case: 3\r\nX-Last: 4\r\nContent-Length: 3\r\n\r\n]
+OK   hci_api_blob_header_order_and_case
+RUN  hci_api_blob_exact_bytes
+OK   hci_api_blob_exact_bytes
+SUMMARY tests=250 failed=0 skipped=0 checks_pass=2291 checks_fail=0
+@@I7 END http_cache_integration exit=0x0 ms=163224 timeout=0 bytes=56940

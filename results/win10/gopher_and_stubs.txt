@@ -1,0 +1,493 @@
+RUN  gs_ws_upgrade_option_on_request
+  NOTE INTERNET_OPTION_UPGRADE_TO_WEB_SOCKET on an unsent request: ok=0 e=87
+OK   gs_ws_upgrade_option_on_request
+RUN  gs_ws_complete_upgrade_unsent_request
+OK   gs_ws_complete_upgrade_unsent_request
+RUN  gs_ws_complete_upgrade_bad_handles
+OK   gs_ws_complete_upgrade_bad_handles
+RUN  gs_ws_query_close_status_args
+OK   gs_ws_query_close_status_args
+RUN  gs_ws_shutdown_table
+OK   gs_ws_shutdown_table
+RUN  gs_ws_close_table
+OK   gs_ws_close_table
+RUN  gs_ws_receive_args
+OK   gs_ws_receive_args
+RUN  gs_ws_send_bad_handles
+OK   gs_ws_send_bad_handles
+RUN  gs_ws_send_length_mismatch_first
+OK   gs_ws_send_length_mismatch_first
+RUN  gs_force_nexus_lookup_resolve_only
+OK   gs_force_nexus_lookup_resolve_only
+RUN  gs_secure_legacy_servers_appcompat_resolves
+OK   gs_secure_legacy_servers_appcompat_resolves
+RUN  gs_free_proxy_info_list_empty
+OK   gs_free_proxy_info_list_empty
+RUN  gs_get_proxy_dll_info
+  NOTE proxy CLSID {057EEE47-2572-4AA1-...}
+OK   gs_get_proxy_dll_info
+RUN  gs_dll_register_exports_resolve_only
+OK   gs_dll_register_exports_resolve_only
+RUN  gs_dll_can_unload_now
+  NOTE DllCanUnloadNow = 0x0
+OK   gs_dll_can_unload_now
+RUN  gs_dll_get_class_object_unknown_clsid
+  NOTE DllGetClassObject bogus clsid: pv cleared
+OK   gs_dll_get_class_object_unknown_clsid
+RUN  gs_ord116_117_domain_legal_table
+OK   gs_ord116_117_domain_legal_table
+RUN  gs_ord116_117_domain_legal_null
+OK   gs_ord116_117_domain_legal_null
+RUN  gs_ord109_export_cookie_file_null
+OK   gs_ord109_export_cookie_file_null
+RUN  gs_ord108_110_import_cookie_file_negative
+OK   gs_ord108_110_import_cookie_file_negative
+RUN  gs_ord102_get_disk_info_missing_dir
+OK   gs_ord102_get_disk_info_missing_dir
+RUN  gs_ord102_get_disk_info_tempdir
+OK   gs_ord102_get_disk_info_tempdir
+RUN  gs_ord102_get_disk_info_args
+OK   gs_ord102_get_disk_info_args
+RUN  gs_ord402_autoproxy_get_proxy_for_url
+OK   gs_ord402_autoproxy_get_proxy_for_url
+RUN  gs_ord401_read_guids_for_connected_networks
+OK   gs_ord401_read_guids_for_connected_networks
+RUN  gs_ord413_set_global_jet_parameters
+OK   gs_ord413_set_global_jet_parameters
+RUN  gs_ord411_create_cache_server_rpc_binding
+OK   gs_ord411_create_cache_server_rpc_binding
+RUN  gs_ord410_get_cache_server_connection
+OK   gs_ord410_get_cache_server_connection
+RUN  gs_ord118_find_p3p_symbol_suffix
+  NOTE p3p CUR: bare=0 a=0 i=1 o=2
+  NOTE p3p ADM: bare=3 a=3 i=4 o=5
+  NOTE p3p DEV: bare=6 a=6 i=7 o=8
+  NOTE p3p TAI: bare=12 a=12 i=13 o=14
+  NOTE p3p PSA: bare=15 a=15 i=16 o=17
+  NOTE p3p PSD: bare=18 a=18 i=19 o=20
+  NOTE p3p IVA: bare=21 a=21 i=22 o=23
+  NOTE p3p IVD: bare=24 a=24 i=25 o=26
+  NOTE p3p CON: bare=27 a=27 i=28 o=29
+  NOTE p3p HIS: bare=30 a=30 i=31 o=32
+  NOTE p3p TEL: bare=33 a=33 i=34 o=35
+  NOTE p3p OTP: bare=36 a=36 i=37 o=38
+OK   gs_ord118_find_p3p_symbol_suffix
+RUN  gs_ord118_find_p3p_symbol_tokens
+  NOTE p3p: NOI=81 ALL=82 CAO=83 IDC=84 OTI=85 NON=86 DSP=80 COR=87 MON=88 LAW=89 NID=79 CUR=0 ADM=3 DEV=6 TAI=12 PSA=15 PSD=18 IVA=21 IVD=24 CON=27 HIS=30 TEL=33 OTP=36 OUR=39 DEL=42 SAM=45 UNR=51 PUB=54 OTR=48 NOR=57 STP=58 LEG=59 BUS=60 IND=61 PHY=62 ONL=63 UNI=64 PUR=65 FIN=66 COM=67 NAV=68 INT=69 DEM=70 CNT=71 STA=72 POL=73 HEA=74 PRE=75 LOC=76 GOV=77 OTC=78 TST=90 
+OK   gs_ord118_find_p3p_symbol_tokens
+RUN  gs_ord118_find_p3p_symbol_rejects
+OK   gs_ord118_find_p3p_symbol_rejects
+RUN  gs_ord346_internal_get_cookie
+OK   gs_ord346_internal_get_cookie
+RUN  gs_ord120_123_get_p3p_policy
+OK   gs_ord120_123_get_p3p_policy
+RUN  gs_dav_compliance_w_ord105
+OK   gs_dav_compliance_w_ord105
+RUN  gs_dav_compliance_ord104
+  NOTE #104 == HttpCheckDavCompliance address: yes
+OK   gs_dav_compliance_ord104
+RUN  gs_dav_compliance_named
+OK   gs_dav_compliance_named
+RUN  gs_fortezza_status_untouched
+OK   gs_fortezza_status_untouched
+RUN  gs_fortezza_command_table
+OK   gs_fortezza_command_table
+RUN  gs_dispatch_api_call_returns
+OK   gs_dispatch_api_call_returns
+RUN  gs_ord112_is_duo_stream
+OK   gs_ord112_is_duo_stream
+RUN  gs_register_url_cache_notification_stub
+OK   gs_register_url_cache_notification_stub
+RUN  gs_url_cache_server_stub
+OK   gs_url_cache_server_stub
+RUN  gs_dll_install_stub
+OK   gs_dll_install_stub
+RUN  gs_get_cert_by_url_stub
+OK   gs_get_cert_by_url_stub
+RUN  gs_run_once_url_cache_stub
+OK   gs_run_once_url_cache_stub
+RUN  gs_delete_ie3_cache_stub
+OK   gs_delete_ie3_cache_stub
+RUN  gs_parse_x509_listbox_stub
+OK   gs_parse_x509_listbox_stub
+RUN  gs_show_client_auth_certs_stub
+OK   gs_show_client_auth_certs_stub
+RUN  gs_show_certificate_stub
+OK   gs_show_certificate_stub
+RUN  gs_ord112_folded_names_same_result
+OK   gs_ord112_folded_names_same_result
+RUN  gs_ordinal_only_addresses
+  NOTE ordinal-only exports: 28 entries, 25 distinct addresses (reference: 25)
+  NOTE #112 == UrlCacheServer: yes; #120 == #123: yes
+OK   gs_ordinal_only_addresses
+RUN  gs_ord403_autoproxy_on_complete_args
+OK   gs_ord403_autoproxy_on_complete_args
+RUN  gs_ord103_pattern_without_group
+  NOTE #103 unknown group: GLE 259
+OK   gs_ord103_pattern_without_group
+RUN  gs_ord103_callback_stops
+  NOTE #103 stop after 1: r=0 GLE=0
+  NOTE #103 stop after 2: r=0 GLE=0
+OK   gs_ord103_callback_stops
+RUN  gs_ord103_visits_group_entries
+OK   gs_ord103_visits_group_entries
+RUN  gs_ord103_empty_group_returns_false
+OK   gs_ord103_empty_group_returns_false
+RUN  gs_ord103_reserved_rejected_no_callback
+OK   gs_ord103_reserved_rejected_no_callback
+RUN  gs_get_header_data_bad_args
+OK   gs_get_header_data_bad_args
+RUN  gs_increment_header_data_bad_index
+OK   gs_increment_header_data_bad_index
+RUN  gs_group_attr_roundtrip
+  NOTE new group: flags=0x0 type=0x0 quota=0
+  NOTE after QUOTA|GROUPNAME: name='gs_group_7452' quota=0
+OK   gs_group_attr_roundtrip
+RUN  gs_group_attr_unknown_group
+  NOTE GetUrlCacheGroupAttributeA unknown group: e=2
+  NOTE SetUrlCacheGroupAttributeA unknown group: e=2
+OK   gs_group_attr_unknown_group
+RUN  gs_get_group_attr_size_first
+OK   gs_get_group_attr_size_first
+RUN  gs_set_group_attr_args
+OK   gs_set_group_attr_args
+RUN  gs_lock_request_file_after_download
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   gs_lock_request_file_after_download
+RUN  gs_unlock_request_file_bad_signature
+OK   gs_unlock_request_file_bad_signature
+RUN  gs_lock_request_file_bad_handles
+OK   gs_lock_request_file_bad_handles
+RUN  gs_unlock_cache_entry_plain_is_ansi
+OK   gs_unlock_cache_entry_plain_is_ansi
+RUN  gs_unlock_cache_entry_w_after_retrieve
+OK   gs_unlock_cache_entry_w_after_retrieve
+RUN  gs_unlock_cache_entry_after_retrieve
+  NOTE second unlock: r=1 e=0
+OK   gs_unlock_cache_entry_after_retrieve
+RUN  gs_unlock_cache_entry_unknown_url
+OK   gs_unlock_cache_entry_unknown_url
+RUN  gs_unlock_cache_entry_args
+OK   gs_unlock_cache_entry_args
+RUN  gs_security_ui_exports_resolve_only
+OK   gs_security_ui_exports_resolve_only
+RUN  gs_show_security_info_by_url_w_no_cache
+  NOTE InternetShowSecurityInfoByURLW url 0: GLE 0
+  NOTE InternetShowSecurityInfoByURLW url 1: GLE 0
+  NOTE InternetShowSecurityInfoByURLW url 2: GLE 0
+OK   gs_show_security_info_by_url_w_no_cache
+RUN  gs_show_security_info_by_url_a_no_cache
+  NOTE InternetShowSecurityInfoByURLA(http://127.0.0.1/): GLE 16962 (seeded 0x4242)
+  NOTE InternetShowSecurityInfoByURLA(https://gs-nosuch.invalid/): GLE 16962 (seeded 0x4242)
+  NOTE InternetShowSecurityInfoByURLA(https://127.0.0.1:1/): GLE 16962 (seeded 0x4242)
+  NOTE InternetShowSecurityInfoByURLA(ftp://127.0.0.1/): GLE 16962 (seeded 0x4242)
+  NOTE InternetShowSecurityInfoByURLA(https://): GLE 16962 (seeded 0x4242)
+  NOTE InternetShowSecurityInfoByURLA(not a url): GLE 16962 (seeded 0x4242)
+  NOTE InternetShowSecurityInfoByURLA(): GLE 16962 (seeded 0x4242)
+OK   gs_show_security_info_by_url_a_no_cache
+RUN  gs_dependency_dup_close_null
+OK   gs_dependency_dup_close_null
+RUN  gs_dependency_open_request_lifecycle
+  NOTE HttpIndicatePageLoadComplete(dep) = 0
+OK   gs_dependency_open_request_lifecycle
+RUN  gs_dependency_open_closed_handle
+OK   gs_dependency_open_closed_handle
+RUN  gs_dependency_open_args
+OK   gs_dependency_open_args
+RUN  gs_push_close_null
+OK   gs_push_close_null
+RUN  gs_push_wait_args
+OK   gs_push_wait_args
+RUN  gs_push_enable_args
+  NOTE HttpPushEnable GLE after: 0
+OK   gs_push_enable_args
+RUN  gs_hsts_preload_observations
+  NOTE hsts preload: google.com=0 www.google.com=0 accounts.google.com=1 paypal.com=1 www.paypal.com=1 twitter.com=1 login.live.com=0 microsoft.com=0 
+OK   gs_hsts_preload_observations
+RUN  gs_hsts_local_hosts_false
+OK   gs_hsts_local_hosts_false
+RUN  gs_hsts_null_args
+  NOTE HttpIsHostHstsEnabled GLE after: 16962
+OK   gs_hsts_null_args
+RUN  gs_privacy_set_invalid_args
+OK   gs_privacy_set_invalid_args
+RUN  gs_privacy_get_custom_zone_range
+  NOTE privacy custom zone 1000: r=0 template 100
+  NOTE privacy custom zone 5000: r=0 template 100
+  NOTE privacy custom zone 10000: r=0 template 100
+OK   gs_privacy_get_custom_zone_range
+RUN  gs_privacy_get_string_sizes
+  NOTE privacy zone 3 1st-party: template 101, string 38 chars
+OK   gs_privacy_get_string_sizes
+RUN  gs_privacy_get_buffer_rules
+OK   gs_privacy_get_buffer_rules
+RUN  gs_privacy_get_template_stable
+OK   gs_privacy_get_template_stable
+RUN  gs_privacy_get_template_standard_zones
+  NOTE privacy zone 0 1st: template 100
+  NOTE privacy zone 0 3rd: template 100
+  NOTE privacy zone 1 1st: template 100
+  NOTE privacy zone 1 3rd: template 100
+  NOTE privacy zone 2 1st: template 100
+  NOTE privacy zone 2 3rd: template 100
+  NOTE privacy zone 3 1st: template 101
+  NOTE privacy zone 3 3rd: template 101
+  NOTE privacy zone 4 1st: template 0
+  NOTE privacy zone 4 3rd: template 0
+OK   gs_privacy_get_template_standard_zones
+RUN  gs_privacy_get_bad_zone_type
+OK   gs_privacy_get_bad_zone_type
+RUN  gs_gopher_handle_type_never_gopher
+OK   gs_gopher_handle_type_never_gopher
+RUN  gs_gopher_create_url_scheme_from_name
+  NOTE CreateUrl scheme name 'gopher' + DEFAULT: r=1 out=gopher://h.example/ e=0
+OK   gs_gopher_create_url_scheme_from_name
+RUN  gs_gopher_create_url_a
+  NOTE CreateUrl gopher port 0: gopher://h.example/1/dir
+OK   gs_gopher_create_url_a
+RUN  gs_gopher_crack_url_w
+OK   gs_gopher_crack_url_w
+RUN  gs_gopher_crack_url_a
+OK   gs_gopher_crack_url_a
+RUN  gs_gopher_open_url_w
+OK   gs_gopher_open_url_w
+RUN  gs_gopher_open_url_a
+OK   gs_gopher_open_url_a
+RUN  gs_connect_valid_services_still_work
+OK   gs_connect_valid_services_still_work
+RUN  gs_connect_w_bad_service_table
+OK   gs_connect_w_bad_service_table
+RUN  gs_connect_a_bad_service_table
+OK   gs_connect_a_bad_service_table
+RUN  gs_gopher_connect_w_service_rejected
+OK   gs_gopher_connect_w_service_rejected
+RUN  gs_gopher_connect_a_service_rejected
+OK   gs_gopher_connect_a_service_rejected
+RUN  gs_load_url_cache_content_stub
+OK   gs_load_url_cache_content_stub
+RUN  gs_writefileex_vs_writefile
+  NOTE InternetWriteFile on an unsent GET: e=12019 (INCORRECT_HANDLE_STATE) written=0
+OK   gs_writefileex_vs_writefile
+RUN  gs_writefileex_w_stub
+OK   gs_writefileex_w_stub
+RUN  gs_writefileex_a_stub
+OK   gs_writefileex_a_stub
+RUN  gs_gopher_handles_survive
+OK   gs_gopher_handles_survive
+RUN  gs_gopher_threads
+OK   gs_gopher_threads
+RUN  gs_gopher_no_response_info
+  NOTE InternetGetLastResponseInfoA after gopher stub: r=1 code=0 len=0
+OK   gs_gopher_no_response_info
+RUN  gs_gopher_gle_overwritten_for_every_seed
+OK   gs_gopher_gle_overwritten_for_every_seed
+RUN  gs_gopher_get_attribute_null_everything
+OK   gs_gopher_get_attribute_null_everything
+RUN  gs_gopher_get_attribute_w
+OK   gs_gopher_get_attribute_w
+RUN  gs_gopher_get_attribute_a
+OK   gs_gopher_get_attribute_a
+RUN  gs_gopher_open_file_w
+OK   gs_gopher_open_file_w
+RUN  gs_gopher_open_file_a
+OK   gs_gopher_open_file_a
+RUN  gs_gopher_find_first_flags_table
+OK   gs_gopher_find_first_flags_table
+RUN  gs_gopher_find_first_w_handles
+OK   gs_gopher_find_first_w_handles
+RUN  gs_gopher_find_first_a_handles
+OK   gs_gopher_find_first_a_handles
+RUN  gs_gopher_get_locator_type_w
+OK   gs_gopher_get_locator_type_w
+RUN  gs_gopher_get_locator_type_a
+OK   gs_gopher_get_locator_type_a
+RUN  gs_gopher_create_locator_w_args
+OK   gs_gopher_create_locator_w_args
+RUN  gs_gopher_create_locator_a_args
+OK   gs_gopher_create_locator_a_args
+RUN  gs_gopher_create_locator_w_types
+OK   gs_gopher_create_locator_w_types
+RUN  gs_gopher_create_locator_a_types
+OK   gs_gopher_create_locator_a_types
+RUN  gs_gopher_no_unicode_free_variants
+OK   gs_gopher_no_unicode_free_variants
+RUN  gs_gopher_all_exports_resolve
+  NOTE gopher/writefileex/loadurlcachecontent share one address: yes
+OK   gs_gopher_all_exports_resolve
+RUN  gs_exports_harness_agrees
+OK   gs_exports_harness_agrees
+RUN  gs_exports_table_sanity
+  NOTE export rows checked: 1356
+OK   gs_exports_table_sanity
+RUN  gs_exports_ws2_32_classic_ordinals
+OK   gs_exports_ws2_32_classic_ordinals
+RUN  gs_exports_crypt32_dpapi_forwarders
+OK   gs_exports_crypt32_dpapi_forwarders
+RUN  gs_exports_schannel_forwarders
+  NOTE EncryptMessage is not a forwarder in the reference table
+  NOTE DecryptMessage is not a forwarder in the reference table
+OK   gs_exports_schannel_forwarders
+RUN  gs_exports_name_case_exact
+OK   gs_exports_name_case_exact
+RUN  gs_exports_wininet_plain_aliases
+  NOTE plain==A alias addresses: 13 of 13
+OK   gs_exports_wininet_plain_aliases
+RUN  gs_exports_wininet_folding_notes
+  NOTE wininet folded export groups in the reference: 19; still folded here: 19
+OK   gs_exports_wininet_folding_notes
+RUN  gs_exports_wininet_in_image
+OK   gs_exports_wininet_in_image
+RUN  gs_exports_wininet_tail
+OK   gs_exports_wininet_tail
+RUN  gs_exports_wininet_selected_ordinals
+OK   gs_exports_wininet_selected_ordinals
+RUN  gs_exports_wininet_ordinal_only_unnamed
+OK   gs_exports_wininet_ordinal_only_unnamed
+RUN  gs_exports_wininet_ordinal_bounds
+OK   gs_exports_wininet_ordinal_bounds
+RUN  gs_exports_ws2_32_all
+  NOTE ws2_32.dll: 195 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+  NOTE ws2_32: 195 named
+OK   gs_exports_ws2_32_all
+RUN  gs_exports_crypt32_all
+  NOTE crypt32.dll: 307 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+OK   gs_exports_crypt32_all
+RUN  gs_exports_schannel_all
+  NOTE schannel.dll: 36 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+OK   gs_exports_schannel_all
+RUN  gs_exports_sspicli_all
+  NOTE sspicli.dll: 105 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+  NOTE sspicli: 105 named
+OK   gs_exports_sspicli_all
+RUN  gs_exports_winhttp_all
+  NOTE winhttp.dll: 70 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+  NOTE winhttp: 70 named
+OK   gs_exports_winhttp_all
+RUN  gs_exports_urlmon_all
+  NOTE urlmon.dll: 316 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+  NOTE urlmon: 131 named, 316 ordinals
+OK   gs_exports_urlmon_all
+RUN  gs_exports_wininet_all
+  NOTE wininet.dll: 327 table rows, 0 names missing, 0 ordinals missing, 0 name/ordinal mismatches, 0 bad forwarders
+OK   gs_exports_wininet_all
+RUN  gs_ord422_423_netchange_resolve_only
+OK   gs_ord422_423_netchange_resolve_only
+RUN  gs_ord420_421_lan_dialup
+  NOTE IsLanConnection #420: hr=0x0 lan=1; IsDialUpConnection #421: hr=0x0 dial=0
+OK   gs_ord420_421_lan_dialup
+RUN  gs_ord101_do_connectoids_exist
+  NOTE DoConnectoidsExist #101 = 0 (GLE 3)
+OK   gs_ord101_do_connectoids_exist
+RUN  gs_connected_state_ex_buffers
+  NOTE ConnectedStateEx: A r=1 flags=0x12 name='LAN Connection'
+  NOTE ConnectedStateExA(reserved=1): r=0 e=87
+OK   gs_connected_state_ex_buffers
+RUN  gs_connected_state_reserved_rejected
+  NOTE InternetGetConnectedState: r=1 flags=0x12
+  NOTE InternetGetConnectedState(reserved=1): r=0 e=87 flags=0x0
+OK   gs_connected_state_reserved_rejected
+RUN  gs_autodial_callback_noop
+OK   gs_autodial_callback_noop
+RUN  gs_set_dial_state_all_variants
+OK   gs_set_dial_state_all_variants
+RUN  gs_goonline_does_not_set_offline
+  NOTE INTERNET_OPTION_CONNECTED_STATE = 0x1
+OK   gs_goonline_does_not_set_offline
+RUN  gs_goonline_plain
+OK   gs_goonline_plain
+RUN  gs_goonline_w_flags
+OK   gs_goonline_w_flags
+RUN  gs_goonline_a_flags
+OK   gs_goonline_a_flags
+RUN  gs_hangup_table
+OK   gs_hangup_table
+RUN  gs_dial_plain_is_ansi
+  NOTE InternetDial == InternetDialA address: yes
+OK   gs_dial_plain_is_ansi
+RUN  gs_dial_w_table
+OK   gs_dial_w_table
+RUN  gs_dial_plain_table
+OK   gs_dial_plain_table
+RUN  gs_dial_a_table
+OK   gs_dial_a_table
+RUN  gs_autodial_hangup_table
+OK   gs_autodial_hangup_table
+RUN  gs_autodial_named_flags
+OK   gs_autodial_named_flags
+RUN  gs_autodial_valid_flags_noop
+OK   gs_autodial_valid_flags_noop
+RUN  gs_autodial_bad_flag_bits
+OK   gs_autodial_bad_flag_bits
+RUN  gs_passport_exports_resolve_only
+OK   gs_passport_exports_resolve_only
+RUN  gs_url_zones_detach
+OK   gs_url_zones_detach
+RUN  gs_update_cache_content_path_null
+OK   gs_update_cache_content_path_null
+RUN  gs_tunnel_socket_wrong_handles
+  NOTE HttpGetTunnelSocket(session) = 12018
+  NOTE HttpGetTunnelSocket(connect) = 12018
+  NOTE HttpGetTunnelSocket(unsent request) = 12019
+OK   gs_tunnel_socket_wrong_handles
+RUN  gs_tunnel_socket_null_handle
+  NOTE HttpGetTunnelSocket(NULL) GLE after: 16962
+OK   gs_tunnel_socket_null_handle
+RUN  gs_server_credentials_odd_urls
+  NOTE HttpGetServerCredentials('') = 12006
+  NOTE HttpGetServerCredentials('not a url') = 12006
+  NOTE HttpGetServerCredentials('ftp://127.0.0.1/') = 12006
+  NOTE HttpGetServerCredentials('https://127.0.0.1:1/') = 1168
+  NOTE HttpGetServerCredentials('http://') = 12005
+OK   gs_server_credentials_odd_urls
+RUN  gs_server_credentials_unknown_host
+  NOTE HttpGetServerCredentials miss: GLE 0 (seeded 0x4242)
+OK   gs_server_credentials_unknown_host
+RUN  gs_server_credentials_null_args
+OK   gs_server_credentials_null_args
+RUN  gs_appcache_free_download_list_edges
+OK   gs_appcache_free_download_list_edges
+RUN  gs_appcache_free_group_list_edges
+OK   gs_appcache_free_group_list_edges
+RUN  gs_appcache_ie_group_list_read
+  NOTE AppCacheGetIEGroupList = 0: 0 groups
+OK   gs_appcache_ie_group_list_read
+RUN  gs_appcache_group_list_read
+  NOTE AppCacheGetGroupList = 0: 0 groups
+OK   gs_appcache_group_list_read
+RUN  gs_appcache_group_list_null
+OK   gs_appcache_group_list_null
+RUN  gs_appcache_delete_group_unknown
+  NOTE AppCacheDeleteGroup(unknown manifest) = 0
+OK   gs_appcache_delete_group_unknown
+RUN  gs_appcache_delete_group_null
+OK   gs_appcache_delete_group_null
+RUN  gs_appcache_close_null
+OK   gs_appcache_close_null
+RUN  gs_appcache_duplicate_null
+OK   gs_appcache_duplicate_null
+RUN  gs_appcache_create_commit_file_null
+OK   gs_appcache_create_commit_file_null
+RUN  gs_appcache_finalize_null
+OK   gs_appcache_finalize_null
+RUN  gs_appcache_get_download_list_null
+OK   gs_appcache_get_download_list_null
+RUN  gs_appcache_get_fallback_url_null
+OK   gs_appcache_get_fallback_url_null
+RUN  gs_appcache_get_manifest_url_null
+OK   gs_appcache_get_manifest_url_null
+RUN  gs_appcache_get_info_null
+OK   gs_appcache_get_info_null
+RUN  gs_appcache_check_manifest_arg_order
+OK   gs_appcache_check_manifest_arg_order
+RUN  gs_appcache_lookup_unknown_url
+  NOTE AppCacheLookup(unknown url, flags 0) = 2, handle 0000000000000000, GLE 0
+  NOTE AppCacheLookup(unknown url, flags 1) = 2, handle 0000000000000000, GLE 0
+OK   gs_appcache_lookup_unknown_url
+RUN  gs_appcache_lookup_bad_flags
+OK   gs_appcache_lookup_bad_flags
+RUN  gs_appcache_lookup_null_args
+OK   gs_appcache_lookup_null_args
+RUN  gs_appcache_exports_resolve
+OK   gs_appcache_exports_resolve
+SUMMARY tests=195 failed=0 skipped=0 checks_pass=7150 checks_fail=0
+@@I7 END gopher_and_stubs exit=0x0 ms=4634 timeout=0 bytes=20198

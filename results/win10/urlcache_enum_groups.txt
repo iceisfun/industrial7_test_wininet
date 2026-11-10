@@ -1,0 +1,486 @@
+RUN  ueg_group_quota_exceeded
+  NOTE 32 KiB entry into a 4 KB-quota group: ret 0 err 1816; member afterwards 1
+OK   ueg_group_quota_exceeded
+RUN  ueg_group_usage_tracks_members
+  FAIL tests/urlcache_enum_groups/groups.c:870: U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)
+  NOTE group usage after a 64 KiB member: 64 KB
+FAIL ueg_group_usage_tracks_members
+RUN  ueg_sticky_commit_and_nonpurgeable_group
+  FAIL tests/urlcache_enum_groups/groups.c:850: U(SetUrlCacheEntryGroupA)(url, 0, s, NULL, 0, NULL)
+  NOTE committed-sticky entry after add/remove of a non-purgeable group: type 0x5
+FAIL ueg_sticky_commit_and_nonpurgeable_group
+RUN  ueg_sticky_kept_while_any_nonpurgeable_group
+  FAIL tests/urlcache_enum_groups/groups.c:833: U(SetUrlCacheEntryGroupA)(url, 0, s1, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:834: U(SetUrlCacheEntryGroupA)(url, 0, s2, NULL, 0, NULL)
+FAIL ueg_sticky_kept_while_any_nonpurgeable_group
+RUN  ueg_purgeable_group_does_not_set_sticky
+  FAIL tests/urlcache_enum_groups/groups.c:821: U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)
+FAIL ueg_purgeable_group_does_not_set_sticky
+RUN  ueg_nonpurgeable_group_sets_sticky
+  FAIL tests/urlcache_enum_groups/groups.c:805: U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)
+FAIL ueg_nonpurgeable_group_sets_sticky
+RUN  ueg_delete_group_flag1_no_flush
+  FAIL tests/urlcache_enum_groups/groups.c:791: U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)
+FAIL ueg_delete_group_flag1_no_flush
+RUN  ueg_delete_group_flush_keeps_multi_member
+  FAIL tests/urlcache_enum_groups/groups.c:777: U(SetUrlCacheEntryGroupA)(both, 0, g1, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:778: U(SetUrlCacheEntryGroupA)(both, 0, g2, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:779: U(SetUrlCacheEntryGroupA)(only, 0, g1, NULL, 0, NULL)
+FAIL ueg_delete_group_flush_keeps_multi_member
+RUN  ueg_delete_group_flush_deletes_entries
+  FAIL tests/urlcache_enum_groups/groups.c:761: U(SetUrlCacheEntryGroupA)(u1, 0, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:762: U(SetUrlCacheEntryGroupA)(u2, 0, g, NULL, 0, NULL)
+FAIL ueg_delete_group_flush_deletes_entries
+RUN  ueg_delete_group_keeps_entries
+  FAIL tests/urlcache_enum_groups/groups.c:749: U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)
+FAIL ueg_delete_group_keeps_entries
+RUN  ueg_seg_entry_in_many_groups
+  FAIL tests/urlcache_enum_groups/groups.c:731: ok == 12 (got 0x0 want 0xc)
+  FAIL tests/urlcache_enum_groups/groups.c:739: U(SetUrlCacheEntryGroupA)(url, 0, gs[1], NULL, 0, NULL)
+FAIL ueg_seg_entry_in_many_groups
+RUN  ueg_seg_entry_in_two_groups
+  FAIL tests/urlcache_enum_groups/groups.c:711: U(SetUrlCacheEntryGroupA)(u1, 0, g1, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:712: U(SetUrlCacheEntryGroupA)(u1, 0, g2, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:713: U(SetUrlCacheEntryGroupA)(u2, 0, g2, NULL, 0, NULL)
+FAIL ueg_seg_entry_in_two_groups
+RUN  ueg_seg_flag_bits
+  FAIL tests/urlcache_enum_groups/groups.c:699: U(SetUrlCacheEntryGroupA)(url, 2, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:701: U(SetUrlCacheEntryGroupA)(url, 0xfffffffe, g, NULL, 0, NULL)
+FAIL ueg_seg_flag_bits
+RUN  ueg_seg_w_add_remove
+  FAIL tests/urlcache_enum_groups/groups.c:688: U(SetUrlCacheEntryGroupW)(ueg_w(url), INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+FAIL ueg_seg_w_add_remove
+RUN  ueg_seg_add_remove_membership
+  FAIL tests/urlcache_enum_groups/groups.c:664: U(SetUrlCacheEntryGroupA)(url, INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:665: 0 (GetLastError got 1816 want 0)
+  FAIL tests/urlcache_enum_groups/groups.c:670: U(SetUrlCacheEntryGroupA)(url, INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/groups.c:671: 0 (GetLastError got 1816 want 0)
+FAIL ueg_seg_add_remove_membership
+RUN  ueg_seg_missing_group_2
+OK   ueg_seg_missing_group_2
+RUN  ueg_seg_missing_entry_2
+OK   ueg_seg_missing_entry_2
+RUN  ueg_seg_plain_is_a
+OK   ueg_seg_plain_is_a
+RUN  ueg_seg_param_validation_w
+OK   ueg_seg_param_validation_w
+RUN  ueg_seg_param_validation_a
+OK   ueg_seg_param_validation_a
+RUN  ueg_set_attr_on_deleted_group_2
+OK   ueg_set_attr_on_deleted_group_2
+RUN  ueg_set_attr_flags_param_ignored
+OK   ueg_set_attr_flags_param_ignored
+RUN  ueg_set_attr_groupname_max_length
+  NOTE 120-char unterminated group name: ret 0 err 122
+OK   ueg_set_attr_groupname_max_length
+RUN  ueg_set_attr_groupname_needs_quota_bit
+  NOTE A GROUPNAME only -> ''
+OK   ueg_set_attr_groupname_needs_quota_bit
+RUN  ueg_set_attr_selective_update
+OK   ueg_set_attr_selective_update
+RUN  ueg_set_attr_storage_roundtrip
+OK   ueg_set_attr_storage_roundtrip
+RUN  ueg_set_attr_flag_roundtrip
+OK   ueg_set_attr_flag_roundtrip
+RUN  ueg_set_attr_quota_roundtrip_kb
+OK   ueg_set_attr_quota_roundtrip_kb
+RUN  ueg_set_attr_type_roundtrip
+OK   ueg_set_attr_type_roundtrip
+RUN  ueg_set_attr_missing_group_2
+OK   ueg_set_attr_missing_group_2
+RUN  ueg_set_attr_param_validation
+OK   ueg_set_attr_param_validation
+RUN  ueg_get_attr_flags_ignored
+OK   ueg_get_attr_flags_ignored
+RUN  ueg_get_attr_field_selection_w
+OK   ueg_get_attr_field_selection_w
+RUN  ueg_get_attr_field_selection_a
+OK   ueg_get_attr_field_selection_a
+RUN  ueg_get_attr_defaults
+OK   ueg_get_attr_defaults
+RUN  ueg_get_attr_missing_group_2
+OK   ueg_get_attr_missing_group_2
+RUN  ueg_get_attr_large_size_resets_cb
+OK   ueg_get_attr_large_size_resets_cb
+RUN  ueg_get_attr_small_size_122_w
+OK   ueg_get_attr_small_size_122_w
+RUN  ueg_get_attr_small_size_122_a
+OK   ueg_get_attr_small_size_122_a
+RUN  ueg_get_attr_struct_sizes
+OK   ueg_get_attr_struct_sizes
+RUN  ueg_get_attr_param_validation_w
+OK   ueg_get_attr_param_validation_w
+RUN  ueg_get_attr_param_validation_a
+OK   ueg_get_attr_param_validation_a
+RUN  ueg_find_group_handle_type_confusion
+OK   ueg_find_group_handle_type_confusion
+RUN  ueg_find_group_bogus_handles
+  NOTE FindNextUrlCacheGroup(NULL) err 6
+OK   ueg_find_group_bogus_handles
+RUN  ueg_find_group_handle_protocol
+  NOTE FindNextUrlCacheGroup after close: err 6
+OK   ueg_find_group_handle_protocol
+RUN  ueg_find_group_sees_created_and_not_deleted
+  NOTE 52 groups enumerated
+OK   ueg_find_group_sees_created_and_not_deleted
+RUN  ueg_find_group_ignored_args
+OK   ueg_find_group_ignored_args
+RUN  ueg_find_group_flags_87
+OK   ueg_find_group_flags_87
+RUN  ueg_find_group_null_id_87
+OK   ueg_find_group_null_id_87
+RUN  ueg_delete_group_flags_ignored_bits
+OK   ueg_delete_group_flags_ignored_bits
+RUN  ueg_delete_group_invalid_ids_2
+OK   ueg_delete_group_invalid_ids_2
+RUN  ueg_delete_group_twice_2
+OK   ueg_delete_group_twice_2
+RUN  ueg_delete_group_reserved_87
+OK   ueg_delete_group_reserved_87
+RUN  ueg_create_group_gidonly_creates_nothing
+  FAIL tests/urlcache_enum_groups/groups.c:83: LOW60(p3) == LOW60(real) + 1 (got 0x0 want 0x4b)
+  FAIL tests/urlcache_enum_groups/groups.c:84: (ULONGLONG)p3 & 0xf000000000000000ULL == (ULONGLONG)STICKY_BIT (got 0x0 want 0x1000000000000000)
+FAIL ueg_create_group_gidonly_creates_nothing
+RUN  ueg_create_group_ids_increase
+  NOTE group ids 0x4b 0x4c 0x100000000000004d
+OK   ueg_create_group_ids_increase
+RUN  ueg_create_group_valid_flags
+  FAIL tests/urlcache_enum_groups/groups.c:45: g != 0 (flags 5 err 87)
+  FAIL tests/urlcache_enum_groups/groups.c:45: g != 0 (flags 7 err 87)
+FAIL ueg_create_group_valid_flags
+RUN  ueg_create_group_bad_flags_87
+OK   ueg_create_group_bad_flags_87
+RUN  ueg_create_group_reserved_87
+OK   ueg_create_group_reserved_87
+RUN  ueg_x_fnxw_size_query_exact
+  SKIP group setup failed (1816)
+SKIP ueg_x_fnxw_size_query_exact
+RUN  ueg_x_blob_deleted_by_delete_entry
+OK   ueg_x_blob_deleted_by_delete_entry
+RUN  ueg_x_blob_on_normal_entry
+  NOTE GetUrlCacheEntryBinaryBlob on a file-backed entry -> 2147549183 type 0x0 cb 0
+OK   ueg_x_blob_on_normal_entry
+RUN  ueg_x_blob_overwrite
+OK   ueg_x_blob_overwrite
+RUN  ueg_x_groupname_non_ascii
+  NOTE A view of a non-ASCII group name: ret 1 err 0 bytes 75 c3 a9 e4 b8 ad
+OK   ueg_x_groupname_non_ascii
+RUN  ueg_x_attr_isolated_between_groups
+OK   ueg_x_attr_isolated_between_groups
+RUN  ueg_x_set_attr_groupsize_not_validated
+OK   ueg_x_set_attr_groupsize_not_validated
+RUN  ueg_x_recommit_member
+  SKIP group setup failed (1816)
+SKIP ueg_x_recommit_member
+RUN  ueg_x_seg_readd_after_remove
+  SKIP group setup failed (1816)
+SKIP ueg_x_seg_readd_after_remove
+RUN  ueg_x_group_outlives_members
+  SKIP group setup failed (1816)
+SKIP ueg_x_group_outlives_members
+RUN  ueg_x_group_created_after_find_first
+  NOTE group created after FindFirstUrlCacheGroup seen by that enumeration: 0 (of 65)
+OK   ueg_x_group_created_after_find_first
+RUN  ueg_x_group_find_handle_double_close_6
+OK   ueg_x_group_find_handle_double_close_6
+RUN  ueg_x_many_groups_listed_then_gone
+OK   ueg_x_many_groups_listed_then_gone
+RUN  ueg_x_history_entry_in_group
+  NOTE SetUrlCacheEntryGroupA(history) -> 0 err 2; group enum visited: 0/0, content: 0/0
+OK   ueg_x_history_entry_in_group
+RUN  ueg_x_group_with_visited_pattern_259
+  SKIP group setup failed (1816)
+SKIP ueg_x_group_with_visited_pattern_259
+RUN  ueg_x_setinfo_expire_seen_by_enum
+  SKIP group setup failed (1816)
+SKIP ueg_x_setinfo_expire_seen_by_enum
+RUN  ueg_x_setinfo_expire_then_expired
+OK   ueg_x_setinfo_expire_then_expired
+RUN  ueg_x_setinfo_type_changes_filter_result
+  SKIP group setup failed (1816)
+SKIP ueg_x_setinfo_type_changes_filter_result
+RUN  ueg_x_header_w_enum
+  FAIL tests/urlcache_enum_groups/extra.c:136: U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)
+  NOTE W enum header: size 27 (A len 27) total 444
+FAIL ueg_x_header_w_enum
+RUN  ueg_x_header_alignment_sizes
+  FAIL tests/urlcache_enum_groups/extra.c:103: U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/extra.c:103: U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/extra.c:103: U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/extra.c:103: U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/extra.c:103: U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/extra.c:103: U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)
+FAIL ueg_x_header_alignment_sizes
+RUN  ueg_x_group_deleted_during_enum
+  SKIP group setup failed (1816)
+SKIP ueg_x_group_deleted_during_enum
+RUN  ueg_x_deleted_member_leaves_group
+  SKIP group setup failed (1816)
+SKIP ueg_x_deleted_member_leaves_group
+RUN  ueg_x_delete_ahead_not_returned
+  SKIP group setup failed (1816)
+SKIP ueg_x_delete_ahead_not_returned
+RUN  ueg_find_entry_created_after_open
+  NOTE entry created after FindFirst seen by that enumeration: 0 (of 42 entries)
+OK   ueg_find_entry_created_after_open
+RUN  ueg_find_delete_current_entry_continues
+OK   ueg_find_delete_current_entry_continues
+RUN  ueg_find_many_handles
+OK   ueg_find_many_handles
+RUN  ueg_find_two_handles_independent
+OK   ueg_find_two_handles_independent
+RUN  ueg_ffa_repeated_size_queries
+OK   ueg_ffa_repeated_size_queries
+RUN  ueg_fnw_small_buffer_does_not_advance
+OK   ueg_fnw_small_buffer_does_not_advance
+RUN  ueg_fna_small_buffer_does_not_advance
+OK   ueg_fna_small_buffer_does_not_advance
+RUN  ueg_find_end_is_259_and_sticky
+OK   ueg_find_end_is_259_and_sticky
+RUN  ueg_find_handle_a_then_w
+OK   ueg_find_handle_a_then_w
+RUN  ueg_findclose_w_handle
+OK   ueg_findclose_w_handle
+RUN  ueg_findclose_success_sets_error_0
+OK   ueg_findclose_success_sets_error_0
+RUN  ueg_findclose_bogus_values_6
+OK   ueg_findclose_bogus_values_6
+RUN  ueg_findclose_null_6
+OK   ueg_findclose_null_6
+RUN  ueg_fnw_bogus_handle_values_6
+OK   ueg_fnw_bogus_handle_values_6
+RUN  ueg_fna_bogus_handle_values_6
+OK   ueg_fna_bogus_handle_values_6
+RUN  ueg_fnw_null_size_and_zero_size_87
+OK   ueg_fnw_null_size_and_zero_size_87
+RUN  ueg_fna_null_size_and_zero_size_87
+OK   ueg_fna_null_size_and_zero_size_87
+RUN  ueg_fnw_null_handle_87
+OK   ueg_fnw_null_handle_87
+RUN  ueg_fna_null_handle_87
+OK   ueg_fna_null_handle_87
+RUN  ueg_entry_no_header_no_ext
+  NOTE bare entry: ext=(null) local=C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\ZA35EFH0\bare[1] size=252
+OK   ueg_entry_no_header_no_ext
+RUN  ueg_entry_fields_match_commit
+  NOTE GetUrlCacheEntryInfoA size 296, enumeration size 296, use count 0/0 hit 1/1
+OK   ueg_entry_fields_match_commit
+RUN  ueg_plain_w_null_finds_entry
+OK   ueg_plain_w_null_finds_entry
+RUN  ueg_plain_cookie_pattern_excludes_content
+  NOTE 'cookie:' enumerated 0 entries
+OK   ueg_plain_cookie_pattern_excludes_content
+RUN  ueg_plain_visited_pattern_excludes_content
+  NOTE 'visited:' enumerated 1 entries
+OK   ueg_plain_visited_pattern_excludes_content
+RUN  ueg_plain_http_pattern_is_not_a_filter
+  NOTE pattern 'http://no.such.prefix.example/' enumerated 65 entries
+OK   ueg_plain_http_pattern_is_not_a_filter
+RUN  ueg_plain_empty_pattern_finds_entry
+OK   ueg_plain_empty_pattern_finds_entry
+RUN  ueg_plain_null_pattern_finds_entry
+  NOTE FindFirstUrlCacheEntryA(NULL) enumerated 67 entries
+OK   ueg_plain_null_pattern_finds_entry
+RUN  ueg_ffa_success_reports_required_size
+OK   ueg_ffa_success_reports_required_size
+RUN  ueg_ffa_exact_size_roundtrip
+OK   ueg_ffa_exact_size_roundtrip
+RUN  ueg_ffw_size_query_122
+OK   ueg_ffw_size_query_122
+RUN  ueg_ffa_size_query_122
+  NOTE short-by-one size 259 -> 260
+OK   ueg_ffa_size_query_122
+RUN  ueg_ffw_buffer_with_zero_size_87
+OK   ueg_ffw_buffer_with_zero_size_87
+RUN  ueg_ffw_null_size_87
+OK   ueg_ffw_null_size_87
+RUN  ueg_ffa_buffer_with_zero_size_87
+OK   ueg_ffa_buffer_with_zero_size_87
+RUN  ueg_ffa_null_size_87
+OK   ueg_ffa_null_size_87
+RUN  ueg_cookie_entry_shape
+  NOTE cookie entry type 0x100001; NORMAL-only filter over cookie: hits 1
+OK   ueg_cookie_entry_shape
+RUN  ueg_cookie_pattern_sees_persistent_cookie
+  NOTE persistent cookie on wininet5148n82ck.i7test.example: 'cookie:' sees it 1, NULL sees it 1, 'cookie:' Ex count 2
+OK   ueg_cookie_pattern_sees_persistent_cookie
+RUN  ueg_colon_pattern_unknown_container_259
+  NOTE plain ':' pattern: handle=0000000000000000 err=259
+OK   ueg_colon_pattern_unknown_container_259
+RUN  ueg_visited_pattern_case_insensitive
+OK   ueg_visited_pattern_case_insensitive
+RUN  ueg_flag1_spans_containers
+  NOTE '' flags0: 70 entries (has visited 0); flags1: 74 entries (has visited 1); visited: 2
+OK   ueg_flag1_spans_containers
+RUN  ueg_flag_fixed_and_filename_w
+  SKIP group setup failed (1816)
+SKIP ueg_flag_fixed_and_filename_w
+RUN  ueg_flag_both_bits_fixed_wins
+  SKIP group setup failed (1816)
+SKIP ueg_flag_both_bits_fixed_wins
+RUN  ueg_flag_fixed_and_filename_small_122
+  SKIP group setup failed (1816)
+SKIP ueg_flag_fixed_and_filename_small_122
+RUN  ueg_flag_fixed_and_filename_a
+  SKIP group setup failed (1816)
+SKIP ueg_flag_fixed_and_filename_a
+RUN  ueg_flag_struct_only_w
+  SKIP group setup failed (1816)
+SKIP ueg_flag_struct_only_w
+RUN  ueg_flag_struct_only_null_buffer_87
+  SKIP group setup failed (1816)
+SKIP ueg_flag_struct_only_null_buffer_87
+RUN  ueg_flag_struct_only_small_122_size_untouched
+  SKIP group setup failed (1816)
+SKIP ueg_flag_struct_only_small_122_size_untouched
+RUN  ueg_flag_struct_only_basic
+  SKIP group setup failed (1816)
+SKIP ueg_flag_struct_only_basic
+RUN  ueg_plain_default_filter_hides_sparse
+OK   ueg_plain_default_filter_hides_sparse
+RUN  ueg_plain_default_filter_hides_edited
+OK   ueg_plain_default_filter_hides_edited
+RUN  ueg_commit_type_roundtrip
+OK   ueg_commit_type_roundtrip
+RUN  ueg_filter_matrix_w
+  FAIL tests/urlcache_enum_groups/enum_ex.c:273: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:273: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:273: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:273: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:273: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:273: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+FAIL ueg_filter_matrix_w
+RUN  ueg_filter_matrix_a
+  FAIL tests/urlcache_enum_groups/enum_ex.c:244: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:244: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:244: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:244: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:244: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+  FAIL tests/urlcache_enum_groups/enum_ex.c:244: U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)
+FAIL ueg_filter_matrix_a
+RUN  ueg_group_scope_w_size_formula
+  SKIP group setup failed (1816)
+SKIP ueg_group_scope_w_size_formula
+RUN  ueg_group_scope_w_exact_set
+  SKIP group setup failed (1816)
+SKIP ueg_group_scope_w_exact_set
+RUN  ueg_group_scope_empty_group_259
+OK   ueg_group_scope_empty_group_259
+RUN  ueg_group_scope_null_pattern
+  SKIP group setup failed (1816)
+SKIP ueg_group_scope_null_pattern
+RUN  ueg_group_scope_exact_set
+  SKIP group setup failed (1816)
+SKIP ueg_group_scope_exact_set
+RUN  ueg_fnxw_param_validation
+  SKIP group setup failed (1816)
+SKIP ueg_fnxw_param_validation
+RUN  ueg_fnxa_param_validation
+  SKIP group setup failed (1816)
+SKIP ueg_fnxa_param_validation
+RUN  ueg_ffxa_group_attribute_args_ignored
+  SKIP group setup failed (1816)
+SKIP ueg_ffxa_group_attribute_args_ignored
+RUN  ueg_ffxw_reserved_87
+OK   ueg_ffxw_reserved_87
+RUN  ueg_ffxw_zero_size_with_buffer_87
+OK   ueg_ffxw_zero_size_with_buffer_87
+RUN  ueg_ffxw_null_size_87
+OK   ueg_ffxw_null_size_87
+RUN  ueg_ffxa_reserved_87
+OK   ueg_ffxa_reserved_87
+RUN  ueg_ffxa_zero_size_with_buffer_87
+OK   ueg_ffxa_zero_size_with_buffer_87
+RUN  ueg_ffxa_null_size_87
+OK   ueg_ffxa_null_size_87
+RUN  ueg_blob_empty
+  NOTE commit empty blob -> 0
+  NOTE get empty blob -> 2147549183 cb 0 blob 0000000000000000
+OK   ueg_blob_empty
+RUN  ueg_blob_roundtrip
+  NOTE blob: type 0x1234 ft1 1dd60c56ed1b169 ft2 1dd510e1e8eb169 ft3 1dd4de974e7b169 (exp 1dd60c56ed1b169 mod 1dd4de974e7b169)
+  NOTE blob entry visible to the content enumeration: 1
+OK   ueg_blob_roundtrip
+RUN  ueg_blob_commit_args
+OK   ueg_blob_commit_args
+RUN  ueg_blob_get_missing
+OK   ueg_blob_get_missing
+RUN  ueg_blob_get_null_args_87
+OK   ueg_blob_get_null_args_87
+RUN  ueg_expired_flags_variants
+  NOTE flags 0x0: past-expiry entry 1, future-expiry entry 0
+  NOTE flags 0x1: past-expiry entry 1, future-expiry entry 0
+  NOTE flags 0x2: past-expiry entry 1, future-expiry entry 0
+  NOTE flags 0x100: past-expiry entry 1, future-expiry entry 0
+  NOTE flags 0x80000000: past-expiry entry 1, future-expiry entry 0
+OK   ueg_expired_flags_variants
+RUN  ueg_expired_no_expire_time
+  NOTE entry without expire time: expired=0 err=0
+OK   ueg_expired_no_expire_time
+RUN  ueg_expired_past_and_future
+OK   ueg_expired_past_and_future
+RUN  ueg_expired_missing_entry
+OK   ueg_expired_missing_entry
+RUN  ueg_expired_null_args
+OK   ueg_expired_null_args
+RUN  ueg_free_space_exports
+OK   ueg_free_space_exports
+RUN  ueg_free_space_percent_over_100_87
+OK   ueg_free_space_percent_over_100_87
+RUN  ueg_set_config_null_87
+OK   ueg_set_config_null_87
+RUN  ueg_config_structsize_not_validated
+OK   ueg_config_structsize_not_validated
+RUN  ueg_config_usage_a
+OK   ueg_config_usage_a
+RUN  ueg_config_usage_needs_full_struct
+OK   ueg_config_usage_needs_full_struct
+RUN  ueg_config_sync_mode
+  NOTE cache sync mode 4
+OK   ueg_config_sync_mode
+RUN  ueg_config_container_selector_w
+OK   ueg_config_container_selector_w
+RUN  ueg_config_paths_a
+OK   ueg_config_paths_a
+RUN  ueg_config_paths_w
+  NOTE container 0 path 'C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\' quota 337920 KB
+  NOTE container 1 path 'C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCookies\' quota 337920 KB
+  NOTE container 2 path 'C:\Users\Administrator\AppData\Local\Microsoft\Windows\History\History.IE5\' quota 337920 KB
+OK   ueg_config_paths_w
+RUN  ueg_config_struct_sizes
+OK   ueg_config_struct_sizes
+RUN  ueg_config_null_87
+OK   ueg_config_null_87
+RUN  ueg_delete_container_missing
+  NOTE DeleteUrlCacheContainerA(missing) -> 1 err 0
+  NOTE DeleteUrlCacheContainerW(missing) -> 1 err 0
+OK   ueg_delete_container_missing
+RUN  ueg_delete_container_bad_args
+OK   ueg_delete_container_bad_args
+RUN  ueg_create_container_bad_args_a
+OK   ueg_create_container_bad_args_a
+RUN  ueg_create_container_bad_args_w
+OK   ueg_create_container_bad_args_w
+RUN  ueg_container_findnext_entry_handle_87
+OK   ueg_container_findnext_entry_handle_87
+RUN  ueg_container_findnext_bad_handle_87
+OK   ueg_container_findnext_bad_handle_87
+RUN  ueg_container_findnext_args
+OK   ueg_container_findnext_args
+RUN  ueg_container_find_nochange_12051
+OK   ueg_container_find_nochange_12051
+RUN  ueg_container_find_small_buffer
+OK   ueg_container_find_small_buffer
+RUN  ueg_container_enum_w_matches_a
+  NOTE 1 extensible containers
+OK   ueg_container_enum_w_matches_a
+RUN  ueg_container_enum_a
+  NOTE container modified counter 2
+  NOTE container 'feedplat' prefix 'feedplat:'
+OK   ueg_container_enum_a
+RUN  ueg_container_find_null_args_w
+OK   ueg_container_find_null_args_w
+RUN  ueg_container_find_null_args_a
+OK   ueg_container_find_null_args_a
+SUMMARY tests=183 failed=20 skipped=25 checks_pass=1815 checks_fail=48
+@@I7 END urlcache_enum_groups exit=0x1 ms=1514 timeout=0 bytes=22294

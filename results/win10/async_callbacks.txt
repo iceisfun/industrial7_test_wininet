@@ -1,0 +1,757 @@
+RUN  ac_y_openurl_handle_callback_removed
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE after closing the URL handle without its callback: 
+OK   ac_y_openurl_handle_callback_removed
+RUN  ac_y_async_redirect_all_on_workers
+OK   ac_y_async_redirect_all_on_workers
+RUN  ac_y_sync_w_callback_redirect_wide
+OK   ac_y_sync_w_callback_redirect_wide
+RUN  ac_y_openurl_async_w_redirect_wide
+OK   ac_y_openurl_async_w_redirect_wide
+RUN  ac_y_openurl_sync_redirect_sequence
+  NOTE sync openurl redirect: 60,80,20,21,30,31,40,41,110,80,30,31,40,41
+OK   ac_y_openurl_sync_redirect_sequence
+RUN  ac_y_conn_close_then_new_connection
+  NOTE request after Connection: close: 80,20,21,30,31,40,41,100
+OK   ac_y_conn_close_then_new_connection
+RUN  ac_y_async_head_sequence
+OK   ac_y_async_head_sequence
+RUN  ac_y_reentrant_remove_session_cb_children_keep
+OK   ac_y_reentrant_remove_session_cb_children_keep
+RUN  ac_y_reentrant_read_in_request_sent
+  NOTE read inside REQUEST_SENT: ret=1 err=0 (?); send ok=1 err=0
+  FAIL tests/async_callbacks/ac_y.c:456: g_yr.ret == FALSE (got 0x1 want 0x0)
+  FAIL tests/async_callbacks/ac_y.c:457: g_yr.err == ERROR_INTERNET_INCORRECT_HANDLE_STATE (got 0x0 want 0x2ef3)
+FAIL ac_y_reentrant_read_in_request_sent
+RUN  ac_y_reentrant_close_connect_in_complete
+  NOTE close connect inside REQUEST_COMPLETE: ret=1 err=0 seq=60,60,80,20,21,30,31,40,41,100,50,51,70,70
+OK   ac_y_reentrant_close_connect_in_complete
+RUN  ac_y_reentrant_set_context_in_created
+OK   ac_y_reentrant_set_context_in_created
+RUN  ac_y_context_set_before_send
+OK   ac_y_context_set_before_send
+RUN  ac_y_sendrequest_w_async_post
+OK   ac_y_sendrequest_w_async_post
+RUN  ac_y_endreq_w_without_sendex
+OK   ac_y_endreq_w_without_sendex
+RUN  ac_y_sendex_null_buffers_async
+  NOTE SendRequestEx(NULL buffers) head: POST /nb HTTP/1.1
+User-Agent: ac-agent
+Host: 127.0.0.1:49701
+Content-Length: 0
+Cache-Control: no-cache
+
+
+OK   ac_y_sendex_null_buffers_async
+RUN  ac_y_sendex_w_end_w_async
+OK   ac_y_sendex_w_end_w_async
+RUN  ac_y_sendex_w_param_checks
+OK   ac_y_sendex_w_param_checks
+RUN  ac_y_sendex_w_null_handle_first
+OK   ac_y_sendex_w_null_handle_first
+RUN  ac_y_sendex_a_null_handle_order
+OK   ac_y_sendex_a_null_handle_order
+RUN  ac_y_qda_before_send
+  NOTE QDA before send (async): ok=1 err=3735928559 (?) av=0x0 events=
+OK   ac_y_qda_before_send
+RUN  ac_y_rfex_on_connect_handle
+  NOTE ReadFileEx(connect handle): ok=0 err=12018 (ERROR_INTERNET_INCORRECT_HANDLE_TYPE)
+OK   ac_y_rfex_on_connect_handle
+RUN  ac_y_rfex_w_async_pending
+OK   ac_y_rfex_w_async_pending
+RUN  ac_y_rfex_undefined_flags_accepted
+OK   ac_y_rfex_undefined_flags_accepted
+RUN  ac_y_rfex_zero_length_completes_in_place
+  NOTE ReadFileEx(len 0) with nothing buffered: ok=1 err=0 len=0
+OK   ac_y_rfex_zero_length_completes_in_place
+RUN  ac_y_rfex_null_handle
+OK   ac_y_rfex_null_handle
+RUN  ac_y_rfex_w_bad_struct_size
+OK   ac_y_rfex_w_bad_struct_size
+RUN  ac_async_session_handle_type
+OK   ac_async_session_handle_type
+RUN  ac_async_option_queries
+  NOTE query option 16 on async session: ok=0 err=120 v=0
+  NOTE query option 30 on async session: ok=0 err=120 v=0
+OK   ac_async_option_queries
+RUN  ac_async_flag_on_children_ignored
+  NOTE REQUEST_FLAGS=0x8
+OK   ac_async_flag_on_children_ignored
+RUN  ac_async_connect_context_zero_ok
+OK   ac_async_connect_context_zero_ok
+RUN  ac_async_connect_http_returns_handle
+OK   ac_async_connect_http_returns_handle
+RUN  ac_reentrant_setcb_inside_created
+OK   ac_reentrant_setcb_inside_created
+RUN  ac_closing_query_inside_callback
+  NOTE query inside HANDLE_CLOSING: ok=0 ctx=0 err=6
+OK   ac_closing_query_inside_callback
+RUN  ac_closing_double_close
+OK   ac_closing_double_close
+RUN  ac_closing_w_callback
+OK   ac_closing_w_callback
+RUN  ac_closing_callback_only_on_request
+OK   ac_closing_callback_only_on_request
+RUN  ac_closing_replaced_callback_receives
+OK   ac_closing_replaced_callback_receives
+RUN  ac_closing_removed_callback_silent
+OK   ac_closing_removed_callback_silent
+RUN  ac_closing_session_with_context_value
+OK   ac_closing_session_with_context_value
+RUN  ac_closing_session_context_zero_silent
+OK   ac_closing_session_context_zero_silent
+RUN  ac_closing_connect_closes_request
+  NOTE connect close order: req1@3 req2@4 con@5
+OK   ac_closing_connect_closes_request
+RUN  ac_closing_session_closes_children
+  NOTE async=0 close order: req@2 con@3
+  NOTE async=1 close order: req@2 con@3
+OK   ac_closing_session_closes_children
+RUN  ac_closing_async
+  NOTE HANDLE_CLOSING(req) flags=10000000 tid=main len=8
+OK   ac_closing_async
+RUN  ac_closing_sync
+  NOTE HANDLE_CLOSING(req) flags=0 tid=main len=8
+OK   ac_closing_sync
+RUN  ac_created_many_requests_contexts
+OK   ac_created_many_requests_contexts
+RUN  ac_created_w_callback
+OK   ac_created_w_callback
+RUN  ac_created_no_callback_no_events
+OK   ac_created_no_callback_no_events
+RUN  ac_created_context_zero_silent
+OK   ac_created_context_zero_silent
+RUN  ac_created_len_and_handle_arg
+  NOTE con: h=0000000000cc000c (hi 0000000000cc000c hc 0000000000cc0010) len=8
+  NOTE req: h=0000000000cc0010 (hc 0000000000cc0010 hr 0000000000cc0014) len=8
+  NOTE created: 2 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [10 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0010 len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
+OK   ac_created_len_and_handle_arg
+RUN  ac_created_async_session
+OK   ac_created_async_session
+RUN  ac_created_sync_session
+OK   ac_created_sync_session
+RUN  ac_opt_context_value_zero_silences
+OK   ac_opt_context_value_zero_silences
+RUN  ac_opt_context_value_set_bad_length
+OK   ac_opt_context_value_set_bad_length
+RUN  ac_opt_context_value_set_changes_delivery
+OK   ac_opt_context_value_set_changes_delivery
+RUN  ac_opt_context_value_defaults
+OK   ac_opt_context_value_defaults
+RUN  ac_opt_callback_on_children
+OK   ac_opt_callback_on_children
+RUN  ac_opt_callback_set_readonly
+OK   ac_opt_callback_set_readonly
+RUN  ac_opt_callback_query_null_handle
+OK   ac_opt_callback_query_null_handle
+RUN  ac_opt_callback_query_short_buffer
+OK   ac_opt_callback_query_short_buffer
+RUN  ac_opt_callback_query
+OK   ac_opt_callback_query
+RUN  ac_setcb_w_inherited_by_child
+OK   ac_setcb_w_inherited_by_child
+RUN  ac_setcb_removed_on_session_not_inherited
+OK   ac_setcb_removed_on_session_not_inherited
+RUN  ac_setcb_inherit_is_snapshot
+OK   ac_setcb_inherit_is_snapshot
+RUN  ac_setcb_request_inherits_connect_cb
+OK   ac_setcb_request_inherits_connect_cb
+RUN  ac_setcb_connect_without_session_cb
+OK   ac_setcb_connect_without_session_cb
+RUN  ac_setcb_connect_inherits_session_cb
+OK   ac_setcb_connect_inherits_session_cb
+RUN  ac_setcb_every_handle_type
+OK   ac_setcb_every_handle_type
+RUN  ac_setcb_invalid_value_stored
+OK   ac_setcb_invalid_value_stored
+RUN  ac_setcb_mixed_a_w_returns_previous
+OK   ac_setcb_mixed_a_w_returns_previous
+RUN  ac_setcb_returns_previous_chain
+OK   ac_setcb_returns_previous_chain
+RUN  ac_setcb_first_returns_null_error_zero
+OK   ac_setcb_first_returns_null_error_zero
+RUN  ac_setcb_closed_handle
+OK   ac_setcb_closed_handle
+RUN  ac_setcb_garbage_handle
+OK   ac_setcb_garbage_handle
+RUN  ac_setcb_plain_export_is_ansi
+OK   ac_setcb_plain_export_is_ansi
+RUN  ac_setcb_null_handle_plain_export
+OK   ac_setcb_null_handle_plain_export
+RUN  ac_setcb_null_handle_w
+OK   ac_setcb_null_handle_w
+RUN  ac_setcb_null_handle_a
+OK   ac_setcb_null_handle_a
+RUN  ac_async_keepalive_close_statuses
+  NOTE keep-alive close: 70
+OK   ac_async_keepalive_close_statuses
+RUN  ac_async_connection_close_statuses
+  NOTE conn-close: send+read=80,20,21,30,31,40,41,100,40,41,50,51 close=70
+  NOTE CLOSING_CONNECTION=1 CONNECTION_CLOSED=1
+OK   ac_async_connection_close_statuses
+RUN  ac_sync_no_callback_baseline
+OK   ac_sync_no_callback_baseline
+RUN  ac_sync_connect_refused_events
+  NOTE sync refused sequence: 80,20
+OK   ac_sync_connect_refused_events
+RUN  ac_sync_send_payloads_match_async
+  NOTE sync GET to 127.0.0.1: IP-literal resolution pairs 1
+OK   ac_sync_send_payloads_match_async
+RUN  ac_sync_send_all_on_calling_thread
+OK   ac_sync_send_all_on_calling_thread
+RUN  ac_sync_send_no_request_complete
+OK   ac_sync_send_no_request_complete
+RUN  ac_sync_send_sequence
+  NOTE sync send sequence: 80,20,21,30,31,40,41
+OK   ac_sync_send_sequence
+RUN  ac_async_w_callback_strings
+OK   ac_async_w_callback_strings
+RUN  ac_sync_localhost_resolution_sequence
+  NOTE localhost sync: 80,20,21,30,31,40,41
+OK   ac_sync_localhost_resolution_sequence
+RUN  ac_async_localhost_resolution_sequence
+  NOTE localhost async: 80,20,21,30,31,40,41,100
+  NOTE localhost: 10 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [10 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0010 len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
+  NOTE   [3] st=20 ctx=4e030003 h=0000000000cc0014 len=6 info=1 A tid=other [5b 3a 3a 31 5d 00 ] '[::1].'
+  NOTE   [4] st=21 ctx=4e030003 h=0000000000cc0014 len=6 info=1 A tid=other [5b 3a 3a 31 5d 00 ] '[::1].'
+  NOTE   [5] st=30 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
+  NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [5a 00 00 00 ] 'Z...'
+  NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
+  NOTE   [8] st=41 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [40 00 00 00 ] '@...'
+  NOTE   [9] st=100 ctx=4e030003 h=0000000000cc0014 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+  NOTE localhost already in the resolver cache: no 10/11
+OK   ac_async_localhost_resolution_sequence
+RUN  ac_async_no_callback_still_pending
+OK   ac_async_no_callback_still_pending
+RUN  ac_async_context_zero_request
+  NOTE async send with context 0: r=0 err=997
+OK   ac_async_context_zero_request
+RUN  ac_async_callback_on_connect_only
+OK   ac_async_callback_on_connect_only
+RUN  ac_async_callback_on_request_only
+OK   ac_async_callback_on_request_only
+RUN  ac_async_send_bad_header_sync_failure
+OK   ac_async_send_bad_header_sync_failure
+RUN  ac_async_send_receive_timeout
+  NOTE receive-timeout 1000 on request: dwResult=1 dwError=0 status=200 seq=80,20,21,30,31,40,41,100
+OK   ac_async_send_receive_timeout
+RUN  ac_async_send_server_closes_without_reply
+  NOTE empty reply: dwError=12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) seq=80,20,21,30,31,40,41,50,51,100 requests=1
+OK   ac_async_send_server_closes_without_reply
+RUN  ac_async_send_server_resets
+  NOTE reset: dwError=12031 (ERROR_INTERNET_CONNECTION_RESET) seq=80,20,21,30,31,40,50,51,100
+OK   ac_async_send_server_resets
+RUN  ac_async_send_connect_refused
+  NOTE refused sequence: 80,20,100
+  NOTE STATUS_CODE query after failed async send: ok=1 err=0 status=0
+OK   ac_async_send_connect_refused
+RUN  ac_async_send_head_request
+OK   ac_async_send_head_request
+RUN  ac_async_send_post_body
+  NOTE POST REQUEST_SENT=168 head=161 body=7
+OK   ac_async_send_post_body
+RUN  ac_async_send_keepalive_reuse_sequence
+  NOTE reused connection sequence: 80,30,31,40,41,100
+OK   ac_async_send_keepalive_reuse_sequence
+RUN  ac_async_send_info_payloads
+  NOTE RESPONSE_RECEIVED 43 bytes (reply 43)
+OK   ac_async_send_info_payloads
+RUN  ac_async_send_complete_thread
+  NOTE async send: statuses on the calling thread:  (worker: 8)
+OK   ac_async_send_complete_thread
+RUN  ac_async_send_relative_order
+OK   ac_async_send_relative_order
+RUN  ac_async_send_sequence_fresh_connection
+  NOTE full sequence: 60,60,80,20,21,30,31,40,41,100
+  NOTE async fresh send: 10 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [10 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0010 len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
+  NOTE   [3] st=20 ctx=4e030003 h=0000000000cc0014 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [4] st=21 ctx=4e030003 h=0000000000cc0014 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [5] st=30 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
+  NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [5b 00 00 00 ] '[...'
+  NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
+  NOTE   [8] st=41 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [40 00 00 00 ] '@...'
+  NOTE   [9] st=100 ctx=4e030003 h=0000000000cc0014 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+OK   ac_async_send_sequence_fresh_connection
+RUN  ac_async_send_complete_once
+OK   ac_async_send_complete_once
+RUN  ac_async_send_returns_io_pending
+OK   ac_async_send_returns_io_pending
+RUN  ac_callback_info_is_copy
+OK   ac_callback_info_is_copy
+RUN  ac_reentrant_read_chain_in_callback
+  NOTE chain: inline=1 async=1
+OK   ac_reentrant_read_chain_in_callback
+RUN  ac_rfex_whole_body
+  NOTE ReadFileEx 70000 bytes, 0 pending
+OK   ac_rfex_whole_body
+RUN  ac_rfex_w_header_rejected
+OK   ac_rfex_w_header_rejected
+RUN  ac_rfex_bad_struct_size
+OK   ac_rfex_bad_struct_size
+RUN  ac_rfex_irf_sync_flag_in_async_session
+  NOTE IRF_SYNC in async session: ok=0 err=997 len=64
+OK   ac_rfex_irf_sync_flag_in_async_session
+RUN  ac_rfex_irf_no_wait
+  NOTE IRF_NO_WAIT with nothing buffered: ok=0 err=997 len=64
+  NOTE NO_WAIT completion len=64
+OK   ac_rfex_irf_no_wait
+RUN  ac_rfex_irf_async_buffered
+  NOTE ReadFileEx buffered: ok=1 err=0 len=5
+OK   ac_rfex_irf_async_buffered
+RUN  ac_rfex_irf_async_pending
+  NOTE ReadFileEx completion: req-ctx@9 alt-ctx@-1 dwResult=1 len=5
+OK   ac_rfex_irf_async_pending
+RUN  ac_qda_sync_session
+OK   ac_qda_sync_session
+RUN  ac_qda_flags_nonzero
+  NOTE QDA dwFlags=1: ok=1 err=0 av=5
+  NOTE QDA dwContext=0x55: ok=1 err=0 av=5
+OK   ac_qda_flags_nonzero
+RUN  ac_qda_at_eof
+OK   ac_qda_at_eof
+RUN  ac_qda_pending_result
+  NOTE QDA completion: dwResult=1 dwError=5 av=0x5
+OK   ac_qda_pending_result
+RUN  ac_qda_buffered_sync_return
+  NOTE QDA buffered: ok=1 err=0 av=5
+OK   ac_qda_buffered_sync_return
+RUN  ac_read_before_send_async
+  NOTE read before send (async): ok=1 err=0 rd=0
+OK   ac_read_before_send_async
+RUN  ac_read_bad_handle_async_session
+  NOTE InternetReadFile(session) err=12018
+OK   ac_read_bad_handle_async_session
+RUN  ac_read_sync_session_with_callback
+  NOTE sync read statuses: 40,41
+OK   ac_read_sync_session_with_callback
+RUN  ac_read_truncated_body_async
+  NOTE truncated body: read 5
+OK   ac_read_truncated_body_async
+RUN  ac_read_close_delimited_async
+OK   ac_read_close_delimited_async
+RUN  ac_read_chunked_async
+  NOTE chunked: 1 pending reads
+OK   ac_read_chunked_async
+RUN  ac_read_whole_body_pattern
+  NOTE 200000 bytes read with 0 pending reads
+OK   ac_read_whole_body_pattern
+RUN  ac_read_small_buffer_from_buffered_data
+OK   ac_read_small_buffer_from_buffered_data
+RUN  ac_read_partial_waits_for_rest
+  NOTE first read: ok=0 err=997 rd=0x0
+OK   ac_read_partial_waits_for_rest
+RUN  ac_read_pending_statuses
+  NOTE read statuses: 40,41,100
+OK   ac_read_pending_statuses
+RUN  ac_read_pending_then_complete
+  NOTE rd right after pending read: 0x0
+  NOTE pending read sequence: 40,41,100
+OK   ac_read_pending_then_complete
+RUN  ac_read_buffered_completes_synchronously
+  NOTE buffered async read: ok=1 err=0 rd=5
+OK   ac_read_buffered_completes_synchronously
+RUN  ac_async_read_request_complete_payload
+OK   ac_async_read_request_complete_payload
+RUN  ac_async_zero_length_read
+  NOTE zero-length async read: ok=1 err=0 rd=0x0
+OK   ac_async_zero_length_read
+RUN  ac_async_close_unread_response
+  NOTE close with 100000 unread bytes: 50,51,70
+OK   ac_async_close_unread_response
+RUN  ac_sync_closing_on_calling_thread
+OK   ac_sync_closing_on_calling_thread
+RUN  ac_sync_cookie_received
+OK   ac_sync_cookie_received
+RUN  ac_sync_redirect_sequence
+OK   ac_sync_redirect_sequence
+RUN  ac_openurl_w_async
+OK   ac_openurl_w_async
+RUN  ac_w_apis_async
+OK   ac_w_apis_async
+RUN  ac_verb_table_async
+OK   ac_verb_table_async
+RUN  ac_body_size_table
+OK   ac_body_size_table
+RUN  ac_status_code_table
+OK   ac_status_code_table
+RUN  ac_two_sessions_two_callbacks
+OK   ac_two_sessions_two_callbacks
+RUN  ac_sequential_requests_reuse_table
+OK   ac_sequential_requests_reuse_table
+RUN  ac_two_requests_in_flight
+  NOTE two in flight: connections=2
+OK   ac_two_requests_in_flight
+RUN  ac_pending_context_changed
+  NOTE context changed while pending: completion on old ctx=1 new ctx=0 seq(all)=60,60,80,20,21,30,31,40,41,100
+OK   ac_pending_context_changed
+RUN  ac_pending_callback_replaced
+OK   ac_pending_callback_replaced
+RUN  ac_pending_callback_removed
+  NOTE callback removed while pending: 0 further events ()
+OK   ac_pending_callback_removed
+RUN  ac_pending_qda_during_send
+  NOTE QDA while send pending: ok=0 err=12019 (ERROR_INTERNET_INCORRECT_HANDLE_STATE) av=0x0
+OK   ac_pending_qda_during_send
+RUN  ac_pending_read_during_send
+  NOTE read while send pending: ok=0 err=12019 (ERROR_INTERNET_INCORRECT_HANDLE_STATE) rd=0x0
+  NOTE completions after read-during-send: 1 seq=60,80,20,21,30,31,40,41,100
+OK   ac_pending_read_during_send
+RUN  ac_pending_second_send
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE second send while pending (child): exit=0x2a (41 TRUE, 42 FALSE+997, 100+n other error)
+OK   ac_pending_second_send
+RUN  ac_pending_query_status_during_send
+  NOTE STATUS_CODE while send pending: ok=0 err=12019 (ERROR_INTERNET_INCORRECT_HANDLE_STATE) st=0
+OK   ac_pending_query_status_during_send
+RUN  ac_https_async_cert_error_probe
+  NOTE https untrusted cert async: done=1 after 12187 ms dwResult=0 dwError=12045 (ERROR_INTERNET_INVALID_CA) seq=80,20,21,50,51,100
+  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=5031 conn=0 req=-1 TIMEOUT n=12 [recv timeout]
+  NOTE srv ev 2 t=5031 conn=0 req=-1 TLS_ABORT n=25 [handshake recv=-1 round=1]
+  NOTE srv ev 3 t=5234 conn=0 req=-1 CLOSED n=0 []
+OK   ac_https_async_cert_error_probe
+RUN  ac_https_async_sequence
+  NOTE https statuses: 80,20,21,30,31,40,41,100
+OK   ac_https_async_sequence
+RUN  ac_ftp_connect_async_refused
+  NOTE ftp refused: 60,20,100
+OK   ac_ftp_connect_async_refused
+RUN  ac_ftp_connect_async
+  NOTE async FTP connect: h=0000000000000000 err=997
+  NOTE ftp connect statuses: 60,20,21,40,41,30,31,40,41,30,31,40,41,100
+OK   ac_ftp_connect_async
+RUN  ac_sendex_write_end_async
+  NOTE HttpSendRequestEx async: ok=0 err=997
+  NOTE after SendRequestEx: 80,20,21,30,31,100
+  NOTE InternetWriteFile[0] async: ok=1 err=0 wr=3
+  NOTE InternetWriteFile[1] async: ok=1 err=0 wr=3
+  NOTE HttpEndRequest async: ok=0 err=997
+  NOTE after EndRequest: 40,41,100
+OK   ac_sendex_write_end_async
+RUN  ac_close_after_complete_no_extra
+OK   ac_close_after_complete_no_extra
+RUN  ac_close_session_with_send_pending
+  NOTE close session with send pending: 50,51,100,70,70
+OK   ac_close_session_with_send_pending
+RUN  ac_close_request_read_pending
+  NOTE close with read pending: 50,51,100,70
+  NOTE pending read completed: dwResult=0 dwError=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+OK   ac_close_request_read_pending
+RUN  ac_close_request_send_pending
+  NOTE close with send pending: 50,51,100,70
+  NOTE close-pending: 12 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0014 len=8 info=1 A tid=main [18 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [3] st=20 ctx=4e030003 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [4] st=21 ctx=4e030003 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [5] st=30 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0018 len=4 info=1 A tid=other [5c 00 00 00 ] '\...'
+  NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [8] st=50 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [9] st=51 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [00 00 00 00 00 00 00 00 f1 2e 00 00 fa 7f 00 00 ] '................'
+  NOTE   [11] st=70 ctx=4e030003 h=0000000000cc0018 len=8 info=1 A tid=other [18 00 cc 00 00 00 00 00 ] '........'
+  NOTE pending send completed: dwResult=0 dwError=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+OK   ac_close_request_send_pending
+RUN  ac_auth_401_basic_with_credentials
+  NOTE 401+creds: status 200 requests 2 statuses 80,20,21,30,31,40,41,40,41,80,30,31,40,41,100
+OK   ac_auth_401_basic_with_credentials
+RUN  ac_auth_401_no_credentials
+  NOTE 401 statuses: 80,20,21,30,31,40,41,100
+OK   ac_auth_401_no_credentials
+RUN  ac_intermediate_response_100
+  NOTE 100-continue statuses: 80,20,21,30,31,40,41,120,40,41,100
+  NOTE INTERMEDIATE len=4 dword=100
+OK   ac_intermediate_response_100
+RUN  ac_cookie_info_payload
+OK   ac_cookie_info_payload
+RUN  ac_cookie_no_cookies_flag_silent
+OK   ac_cookie_no_cookies_flag_silent
+RUN  ac_cookie_received_and_sent
+  NOTE set-cookie response statuses: 80,20,21,30,31,40,41,321,100
+  NOTE cookie1: 11 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0014 len=8 info=1 A tid=main [18 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [3] st=20 ctx=4e030003 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [4] st=21 ctx=4e030003 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [5] st=30 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0018 len=4 info=1 A tid=other [6b 00 00 00 ] 'k...'
+  NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [8] st=41 ctx=4e030003 h=0000000000cc0018 len=4 info=1 A tid=other [54 00 00 00 ] 'T...'
+  NOTE   [9] st=321 ctx=4e030003 h=0000000000cc0018 len=32 info=1 A tid=other [01 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ] '................................'
+  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+  NOTE cookie request statuses: 80,320,30,31,40,41,100
+  NOTE COOKIE_SENT len=16 cSent=1 cSuppressed=0
+OK   ac_cookie_received_and_sent
+RUN  ac_redirect_cross_port_new_connection
+  NOTE cross-port redirect: 80,20,21,30,31,40,41,110,80,20,21,30,31,40,41,100
+OK   ac_redirect_cross_port_new_connection
+RUN  ac_redirect_no_auto_redirect
+OK   ac_redirect_no_auto_redirect
+RUN  ac_redirect_w_callback_url_wide
+OK   ac_redirect_w_callback_url_wide
+RUN  ac_redirect_sequence_exact
+OK   ac_redirect_sequence_exact
+RUN  ac_redirect_status_and_url
+  NOTE redirect sequence: 60,80,20,21,30,31,40,41,110,80,30,31,40,41,100
+OK   ac_redirect_status_and_url
+RUN  ac_openurl_async_context_zero
+  NOTE async openurl ctx 0: h=0000000000000000 err=997
+OK   ac_openurl_async_context_zero
+RUN  ac_openurl_sync_with_callback
+  NOTE sync openurl: 60,80,20,21,30,31,40,41
+OK   ac_openurl_sync_with_callback
+RUN  ac_openurl_async_empty_url
+OK   ac_openurl_async_empty_url
+RUN  ac_openurl_async_bad_url
+  NOTE openurl('notaurl') async: completion 0/12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME) seq=100
+  NOTE openurl('zz://127.0.0.1/') async: completion 0/12006 (ERROR_INTERNET_UNRECOGNIZED_SCHEME) seq=100
+OK   ac_openurl_async_bad_url
+RUN  ac_openurl_async_connect_refused
+  NOTE openurl refused: 60,80,20,70,100
+OK   ac_openurl_async_connect_refused
+RUN  ac_openurl_async_sequence
+  NOTE openurl async sequence: 60,80,20,21,30,31,40,41,100
+OK   ac_openurl_async_sequence
+RUN  ac_openurl_async_pending_and_handle
+  NOTE openurl REQUEST_COMPLETE h=0000000000cc000c (session 0000000000cc000c, url 0000000000cc0018)
+  NOTE openurl sequence: 60,80,20,21,30,31,40,41,100
+  NOTE openurl: 9 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=b110004 h=0000000000cc0014 len=8 info=1 A tid=other [18 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=80 ctx=b110004 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [2] st=20 ctx=b110004 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [3] st=21 ctx=b110004 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [4] st=30 ctx=b110004 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [5] st=31 ctx=b110004 h=0000000000cc0018 len=4 info=1 A tid=other [5a 00 00 00 ] 'Z...'
+  NOTE   [6] st=40 ctx=b110004 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [7] st=41 ctx=b110004 h=0000000000cc0018 len=4 info=1 A tid=other [40 00 00 00 ] '@...'
+  NOTE   [8] st=100 ctx=b110004 h=0000000000cc000c len=16 info=1 A tid=other [18 00 cc 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+OK   ac_openurl_async_pending_and_handle
+RUN  ac_x_status_values_documented
+  NOTE statuses with Set-Cookie + redirect, NO_COOKIES: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,100,40,41,70,70
+OK   ac_x_status_values_documented
+RUN  ac_x_query_info_after_complete_silent
+OK   ac_x_query_info_after_complete_silent
+RUN  ac_x_add_headers_sync_in_async_session
+OK   ac_x_add_headers_sync_in_async_session
+RUN  ac_x_connect_http_no_complete
+OK   ac_x_connect_http_no_complete
+RUN  ac_x_w_and_a_on_sibling_requests
+OK   ac_x_w_and_a_on_sibling_requests
+RUN  ac_x_callback_on_one_of_two_requests
+OK   ac_x_callback_on_one_of_two_requests
+RUN  ac_x_session_cb_after_request_open
+OK   ac_x_session_cb_after_request_open
+RUN  ac_x_async_late_body_received_count
+OK   ac_x_async_late_body_received_count
+RUN  ac_x_sync_late_body_statuses
+  NOTE sync late body read statuses: 40,41
+OK   ac_x_sync_late_body_statuses
+RUN  ac_x_sync_rfex_irf_async
+OK   ac_x_sync_rfex_irf_async
+RUN  ac_x_sendex_large_write
+  NOTE 100000-byte InternetWriteFile async: ok=1 err=0 wr=100000
+OK   ac_x_sendex_large_write
+RUN  ac_x_sendex_initial_buffer
+OK   ac_x_sendex_initial_buffer
+RUN  ac_x_openurl_async_404_handle
+OK   ac_x_openurl_async_404_handle
+RUN  ac_x_openurl_async_headers
+OK   ac_x_openurl_async_headers
+RUN  ac_x_openurl_async_redirect
+  NOTE openurl redirect seq: 60,80,20,21,30,31,40,41,110,80,30,31,40,41,100
+OK   ac_x_openurl_async_redirect
+RUN  ac_x_redirect_with_body
+  NOTE redirect with body: 80,20,21,30,31,40,41,110,80,30,31,40,41,100
+OK   ac_x_redirect_with_body
+RUN  ac_x_redirect_303_post_to_get
+  NOTE 303 follow-up head: GET /see HTTP/1.1
+User-Agent: ac-agent
+Host: 127.0.0.1:50031
+Cache-Control: no-cache
+Connection: Keep-Alive
+
+
+OK   ac_x_redirect_303_post_to_get
+RUN  ac_x_redirect_chain_three
+OK   ac_x_redirect_chain_three
+RUN  ac_x_204_read_zero_sync
+OK   ac_x_204_read_zero_sync
+RUN  ac_x_head_read_zero_sync
+OK   ac_x_head_read_zero_sync
+RUN  ac_x_gzip_no_decoding_raw
+OK   ac_x_gzip_no_decoding_raw
+RUN  ac_x_gzip_decoding_async
+  NOTE gzip decode async: pending=0 sync=9
+OK   ac_x_gzip_decoding_async
+RUN  ac_x_qda_buffered_table
+  NOTE size 1: QDA ok=1 av=1
+  NOTE size 10: QDA ok=1 av=10
+  NOTE size 100: QDA ok=1 av=100
+  NOTE size 1000: QDA ok=1 av=1000
+OK   ac_x_qda_buffered_table
+RUN  ac_x_qda_then_exact_read
+OK   ac_x_qda_then_exact_read
+RUN  ac_x_read_after_eof_repeated
+OK   ac_x_read_after_eof_repeated
+RUN  ac_x_chunked_size_table
+OK   ac_x_chunked_size_table
+RUN  ac_x_read_bufsize_table_trickled
+  NOTE trickled bufsize 1: pending=4 sync=23
+  NOTE trickled bufsize 5: pending=4 sync=3
+  NOTE trickled bufsize 16: pending=2 sync=1
+  NOTE trickled bufsize 4096: pending=1 sync=1
+OK   ac_x_read_bufsize_table_trickled
+RUN  ac_x_read_bufsize_table
+  NOTE bufsize 1: pending=0 sync=3001
+  NOTE bufsize 2: pending=0 sync=1501
+  NOTE bufsize 3: pending=0 sync=1001
+  NOTE bufsize 7: pending=0 sync=430
+  NOTE bufsize 64: pending=0 sync=48
+  NOTE bufsize 1000: pending=0 sync=4
+  NOTE bufsize 4096: pending=0 sync=2
+  NOTE bufsize 65536: pending=0 sync=2
+OK   ac_x_read_bufsize_table
+RUN  ac_x_header_table_request_sent
+OK   ac_x_header_table_request_sent
+RUN  ac_x_post_size_table_request_sent
+  NOTE POST 0: sends=1 REQUEST_SENT=112,0 head=112 body=0 seq=20,21,30,31,40,41,100
+  NOTE POST 1: sends=1 REQUEST_SENT=113,0 head=112 body=1 seq=20,21,30,31,40,41,100
+  NOTE POST 2: sends=1 REQUEST_SENT=114,0 head=112 body=2 seq=20,21,30,31,40,41,100
+  NOTE POST 17: sends=1 REQUEST_SENT=130,0 head=113 body=17 seq=20,21,30,31,40,41,100
+  NOTE POST 100: sends=1 REQUEST_SENT=214,0 head=114 body=100 seq=20,21,30,31,40,41,100
+  NOTE POST 200: sends=1 REQUEST_SENT=314,0 head=114 body=200 seq=20,21,30,31,40,41,100
+  NOTE POST 500: sends=1 REQUEST_SENT=614,0 head=114 body=500 seq=20,21,30,31,40,41,100
+  NOTE POST 512: sends=1 REQUEST_SENT=626,0 head=114 body=512 seq=20,21,30,31,40,41,100
+  NOTE POST 999: sends=2 REQUEST_SENT=114,999 head=114 body=999 seq=20,21,30,31,30,31,40,41,100
+  NOTE POST 1000: sends=2 REQUEST_SENT=115,1000 head=115 body=1000 seq=20,21,30,31,30,31,40,41,100
+  NOTE POST 4096: sends=2 REQUEST_SENT=115,4096 head=115 body=4096 seq=20,21,30,31,30,31,40,41,100
+  NOTE POST 5000: sends=2 REQUEST_SENT=115,5000 head=115 body=5000 seq=20,21,30,31,30,31,40,41,100
+OK   ac_x_post_size_table_request_sent
+RUN  ac_x_requests_on_two_servers
+OK   ac_x_requests_on_two_servers
+RUN  ac_x_many_requests_distinct_contexts
+  NOTE request 0: 60,80,20,21,30,31,40,41,100,40,41
+  NOTE request 1: 60,80,30,31,40,41,100,40,41
+  NOTE request 2: 60,80,30,31,40,41,100,40,41
+  NOTE request 3: 60,80,20,21,30,31,40,41,100,40,41
+  NOTE request 4: 60,80,30,31,40,41,100,40,41
+  NOTE request 5: 60,80,30,31,40,41,100,40,41
+  NOTE connections used for 6 concurrent requests: 2
+OK   ac_x_many_requests_distinct_contexts
+RUN  ac_x_close_idle_request_no_complete
+OK   ac_x_close_idle_request_no_complete
+RUN  ac_x_close_session_read_pending
+  NOTE close session with read pending: 50,51,100,70,70
+OK   ac_x_close_session_read_pending
+RUN  ac_x_close_request_rfex_pending
+  NOTE close with ReadFileEx pending: 50,51,100,70
+OK   ac_x_close_request_rfex_pending
+RUN  ac_x_close_request_qda_pending
+  NOTE close with QDA pending: 50,51,100,70
+OK   ac_x_close_request_qda_pending
+RUN  ac_x_close_connect_with_send_pending
+  NOTE close connect with send pending: 50,51,100,70,70
+  NOTE close connect pending: 13 events (main tid 7276, dropped 0)
+  NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0014 len=8 info=1 A tid=main [18 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [3] st=20 ctx=4e030003 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [4] st=21 ctx=4e030003 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
+  NOTE   [5] st=30 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0018 len=4 info=1 A tid=other [5a 00 00 00 ] 'Z...'
+  NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [8] st=50 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [9] st=51 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
+  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [00 00 00 00 00 00 00 00 f1 2e 00 00 fa 7f 00 00 ] '................'
+  NOTE   [11] st=70 ctx=4e030003 h=0000000000cc0018 len=8 info=1 A tid=other [18 00 cc 00 00 00 00 00 ] '........'
+  NOTE   [12] st=70 ctx=c0440002 h=0000000000cc0014 len=8 info=1 A tid=other [14 00 cc 00 00 00 00 00 ] '........'
+  NOTE   completion dwResult=0 dwError=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+OK   ac_x_close_connect_with_send_pending
+RUN  ac_x_sm_failure_reported
+OK   ac_x_sm_failure_reported
+RUN  ac_x_sm_get_404_body
+  NOTE state machine /sm6: len=7 completions=1 inline=3
+OK   ac_x_sm_get_404_body
+RUN  ac_x_sm_get_empty_body
+  NOTE state machine /sm5: len=0 completions=1 inline=1
+OK   ac_x_sm_get_empty_body
+RUN  ac_x_sm_get_close_delimited
+  NOTE state machine /sm4: len=11 completions=2 inline=3
+OK   ac_x_sm_get_close_delimited
+RUN  ac_x_sm_get_chunked_body
+  NOTE state machine /sm3: len=28 completions=1 inline=12
+OK   ac_x_sm_get_chunked_body
+RUN  ac_x_sm_get_trickled_body
+  NOTE state machine /sm2: len=20 completions=6 inline=1
+OK   ac_x_sm_get_trickled_body
+RUN  ac_x_sm_get_buffered_body
+  NOTE state machine /sm1: len=18 completions=1 inline=6
+OK   ac_x_sm_get_buffered_body
+RUN  ac_x_reentrant_replace_callback_mid_send
+  NOTE old callback: 80,20,21,30,31 / new callback: 40,41,100
+OK   ac_x_reentrant_replace_callback_mid_send
+RUN  ac_x_reentrant_qda_in_complete
+  NOTE QDA inside send completion: ret=1 err=0 av=5
+OK   ac_x_reentrant_qda_in_complete
+RUN  ac_x_reentrant_send_other_request
+  NOTE send from inside the callback: ret=0 err=997
+  NOTE second request statuses: 60,80,20,21,30,31,40,41,100 (server connections 2)
+OK   ac_x_reentrant_send_other_request
+RUN  ac_x_reentrant_remove_callback_in_complete
+  NOTE read after removing callback: ok=1 err=0 rd=5
+OK   ac_x_reentrant_remove_callback_in_complete
+RUN  ac_x_reentrant_context_query_every_status
+OK   ac_x_reentrant_context_query_every_status
+RUN  ac_x_reentrant_query_info_in_complete
+OK   ac_x_reentrant_query_info_in_complete
+RUN  ac_x_reentrant_close_in_complete
+  NOTE close inside REQUEST_COMPLETE: ret=1 err=0; seq 60,80,20,21,30,31,40,41,100,50,51,70
+OK   ac_x_reentrant_close_in_complete
+RUN  ac_x_send_on_connect_handle
+  NOTE HttpSendRequest(connect handle): ok=0 err=12018 (ERROR_INTERNET_INCORRECT_HANDLE_TYPE)
+  NOTE   events: 
+OK   ac_x_send_on_connect_handle
+RUN  ac_x_read_on_connect_handle
+  NOTE InternetReadFile(connect handle): ok=0 err=12018 (ERROR_INTERNET_INCORRECT_HANDLE_TYPE) rd=0xdeadbeef
+OK   ac_x_read_on_connect_handle
+RUN  ac_x_qda_on_connect_handle
+  NOTE QDA(connect handle): ok=0 err=997 (?) av=0x0
+  NOTE   events: 100; completion dwResult=0 dwError=12018 (ERROR_INTERNET_INCORRECT_HANDLE_TYPE)
+OK   ac_x_qda_on_connect_handle
+RUN  ac_x_qda_null_handle
+  NOTE QDA(NULL handle): ok=0 err=6 av=0xdeadbeef
+OK   ac_x_qda_null_handle
+RUN  ac_x_qda_null_out_param
+  NOTE events after QDA(NULL): 
+OK   ac_x_qda_null_out_param
+RUN  ac_x_endreq_without_sendex
+  NOTE HttpEndRequest without SendRequestEx: ok=0 err=997 (?)
+  NOTE   completion dwResult=0 dwError=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
+  NOTE   statuses: 100, requests at server 0
+OK   ac_x_endreq_without_sendex
+RUN  ac_x_sendex_bad_struct_size
+OK   ac_x_sendex_bad_struct_size
+RUN  ac_x_sendex_buffersout_rejected
+OK   ac_x_sendex_buffersout_rejected
+RUN  ac_x_endreq_a_null_handle
+  NOTE HttpEndRequestA(NULL): ok=0 err=6 (?)
+OK   ac_x_endreq_a_null_handle
+RUN  ac_x_endreq_w_null_handle
+OK   ac_x_endreq_w_null_handle
+RUN  ac_x_endreq_w_buffersout_rejected
+OK   ac_x_endreq_w_buffersout_rejected
+RUN  ac_x_endreq_a_buffersout_rejected
+OK   ac_x_endreq_a_buffersout_rejected
+SUMMARY tests=243 failed=1 skipped=0 checks_pass=2167 checks_fail=2
+@@I7 END async_callbacks exit=0x1 ms=497794 timeout=0 bytes=36624

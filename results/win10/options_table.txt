@@ -1,0 +1,874 @@
+RUN  ot_val_max_conns_defaults_global
+  NOTE MAX_CONNS_PER_SERVER 2, PER_1_0_SERVER 4 (registry-configurable; the VM image reads 2 and 4)
+OK   ot_val_max_conns_defaults_global
+RUN  ot_val_bufferless_actions_handle_gates
+OK   ot_val_bufferless_actions_handle_gates
+RUN  ot_val_security_flags_http_request
+OK   ot_val_security_flags_http_request
+RUN  ot_val_request_flags_and_priority
+OK   ot_val_request_flags_and_priority
+RUN  ot_val_http_decoding
+OK   ot_val_http_decoding
+RUN  ot_val_codepage_options
+OK   ot_val_codepage_options
+RUN  ot_val_buffer_sizes
+OK   ot_val_buffer_sizes
+RUN  ot_val_parent_handle
+OK   ot_val_parent_handle
+RUN  ot_val_context_value
+OK   ot_val_context_value
+RUN  ot_val_fixed_answers
+OK   ot_val_fixed_answers
+RUN  ot_val_http_version_global
+OK   ot_val_http_version_global
+RUN  ot_val_version_info
+OK   ot_val_version_info
+RUN  ot_tls_options_on_plain_http
+OK   ot_tls_options_on_plain_http
+RUN  ot_tls_server_cert_chain_context
+  NOTE chain: 1 chain(s), 1 element(s), trust error 0x20
+OK   ot_tls_server_cert_chain_context
+RUN  ot_tls_certificate_string
+  NOTE SECURITY_CERTIFICATE (227 chars): Subject:
+localhost
+Issuer:
+localhost
+Effective Date:	9/29/2026 7:01:53 PM
+Expiration Date:	9/30/2027 7:01:53 PM
+Security Protocol:	(null)
+Signature Type:	(null)
+Encryption Type:	(null)
+Privac
+OK   ot_tls_certificate_string
+RUN  ot_tls_certificate_struct
+  NOTE cert subject 'localhost' protocol '(null)' sig '(null)' enc '(null)' key 256
+OK   ot_tls_certificate_struct
+RUN  ot_tls_key_bitness
+  NOTE KEY_BITNESS 256
+  NOTE KEY_BITNESS 256
+OK   ot_tls_key_bitness
+RUN  ot_tls_security_flags_after_handshake
+  NOTE T SECURITY_FLAGS 0x20000101 (04 F8 measured 0x20000101)
+  NOTE X SECURITY_FLAGS 0x0
+OK   ot_tls_security_flags_after_handshake
+RUN  ot_conns_per_proxy_global_only
+  NOTE MAX_CONNS_PER_PROXY default 4
+OK   ot_conns_per_proxy_global_only
+RUN  ot_conns_wrong_handles
+OK   ot_conns_wrong_handles
+RUN  ot_conns_global_clamped_2_128
+OK   ot_conns_global_clamped_2_128
+RUN  ot_to_values_not_validated
+OK   ot_to_values_not_validated
+RUN  ot_to_length_rules
+OK   ot_to_length_rules
+RUN  ot_to_backoff_reads_zero
+OK   ot_to_backoff_reads_zero
+RUN  ot_to_global_roundtrip_and_new_session
+OK   ot_to_global_roundtrip_and_new_session
+RUN  ot_to_global_connect_timeout_zero_ignored
+OK   ot_to_global_connect_timeout_zero_ignored
+RUN  ot_to_connect_timeout_zero_ignored
+OK   ot_to_connect_timeout_zero_ignored
+RUN  ot_to_children_copy_parent_at_creation
+OK   ot_to_children_copy_parent_at_creation
+RUN  ot_to_handles_hold_their_own_values
+OK   ot_to_handles_hold_their_own_values
+RUN  ot_to_request_roundtrip_w
+OK   ot_to_request_roundtrip_w
+RUN  ot_to_session_roundtrip
+OK   ot_to_session_roundtrip
+RUN  ot_struct_user_agent_long
+OK   ot_struct_user_agent_long
+RUN  ot_struct_user_agent_empty_and_nul
+OK   ot_struct_user_agent_empty_and_nul
+RUN  ot_struct_proxy_set_short_length
+  NOTE PROXY A: type 1 proxy '' bypass '' len 24 (in 24)
+OK   ot_struct_proxy_set_short_length
+RUN  ot_struct_proxy_set_on_session
+  NOTE PROXY A: type 3 proxy '127.0.0.1:8' bypass '127.0.0.1:8 *.example' len 58 (in 58)
+  NOTE PROXY A: type 1 proxy '' bypass '' len 24 (in 24)
+OK   ot_struct_proxy_set_on_session
+RUN  ot_struct_proxy_named_session
+  NOTE PROXY A: type 3 proxy '127.0.0.1:9' bypass '127.0.0.1:9 <local>' len 56 (in 56)
+OK   ot_struct_proxy_named_session
+RUN  ot_struct_proxy_direct_session
+  NOTE PROXY A: type 1 proxy '' bypass '' len 24 (in 24)
+OK   ot_struct_proxy_direct_session
+RUN  ot_str_secondary_cache_key
+OK   ot_str_secondary_cache_key
+RUN  ot_str_credentials_session_rejected
+OK   ot_str_credentials_session_rejected
+RUN  ot_str_username_set_roundtrip
+OK   ot_str_username_set_roundtrip
+RUN  ot_str_username_password_connect
+OK   ot_str_username_password_connect
+RUN  ot_str_url_wrong_handles
+OK   ot_str_url_wrong_handles
+RUN  ot_str_url_with_port_and_sent
+OK   ot_str_url_with_port_and_sent
+RUN  ot_str_url_request
+OK   ot_str_url_request
+RUN  ot_str_user_agent_wrong_handles
+OK   ot_str_user_agent_wrong_handles
+RUN  ot_str_user_agent_set_w_chars
+OK   ot_str_user_agent_set_w_chars
+RUN  ot_str_user_agent_set_a
+OK   ot_str_user_agent_set_a
+RUN  ot_str_user_agent_null_agent
+OK   ot_str_user_agent_null_agent
+RUN  ot_str_user_agent_default
+OK   ot_str_user_agent_default
+RUN  ot_setm_201_99999
+  SETM opt=99999 compared=110 mismatches=0
+OK   ot_setm_201_99999
+RUN  ot_setm_190_200
+  SETM opt=190 compared=110 mismatches=0
+  SETM opt=191 compared=110 mismatches=0
+  SETM opt=192 compared=110 mismatches=0
+  SETM opt=193 compared=110 mismatches=0
+  SETM opt=194 compared=110 mismatches=0
+  SETM opt=195 compared=110 mismatches=0
+  SETM opt=196 compared=110 mismatches=0
+  SETM opt=197 compared=110 mismatches=0
+  SETM opt=198 compared=110 mismatches=0
+  SETM opt=199 compared=110 mismatches=0
+  SETM opt=200 compared=110 mismatches=0
+OK   ot_setm_190_200
+RUN  ot_setm_180_189
+  SETM opt=180 compared=110 mismatches=0
+  SETM opt=181 compared=110 mismatches=0
+  SETM opt=182 compared=110 mismatches=0
+  SETM opt=183 compared=110 mismatches=0
+  SETM opt=184 compared=110 mismatches=0
+  SETM opt=185 compared=110 mismatches=0
+  SETM opt=186 compared=110 mismatches=0
+  SETM opt=187 compared=110 mismatches=0
+  SETM opt=188 compared=110 mismatches=0
+  SETM opt=189 compared=110 mismatches=0
+OK   ot_setm_180_189
+RUN  ot_setm_170_179
+  SETM opt=170 compared=110 mismatches=0
+  SETM opt=171 compared=110 mismatches=0
+  SETM opt=172 compared=110 mismatches=0
+  SETM opt=173 compared=110 mismatches=0
+  SETM opt=174 compared=110 mismatches=0
+  SETM opt=175 compared=110 mismatches=0
+  SETM opt=176 compared=110 mismatches=0
+  SETM opt=177 compared=110 mismatches=0
+  SETM opt=178 compared=110 mismatches=0
+  SETM opt=179 compared=110 mismatches=0
+OK   ot_setm_170_179
+RUN  ot_setm_160_169
+  SETM opt=160 compared=110 mismatches=0
+  SETM opt=161 compared=110 mismatches=0
+  SETM opt=162 compared=110 mismatches=0
+  SETM opt=163 compared=110 mismatches=0
+  SETM opt=164 compared=110 mismatches=0
+  SETM opt=165 compared=110 mismatches=0
+  SETM opt=166 compared=110 mismatches=0
+  SETM opt=167 compared=110 mismatches=0
+  SETM opt=168 compared=110 mismatches=0
+  SETM opt=169 compared=110 mismatches=0
+OK   ot_setm_160_169
+RUN  ot_setm_150_159
+  SETM opt=150 compared=110 mismatches=0
+  SETM opt=151 compared=110 mismatches=0
+  SETM opt=152 compared=110 mismatches=0
+  SETM opt=153 compared=110 mismatches=0
+  SETM opt=154 compared=0 mismatches=0
+  SETM opt=155 compared=110 mismatches=0
+  SETM opt=156 compared=110 mismatches=0
+  SETM opt=157 compared=110 mismatches=0
+  SETM opt=158 compared=110 mismatches=0
+  SETM opt=159 compared=110 mismatches=0
+OK   ot_setm_150_159
+RUN  ot_setm_140_149
+  SETM opt=140 compared=110 mismatches=0
+  SETM opt=141 compared=110 mismatches=0
+  SETM opt=142 compared=110 mismatches=0
+  SETM opt=143 compared=110 mismatches=0
+  SETM opt=144 compared=110 mismatches=0
+  SETM opt=145 compared=110 mismatches=0
+  SETM opt=146 compared=110 mismatches=0
+  SETM opt=147 compared=110 mismatches=0
+  SETM opt=148 compared=110 mismatches=0
+  SETM opt=149 compared=110 mismatches=0
+OK   ot_setm_140_149
+RUN  ot_setm_130_139
+  SETM opt=130 compared=110 mismatches=0
+  SETM opt=131 compared=110 mismatches=0
+  SETM opt=132 compared=110 mismatches=0
+  SETM opt=133 compared=110 mismatches=0
+  SETM opt=134 compared=110 mismatches=0
+  SETM opt=135 compared=110 mismatches=0
+  SETM opt=136 compared=110 mismatches=0
+  SETM opt=137 compared=110 mismatches=0
+  SETM opt=138 compared=110 mismatches=0
+  SETM opt=139 compared=110 mismatches=0
+OK   ot_setm_130_139
+RUN  ot_setm_120_129
+  SETM opt=120 compared=110 mismatches=0
+  SETM opt=121 compared=110 mismatches=0
+  SETM opt=122 compared=110 mismatches=0
+  SETM opt=123 compared=110 mismatches=0
+  SETM opt=124 compared=110 mismatches=0
+  SETM opt=125 compared=110 mismatches=0
+  SETM opt=126 compared=110 mismatches=0
+  SETM opt=127 compared=110 mismatches=0
+  SETM opt=128 compared=110 mismatches=0
+  SETM opt=129 compared=110 mismatches=0
+OK   ot_setm_120_129
+RUN  ot_setm_110_119
+  SETM opt=110 compared=110 mismatches=0
+  SETM opt=111 compared=110 mismatches=0
+  SETM opt=112 compared=110 mismatches=0
+  SETM opt=113 compared=110 mismatches=0
+  SETM opt=114 compared=110 mismatches=0
+  SETM opt=115 compared=110 mismatches=0
+  SETM opt=116 compared=110 mismatches=0
+  SETM opt=117 compared=110 mismatches=0
+  SETM opt=118 compared=110 mismatches=0
+  SETM opt=119 compared=110 mismatches=0
+OK   ot_setm_110_119
+RUN  ot_setm_100_109
+  SETM opt=100 compared=110 mismatches=0
+  SETM opt=101 compared=110 mismatches=0
+  SETM opt=102 compared=110 mismatches=0
+  SETM opt=103 compared=110 mismatches=0
+  SETM opt=104 compared=110 mismatches=0
+  SETM opt=105 compared=110 mismatches=0
+  SETM opt=106 compared=110 mismatches=0
+  SETM opt=107 compared=110 mismatches=0
+  SETM opt=108 compared=110 mismatches=0
+  SETM opt=109 compared=110 mismatches=0
+OK   ot_setm_100_109
+RUN  ot_setm_90_99
+  SETM opt=90 compared=110 mismatches=0
+  SETM opt=91 compared=110 mismatches=0
+  SETM opt=92 compared=110 mismatches=0
+  SETM opt=93 compared=110 mismatches=0
+  SETM opt=94 compared=110 mismatches=0
+  SETM opt=95 compared=0 mismatches=0
+  SETM opt=96 compared=110 mismatches=0
+  SETM opt=97 compared=110 mismatches=0
+  SETM opt=98 compared=110 mismatches=0
+  SETM opt=99 compared=110 mismatches=0
+OK   ot_setm_90_99
+RUN  ot_setm_80_89
+  SETM opt=80 compared=110 mismatches=0
+  SETM opt=81 compared=110 mismatches=0
+  SETM opt=82 compared=110 mismatches=0
+  SETM opt=83 compared=110 mismatches=0
+  SETM opt=84 compared=110 mismatches=0
+  SETM opt=85 compared=110 mismatches=0
+  SETM opt=86 compared=110 mismatches=0
+  SETM opt=87 compared=110 mismatches=0
+  SETM opt=88 compared=110 mismatches=0
+  SETM opt=89 compared=110 mismatches=0
+OK   ot_setm_80_89
+RUN  ot_setm_70_79
+  SETM opt=70 compared=110 mismatches=0
+  SETM opt=71 compared=110 mismatches=0
+  SETM opt=72 compared=110 mismatches=0
+  SETM opt=73 compared=110 mismatches=0
+  SETM opt=74 compared=110 mismatches=0
+  SETM opt=75 compared=100 mismatches=0
+  SETM opt=76 compared=110 mismatches=0
+  SETM opt=77 compared=110 mismatches=0
+  SETM opt=78 compared=110 mismatches=0
+  SETM opt=79 compared=110 mismatches=0
+OK   ot_setm_70_79
+RUN  ot_setm_60_69
+  SETM opt=60 compared=110 mismatches=0
+  SETM opt=61 compared=110 mismatches=0
+  SETM opt=62 compared=110 mismatches=0
+  SETM opt=63 compared=110 mismatches=0
+  SETM opt=64 compared=110 mismatches=0
+  SETM opt=65 compared=110 mismatches=0
+  SETM opt=66 compared=110 mismatches=0
+  SETM opt=67 compared=110 mismatches=0
+  SETM opt=68 compared=110 mismatches=0
+  SETM opt=69 compared=110 mismatches=0
+OK   ot_setm_60_69
+RUN  ot_setm_50_59
+  SETM opt=50 compared=110 mismatches=0
+  SETM opt=51 compared=110 mismatches=0
+  SETM opt=52 compared=110 mismatches=0
+  SETM opt=53 compared=110 mismatches=0
+  SETM opt=54 compared=110 mismatches=0
+  SETM opt=55 compared=110 mismatches=0
+  SETM opt=56 compared=110 mismatches=0
+  SETM opt=57 compared=110 mismatches=0
+  SETM opt=58 compared=110 mismatches=0
+  SETM opt=59 compared=110 mismatches=0
+OK   ot_setm_50_59
+RUN  ot_setm_40_49
+  SETM opt=40 compared=110 mismatches=0
+  SETM opt=41 compared=110 mismatches=0
+  SETM opt=42 compared=0 mismatches=0
+  SETM opt=43 compared=110 mismatches=0
+  SETM opt=44 compared=110 mismatches=0
+  SETM opt=45 compared=110 mismatches=0
+  SETM opt=46 compared=110 mismatches=0
+  SETM opt=47 compared=110 mismatches=0
+  SETM opt=48 compared=110 mismatches=0
+  SETM opt=49 compared=110 mismatches=0
+OK   ot_setm_40_49
+RUN  ot_setm_30_39
+  SETM opt=30 compared=110 mismatches=0
+  SETM opt=31 compared=110 mismatches=0
+  SETM opt=32 compared=110 mismatches=0
+  SETM opt=33 compared=110 mismatches=0
+  SETM opt=34 compared=110 mismatches=0
+  SETM opt=35 compared=110 mismatches=0
+  SETM opt=36 compared=110 mismatches=0
+  SETM opt=37 compared=110 mismatches=0
+  SETM opt=38 compared=110 mismatches=0
+  SETM opt=39 compared=0 mismatches=0
+OK   ot_setm_30_39
+RUN  ot_setm_20_29
+  SETM opt=20 compared=110 mismatches=0
+  SETM opt=21 compared=110 mismatches=0
+  SETM opt=22 compared=110 mismatches=0
+  SETM opt=23 compared=110 mismatches=0
+  SETM opt=24 compared=110 mismatches=0
+  SETM opt=25 compared=110 mismatches=0
+  SETM opt=26 compared=110 mismatches=0
+  SETM opt=27 compared=110 mismatches=0
+  SETM opt=28 compared=110 mismatches=0
+  SETM opt=29 compared=110 mismatches=0
+OK   ot_setm_20_29
+RUN  ot_setm_10_19
+  SETM opt=10 compared=110 mismatches=0
+  SETM opt=11 compared=110 mismatches=0
+  SETM opt=12 compared=110 mismatches=0
+  SETM opt=13 compared=110 mismatches=0
+  SETM opt=14 compared=110 mismatches=0
+  SETM opt=15 compared=110 mismatches=0
+  SETM opt=16 compared=110 mismatches=0
+  SETM opt=17 compared=110 mismatches=0
+  SETM opt=18 compared=110 mismatches=0
+  SETM opt=19 compared=110 mismatches=0
+OK   ot_setm_10_19
+RUN  ot_setm_0_9
+  SETM opt=0 compared=110 mismatches=0
+  SETM opt=1 compared=110 mismatches=0
+  SETM opt=2 compared=110 mismatches=0
+  SETM opt=3 compared=110 mismatches=0
+  SETM opt=4 compared=110 mismatches=0
+  SETM opt=5 compared=110 mismatches=0
+  SETM opt=6 compared=110 mismatches=0
+  SETM opt=7 compared=110 mismatches=0
+  SETM opt=8 compared=110 mismatches=0
+  SETM opt=9 compared=110 mismatches=0
+OK   ot_setm_0_9
+RUN  ot_rule_not_implemented_options
+OK   ot_rule_not_implemented_options
+RUN  ot_rule_readonly_options
+OK   ot_rule_readonly_options
+RUN  ot_rule_a_and_w_agree_on_fixed_options
+OK   ot_rule_a_and_w_agree_on_fixed_options
+RUN  ot_rule_success_last_error
+OK   ot_rule_success_last_error
+RUN  ot_rule_short_buffer_untouched
+OK   ot_rule_short_buffer_untouched
+RUN  ot_rule_null_buffer_sets_len_zero_then_122
+OK   ot_rule_null_buffer_sets_len_zero_then_122
+RUN  ot_rule_handle_type_ftp_find_and_file
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE ftp file URL 'ftp://127.0.0.1:50084/hello.txt' len 31
+OK   ot_rule_handle_type_ftp_find_and_file
+RUN  ot_rule_handle_type_values
+OK   ot_rule_handle_type_values
+RUN  ot_rule_bogus_handle_values
+OK   ot_rule_bogus_handle_values
+RUN  ot_rule_closed_handle
+OK   ot_rule_closed_handle
+RUN  ot_rule_set_outside_range_real_handles
+OK   ot_rule_set_outside_range_real_handles
+RUN  ot_rule_set_null_handle
+OK   ot_rule_set_null_handle
+RUN  ot_rule_query_null_handle_outside_range
+OK   ot_rule_query_null_handle_outside_range
+RUN  ot_rule_query_null_handle_inside_range
+OK   ot_rule_query_null_handle_inside_range
+RUN  ot_rule_query_null_length_pointer
+OK   ot_rule_query_null_length_pointer
+RUN  ot_rtm_180_200
+  RTM opt=180 compared=68 mismatches=0
+  RTM opt=181 compared=68 mismatches=0
+  RTM opt=182 compared=68 mismatches=0
+  RTM opt=183 compared=68 mismatches=0
+  RTM opt=184 compared=68 mismatches=0
+  RTM opt=185 compared=68 mismatches=0
+  RTM opt=186 compared=68 mismatches=0
+  RTM opt=187 compared=68 mismatches=0
+  RTM opt=188 compared=68 mismatches=0
+  RTM opt=189 compared=68 mismatches=0
+  RTM opt=190 compared=68 mismatches=0
+  RTM opt=191 compared=68 mismatches=0
+  RTM opt=192 compared=68 mismatches=0
+  RTM opt=193 compared=68 mismatches=0
+  RTM opt=194 compared=68 mismatches=0
+  RTM opt=195 compared=68 mismatches=0
+  RTM opt=196 compared=68 mismatches=0
+  RTM opt=197 compared=68 mismatches=0
+  RTM opt=198 compared=68 mismatches=0
+  RTM opt=199 compared=68 mismatches=0
+  RTM opt=200 compared=68 mismatches=0
+OK   ot_rtm_180_200
+RUN  ot_rtm_160_179
+  RTM opt=160 compared=68 mismatches=0
+  RTM opt=161 compared=68 mismatches=0
+  RTM opt=162 compared=68 mismatches=0
+  RTM opt=163 compared=68 mismatches=0
+  RTM opt=164 compared=68 mismatches=0
+  RTM opt=165 compared=68 mismatches=0
+  RTM opt=166 compared=68 mismatches=0
+  RTM opt=167 compared=68 mismatches=0
+  RTM opt=168 compared=68 mismatches=0
+  RTM opt=169 compared=68 mismatches=0
+  RTM opt=170 compared=68 mismatches=0
+  RTM opt=171 compared=68 mismatches=0
+  RTM opt=172 compared=68 mismatches=0
+  RTM opt=173 compared=68 mismatches=0
+  RTM opt=174 compared=68 mismatches=0
+  RTM opt=175 compared=68 mismatches=0
+  RTM opt=176 compared=68 mismatches=0
+  RTM opt=177 compared=68 mismatches=0
+  RTM opt=178 compared=68 mismatches=0
+  RTM opt=179 compared=68 mismatches=0
+OK   ot_rtm_160_179
+RUN  ot_rtm_140_159
+  RTM opt=140 compared=68 mismatches=0
+  RTM opt=141 compared=68 mismatches=0
+  RTM opt=142 compared=68 mismatches=0
+  RTM opt=143 compared=68 mismatches=0
+  RTM opt=144 compared=68 mismatches=0
+  RTM opt=145 compared=68 mismatches=0
+  RTM opt=146 compared=68 mismatches=0
+  RTM opt=147 compared=68 mismatches=0
+  RTM opt=148 compared=68 mismatches=0
+  RTM opt=149 compared=68 mismatches=0
+  RTM opt=150 compared=68 mismatches=0
+  RTM opt=151 compared=68 mismatches=0
+  RTM opt=152 compared=68 mismatches=0
+  RTM opt=153 compared=68 mismatches=0
+  RTM opt=155 compared=68 mismatches=0
+  RTM opt=156 compared=68 mismatches=0
+  RTM opt=157 compared=68 mismatches=0
+  RTM opt=158 compared=68 mismatches=0
+  RTM opt=159 compared=68 mismatches=0
+OK   ot_rtm_140_159
+RUN  ot_rtm_120_139
+  RTM opt=120 compared=68 mismatches=0
+  RTM opt=121 compared=68 mismatches=0
+  RTM opt=122 compared=68 mismatches=0
+  RTM opt=123 compared=68 mismatches=0
+  RTM opt=124 compared=68 mismatches=0
+  RTM opt=125 compared=68 mismatches=0
+  RTM opt=126 compared=68 mismatches=0
+  RTM opt=127 compared=68 mismatches=0
+  RTM opt=128 compared=68 mismatches=0
+  RTM opt=129 compared=68 mismatches=0
+  RTM opt=130 compared=68 mismatches=0
+  RTM opt=131 compared=68 mismatches=0
+  RTM opt=132 compared=68 mismatches=0
+  RTM opt=133 compared=68 mismatches=0
+  RTM opt=134 compared=68 mismatches=0
+  RTM opt=135 compared=68 mismatches=0
+  RTM opt=136 compared=68 mismatches=0
+  RTM opt=137 compared=68 mismatches=0
+  RTM opt=138 compared=68 mismatches=0
+  RTM opt=139 compared=68 mismatches=0
+OK   ot_rtm_120_139
+RUN  ot_rtm_100_119
+  RTM opt=100 compared=68 mismatches=0
+  RTM opt=101 compared=68 mismatches=0
+  RTM opt=102 compared=68 mismatches=0
+  RTM opt=103 compared=68 mismatches=0
+  RTM opt=104 compared=68 mismatches=0
+  RTM opt=105 compared=68 mismatches=0
+  RTM opt=106 compared=68 mismatches=0
+  RTM opt=107 compared=68 mismatches=0
+  RTM opt=108 compared=68 mismatches=0
+  RTM opt=109 compared=68 mismatches=0
+  RTM opt=110 compared=68 mismatches=0
+  RTM opt=111 compared=68 mismatches=0
+  RTM opt=112 compared=68 mismatches=0
+  RTM opt=113 compared=68 mismatches=0
+  RTM opt=114 compared=68 mismatches=0
+  RTM opt=115 compared=68 mismatches=0
+  RTM opt=116 compared=68 mismatches=0
+  RTM opt=117 compared=68 mismatches=0
+  RTM opt=118 compared=68 mismatches=0
+  RTM opt=119 compared=68 mismatches=0
+OK   ot_rtm_100_119
+RUN  ot_rtm_80_99
+  RTM opt=80 compared=68 mismatches=0
+  RTM opt=81 compared=68 mismatches=0
+  RTM opt=82 compared=68 mismatches=0
+  RTM opt=83 compared=68 mismatches=0
+  RTM opt=84 compared=68 mismatches=0
+  RTM opt=85 compared=68 mismatches=0
+  RTM opt=86 compared=68 mismatches=0
+  RTM opt=87 compared=68 mismatches=0
+  RTM opt=88 compared=68 mismatches=0
+  RTM opt=89 compared=68 mismatches=0
+  RTM opt=90 compared=68 mismatches=0
+  RTM opt=91 compared=68 mismatches=0
+  RTM opt=92 compared=68 mismatches=0
+  RTM opt=93 compared=68 mismatches=0
+  RTM opt=94 compared=68 mismatches=0
+  RTM opt=96 compared=68 mismatches=0
+  RTM opt=97 compared=68 mismatches=0
+  RTM opt=98 compared=68 mismatches=0
+  RTM opt=99 compared=68 mismatches=0
+OK   ot_rtm_80_99
+RUN  ot_rtm_60_79
+  RTM opt=60 compared=68 mismatches=0
+  RTM opt=61 compared=68 mismatches=0
+  RTM opt=62 compared=68 mismatches=0
+  RTM opt=63 compared=68 mismatches=0
+  RTM opt=64 compared=68 mismatches=0
+  RTM opt=65 compared=68 mismatches=0
+  RTM opt=66 compared=68 mismatches=0
+  RTM opt=67 compared=68 mismatches=0
+  RTM opt=68 compared=68 mismatches=0
+  RTM opt=69 compared=68 mismatches=0
+  RTM opt=70 compared=68 mismatches=0
+  RTM opt=71 compared=68 mismatches=0
+  RTM opt=72 compared=68 mismatches=0
+  RTM opt=73 compared=68 mismatches=0
+  RTM opt=74 compared=68 mismatches=0
+  RTM opt=76 compared=68 mismatches=0
+  RTM opt=77 compared=68 mismatches=0
+  RTM opt=78 compared=68 mismatches=0
+  RTM opt=79 compared=68 mismatches=0
+OK   ot_rtm_60_79
+RUN  ot_rtm_40_59
+  RTM opt=40 compared=68 mismatches=0
+  RTM opt=41 compared=68 mismatches=0
+  RTM opt=43 compared=68 mismatches=0
+  RTM opt=44 compared=68 mismatches=0
+  RTM opt=45 compared=68 mismatches=0
+  RTM opt=46 compared=68 mismatches=0
+  RTM opt=47 compared=68 mismatches=0
+  RTM opt=48 compared=68 mismatches=0
+  RTM opt=49 compared=68 mismatches=0
+  RTM opt=50 compared=68 mismatches=0
+  RTM opt=51 compared=68 mismatches=0
+  RTM opt=52 compared=68 mismatches=0
+  RTM opt=53 compared=68 mismatches=0
+  RTM opt=54 compared=68 mismatches=0
+  RTM opt=55 compared=68 mismatches=0
+  RTM opt=56 compared=68 mismatches=0
+  RTM opt=57 compared=68 mismatches=0
+  RTM opt=58 compared=68 mismatches=0
+  RTM opt=59 compared=68 mismatches=0
+OK   ot_rtm_40_59
+RUN  ot_rtm_20_39
+  RTM opt=20 compared=68 mismatches=0
+  RTM opt=21 compared=68 mismatches=0
+  RTM opt=22 compared=68 mismatches=0
+  RTM opt=23 compared=68 mismatches=0
+  RTM opt=24 compared=68 mismatches=0
+  RTM opt=25 compared=68 mismatches=0
+  RTM opt=26 compared=68 mismatches=0
+  RTM opt=27 compared=68 mismatches=0
+  RTM opt=28 compared=68 mismatches=0
+  RTM opt=29 compared=68 mismatches=0
+  RTM opt=30 compared=68 mismatches=0
+  RTM opt=31 compared=68 mismatches=0
+  RTM opt=32 compared=68 mismatches=0
+  RTM opt=33 compared=68 mismatches=0
+  RTM opt=34 compared=68 mismatches=0
+  RTM opt=35 compared=68 mismatches=0
+  RTM opt=36 compared=68 mismatches=0
+  RTM opt=38 compared=68 mismatches=0
+OK   ot_rtm_20_39
+RUN  ot_rtm_0_19
+  RTM opt=0 compared=68 mismatches=0
+  RTM opt=1 compared=68 mismatches=0
+  RTM opt=2 compared=68 mismatches=0
+  RTM opt=3 compared=68 mismatches=0
+  RTM opt=4 compared=68 mismatches=0
+  RTM opt=5 compared=68 mismatches=0
+  RTM opt=6 compared=68 mismatches=0
+  RTM opt=7 compared=68 mismatches=0
+  RTM opt=8 compared=68 mismatches=0
+  RTM opt=9 compared=68 mismatches=0
+  RTM opt=10 compared=68 mismatches=0
+  RTM opt=11 compared=68 mismatches=0
+  RTM opt=12 compared=68 mismatches=0
+  RTM opt=13 compared=68 mismatches=0
+  RTM opt=14 compared=68 mismatches=0
+  RTM opt=15 compared=68 mismatches=0
+  RTM opt=16 compared=68 mismatches=0
+  RTM opt=17 compared=68 mismatches=0
+  RTM opt=18 compared=68 mismatches=0
+  RTM opt=19 compared=68 mismatches=0
+OK   ot_rtm_0_19
+RUN  ot_qm_out_of_range
+  QM [-1,-1] rows=16 mismatches=0
+  QM [201,100000] rows=96 mismatches=0
+OK   ot_qm_out_of_range
+RUN  ot_qm_190_200
+  NOTE opt 192 S A len=8 value 00002b07f77f0000
+  NOTE opt 192 S W len=8 value 00002b07f77f0000cccccccccccccccc
+  NOTE opt 192 C A len=8 value 00002b07f77f0000
+  NOTE opt 192 C W len=8 value 00002b07f77f0000cccccccccccccccc
+  NOTE opt 192 R A len=8 value 00002b07f77f0000
+  NOTE opt 192 R W len=8 value 00002b07f77f0000cccccccccccccccc
+  NOTE opt 192 X A len=8 value 00002b07f77f0000
+  NOTE opt 192 X W len=8 value 00002b07f77f0000cccccccccccccccc
+  NOTE opt 192 T A len=8 value 00002b07f77f0000
+  NOTE opt 192 T W len=8 value 00002b07f77f0000cccccccccccccccc
+  QM [190,200] rows=176 mismatches=0
+OK   ot_qm_190_200
+RUN  ot_qm_180_189
+  NOTE opt 186 X A len=4096 value 06000000ccccccccee076650000000007d12665000000000756266500000000010736650000000000000000000000000
+  NOTE opt 186 X W len=4096 value 06000000ccccccccee076650000000007d12665000000000756266500000000010736650000000000000000000000000
+  NOTE opt 186 T A len=4096 value 06000000ccccccccee076650000000007d126650000000009b7a815000000000da84815000000000ed84815000000000
+  NOTE opt 186 T W len=4096 value 06000000ccccccccee076650000000007d126650000000009b7a815000000000da84815000000000ed84815000000000
+  QM [180,189] rows=160 mismatches=0
+OK   ot_qm_180_189
+RUN  ot_qm_170_179
+  QM [170,179] rows=160 mismatches=0
+OK   ot_qm_170_179
+RUN  ot_qm_160_169
+  QM [160,169] rows=160 mismatches=0
+OK   ot_qm_160_169
+RUN  ot_qm_150_159
+  QM [150,159] rows=160 mismatches=0
+OK   ot_qm_150_159
+RUN  ot_qm_140_149
+  QM [140,149] rows=160 mismatches=0
+OK   ot_qm_140_149
+RUN  ot_qm_130_139
+  QM [130,139] rows=160 mismatches=0
+OK   ot_qm_130_139
+RUN  ot_qm_120_129
+  QM [120,129] rows=160 mismatches=0
+OK   ot_qm_120_129
+RUN  ot_qm_110_119
+  NOTE opt 117 X A len=4 value 00000000
+  NOTE opt 117 X W len=4 value 00000000cccccccc
+  NOTE opt 117 T A len=4 value 00000000
+  NOTE opt 117 T W len=4 value 00000000cccccccc
+  QM [110,119] rows=160 mismatches=0
+OK   ot_qm_110_119
+RUN  ot_qm_100_109
+  NOTE opt 105 T A len=8 value 009f3599fc010000
+  NOTE opt 105 T W len=8 value 009f3599fc010000cccccccccccccccc
+  QM [100,109] rows=160 mismatches=0
+OK   ot_qm_100_109
+RUN  ot_qm_90_99
+  QM [90,99] rows=160 mismatches=0
+OK   ot_qm_90_99
+RUN  ot_qm_80_89
+  QM [80,89] rows=160 mismatches=0
+OK   ot_qm_80_89
+RUN  ot_qm_70_79
+  QM [70,79] rows=160 mismatches=0
+OK   ot_qm_70_79
+RUN  ot_qm_60_69
+  NOTE opt 66 R A len=716 value cc02000000000000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  NOTE opt 66 R W len=716 value cc02000000000000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  NOTE opt 66 X A len=716 value cc02000000000000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  NOTE opt 66 X W len=716 value cc02000000000000cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  NOTE opt 66 T A len=716 value cc020000010000000008000010660000000100000d8000000000000006ae000080010000010000000303000030c00000
+  NOTE opt 66 T W len=716 value cc020000010000000008000010660000000100000d8000000000000006ae000080010000010000000303000030c00000
+  NOTE opt 67 R A len=24 value ffffffffffffffff00000000000000000000000000000000
+  NOTE opt 67 R W len=24 value ffffffffffffffff00000000000000000000000000000000cccccccccccccccccccccccccccccccccccccccccccccccc
+  NOTE opt 67 X A len=24 value ffffffffffffffff00000000000000000000000000000000
+  NOTE opt 67 X W len=24 value ffffffffffffffff00000000000000000000000000000000cccccccccccccccccccccccccccccccccccccccccccccccc
+  NOTE opt 67 T A len=24 value ffffffffffffffff00000000000000000000000000000000
+  NOTE opt 67 T W len=24 value ffffffffffffffff00000000000000000000000000000000cccccccccccccccccccccccccccccccccccccccccccccccc
+  QM [60,69] rows=160 mismatches=0
+OK   ot_qm_60_69
+RUN  ot_qm_50_59
+  QM [50,59] rows=160 mismatches=0
+OK   ot_qm_50_59
+RUN  ot_qm_40_49
+  QM [40,49] rows=160 mismatches=0
+OK   ot_qm_40_49
+RUN  ot_qm_30_39
+  NOTE opt 32 T A len=64 value 806a69b8df6fde0180ea38154550dd012002911bac010000c003911bac01000000000000000000000000000000000000
+  NOTE opt 32 T W len=64 value 806a69b8df6fde0180ea38154550dd01e003911bac010000e001911bac01000000000000000000000000000000000000
+  NOTE opt 33 L A len=61 value 433a5c55736572735c41444d494e497e315c417070446174615c4c6f63616c5c54656d705c77696e696e65745f323839
+  NOTE opt 33 L W len=61 value 43003a005c00550073006500720073005c00410044004d0049004e0049007e0031005c00410070007000440061007400
+  NOTE opt 34 R A len=24 value 687474703a2f2f3132372e302e302e313a35303231362f70
+  NOTE opt 34 R W len=24 value 68007400740070003a002f002f003100320037002e0030002e0030002e0031003a00350030003200310036002f007000
+  NOTE opt 34 X A len=24 value 687474703a2f2f3132372e302e302e313a35303231362f78
+  NOTE opt 34 X W len=24 value 68007400740070003a002f002f003100320037002e0030002e0030002e0031003a00350030003200310036002f007800
+  NOTE opt 34 T A len=25 value 68747470733a2f2f3132372e302e302e313a35303231382f74
+  NOTE opt 34 T W len=25 value 680074007400700073003a002f002f003100320037002e0030002e0030002e0031003a00350030003200310038002f00
+  NOTE opt 35 T A len=227 value 5375626a6563743a0d0a6c6f63616c686f73740d0a4973737565723a0d0a6c6f63616c686f73740d0a45666665637469
+  NOTE opt 35 T W len=227 value 5375626a6563743a0d0a6c6f63616c686f73740d0a4973737565723a0d0a6c6f63616c686f73740d0a45666665637469
+  QM [30,39] rows=160 mismatches=0
+OK   ot_qm_30_39
+RUN  ot_qm_20_29
+  NOTE opt 21 S A len=8 value 0000000000000000
+  NOTE opt 21 S W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 21 C A len=8 value 0400cc0000000000
+  NOTE opt 21 C W len=8 value 0400cc0000000000cccccccccccccccc
+  NOTE opt 21 R A len=8 value 0800cc0000000000
+  NOTE opt 21 R W len=8 value 0800cc0000000000cccccccccccccccc
+  NOTE opt 21 X A len=8 value 0800cc0000000000
+  NOTE opt 21 X W len=8 value 0800cc0000000000cccccccccccccccc
+  NOTE opt 21 T A len=8 value 1400cc0000000000
+  NOTE opt 21 T W len=8 value 1400cc0000000000cccccccccccccccc
+  NOTE opt 21 F A len=8 value 0400cc0000000000
+  NOTE opt 21 F W len=8 value 0400cc0000000000cccccccccccccccc
+  NOTE opt 21 L A len=8 value 0400cc0000000000
+  NOTE opt 21 L W len=8 value 0400cc0000000000cccccccccccccccc
+  NOTE opt 24 N A len=4 value e5030000
+  NOTE opt 24 N W len=4 value e5030000cccccccc
+  NOTE opt 24 S A len=4 value e5030000
+  NOTE opt 24 S W len=4 value e5030000cccccccc
+  NOTE opt 24 C A len=4 value e5030000
+  NOTE opt 24 C W len=4 value e5030000cccccccc
+  NOTE opt 24 R A len=4 value e5030000
+  NOTE opt 24 R W len=4 value e5030000cccccccc
+  NOTE opt 24 X A len=4 value e5030000
+  NOTE opt 24 X W len=4 value e5030000cccccccc
+  NOTE opt 24 T A len=4 value e5030000
+  NOTE opt 24 T W len=4 value e5030000cccccccc
+  NOTE opt 24 F A len=4 value e5030000
+  NOTE opt 24 F W len=4 value e5030000cccccccc
+  NOTE opt 24 L A len=4 value e5030000
+  NOTE opt 24 L W len=4 value e5030000cccccccc
+  QM [20,29] rows=160 mismatches=0
+OK   ot_qm_20_29
+RUN  ot_qm_10_19
+  QM [10,19] rows=160 mismatches=0
+OK   ot_qm_10_19
+RUN  ot_qm_0_9
+  NOTE opt 1 S A len=8 value 0000000000000000
+  NOTE opt 1 S W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 1 C A len=8 value 0000000000000000
+  NOTE opt 1 C W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 1 R A len=8 value 0000000000000000
+  NOTE opt 1 R W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 1 X A len=8 value 0000000000000000
+  NOTE opt 1 X W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 1 T A len=8 value 0000000000000000
+  NOTE opt 1 T W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 1 F A len=8 value 0000000000000000
+  NOTE opt 1 F W len=8 value 0000000000000000cccccccccccccccc
+  NOTE opt 1 L A len=8 value 0000000000000000
+  NOTE opt 1 L W len=8 value 0000000000000000cccccccccccccccc
+  QM [0,9] rows=160 mismatches=0
+OK   ot_qm_0_9
+RUN  ot_misc_keep_connection_connect_only
+  NOTE HCon KEEP_CONNECTION 0
+OK   ot_misc_keep_connection_connect_only
+RUN  ot_misc_request_flags_from_cache
+  NOTE network fetch REQUEST_FLAGS 0x0
+  NOTE cache read REQUEST_FLAGS 0x1
+OK   ot_misc_request_flags_from_cache
+RUN  ot_misc_datafile_name_cached_download
+  NOTE DATAFILE_NAME 'C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\G720FYMI\wininet_2052_2_dfn[1].txt'
+OK   ot_misc_datafile_name_cached_download
+RUN  ot_misc_per_connection_option_session
+  NOTE DIRECT session PER_CONN_FLAGS 0x9
+OK   ot_misc_per_connection_option_session
+RUN  ot_misc_request_state_gates
+OK   ot_misc_request_state_gates
+RUN  ot_misc_extended_error_after_refused_connect
+  NOTE EXTENDED_ERROR (thread) after a refused connect: 997
+  NOTE (the VM reports 997 ERROR_IO_PENDING here, not WSAECONNREFUSED)
+  NOTE EXTENDED_ERROR via the request handle: 997
+OK   ot_misc_extended_error_after_refused_connect
+RUN  ot_misc_diagnostic_socket_info
+  NOTE unsent R DIAGNOSTIC_SOCKET_INFO: r=1 err=0
+OK   ot_misc_diagnostic_socket_info
+RUN  ot_misc_callback_pointer
+OK   ot_misc_callback_pointer
+RUN  ot_live_connected_state_set_ignored
+  LV connected mismatches=0
+OK   ot_live_connected_state_set_ignored
+RUN  ot_live_suppress_behavior_values
+  LV suppress mismatches=0
+OK   ot_live_suppress_behavior_values
+RUN  ot_live_error_mask_values
+OK   ot_live_error_mask_values
+RUN  ot_live_ftp_connect_timeouts
+OK   ot_live_ftp_connect_timeouts
+RUN  ot_live_parent_context_ftp_and_file
+OK   ot_live_parent_context_ftp_and_file
+RUN  ot_live_open_url_hidden_connect
+OK   ot_live_open_url_hidden_connect
+RUN  ot_live_receive_timeout_effect
+  NOTE request with RECEIVE_TIMEOUT 500 failed after 4016 ms (server answers after 4000 ms)
+OK   ot_live_receive_timeout_effect
+RUN  ot_live_user_agent_on_wire
+  FAIL tests/options_table/ot_live.c:145: srv_req_header(sv, before, "User-Agent") == i ? "ot-ua-W/2.0" : "ot-ua-A/1.0" (got "ot-ua-initial" want "ot-ua-A/1.0")
+  FAIL tests/options_table/ot_live.c:145: srv_req_header(sv, before, "User-Agent") == i ? "ot-ua-W/2.0" : "ot-ua-A/1.0" (got "ot-ua-initial" want "ot-ua-W/2.0")
+  NOTE request opened before the USER_AGENT change sends User-Agent 'ot-ua-initial'
+FAIL ot_live_user_agent_on_wire
+RUN  ot_live_url_after_redirect
+OK   ot_live_url_after_redirect
+RUN  ot_live_socket_info_handle_gates
+OK   ot_live_socket_info_handle_gates
+RUN  ot_live_socket_info_mid_body_https
+  FAIL tests/options_table/ot_live.c:28: ok (send err 12030)
+FAIL ot_live_socket_info_mid_body_https
+RUN  ot_live_socket_info_mid_body_http
+  NOTE HTTP mid-body socket info: src 50263 dst 50262 flags 0x0
+OK   ot_live_socket_info_mid_body_http
+RUN  ot_inh_150_200
+  INH { 155, 0x1, "4=00000000|4=00000000|4=00000000|ok|4=01000000|4=00000000|4=00000000|4=01000000|4=01000000" },
+  INH { 157, 0x1, "4=00000000|4=00000000|4=00000000|ok|4=01000000|4=00000000|4=00000000|4=01000000|4=01000000" },
+  INH { 158, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 162, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 172, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 174, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 177, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 178, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 179, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 180, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+OK   ot_inh_150_200
+RUN  ot_inh_100_149
+  INH { 100, 0xfde9, "4=ffffffff|4=ffffffff|4=ffffffff|ok|4=e9fd0000|4=ffffffff|4=ffffffff|4=e9fd0000|4=e9fd0000" },
+  INH { 101, 0xfde9, "4=ffffffff|4=ffffffff|4=ffffffff|ok|4=e9fd0000|4=ffffffff|4=ffffffff|4=e9fd0000|4=e9fd0000" },
+  INH { 102, 0x1, "4=03000000|4=03000000|4=03000000|ok|4=01000000|4=03000000|4=03000000|4=01000000|4=01000000" },
+  INH { 114, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 121, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 125, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 133, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 138, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 141, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 148, 0x2, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+OK   ot_inh_100_149
+RUN  ot_inh_0_99
+  INH { 2, 0x1e61, "4=60ea0000|4=60ea0000|4=60ea0000|ok|4=611e0000|4=60ea0000|4=60ea0000|4=611e0000|4=611e0000" },
+  INH { 6, 0x1e61, "4=30750000|4=30750000|4=30750000|ok|4=611e0000|4=30750000|4=30750000|4=611e0000|4=611e0000" },
+  INH { 11, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 62, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+  INH { 65, 0x1, "4=00000000|4=00000000|4=00000000|ok|4=01000000|4=00000000|4=00000000|4=01000000|4=01000000" },
+  INH { 68, 0xfde9, "4=ffffffff|4=ffffffff|4=ffffffff|ok|4=e9fd0000|4=ffffffff|4=ffffffff|4=e9fd0000|4=e9fd0000" },
+  INH { 81, 0x1, "!87/0|!87/0|!87/0|ok|!87/0|!87/0|!87/0|!87/0|!87/0" },
+OK   ot_inh_0_99
+RUN  ot_mc_global_set_updates_records
+  MC global mismatches=0 rc=0x0
+OK   ot_mc_global_set_updates_records
+RUN  ot_mc_connect_set_clamped_shared
+  MC set mismatches=0 rc=0x0
+OK   ot_mc_connect_set_clamped_shared
+RUN  ot_mc_record_shared_per_host_name
+  MC connect created before the record: r=1 e=0 v=2
+  MC MISMATCH line 82: localhost connect: r=1 e=0 v=2
+  MC after mismatches=1 rc=0x0
+  FAIL tests/options_table/ot_conns_child.c:160: rc == 0 (scenario after: child exit 0x1 (mismatch count, or 0xC0DE/0xDEAD failure))
+FAIL ot_mc_record_shared_per_host_name
+RUN  ot_mc_fresh_connect_has_no_record
+  MC MISMATCH line 48: PER_SERVER on a record-less connect r=1 e=0 v=2
+  MC MISMATCH line 52: set PER_SERVER 4: 0
+  MC fresh mismatches=2 rc=0x0
+  FAIL tests/options_table/ot_conns_child.c:160: rc == 0 (scenario fresh: child exit 0x2 (mismatch count, or 0xC0DE/0xDEAD failure))
+FAIL ot_mc_fresh_connect_has_no_record
+SUMMARY tests=143 failed=4 skipped=0 checks_pass=5025 checks_fail=5
+@@I7 END options_table exit=0x1 ms=89644 timeout=0 bytes=37475

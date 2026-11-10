@@ -1,0 +1,435 @@
+RUN  rsp_val_lengths_around_buffer_sizes
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   rsp_val_lengths_around_buffer_sizes
+RUN  rsp_val_value_looks_like_headers
+OK   rsp_val_value_looks_like_headers
+RUN  rsp_val_headers_named_like_synthetic_levels
+OK   rsp_val_headers_named_like_synthetic_levels
+RUN  rsp_val_second_status_line_in_headers
+OK   rsp_val_second_status_line_in_headers
+RUN  rsp_val_reason_phrase_bytes
+OK   rsp_val_reason_phrase_bytes
+RUN  rsp_val_long_names
+OK   rsp_val_long_names
+RUN  rsp_val_known_name_lookalikes
+OK   rsp_val_known_name_lookalikes
+RUN  rsp_val_control_bytes_at_value_ends
+  NOTE leading 0x01: \x01v len 2
+  NOTE trailing 0x01: v\x01 len 2
+  NOTE leading 0x0b: \x0bv len 2
+  NOTE trailing 0x0b: v\x0b len 2
+  NOTE leading 0x0c: \x0cv len 2
+  NOTE trailing 0x0c: v\x0c len 2
+  NOTE leading 0x1f: \x1fv len 2
+  NOTE trailing 0x1f: v\x1f len 2
+  NOTE leading 0x7f: \x7fv len 2
+  NOTE trailing 0x7f: v\x7f len 2
+OK   rsp_val_control_bytes_at_value_ends
+RUN  rsp_val_control_bytes_inside_value
+OK   rsp_val_control_bytes_inside_value
+RUN  rsp_status_redirect_location_verbatim
+OK   rsp_status_redirect_location_verbatim
+RUN  rsp_status_truncated_head
+OK   rsp_status_truncated_head
+RUN  rsp_status_reset_response
+  NOTE RST response: err=12031 ERROR_INTERNET_CONNECTION_RESET, connections=1
+OK   rsp_status_reset_response
+RUN  rsp_status_empty_response
+  NOTE empty response: err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE, connections=1
+OK   rsp_status_empty_response
+RUN  rsp_status_interim_variants
+  NOTE interim "HTTP/1.0 100 Continue\r\n\r\n": sent=1 err=0 code=200 X-N=0
+  NOTE interim "HTTP/1.1 100\r\n\r\n": sent=1 err=0 code=200 X-N=1
+  NOTE interim "HTTP/1.1 100 Continue\r\nX-I: 1\r\n\r\n": sent=1 err=0 code=200 X-N=2
+  NOTE interim "HTTP/1.1 199 Odd\r\n\r\n": sent=1 err=0 code=200 X-N=3
+OK   rsp_status_interim_variants
+RUN  rsp_status_interim_headers_dropped
+OK   rsp_status_interim_headers_dropped
+RUN  rsp_status_several_interim
+OK   rsp_status_several_interim
+RUN  rsp_status_100_continue_consumed
+OK   rsp_status_100_continue_consumed
+RUN  rsp_status_http09_short_and_binary
+  NOTE truncated "HTTP/" as 0.9: body 5 "HTTP/"
+  NOTE truncated "HTTP/1.1 2" as 0.9: body 10 "HTTP/1.1 2"
+OK   rsp_status_http09_short_and_binary
+RUN  rsp_status_http09_synthesised
+  NOTE HTTP/0.9: STATUS_TEXT=OK (err 0) RAW_HEADERS_CRLF=HTTP/1.0 200 OK\r\n\r\n
+OK   rsp_status_http09_synthesised
+RUN  rsp_status_code_token_variants
+OK   rsp_status_code_token_variants
+RUN  rsp_status_leading_junk
+OK   rsp_status_leading_junk
+RUN  rsp_status_version_variants
+OK   rsp_status_version_variants
+RUN  rsp_status_spacing_variants
+OK   rsp_status_spacing_variants
+RUN  rsp_status_missing_reason
+OK   rsp_status_missing_reason
+RUN  rsp_status_http10_close_delimited
+OK   rsp_status_http10_close_delimited
+RUN  rsp_status_http10
+OK   rsp_status_http10
+RUN  rsp_status_reason_verbatim
+OK   rsp_status_reason_verbatim
+RUN  rsp_status_code_table
+OK   rsp_status_code_table
+RUN  rsp_seg_head_request_split
+OK   rsp_seg_head_request_split
+RUN  rsp_seg_chunked_split
+OK   rsp_seg_chunked_split
+RUN  rsp_seg_close_delimited_split
+OK   rsp_seg_close_delimited_split
+RUN  rsp_seg_body_shares_segment_with_head
+OK   rsp_seg_body_shares_segment_with_head
+RUN  rsp_seg_big_head_pieces
+OK   rsp_seg_big_head_pieces
+RUN  rsp_seg_drip_piece_sizes
+OK   rsp_seg_drip_piece_sizes
+RUN  rsp_seg_interim_response_split
+OK   rsp_seg_interim_response_split
+RUN  rsp_seg_lf_only_head_at_every_offset
+OK   rsp_seg_lf_only_head_at_every_offset
+RUN  rsp_seg_split_head_twice
+OK   rsp_seg_split_head_twice
+RUN  rsp_seg_split_head_at_every_offset
+OK   rsp_seg_split_head_at_every_offset
+RUN  rsp_more_case_variants_one_family
+OK   rsp_more_case_variants_one_family
+RUN  rsp_more_status_line_terminators
+OK   rsp_more_status_line_terminators
+RUN  hqi_more_w_zero_length_nonnull_buffer
+OK   hqi_more_w_zero_length_nonnull_buffer
+RUN  hqi_more_w_odd_buffer_lengths
+OK   hqi_more_w_odd_buffer_lengths
+RUN  hqi_more_w_custom_binary_short_buffer
+OK   hqi_more_w_custom_binary_short_buffer
+RUN  hqi_more_w_custom_name_unmappable_char
+OK   hqi_more_w_custom_name_unmappable_char
+RUN  hqi_more_state_error_after_len_zeroing
+  NOTE REQ Content-Length during HttpSendRequestEx: ok=0 err=12019 value=-
+OK   hqi_more_state_error_after_len_zeroing
+RUN  hqi_more_index_untouched_on_errors
+OK   hqi_more_index_untouched_on_errors
+RUN  hqi_more_null_buffer_len_kept_on_early_errors
+OK   hqi_more_null_buffer_len_kept_on_early_errors
+RUN  rsp_more_whitespace_only_line
+  NOTE whitespace-only line: X-B=(absent) raw=HTTP/1.1 200 OK\r\nX-A: 1\r\n\r\n
+  FAIL tests/http_response_headers/rsp_more.c:133: HttpQueryInfoA(CUSTOM "X-B") (got "(fail)" len=524287 err=12150 want "2")
+  FAIL tests/http_response_headers/rsp_more.c:133: HttpQueryInfoW(CUSTOM "X-B") (got "(fail)" len=524286 err=12150 want "2")
+  FAIL tests/http_response_headers/rsp_more.c:134: HttpQueryInfoA(CUSTOM "X-C") (got "(fail)" len=524287 err=12150 want "3")
+  FAIL tests/http_response_headers/rsp_more.c:134: HttpQueryInfoW(CUSTOM "X-C") (got "(fail)" len=524286 err=12150 want "3")
+  FAIL tests/http_response_headers/rsp_more.c:135: HttpQueryInfoA(level=22/0x16) (got "HTTP/1.1 200 OK\r\nX-A: 1\r\n\r\n" err=0 want "HTTP/1.1 200 OK\r\nX-A: 1\r\nX-B: 2\r\nX-C: 3\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
+  FAIL tests/http_response_headers/rsp_more.c:135: A length (len=27 want 81)
+FAIL rsp_more_whitespace_only_line
+RUN  rsp_more_bom_before_status_line
+OK   rsp_more_bom_before_status_line
+RUN  rsp_more_101_after_100_is_final
+OK   rsp_more_101_after_100_is_final
+RUN  rsp_more_many_interim_responses
+OK   rsp_more_many_interim_responses
+RUN  rsp_more_zero_padded_100_is_interim
+OK   rsp_more_zero_padded_100_is_interim
+RUN  rsp_more_status_below_100_is_final
+OK   rsp_more_status_below_100_is_final
+RUN  rsp_more_interim_then_eof
+  NOTE 100 then EOF: sent=0 err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE
+OK   rsp_more_interim_then_eof
+RUN  rsp_more_101_without_upgrade_is_final
+OK   rsp_more_101_without_upgrade_is_final
+RUN  rsp_life_queries_are_repeatable
+OK   rsp_life_queries_are_repeatable
+RUN  rsp_life_query_after_parent_closed
+OK   rsp_life_query_after_parent_closed
+RUN  rsp_life_query_from_other_thread
+OK   rsp_life_query_from_other_thread
+RUN  rsp_life_two_handles_independent
+OK   rsp_life_two_handles_independent
+RUN  rsp_life_keepalive_304_then_get
+  NOTE GET /304 then GET: 1 connection(s)
+OK   rsp_life_keepalive_304_then_get
+RUN  rsp_life_keepalive_204_then_get
+  NOTE GET /204 then GET: 1 connection(s)
+OK   rsp_life_keepalive_204_then_get
+RUN  rsp_life_keepalive_head_then_get
+  NOTE HEAD /head1000 then GET: 1 connection(s)
+OK   rsp_life_keepalive_head_then_get
+RUN  rsp_life_keepalive_get_then_get
+  NOTE GET /first then GET: 1 connection(s)
+OK   rsp_life_keepalive_get_then_get
+RUN  rsp_life_https_response_headers
+  FAIL tests/http_response_headers/rsp_lifecycle.c:241: ok (https send err=12030 ERROR_INTERNET_CONNECTION_ABORTED)
+FAIL rsp_life_https_response_headers
+RUN  rsp_life_resend_failure_clears_old_headers
+  NOTE resend to a server that closes: sent=0 err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE (conns 2)
+OK   rsp_life_resend_failure_clears_old_headers
+RUN  rsp_life_after_connection_refused
+OK   rsp_life_after_connection_refused
+RUN  rsp_life_after_invalid_response
+OK   rsp_life_after_invalid_response
+RUN  rsp_life_auto_redirect_final_headers
+OK   rsp_life_auto_redirect_final_headers
+RUN  rsp_life_open_url_handle
+OK   rsp_life_open_url_handle
+RUN  rsp_life_send_request_ex_end_request
+OK   rsp_life_send_request_ex_end_request
+RUN  rsp_life_headers_stable_during_body_read
+OK   rsp_life_headers_stable_during_body_read
+RUN  rsp_life_resend_without_reading_body
+  NOTE connections used for two sends without a read: 1
+OK   rsp_life_resend_without_reading_body
+RUN  rsp_life_resend_replaces_headers
+OK   rsp_life_resend_replaces_headers
+RUN  rsp_hdr_auth_challenges_verbatim
+OK   rsp_hdr_auth_challenges_verbatim
+RUN  rsp_hdr_set_cookie_kept_with_no_cookies
+OK   rsp_hdr_set_cookie_kept_with_no_cookies
+RUN  rsp_hdr_content_encoding_gzip_decoded
+  NOTE decoding on: Content-Encoding=(gone) Content-Length=(gone) req Accept-Encoding=gzip, deflate
+OK   rsp_hdr_content_encoding_gzip_decoded
+RUN  rsp_hdr_content_encoding_gzip_not_decoded_by_default
+OK   rsp_hdr_content_encoding_gzip_not_decoded_by_default
+RUN  rsp_hdr_content_headers_verbatim
+OK   rsp_hdr_content_headers_verbatim
+RUN  rsp_hdr_chunked_has_no_content_length
+OK   rsp_hdr_chunked_has_no_content_length
+RUN  rsp_hdr_204_and_304_with_length
+  NOTE 204: read ok=1 rd=0 in 2016 ms
+  NOTE 304: read ok=1 rd=0 in 2000 ms
+OK   rsp_hdr_204_and_304_with_length
+RUN  rsp_hdr_head_chunked_without_body
+OK   rsp_hdr_head_chunked_without_body
+RUN  rsp_hdr_head_content_length_without_body
+  NOTE HEAD: send 0 ms, read 0 ms (server holds the connection 2500 ms)
+OK   rsp_hdr_head_content_length_without_body
+RUN  rsp_hdr_huge_head_sizes
+  NOTE head 256 KB (2310 lines): sent=1 err=0 ? X-Last=last
+  NOTE head 1024 KB (9208 lines): sent=1 err=0 ? X-Last=last
+  NOTE head 4096 KB (36569 lines): sent=1 err=0 ? X-Last=last
+OK   rsp_hdr_huge_head_sizes
+RUN  rsp_hdr_long_values
+OK   rsp_hdr_long_values
+RUN  rsp_hdr_repeated_header_count
+OK   rsp_hdr_repeated_header_count
+RUN  rsp_hdr_many_distinct_headers
+OK   rsp_hdr_many_distinct_headers
+RUN  rsp_hdr_duplicate_content_length
+OK   rsp_hdr_duplicate_content_length
+RUN  rsp_hdr_duplicate_known_header
+OK   rsp_hdr_duplicate_known_header
+RUN  rsp_hdr_bare_cr_and_nul_in_value
+OK   rsp_hdr_bare_cr_and_nul_in_value
+RUN  rsp_hdr_mixed_line_endings
+OK   rsp_hdr_mixed_line_endings
+RUN  rsp_hdr_lf_only_line_endings
+OK   rsp_hdr_lf_only_line_endings
+RUN  rsp_hdr_fold_on_first_header_line
+OK   rsp_hdr_fold_on_first_header_line
+RUN  rsp_hdr_folded_continuation
+OK   rsp_hdr_folded_continuation
+RUN  rsp_hdr_empty_name
+OK   rsp_hdr_empty_name
+RUN  rsp_hdr_line_without_colon
+OK   rsp_hdr_line_without_colon
+RUN  rsp_hdr_colon_in_value
+OK   rsp_hdr_colon_in_value
+RUN  rsp_hdr_name_charset
+OK   rsp_hdr_name_charset
+RUN  rsp_hdr_name_casing_preserved_in_raw
+OK   rsp_hdr_name_casing_preserved_in_raw
+RUN  rsp_hdr_space_before_colon
+OK   rsp_hdr_space_before_colon
+RUN  rsp_hdr_empty_values
+OK   rsp_hdr_empty_values
+RUN  rsp_hdr_value_inner_whitespace_kept
+OK   rsp_hdr_value_inner_whitespace_kept
+RUN  rsp_hdr_value_trailing_whitespace
+OK   rsp_hdr_value_trailing_whitespace
+RUN  rsp_hdr_value_leading_whitespace_trimmed
+OK   rsp_hdr_value_leading_whitespace_trimmed
+RUN  hqi_req_send_headers_and_resend
+  NOTE resend without headers: X-Send on the wire 1 time(s); request store says s
+OK   hqi_req_send_headers_and_resend
+RUN  hqi_req_buffer_protocol
+OK   hqi_req_buffer_protocol
+RUN  hqi_req_host_and_user_agent_after_send
+OK   hqi_req_host_and_user_agent_after_send
+RUN  hqi_req_and_response_stores_separate
+OK   hqi_req_and_response_stores_separate
+RUN  hqi_req_raw_nul_layout_matches_wire
+OK   hqi_req_raw_nul_layout_matches_wire
+RUN  hqi_req_post_content_length
+OK   hqi_req_post_content_length
+RUN  hqi_req_numbers_and_dates
+OK   hqi_req_numbers_and_dates
+RUN  hqi_req_add_flag_matrix
+OK   hqi_req_add_flag_matrix
+RUN  hqi_req_added_header_visible_before_send
+OK   hqi_req_added_header_visible_before_send
+RUN  hqi_date_clock_filled_values_recorded
+  NOTE X-A -> 2026-09-30 dow3 19:03:00 (now 2026-09-30 19:03)
+  NOTE X-B -> 2026-09-30 dow3 19:03:00 (now 2026-09-30 19:03)
+  NOTE X-C -> 2000-11-15 dow2 19:03:00 (now 2026-09-30 19:03)
+  NOTE Retry-After -> 2026-09-30 dow3 19:03:00 (now 2026-09-30 19:03)
+  NOTE X-E -> err 12154
+  NOTE X-F -> 1994-11-15 dow2 12:45:26 (now 2026-09-30 19:03)
+  NOTE X-G -> err 12154
+OK   hqi_date_clock_filled_values_recorded
+RUN  hqi_date_long_value
+OK   hqi_date_long_value
+RUN  hqi_date_levels_with_systemtime
+OK   hqi_date_levels_with_systemtime
+RUN  hqi_date_custom_table
+OK   hqi_date_custom_table
+RUN  hqi_num_number_rejected_on_other_levels
+OK   hqi_num_number_rejected_on_other_levels
+RUN  hqi_num_content_length_values
+OK   hqi_num_content_length_values
+RUN  hqi_num_number64_table
+OK   hqi_num_number64_table
+RUN  hqi_num_number32_table
+OK   hqi_num_number32_table
+RUN  hqi_lvl_request_method_and_version
+OK   hqi_lvl_request_method_and_version
+RUN  hqi_lvl_request_raw_headers_match_wire
+OK   hqi_lvl_request_raw_headers_match_wire
+RUN  hqi_lvl_request_side_matches_wire
+OK   hqi_lvl_request_side_matches_wire
+RUN  hqi_lvl_side_effect_headers
+OK   hqi_lvl_side_effect_headers
+RUN  hqi_lvl_synthetic_levels_on_bulk
+OK   hqi_lvl_synthetic_levels_on_bulk
+RUN  hqi_lvl_raw_headers_crlf_is_rebuilt_in_order
+OK   hqi_lvl_raw_headers_crlf_is_rebuilt_in_order
+RUN  hqi_lvl_custom_name_equals_level
+OK   hqi_lvl_custom_name_equals_level
+RUN  hqi_lvl_every_known_level_lowercase_names
+OK   hqi_lvl_every_known_level_lowercase_names
+RUN  hqi_lvl_every_known_level_w
+OK   hqi_lvl_every_known_level_w
+RUN  hqi_lvl_every_known_level_a
+OK   hqi_lvl_every_known_level_a
+RUN  hqi_idx_second_request_on_keepalive
+OK   hqi_idx_second_request_on_keepalive
+RUN  hqi_idx_request_header_coalesced_by_add
+OK   hqi_idx_request_header_coalesced_by_add
+RUN  hqi_idx_request_header_duplicates
+OK   hqi_idx_request_header_duplicates
+RUN  hqi_idx_coalesce_with_empty_values
+OK   hqi_idx_coalesce_with_empty_values
+RUN  hqi_idx_coalesce_buffer_sizes
+OK   hqi_idx_coalesce_buffer_sizes
+RUN  hqi_idx_coalesce_known_and_custom
+OK   hqi_idx_coalesce_known_and_custom
+RUN  hqi_idx_interleaved_order_preserved
+OK   hqi_idx_interleaved_order_preserved
+RUN  hqi_idx_unchanged_on_insufficient_buffer
+OK   hqi_idx_unchanged_on_insufficient_buffer
+RUN  hqi_idx_null_index_pointer_is_first
+OK   hqi_idx_null_index_pointer_is_first
+RUN  hqi_idx_direct_index_access
+OK   hqi_idx_direct_index_access
+RUN  hqi_idx_walk_custom_mixed_case
+OK   hqi_idx_walk_custom_mixed_case
+RUN  hqi_idx_walk_known_w
+OK   hqi_idx_walk_known_w
+RUN  hqi_idx_walk_known_a
+OK   hqi_idx_walk_known_a
+RUN  hqi_gen_single_name_repeated
+OK   hqi_gen_single_name_repeated
+RUN  hqi_gen_seeds_http10_lf_w
+OK   hqi_gen_seeds_http10_lf_w
+RUN  hqi_gen_seeds_http10_lf_a
+OK   hqi_gen_seeds_http10_lf_a
+RUN  hqi_gen_seeds_040_080_w
+OK   hqi_gen_seeds_040_080_w
+RUN  hqi_gen_seeds_000_040_w
+OK   hqi_gen_seeds_000_040_w
+RUN  hqi_gen_seeds_080_120_a
+OK   hqi_gen_seeds_080_120_a
+RUN  hqi_gen_seeds_040_080_a
+OK   hqi_gen_seeds_040_080_a
+RUN  hqi_gen_seeds_000_040_a
+OK   hqi_gen_seeds_000_040_a
+RUN  hqi_buf_high_bytes_a_verbatim_w_acp
+OK   hqi_buf_high_bytes_a_verbatim_w_acp
+RUN  hqi_buf_large_value_roundtrip
+OK   hqi_buf_large_value_roundtrip
+RUN  hqi_buf_raw_headers_nul_layout
+OK   hqi_buf_raw_headers_nul_layout
+RUN  hqi_buf_raw_headers_crlf_exact
+OK   hqi_buf_raw_headers_crlf_exact
+RUN  hqi_buf_empty_value
+OK   hqi_buf_empty_value
+RUN  hqi_buf_status_text_sizes
+OK   hqi_buf_status_text_sizes
+RUN  hqi_buf_w_number64_known_level_widened
+OK   hqi_buf_w_number64_known_level_widened
+RUN  hqi_buf_number64_sizes
+OK   hqi_buf_number64_sizes
+RUN  hqi_buf_systemtime_sizes
+OK   hqi_buf_systemtime_sizes
+RUN  hqi_buf_number_sizes
+OK   hqi_buf_number_sizes
+RUN  hqi_buf_w_custom_partial_buffer
+OK   hqi_buf_w_custom_partial_buffer
+RUN  hqi_buf_w_partial_buffer_advances_index
+OK   hqi_buf_w_partial_buffer_advances_index
+RUN  hqi_buf_w_string_size_table
+OK   hqi_buf_w_string_size_table
+RUN  hqi_buf_a_string_size_table
+OK   hqi_buf_a_string_size_table
+RUN  hqi_args_before_send
+  NOTE before send RAW_HEADERS: \0\0 err=0 len=1
+OK   hqi_args_before_send
+RUN  hqi_args_success_sets_last_error_zero
+OK   hqi_args_success_sets_last_error_zero
+RUN  hqi_args_not_found_keeps_length
+OK   hqi_args_not_found_keeps_length
+RUN  hqi_args_null_buffer_w
+OK   hqi_args_null_buffer_w
+RUN  hqi_args_null_buffer_a_is_size_query
+OK   hqi_args_null_buffer_a_is_size_query
+RUN  hqi_args_custom_name_buffer_reuse
+OK   hqi_args_custom_name_buffer_reuse
+RUN  hqi_args_custom_name_rules_w
+OK   hqi_args_custom_name_rules_w
+RUN  hqi_args_custom_name_rules_a
+OK   hqi_args_custom_name_rules_a
+RUN  hqi_args_custom_null_buffer
+OK   hqi_args_custom_null_buffer
+RUN  hqi_args_index_on_synthetic_levels
+OK   hqi_args_index_on_synthetic_levels
+RUN  hqi_args_index_with_coalesce_comma
+OK   hqi_args_index_with_coalesce_comma
+RUN  hqi_args_custom_bypasses_mask
+OK   hqi_args_custom_bypasses_mask
+RUN  hqi_args_status_text_takes_no_modifiers
+OK   hqi_args_status_text_takes_no_modifiers
+RUN  hqi_args_request_flag_mask
+OK   hqi_args_request_flag_mask
+RUN  hqi_args_modifier_mask_table_w
+OK   hqi_args_modifier_mask_table_w
+RUN  hqi_args_modifier_mask_table
+  NOTE mask table: 375 rejected, 9 accepted
+OK   hqi_args_modifier_mask_table
+RUN  hqi_args_allowed_modifier_pairs
+OK   hqi_args_allowed_modifier_pairs
+RUN  hqi_args_bad_modifier_pairs
+OK   hqi_args_bad_modifier_pairs
+RUN  hqi_args_null_length_pointer
+OK   hqi_args_null_length_pointer
+RUN  hqi_args_level_out_of_range
+OK   hqi_args_level_out_of_range
+RUN  hqi_args_closed_request_handle
+OK   hqi_args_closed_request_handle
+RUN  hqi_args_wrong_handle_types
+OK   hqi_args_wrong_handle_types
+RUN  hqi_args_handle_checked_before_params
+OK   hqi_args_handle_checked_before_params
+RUN  hqi_args_garbage_handles
+OK   hqi_args_garbage_handles
+RUN  hqi_args_null_handle
+OK   hqi_args_null_handle
+SUMMARY tests=190 failed=2 skipped=0 checks_pass=43092 checks_fail=7
+@@I7 END http_response_headers exit=0x1 ms=122205 timeout=0 bytes=17853

@@ -1,0 +1,1276 @@
+RUN  hep_zz_timing_probe
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE timing probe no keeper (4 rounds): open 15 ms, request 79 ms, close 0 ms, server stop 1249 ms
+  NOTE timing probe keeper (4 rounds): open 0 ms, request 0 ms, close 0 ms, server stop 1250 ms
+OK   hep_zz_timing_probe
+RUN  hep_userinfo_via_proxy_absolute_form
+  NOTE OBS userinfo via proxy -> ok=1 target=http://ui.example/z host=ui.example auth=-
+OK   hep_userinfo_via_proxy_absolute_form
+RUN  hep_userinfo_not_in_host_header
+  NOTE OBS userinfo on 200 server: auth0=-
+OK   hep_userinfo_not_in_host_header
+RUN  hep_userinfo_basic_preemptive_or_challenge
+OK   hep_userinfo_basic_preemptive_or_challenge
+RUN  hep_userinfo_table
+  NOTE OBS userinfo plain [user:pass] -> ok=1 st=200 n=3 body=yes reqs=2 auth0=- auth1=Basic dXNlcjpwYXNz decoded=user:pass target=/ui
+  NOTE OBS userinfo user_only [user] -> ok=1 st=401 n=2 body=no reqs=1 auth0=- auth1=- decoded=- target=/ui
+  NOTE OBS userinfo empty_pass [user:] -> ok=1 st=401 n=2 body=no reqs=1 auth0=- auth1=- decoded=- target=/ui
+  NOTE OBS userinfo empty_user [:pass] -> ok=1 st=401 n=2 body=no reqs=1 auth0=- auth1=- decoded=- target=/ui
+  NOTE OBS userinfo pct_escaped [us%40er:p%3Ass] -> ok=1 st=200 n=3 body=yes reqs=2 auth0=- auth1=Basic dXNAZXI6cDpzcw== decoded=us@er:p:ss target=/ui
+  NOTE OBS userinfo colon_in_pass [u:p:q] -> ok=0 err=12005 reqs=0 auth0=- auth1=- decoded=- target=-
+  NOTE OBS userinfo domain_backslash [d%5Cu:p] -> ok=1 st=200 n=3 body=yes reqs=2 auth0=- auth1=Basic ZFx1OnA= decoded=d\\u:p target=/ui
+OK   hep_userinfo_table
+RUN  hep_ipv6_openurl_variants
+  NOTE OBS v6 url http://[::1]:49708 -> ok=1 err=0 target=/ host=[::1]:49708
+  NOTE OBS v6 url http://[0:0:0:0:0:0:0:1]:49708/x -> ok=1 err=0 target=/x host=[0:0:0:0:0:0:0:1]:49708
+  NOTE OBS v6 url http://[::1]:49708/x?y#z -> ok=1 err=0 target=/x?y#z host=[::1]:49708
+  NOTE OBS v6 url http://::1:49708/x -> ok=0 err=12005 target=- host=-
+  NOTE OBS v6 url http://[::1%251]:49708/x -> ok=0 err=12029 target=- host=-
+OK   hep_ipv6_openurl_variants
+RUN  hep_ipv6_connect_forms
+  NOTE OBS connect [::1] -> ok=1 err=0 host=[::1]:49712
+  NOTE OBS connect [[::1]] -> ok=1 err=0 host=[::1]:49712
+  NOTE OBS connect [0:0:0:0:0:0:0:1] -> ok=1 err=0 host=[0:0:0:0:0:0:0:1]:49712
+  NOTE OBS connect [[0:0:0:0:0:0:0:1]] -> ok=1 err=0 host=[0:0:0:0:0:0:0:1]:49712
+  NOTE OBS connect [::ffff:127.0.0.1] -> ok=0 err=12029 host=-
+  NOTE OBS connect [[::1%1]] -> ok=0 err=12029 host=-
+OK   hep_ipv6_connect_forms
+RUN  hep_ipv6_openurl_brackets
+OK   hep_ipv6_openurl_brackets
+RUN  hep_direct_host_header_has_port
+OK   hep_direct_host_header_has_port
+RUN  hep_default_port_connect_port_values_via_proxy
+  NOTE OBS connect port 0 -> ok=1 target=http://dp.example/p host=dp.example
+  NOTE OBS connect port 80 -> ok=1 target=http://dp.example/p host=dp.example
+  NOTE OBS connect port 443 -> ok=1 target=http://dp.example:443/p host=dp.example:443
+  NOTE OBS connect port 8080 -> ok=1 target=http://dp.example:8080/p host=dp.example:8080
+  NOTE OBS connect port 65535 -> ok=1 target=http://dp.example:65535/p host=dp.example:65535
+OK   hep_default_port_connect_port_values_via_proxy
+RUN  hep_default_port_host_header_via_proxy
+  NOTE OBS dp http://dp.example/x -> ok=1 err=0 target=http://dp.example/x host=dp.example
+  NOTE OBS dp http://dp.example:80/x -> ok=1 err=0 target=http://dp.example/x host=dp.example
+  NOTE OBS dp http://dp.example:8080/x -> ok=1 err=0 target=http://dp.example:8080/x host=dp.example:8080
+  NOTE OBS dp http://dp.example:080/x -> ok=1 err=0 target=http://dp.example/x host=dp.example
+  NOTE OBS dp http://DP.Example/x -> ok=1 err=0 target=http://dp.example/x host=DP.Example
+  NOTE OBS dp http://dp.example./x -> ok=1 err=0 target=http://dp.example./x host=dp.example.
+  NOTE OBS dp http://dp.example:/x -> ok=1 err=0 target=http://dp.example/x host=dp.example
+  NOTE OBS dp http://dp.example -> ok=1 err=0 target=http://dp.example/ host=dp.example
+  NOTE OBS dp http://dp.example?q -> ok=1 err=0 target=http://dp.example/?q host=dp.example
+  NOTE OBS dp http://dp.example:443/x -> ok=1 err=0 target=http://dp.example:443/x host=dp.example:443
+OK   hep_default_port_host_header_via_proxy
+RUN  hep_idn_connect_w_host_header
+  NOTE OBS ConnectW IDN -> ok=1 err=0 target=http://xn--bcher-kva.example:8080/c host=xn--bcher-kva.example:8080
+OK   hep_idn_connect_w_host_header
+RUN  hep_idn_openurl_a_high_bytes
+  NOTE OBS idn A 0 -> ok=1 err=0 target=http://b%FCcher.example/idn host=b\xfccher.example
+  NOTE OBS idn A 1 -> ok=1 err=0 target=http://b%C3%BCcher.example/idn host=b\xc3\xbccher.example
+OK   hep_idn_openurl_a_high_bytes
+RUN  hep_idn_option_values
+  NOTE OBS idn idn0 idnopt=0 set=1/0 -> ok=1 err=0 target=http://xn--bcher-kva.example/idn host=xn--bcher-kva.example
+  NOTE OBS idn idn1_direct idnopt=1 set=1/0 -> ok=1 err=0 target=http://xn--bcher-kva.example/idn host=xn--bcher-kva.example
+  NOTE OBS idn idn2_proxy idnopt=2 set=1/0 -> ok=1 err=0 target=http://xn--bcher-kva.example/idn host=xn--bcher-kva.example
+  NOTE OBS idn idn3 idnopt=3 set=1/0 -> ok=1 err=0 target=http://xn--bcher-kva.example/idn host=xn--bcher-kva.example
+OK   hep_idn_option_values
+RUN  hep_idn_openurl_w_default
+  NOTE OBS idn buecher idnopt=(unset)0 set=1/0 -> ok=1 err=0 target=http://xn--bcher-kva.example/idn host=xn--bcher-kva.example
+  NOTE OBS idn cjk idnopt=(unset)0 set=1/0 -> ok=1 err=0 target=http://xn--fiq228c.example/idn host=xn--fiq228c.example
+  NOTE OBS idn upper idnopt=(unset)0 set=1/0 -> ok=1 err=0 target=http://xn--mnchen-3ya.example/idn host=xn--mnchen-3ya.example
+  NOTE OBS idn already_puny idnopt=(unset)0 set=1/0 -> ok=1 err=0 target=http://xn--bcher-kva.example/idn host=xn--bcher-kva.example
+  NOTE OBS idn two_labels idnopt=(unset)0 set=1/0 -> ok=1 err=0 target=http://xn--9ca.xn--9ca.example/idn host=xn--9ca.xn--9ca.example
+OK   hep_idn_openurl_w_default
+RUN  hep_url_codepage_invalid_values
+  NOTE OBS set opt 68 = 0 -> 1 err 0
+  NOTE OBS set opt 68 = 1 -> 0 err 87
+  NOTE OBS set opt 68 = 12345 -> 0 err 87
+  NOTE OBS set opt 68 = 65000 -> 1 err 0
+  NOTE OBS set opt 68 = 65001 -> 1 err 0
+  NOTE OBS set opt 68 = 4294967295 -> 0 err 87
+  NOTE OBS set opt 100 = 0 -> 1 err 0
+  NOTE OBS set opt 100 = 1 -> 0 err 87
+  NOTE OBS set opt 100 = 12345 -> 0 err 87
+  NOTE OBS set opt 100 = 65000 -> 1 err 0
+  NOTE OBS set opt 100 = 65001 -> 1 err 0
+  NOTE OBS set opt 100 = 4294967295 -> 0 err 87
+  NOTE OBS set opt 101 = 0 -> 1 err 0
+  NOTE OBS set opt 101 = 1 -> 0 err 87
+  NOTE OBS set opt 101 = 12345 -> 0 err 87
+  NOTE OBS set opt 101 = 65000 -> 1 err 0
+  NOTE OBS set opt 101 = 65001 -> 1 err 0
+  NOTE OBS set opt 101 = 4294967295 -> 0 err 87
+  NOTE OBS set CODEPAGE_PATH short buffer -> 0 err 12010
+OK   hep_url_codepage_invalid_values
+RUN  hep_url_codepage_path_openurl_w
+  NOTE OBS openurlW codepage none set=1/0 -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+  NOTE OBS openurlW codepage path_utf8 set=1/0 -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+  NOTE OBS openurlW codepage path_1252 set=1/0 -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+  NOTE OBS openurlW codepage extra_1252 set=1/0 -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+  NOTE OBS openurlW codepage extra_utf8 set=1/0 -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+OK   hep_url_codepage_path_openurl_w
+RUN  hep_url_codepage_path_option_effect
+  NOTE OBS codepage path_utf8_req opt=100 val=65001 request set=1/0 -> ok=1 target=/\xc3\xa9
+  NOTE OBS codepage path_1252_req opt=100 val=1252 request set=1/0 -> ok=1 target=/\xc3\xa9
+  NOTE OBS codepage path_1252_session opt=100 val=1252 session set=1/0 -> ok=1 target=/\xc3\xa9
+  NOTE OBS codepage extra_1252_req opt=101 val=1252 request set=1/0 -> ok=1 target=/p?q=\xc3\xa9
+  NOTE OBS codepage codepage_1252_req opt=68 val=1252 request set=1/0 -> ok=1 target=/\xc3\xa9
+OK   hep_url_codepage_path_option_effect
+RUN  hep_url_codepage_options_defaults
+  NOTE OBS session option CODEPAGE: q=1 err=0 v=4294967295 (0xffffffff) len=4
+  NOTE OBS global option CODEPAGE: q=0 err=12018 v=3735928559
+  NOTE OBS session option CODEPAGE_PATH: q=1 err=0 v=4294967295 (0xffffffff) len=4
+  NOTE OBS global option CODEPAGE_PATH: q=0 err=12018 v=3735928559
+  NOTE OBS session option CODEPAGE_EXTRA: q=1 err=0 v=4294967295 (0xffffffff) len=4
+  NOTE OBS global option CODEPAGE_EXTRA: q=0 err=12018 v=3735928559
+  NOTE OBS session option IDN: q=1 err=0 v=3 (0x3) len=4
+  NOTE OBS global option IDN: q=0 err=12018 v=3735928559
+OK   hep_url_codepage_options_defaults
+RUN  hep_url_openrequest_w_object_is_utf8
+  NOTE OBS OpenRequestW CJK object -> /\xe4\xb8\xad
+OK   hep_url_openrequest_w_object_is_utf8
+RUN  hep_url_path_bytes_openrequest_w
+  NOTE OBS path OpenRequestW space -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenRequestW pct20 -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenRequestW space_query -> ok=1 err=0 target=/sp%20ace?q=a%20b
+  NOTE OBS path OpenRequestW pct41 -> ok=1 err=0 target=/%41
+  NOTE OBS path OpenRequestW pct_bad -> ok=1 err=0 target=/%zz
+  NOTE OBS path OpenRequestW pct_alone -> ok=1 err=0 target=/%
+  NOTE OBS path OpenRequestW pct2f_lower -> ok=1 err=0 target=/%2f
+  NOTE OBS path OpenRequestW pct00 -> ok=1 err=0 target=/%00
+  NOTE OBS path OpenRequestW dotdot -> ok=1 err=0 target=/b
+  NOTE OBS path OpenRequestW dot -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenRequestW pct_dotdot -> ok=1 err=0 target=/a/%2e%2e/b
+  NOTE OBS path OpenRequestW backslash -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenRequestW tab -> ok=1 err=0 target=/tab
+  NOTE OBS path OpenRequestW quote_lt_gt -> ok=1 err=0 target=/q"<>
+  NOTE OBS path OpenRequestW e_acute -> ok=1 err=0 target=/\xc3\xa9
+  NOTE OBS path OpenRequestW utf8_bytes_as_latin1 -> ok=1 err=0 target=/\xc3\x83\xc2\xa9
+  NOTE OBS path OpenRequestW cjk -> ok=1 err=0 target=/\xe4\xb8\xad\xe6\x96\x87
+  NOTE OBS path OpenRequestW euro -> ok=1 err=0 target=/\xe2\x82\xac
+  NOTE OBS path OpenRequestW emoji -> ok=1 err=0 target=/\xf0\x9f\x98\x80
+  NOTE OBS path OpenRequestW e_acute_query -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+OK   hep_url_path_bytes_openrequest_w
+RUN  hep_url_path_bytes_openrequest_a
+  NOTE OBS path OpenRequestA space -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenRequestA pct20 -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenRequestA space_query -> ok=1 err=0 target=/sp%20ace?q=a%20b
+  NOTE OBS path OpenRequestA pct41 -> ok=1 err=0 target=/%41
+  NOTE OBS path OpenRequestA pct_bad -> ok=1 err=0 target=/%zz
+  NOTE OBS path OpenRequestA pct_alone -> ok=1 err=0 target=/%
+  NOTE OBS path OpenRequestA pct2f_lower -> ok=1 err=0 target=/%2f
+  NOTE OBS path OpenRequestA pct00 -> ok=1 err=0 target=/%00
+  NOTE OBS path OpenRequestA dotdot -> ok=1 err=0 target=/b
+  NOTE OBS path OpenRequestA dot -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenRequestA pct_dotdot -> ok=1 err=0 target=/a/%2e%2e/b
+  NOTE OBS path OpenRequestA backslash -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenRequestA tab -> ok=1 err=0 target=/tab
+  NOTE OBS path OpenRequestA quote_lt_gt -> ok=1 err=0 target=/q"<>
+  NOTE OBS path OpenRequestA e_acute -> ok=1 err=0 target=/\xe9
+  NOTE OBS path OpenRequestA utf8_bytes_as_latin1 -> ok=1 err=0 target=/\xc3\xa9
+OK   hep_url_path_bytes_openrequest_a
+RUN  hep_url_path_bytes_openurl_w
+  NOTE OBS path OpenUrlW space -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenUrlW pct20 -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenUrlW space_query -> ok=1 err=0 target=/sp%20ace?q=a%20b
+  NOTE OBS path OpenUrlW pct41 -> ok=1 err=0 target=/%41
+  NOTE OBS path OpenUrlW pct_bad -> ok=1 err=0 target=/%zz
+  NOTE OBS path OpenUrlW pct_alone -> ok=1 err=0 target=/%
+  NOTE OBS path OpenUrlW pct2f_lower -> ok=1 err=0 target=/%2f
+  NOTE OBS path OpenUrlW pct00 -> ok=1 err=0 target=/%00
+  NOTE OBS path OpenUrlW dotdot -> ok=1 err=0 target=/b
+  NOTE OBS path OpenUrlW dot -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenUrlW pct_dotdot -> ok=1 err=0 target=/a/%2e%2e/b
+  NOTE OBS path OpenUrlW backslash -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenUrlW tab -> ok=1 err=0 target=/tab
+  NOTE OBS path OpenUrlW quote_lt_gt -> ok=1 err=0 target=/q"<>
+  NOTE OBS path OpenUrlW e_acute -> ok=1 err=0 target=/\xc3\xa9
+  NOTE OBS path OpenUrlW utf8_bytes_as_latin1 -> ok=1 err=0 target=/\xc3\x83\xc2\xa9
+  NOTE OBS path OpenUrlW cjk -> ok=1 err=0 target=/\xe4\xb8\xad\xe6\x96\x87
+  NOTE OBS path OpenUrlW euro -> ok=1 err=0 target=/\xe2\x82\xac
+  NOTE OBS path OpenUrlW emoji -> ok=1 err=0 target=/\xf0\x9f\x98\x80
+  NOTE OBS path OpenUrlW e_acute_query -> ok=1 err=0 target=/\xc3\xa9?q=\xc3\xa9
+OK   hep_url_path_bytes_openurl_w
+RUN  hep_url_path_bytes_openurl_a
+  NOTE OBS path OpenUrlA space -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenUrlA pct20 -> ok=1 err=0 target=/a%20b
+  NOTE OBS path OpenUrlA space_query -> ok=1 err=0 target=/sp%20ace?q=a%20b
+  NOTE OBS path OpenUrlA pct41 -> ok=1 err=0 target=/%41
+  NOTE OBS path OpenUrlA pct_bad -> ok=1 err=0 target=/%zz
+  NOTE OBS path OpenUrlA pct_alone -> ok=1 err=0 target=/%
+  NOTE OBS path OpenUrlA pct2f_lower -> ok=1 err=0 target=/%2f
+  NOTE OBS path OpenUrlA pct00 -> ok=1 err=0 target=/%00
+  NOTE OBS path OpenUrlA dotdot -> ok=1 err=0 target=/b
+  NOTE OBS path OpenUrlA dot -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenUrlA pct_dotdot -> ok=1 err=0 target=/a/%2e%2e/b
+  NOTE OBS path OpenUrlA backslash -> ok=1 err=0 target=/a/b
+  NOTE OBS path OpenUrlA tab -> ok=1 err=0 target=/tab
+  NOTE OBS path OpenUrlA quote_lt_gt -> ok=1 err=0 target=/q"<>
+  NOTE OBS path OpenUrlA e_acute -> ok=1 err=0 target=/\xe9
+  NOTE OBS path OpenUrlA utf8_bytes_as_latin1 -> ok=1 err=0 target=/\xc3\xa9
+OK   hep_url_path_bytes_openurl_a
+RUN  hep_url_fragment_openurl_w
+OK   hep_url_fragment_openurl_w
+RUN  hep_url_fragment_sent_openurl
+  NOTE OBS frag /f#frag -> /f#frag
+  NOTE OBS frag /f?q=1#frag -> /f?q=1#frag
+  NOTE OBS frag /f# -> /f#
+  NOTE OBS frag /#x -> /#x
+  NOTE OBS frag /f#a#b -> /f#a#b
+  NOTE OBS frag /f#frag?notquery -> /f#frag?notquery
+  NOTE OBS frag /f%23notfrag -> /f%23notfrag
+OK   hep_url_fragment_sent_openurl
+RUN  hep_url_host_total_1000
+  NOTE OBS host label=50 total=1000 -> ok=1 st=200 n=2 body=ok target_len=266 host_hdr_len=256
+OK   hep_url_host_total_1000
+RUN  hep_url_host_total_256
+  NOTE OBS host label=50 total=256 -> ok=1 st=200 n=2 body=ok target_len=266 host_hdr_len=256
+OK   hep_url_host_total_256
+RUN  hep_url_host_total_253
+  NOTE OBS host label=50 total=253 -> ok=1 st=200 n=2 body=ok target_len=263 host_hdr_len=253
+OK   hep_url_host_total_253
+RUN  hep_url_host_label_64
+  NOTE OBS host label=64 total=64 -> ok=1 st=200 n=2 body=ok target_len=74 host_hdr_len=64
+OK   hep_url_host_label_64
+RUN  hep_url_host_label_63
+  NOTE OBS host label=63 total=63 -> ok=1 st=200 n=2 body=ok target_len=73 host_hdr_len=63
+OK   hep_url_host_label_63
+RUN  hep_url_object_len_200000
+  NOTE OBS object len=200000 -> ok=1 st=200 n=2 body=ok target_len=200000
+OK   hep_url_object_len_200000
+RUN  hep_url_object_len_65536
+  NOTE OBS object len=65536 -> ok=1 st=200 n=2 body=ok target_len=65536
+OK   hep_url_object_len_65536
+RUN  hep_url_object_len_8192
+  NOTE OBS object len=8192 -> ok=1 st=200 n=2 body=ok target_len=8192
+OK   hep_url_object_len_8192
+RUN  hep_url_object_len_2084
+  NOTE OBS object len=2084 -> ok=1 st=200 n=2 body=ok target_len=2084
+OK   hep_url_object_len_2084
+RUN  hep_url_object_len_2048
+  NOTE OBS object len=2048 -> ok=1 st=200 n=2 body=ok target_len=2048
+OK   hep_url_object_len_2048
+RUN  hep_url_openurl_query_16000
+  NOTE OBS openurl query=16000 total=16025 -> ok=1 st=200 n=2 body=ok target_len=16003
+OK   hep_url_openurl_query_16000
+RUN  hep_url_openurl_query_2100
+  NOTE OBS openurl query=2100 total=2125 -> ok=1 st=200 n=2 body=ok target_len=2103
+OK   hep_url_openurl_query_2100
+RUN  hep_url_openurl_len_100000
+  NOTE OBS openurl total=100000 -> ok=1 st=200 n=2 body=ok target_len=99978
+OK   hep_url_openurl_len_100000
+RUN  hep_url_openurl_len_32768
+  NOTE OBS openurl total=32768 -> ok=1 st=200 n=2 body=ok target_len=32746
+OK   hep_url_openurl_len_32768
+RUN  hep_url_openurl_len_8192
+  NOTE OBS openurl total=8192 -> ok=1 st=200 n=2 body=ok target_len=8170
+OK   hep_url_openurl_len_8192
+RUN  hep_url_openurl_len_4096
+  NOTE OBS openurl total=4096 -> ok=1 st=200 n=2 body=ok target_len=4074
+OK   hep_url_openurl_len_4096
+RUN  hep_url_openurl_len_2085
+  NOTE OBS openurl total=2085 -> ok=1 st=200 n=2 body=ok target_len=2063
+OK   hep_url_openurl_len_2085
+RUN  hep_url_openurl_len_2084
+  NOTE OBS openurl total=2084 -> ok=1 st=200 n=2 body=ok target_len=2062
+OK   hep_url_openurl_len_2084
+RUN  hep_url_openurl_len_2083
+  NOTE OBS openurl total=2083 -> ok=1 st=200 n=2 body=ok target_len=2061
+OK   hep_url_openurl_len_2083
+RUN  hep_url_openurl_len_2048
+  NOTE OBS openurl total=2048 -> ok=1 st=200 n=2 body=ok target_len=2026
+OK   hep_url_openurl_len_2048
+RUN  hep_url_openurl_len_2000
+  NOTE OBS openurl total=2000 -> ok=1 st=200 n=2 body=ok target_len=1978
+OK   hep_url_openurl_len_2000
+RUN  hep_status_downlevel_query_errors
+  NOTE OBS downlevel send ok=1 err=0
+  NOTE OBS downlevel level 19 -> 1 200
+  NOTE OBS downlevel level 20 -> 1 OK
+  NOTE OBS downlevel level 18 -> 1 HTTP/1.0
+  NOTE OBS downlevel level 22 -> 1 HTTP/1.0 200 OK\r\n\r\n
+  NOTE OBS downlevel level 21 -> 1 HTTP/1.0 200 OK\x00
+  NOTE OBS downlevel level 5 -> 0 ERROR_HTTP_HEADER_NOT_FOUND
+  NOTE OBS downlevel level 1 -> 0 ERROR_HTTP_HEADER_NOT_FOUND
+  NOTE OBS downlevel level 9 -> 0 ERROR_HTTP_HEADER_NOT_FOUND
+OK   hep_status_downlevel_query_errors
+RUN  hep_status_raw_headers_keep_original_line
+  NOTE OBS raw[HTTP/1.1 600 Six] -> HTTP/1.1 600 Six\r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+  NOTE OBS raw[HTTP/1.1 099 X] -> HTTP/1.1 099 X\r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+  NOTE OBS raw[http/1.1 200 ok] -> http/1.1 200 ok\r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+  NOTE OBS raw[HTTP/1.1  200  OK] -> HTTP/1.1 200 OK\r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+  NOTE OBS raw[HTTP/1.1 200] -> HTTP/1.1 200 \r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+  NOTE OBS raw[HTTP/2 200 OK] -> HTTP/2 200 OK\r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+  NOTE OBS raw[HTTP/1.1	200	OK] -> HTTP/1.1 200 OK\r\nX-K: v\r\nContent-Length: 0\r\n\r\n
+OK   hep_status_raw_headers_keep_original_line
+RUN  hep_status_600_is_not_an_error_class
+OK   hep_status_600_is_not_an_error_class
+RUN  hep_rsp_le_status_crlf_cr_cr
+OK   hep_rsp_le_status_crlf_cr_cr
+RUN  hep_rsp_le_lfcr
+OK   hep_rsp_le_lfcr
+RUN  hep_rsp_le_crcrlf
+OK   hep_rsp_le_crcrlf
+RUN  hep_rsp_le_cr_only
+OK   hep_rsp_le_cr_only
+RUN  hep_rsp_le_lf_then_crlf_end
+OK   hep_rsp_le_lf_then_crlf_end
+RUN  hep_rsp_le_crlf_then_lf_end
+OK   hep_rsp_le_crlf_then_lf_end
+RUN  hep_rsp_le_lf_status_crlf_rest
+OK   hep_rsp_le_lf_status_crlf_rest
+RUN  hep_rsp_le_lf_only
+OK   hep_rsp_le_lf_only
+RUN  hep_rsp_h09_http_later_in_line
+OK   hep_rsp_h09_http_later_in_line
+RUN  hep_rsp_h09_binary
+OK   hep_rsp_h09_binary
+RUN  hep_rsp_h09_looks_like_header
+OK   hep_rsp_h09_looks_like_header
+RUN  hep_rsp_h09_html
+OK   hep_rsp_h09_html
+RUN  hep_rsp_h09_plain_text
+OK   hep_rsp_h09_plain_text
+RUN  hep_rsp_tr_cl_body_short
+OK   hep_rsp_tr_cl_body_short
+RUN  hep_rsp_tr_header_half_name
+OK   hep_rsp_tr_header_half_name
+RUN  hep_rsp_tr_header_partial_line
+OK   hep_rsp_tr_header_partial_line
+RUN  hep_rsp_tr_header_no_terminator
+OK   hep_rsp_tr_header_no_terminator
+RUN  hep_rsp_tr_status_blank_body
+OK   hep_rsp_tr_status_blank_body
+RUN  hep_rsp_tr_status_blank
+OK   hep_rsp_tr_status_blank
+RUN  hep_rsp_tr_status_line_lf_only
+OK   hep_rsp_tr_status_line_lf_only
+RUN  hep_rsp_tr_status_line_only
+OK   hep_rsp_tr_status_line_only
+RUN  hep_rsp_tr_status_no_crlf
+OK   hep_rsp_tr_status_no_crlf
+RUN  hep_rsp_tr_http_version_only
+OK   hep_rsp_tr_http_version_only
+RUN  hep_rsp_tr_http_only
+OK   hep_rsp_tr_http_only
+RUN  hep_rsp_tr_one_byte_H
+OK   hep_rsp_tr_one_byte_H
+RUN  hep_rsp_tr_empty_close
+OK   hep_rsp_tr_empty_close
+RUN  hep_rsp_pv_leading_nul
+OK   hep_rsp_pv_leading_nul
+RUN  hep_rsp_pv_leading_lf
+OK   hep_rsp_pv_leading_lf
+RUN  hep_rsp_pv_leading_2crlf
+OK   hep_rsp_pv_leading_2crlf
+RUN  hep_rsp_pv_leading_crlf
+OK   hep_rsp_pv_leading_crlf
+RUN  hep_rsp_pv_leading_tab
+OK   hep_rsp_pv_leading_tab
+RUN  hep_rsp_pv_leading_space
+OK   hep_rsp_pv_leading_space
+RUN  hep_rsp_pv_junk_5_bytes
+OK   hep_rsp_pv_junk_5_bytes
+RUN  hep_rsp_pv_junk_4_bytes
+OK   hep_rsp_pv_junk_4_bytes
+RUN  hep_rsp_pv_junk_1_byte
+OK   hep_rsp_pv_junk_1_byte
+RUN  hep_rsp_pv_rtsp
+OK   hep_rsp_pv_rtsp
+RUN  hep_rsp_pv_icy
+OK   hep_rsp_pv_icy
+RUN  hep_rsp_pv_https_token
+OK   hep_rsp_pv_https_token
+RUN  hep_rsp_pv_httpx
+OK   hep_rsp_pv_httpx
+RUN  hep_rsp_pv_http_slash_only
+OK   hep_rsp_pv_http_slash_only
+RUN  hep_rsp_pv_http_no_slash
+OK   hep_rsp_pv_http_no_slash
+RUN  hep_rsp_pv_http_1_12
+OK   hep_rsp_pv_http_1_12
+RUN  hep_rsp_pv_http1_no_minor
+OK   hep_rsp_pv_http1_no_minor
+RUN  hep_rsp_pv_http99
+OK   hep_rsp_pv_http99
+RUN  hep_rsp_pv_http09
+OK   hep_rsp_pv_http09
+RUN  hep_rsp_pv_http3
+OK   hep_rsp_pv_http3
+RUN  hep_rsp_pv_http20
+OK   hep_rsp_pv_http20
+RUN  hep_rsp_pv_http2
+OK   hep_rsp_pv_http2
+RUN  hep_rsp_pv_mixed_case_http
+OK   hep_rsp_pv_mixed_case_http
+RUN  hep_rsp_pv_lowercase_http
+OK   hep_rsp_pv_lowercase_http
+RUN  hep_rsp_rs_reason_mismatch_404_ok
+OK   hep_rsp_rs_reason_mismatch_404_ok
+RUN  hep_rsp_rs_reason_lowercase_ok
+OK   hep_rsp_rs_reason_lowercase_ok
+RUN  hep_rsp_rs_reason_long_2000
+  NOTE OBS rs_reason_long_2000 | ok=1 st=200 ver=HTTP/1.1 txt=RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR n=2 body=hi
+OK   hep_rsp_rs_reason_long_2000
+RUN  hep_rsp_rs_reason_nul
+OK   hep_rsp_rs_reason_nul
+RUN  hep_rsp_rs_reason_high_bytes
+OK   hep_rsp_rs_reason_high_bytes
+RUN  hep_rsp_rs_many_spaces_sep
+OK   hep_rsp_rs_many_spaces_sep
+RUN  hep_rsp_rs_reason_tab_sep
+OK   hep_rsp_rs_reason_tab_sep
+RUN  hep_rsp_rs_reason_trailing_ws
+OK   hep_rsp_rs_reason_trailing_ws
+RUN  hep_rsp_rs_reason_spaces
+OK   hep_rsp_rs_reason_spaces
+RUN  hep_rsp_rs_no_reason_trailing_sp
+OK   hep_rsp_rs_no_reason_trailing_sp
+RUN  hep_rsp_rs_no_reason
+OK   hep_rsp_rs_no_reason
+RUN  hep_rsp_st_199_interim_then_200
+OK   hep_rsp_st_199_interim_then_200
+RUN  hep_rsp_st_103_hints_then_200
+OK   hep_rsp_st_103_hints_then_200
+RUN  hep_rsp_st_102_then_200
+OK   hep_rsp_st_102_then_200
+RUN  hep_rsp_st_100_twice_then_200
+OK   hep_rsp_st_100_twice_then_200
+RUN  hep_rsp_st_100_then_200
+OK   hep_rsp_st_100_then_200
+RUN  hep_rsp_st_100_then_close
+OK   hep_rsp_st_100_then_close
+RUN  hep_rsp_st_101_without_upgrade
+OK   hep_rsp_st_101_without_upgrade
+RUN  hep_rsp_st_304_with_body_bytes
+OK   hep_rsp_st_304_with_body_bytes
+RUN  hep_rsp_st_204_with_body_bytes
+OK   hep_rsp_st_204_with_body_bytes
+RUN  hep_rsp_st_599
+OK   hep_rsp_st_599
+RUN  hep_rsp_st_499
+OK   hep_rsp_st_499
+RUN  hep_rsp_st_399_no_location
+OK   hep_rsp_st_399_no_location
+RUN  hep_rsp_st_299
+OK   hep_rsp_st_299
+RUN  hep_rsp_st_199
+OK   hep_rsp_st_199
+RUN  hep_rsp_st_high_byte_status
+OK   hep_rsp_st_high_byte_status
+RUN  hep_rsp_st_fullwidth_digits
+OK   hep_rsp_st_fullwidth_digits
+RUN  hep_rsp_st_hex_0xc8
+OK   hep_rsp_st_hex_0xc8
+RUN  hep_rsp_st_200_dot_5
+OK   hep_rsp_st_200_dot_5
+RUN  hep_rsp_st_20_0_space_inside
+OK   hep_rsp_st_20_0_space_inside
+RUN  hep_rsp_st_200x_suffix
+OK   hep_rsp_st_200x_suffix
+RUN  hep_rsp_st_2OO_letter_o
+OK   hep_rsp_st_2OO_letter_o
+RUN  hep_rsp_st_letters
+OK   hep_rsp_st_letters
+RUN  hep_rsp_st_plus_200
+OK   hep_rsp_st_plus_200
+RUN  hep_rsp_st_minus_1
+OK   hep_rsp_st_minus_1
+RUN  hep_rsp_st_0200_leading_zero
+OK   hep_rsp_st_0200_leading_zero
+RUN  hep_rsp_st_7_one_digit
+OK   hep_rsp_st_7_one_digit
+RUN  hep_rsp_st_42_two_digits
+OK   hep_rsp_st_42_two_digits
+RUN  hep_rsp_st_001
+OK   hep_rsp_st_001
+RUN  hep_rsp_st_000
+OK   hep_rsp_st_000
+RUN  hep_rsp_st_0
+OK   hep_rsp_st_0
+RUN  hep_rsp_st_099_no_reason
+OK   hep_rsp_st_099_no_reason
+RUN  hep_rsp_st_099
+OK   hep_rsp_st_099
+RUN  hep_rsp_st_99999999999999999999
+OK   hep_rsp_st_99999999999999999999
+RUN  hep_rsp_st_4294967296
+OK   hep_rsp_st_4294967296
+RUN  hep_rsp_st_4294967295
+OK   hep_rsp_st_4294967295
+RUN  hep_rsp_st_12345
+OK   hep_rsp_st_12345
+RUN  hep_rsp_st_1000
+OK   hep_rsp_st_1000
+RUN  hep_rsp_st_999
+OK   hep_rsp_st_999
+RUN  hep_rsp_st_699
+OK   hep_rsp_st_699
+RUN  hep_rsp_st_600
+OK   hep_rsp_st_600
+RUN  hep_rsp_st_500
+OK   hep_rsp_st_500
+RUN  hep_rsp_st_404
+OK   hep_rsp_st_404
+RUN  hep_rsp_st_200_http10
+OK   hep_rsp_st_200_http10
+RUN  hep_rsp_st_200_baseline
+OK   hep_rsp_st_200_baseline
+RUN  hep_req_header_count_500
+OK   hep_req_header_count_500
+RUN  hep_req_header_value_200k
+  NOTE OBS request header 200000 bytes -> ok=1 err=0 seen=200000
+OK   hep_req_header_value_200k
+RUN  hep_req_header_value_64k
+  NOTE OBS request header 65536 bytes -> ok=1 err=0 seen=65536
+OK   hep_req_header_value_64k
+RUN  hep_req_header_value_8k
+  NOTE OBS request header 8192 bytes -> ok=1 err=0 seen=8192
+OK   hep_req_header_value_8k
+RUN  hep_send_headers_not_sticky_across_resend
+  NOTE OBS send headers on resend: kept
+OK   hep_send_headers_not_sticky_across_resend
+RUN  hep_add_remove_after_send
+OK   hep_add_remove_after_send
+RUN  hep_add_between_send_and_read
+OK   hep_add_between_send_and_read
+RUN  hep_add_after_send_replace_host
+  NOTE OBS replace Host after send: add=1/0 resend=1 host0=127.0.0.1:50253 host1=other.example
+OK   hep_add_after_send_replace_host
+RUN  hep_add_after_send_succeeds_and_applies_to_resend
+  NOTE OBS add after send: 1 err 0
+OK   hep_add_after_send_succeeds_and_applies_to_resend
+RUN  hep_nonascii_w_verb_and_version
+  NOTE OBS W verb 0 -> open=0 ok=0 method=- err=87
+  NOTE OBS W verb 1 -> open=0 ok=0 method=- err=87
+OK   hep_nonascii_w_verb_and_version
+RUN  hep_nonascii_w_query_request_header_back
+  NOTE OBS W query back: len=4 chars=00c3 00a9 0000
+OK   hep_nonascii_w_query_request_header_back
+RUN  hep_nonascii_w_header_name
+  NOTE OBS W non-ASCII header name: add=1/0 send=1 raw=GET /w HTTP/1.1\r\nX-\xc3\xa9: v\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50260\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+OK   hep_nonascii_w_header_name
+RUN  hep_nonascii_w_add_headers_utf8
+OK   hep_nonascii_w_add_headers_utf8
+RUN  hep_nonascii_w_add_headers
+  NOTE OBS W add e_acute -> \xc3\xa9
+  NOTE OBS W add euro -> \xe2\x82\xac
+  NOTE OBS W add cjk -> \xe4\xb8\xad\xe6\x96\x87
+  NOTE OBS W add snowman -> \xe2\x98\x83
+OK   hep_nonascii_w_add_headers
+RUN  hep_nonascii_w_send_headers
+  NOTE OBS W send e_acute -> \xc3\xa9
+  NOTE OBS W send euro -> \xe2\x82\xac
+  NOTE OBS W send cjk -> \xe4\xb8\xad\xe6\x96\x87
+  NOTE OBS W send snowman -> \xe2\x98\x83
+  NOTE OBS W send emoji_pair -> \xf0\x9f\x98\x80
+  NOTE OBS W send lone_surrogate -> \xef\xbf\xbd
+  NOTE OBS W send latin1_range -> \xc2\x80\xc3\xbf
+OK   hep_nonascii_w_send_headers
+RUN  hep_nonascii_send_headers_a_verbatim
+OK   hep_nonascii_send_headers_a_verbatim
+RUN  hep_inject_referrer_crlf
+  NOTE OBS referrer [http://r.example/\r\nX-Inj: 1] -> open=1 ok=1 raw=GET /r HTTP/1.1\r\nReferer: http://r.example/\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50288\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS referrer [http://r.example/a b] -> open=1 ok=1 raw=GET /r HTTP/1.1\r\nReferer: http://r.example/a b\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50290\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS referrer [http://r.example/\xe9] -> open=1 ok=1 raw=GET /r HTTP/1.1\r\nReferer: http://r.example/\xe9\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50292\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+OK   hep_inject_referrer_crlf
+RUN  hep_inject_user_agent_crlf
+  NOTE OBS inject agent [ua\r\nX-Inj: 1] -> ok=1 st=200 n=2 body=ok reqs=1 raw=GET / HTTP/1.1\r\nUser-Agent: ua\r\nHost: 127.0.0.1:50294\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject agent [ua\nX-Inj: 1] -> ok=1 st=200 n=2 body=ok reqs=1 raw=GET / HTTP/1.1\r\nUser-Agent: ua\r\nHost: 127.0.0.1:50296\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject agent [ua\rX] -> ok=1 st=200 n=2 body=ok reqs=1 raw=GET / HTTP/1.1\r\nUser-Agent: ua\r\nHost: 127.0.0.1:50298\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject agent [ua\r\n\r\nGET /smuggled HTTP/1.1] -> ok=1 st=200 n=2 body=ok reqs=1 raw=GET / HTTP/1.1\r\nUser-Agent: ua\r\nHost: 127.0.0.1:50300\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+OK   hep_inject_user_agent_crlf
+RUN  hep_inject_send_connection_close_header
+  NOTE step open
+  NOTE step send
+  NOTE step sent ok=1 err=0
+  NOTE step read n=2 ok=1
+  NOTE OBS Connection: close via send headers raw=GET /s HTTP/1.1\r\nX-A: v\r\nUser-Agent: hep-cc\r\nHost: 127.0.0.1:50302\r\nConnection: Close\r\nCache-Control: no-cache\r\n\r\n
+  NOTE step closed request
+  NOTE step closed session
+  NOTE step server stopped
+OK   hep_inject_send_connection_close_header
+RUN  hep_inject_send_content_length_header
+  NOTE OBS caller Content-Length 5 without body -> st=200 line=GET /s HTTP/1.1 hdrs=X-A|Content-Length|User-Agent|Host|Connection|Cache-Control
+OK   hep_inject_send_content_length_header
+RUN  hep_inject_send_headers_split_values
+OK   hep_inject_send_headers_split_values
+RUN  hep_inject_send_headers_table
+  NOTE OBS inject send [X-A: v\r\n\r\nGET /smuggled HTTP/1.1\r\nHost: x\r\n\r\n] -> send=0 err=12150 reqs=0 reqs=0 raw=-
+  NOTE OBS inject send [X-A: a\rb\r\n] -> send=0 err=12150 reqs=0 reqs=0 raw=-
+  NOTE OBS inject send [X-A: a\nX-Inj: 1\r\n] -> st=200 line=GET /s HTTP/1.1 hdrs=X-A|X-Inj|User-Agent|Host|Connection|Cache-Control reqs=1 raw=GET /s HTTP/1.1\r\nX-A: a\r\nX-Inj: 1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50310\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject send [X-A: v\r\nHost: evil.example\r\n] -> st=200 line=GET /s HTTP/1.1 hdrs=X-A|Host|User-Agent|Connection|Cache-Control reqs=1 raw=GET /s HTTP/1.1\r\nX-A: v\r\nHost: evil.example\r\nUser-Agent: hep-req\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject send [X-A: v\r\n X-Fold: 1\r\n] -> st=200 line=GET /s HTTP/1.1 hdrs=X-A|X-Fold|User-Agent|Host|Connection|Cache-Control reqs=1 raw=GET /s HTTP/1.1\r\nX-A: v\r\nX-Fold: 1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50314\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject send [X-A: v\r\nUser-Agent: other\r\n] -> st=200 line=GET /s HTTP/1.1 hdrs=X-A|User-Agent|Host|Connection|Cache-Control reqs=1 raw=GET /s HTTP/1.1\r\nX-A: v\r\nUser-Agent: other\r\nHost: 127.0.0.1:50316\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+OK   hep_inject_send_headers_table
+RUN  hep_inject_crlf_in_add_gives_two_headers
+OK   hep_inject_crlf_in_add_gives_two_headers
+RUN  hep_inject_add_request_headers_table
+  NOTE OBS inject add crlf_two_headers -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nX-Inj: 1\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50320\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add bare_cr_in_value -> add=0/87 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: a\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50322\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add bare_lf_in_value -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: a\r\nX-Inj: 1\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50324\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add double_crlf_smuggle -> add=0/87 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50326\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add obs_fold -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nX-Fold: 1\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50328\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add nul_in_value -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: a\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50330\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add host_override -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nHost: evil.example\r\nUser-Agent: hep\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add content_length_inject -> add=1/0 send=0/12152 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nContent-Length: 999\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50334\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add te_inject -> add=1/0 send=0/12152 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nTransfer-Encoding: chunked\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50336\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add replace_add_crlf -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50338\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add high_bytes -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: \x80\xff\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50340\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS inject add ws_value -> add=1/0 send=1/0 reqs=1 raw=GET /i HTTP/1.1\r\nX-A: v\r\nUser-Agent: hep\r\nHost: 127.0.0.1:50342\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+OK   hep_inject_add_request_headers_table
+RUN  hep_send_header_length_w_table
+  NOTE OBS W hlen -1 -> ok=1 err=0 names=X-A|X-B|X-C|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS W hlen 24 -> ok=1 err=0 names=X-A|X-B|X-C|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS W hlen 16 -> ok=1 err=0 names=X-A|X-B|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS W hlen 8 -> ok=1 err=0 names=X-A|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS W hlen 0 -> ok=1 err=0 names=X-A|X-B|X-C|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS W hlen 48 -> ok=0 err=12150 names=-
+  NOTE OBS W hlen 25 -> ok=0 err=12150 names=-
+OK   hep_send_header_length_w_table
+RUN  hep_send_header_length_two_lines_prefix
+OK   hep_send_header_length_two_lines_prefix
+RUN  hep_send_header_length_exact_and_minus1_agree
+OK   hep_send_header_length_exact_and_minus1_agree
+RUN  hep_send_header_length_table
+  NOTE OBS hlen minus1 (-1) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|X-C|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen minus1 raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nX-C: 3\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50362\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen exact (24) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|X-C|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen exact raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nX-C: 3\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50364\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen minus_crlf (22) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|X-C|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen minus_crlf raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nX-C: 3\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50366\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen two_lines (16) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen two_lines raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50368\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen cut_after_value_2 (14) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen cut_after_value_2 raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50370\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen cut_in_value_2 (12) -> send=0 err=12150 reqs=0
+  NOTE OBS hlen cut_in_name_2 (10) -> send=0 err=12150 reqs=0
+  NOTE OBS hlen one_line (8) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen one_line raw=GET /h HTTP/1.1\r\nX-A: 1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50374\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen cut_before_crlf (6) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen cut_before_crlf raw=GET /h HTTP/1.1\r\nX-A: 1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50376\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen cut_in_name (3) -> send=0 err=12150 reqs=0
+  NOTE OBS hlen one_char (1) -> send=0 err=12150 reqs=0
+  NOTE OBS hlen plus_nul (25) -> send=0 err=12150 reqs=0
+  NOTE OBS hlen zero (0) -> send=0 err=87 reqs=0
+  NOTE OBS hlen minus2 (-2) -> send=0 err=12150 reqs=0
+  NOTE OBS hlen embedded_nul (15) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen embedded_nul raw=GET /h HTTP/1.1\r\nX-A: 1\x00X-B: 2\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50383\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen blank_line_middle (-1) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen blank_line_middle raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50385\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen leading_blank_lines (-1) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen leading_blank_lines raw=GET /h HTTP/1.1\r\nX-A: 1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50387\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen lf_only (-1) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen lf_only raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50389\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen cr_only (-1) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|X-B|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen cr_only raw=GET /h HTTP/1.1\r\nX-A: 1\r\nX-B: 2\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50391\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS hlen no_crlf (-1) -> st=200 line=GET /h HTTP/1.1 hdrs=X-A|User-Agent|Host|Connection|Cache-Control
+  NOTE OBS hlen no_crlf raw=GET /h HTTP/1.1\r\nX-A: 1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50393\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+OK   hep_send_header_length_table
+RUN  hep_all_null_open_request_w
+OK   hep_all_null_open_request_w
+RUN  hep_all_null_open_request
+OK   hep_all_null_open_request
+RUN  hep_version_table
+  NOTE OBS version [(null)] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50399\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [HTTP/1.1] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50401\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [HTTP/1.0] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50403\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50405\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [HTTP/2.0] -> st=200 line=GET /v HTTP/2.0 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/2.0\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50407\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [HTTP/0.9] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50409\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [http/1.1] -> st=200 line=GET /v http/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v http/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50411\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [FOO/9] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50413\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS version [HTTP/1.1\r\nX-Inj: 1] -> open=0 err=12153 raw=-
+  NOTE OBS version [HTTP/1.1 extra] -> open=0 err=12153 raw=-
+OK   hep_version_table
+RUN  hep_object_table
+  NOTE OBS obj [(null)] -> / | GET / HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50417\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [] -> / | GET / HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50419\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/] -> / | GET / HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50421\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [x] -> /x | GET /x HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50423\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [x/y] -> /x/y | GET /x/y HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50425\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [*] -> /* | GET /* HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50427\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [//double] -> //double | GET //double HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50429\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/a/../b] -> /b | GET /b HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50431\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/a/./b] -> /a/b | GET /a/b HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50433\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/a b] -> /a%20b | GET /a%20b HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50435\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/a%20b] -> /a%20b | GET /a%20b HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50437\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/a+b] -> /a+b | GET /a+b HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50439\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/%41%42] -> /%41%42 | GET /%41%42 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50441\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/%zz] -> /%zz | GET /%zz HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50443\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/%] -> /% | GET /% HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50445\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/%2] -> /%2 | GET /%2 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50447\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/%00x] -> /%00x | GET /%00x HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50449\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/%2F] -> /%2F | GET /%2F HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50451\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/p?q=1&r=2] -> /p?q=1&r=2 | GET /p?q=1&r=2 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50453\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/p?q=a b] -> /p?q=a%20b | GET /p?q=a%20b HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50455\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/p?] -> /p? | GET /p? HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50457\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/p#frag] -> /p#frag | GET /p#frag HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50459\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/p?q#f] -> /p?q#f | GET /p?q#f HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50461\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/back\\slash] -> /back/slash | GET /back/slash HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50463\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/tab\there] -> /tabhere | GET /tabhere HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50465\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/quote"x] -> /quote"x | GET /quote"x HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50467\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/lt<gt>] -> /lt<gt> | GET /lt<gt> HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50469\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/brace{}|^`] -> /brace{}|^` | GET /brace{}|^` HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50471\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/\x7f] -> /\x7f | GET /\x7f HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50473\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/\xe9] -> /\xe9 | GET /\xe9 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50475\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/\xc3\xa9] -> /\xc3\xa9 | GET /\xc3\xa9 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50477\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/\xe4\xb8\xad] -> /\xe4\xb8\xad | GET /\xe4\xb8\xad HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50479\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [http://other.example/abs] -> /http://other.example/abs | GET /http://other.example/abs HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50481\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [http://127.0.0.1/abs] -> /http://127.0.0.1/abs | GET /http://127.0.0.1/abs HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50483\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [HTTP://X/Y] -> /HTTP://X/Y | GET /HTTP://X/Y HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50485\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [ftp://x/y] -> /ftp://x/y | GET /ftp://x/y HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50487\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/crlf\r\nX-Inj: 1] -> /crlfX-Inj:%201 | GET /crlfX-Inj:%201 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50489\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/lf\nX-Inj: 1] -> /lfX-Inj:%201 | GET /lfX-Inj:%201 HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50491\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/lf\nX-Inj: 1] not frozen yet
+  NOTE OBS obj [/cr\rX] -> /crX | GET /crX HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50493\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/cr\rX] not frozen yet
+  NOTE OBS obj [/space HTTP/1.0\r\nX-Inj: 1\r\n\r\nGET /smuggled] -> /space%20HTTP/1.0X-Inj:%201GET%20/smuggled | GET /space%20HTTP/1.0X-Inj:%201GET%20/smuggled HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50495\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS obj [/space HTTP/1.0\r\nX-Inj: 1\r\n\r\nGET /smuggled] not frozen yet
+  NOTE timing: hep_object_table took 12546 ms
+OK   hep_object_table
+RUN  hep_method_with_space_and_ctl
+  NOTE OBS verb [GE T] -> open=0 err=87 raw=-
+  NOTE OBS verb [GET ] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50498\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS verb [ GET] -> st=200 line=GET /v HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control raw=GET /v HTTP/1.1\r\nUser-Agent: hep-req\r\nHost: 127.0.0.1:50500\r\nConnection: Keep-Alive\r\nCache-Control: no-cache\r\n\r\n
+  NOTE OBS verb [G\tET] -> open=0 err=87 raw=-
+  NOTE OBS verb [GET\r\nX-Inj: 1\r\n] -> open=0 err=87 raw=-
+  NOTE OBS verb [GET /evil HTTP/1.1\r\nX:] -> open=0 err=87 raw=-
+  NOTE OBS verb [G\x80T] -> open=0 err=87 raw=-
+  NOTE OBS verb [G\xc3\xa9T] -> open=0 err=87 raw=-
+OK   hep_method_with_space_and_ctl
+RUN  hep_method_empty_string
+  NOTE OBS empty verb -> st=200 line=GET /n HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control
+OK   hep_method_empty_string
+RUN  hep_method_null_is_get
+OK   hep_method_null_is_get
+RUN  hep_method_lowercase_head_reads_body
+  NOTE OBS verb HEAD on CL:4 reply -> ok=1 st=200 n=0 body=
+  NOTE OBS verb head on CL:4 reply -> ok=1 st=200 n=4 body=body
+  NOTE OBS verb Head on CL:4 reply -> ok=1 st=200 n=4 body=body
+OK   hep_method_lowercase_head_reads_body
+RUN  hep_method_trace_rejected_w
+OK   hep_method_trace_rejected_w
+RUN  hep_method_trace_track_rejected
+OK   hep_method_trace_track_rejected
+RUN  hep_method_token_table
+  NOTE OBS verb [GET] -> st=200 line=GET /m HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control
+  NOTE OBS verb [get] -> st=200 line=get /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [Get] -> st=200 line=Get /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [gEt] -> st=200 line=gEt /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [POST] -> st=200 line=POST /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [post] -> st=200 line=post /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [HEAD] -> st=200 line=HEAD /m HTTP/1.1 hdrs=User-Agent|Host|Connection|Cache-Control
+  NOTE OBS verb [head] -> st=200 line=head /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [PUT] -> st=200 line=PUT /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [put] -> st=200 line=put /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [DELETE] -> st=200 line=DELETE /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [delete] -> st=200 line=delete /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [OPTIONS] -> st=200 line=OPTIONS /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [CONNECT] -> st=200 line=CONNECT /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [PATCH] -> st=200 line=PATCH /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [PROPFIND] -> st=200 line=PROPFIND /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [MKCOL] -> st=200 line=MKCOL /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [M-SEARCH] -> st=200 line=M-SEARCH /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [FOO] -> st=200 line=FOO /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [foo_bar] -> st=200 line=foo_bar /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [X] -> st=200 line=X /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+  NOTE OBS verb [VERYLONGMETHODNAMEVERYLONGMETHODNAMEVERYLONGMETHODNAMEVERYLONGMETHODNAME] -> st=200 line=VERYLONGMETHODNAMEVERYLONGMETHODNAMEVERYLONGMETHODNAMEVERYLONGMETHODNAME /m HTTP/1.1 hdrs=User-Agent|Host|Content-Length|Connection|Cache-Control
+OK   hep_method_token_table
+RUN  hep_split_every_boundary
+OK   hep_split_every_boundary
+RUN  hep_split_17byte_20ms
+OK   hep_split_17byte_20ms
+RUN  hep_split_7byte_10ms
+OK   hep_split_7byte_10ms
+RUN  hep_split_3byte_1ms
+OK   hep_split_3byte_1ms
+RUN  hep_split_2byte_5ms
+OK   hep_split_2byte_5ms
+RUN  hep_split_1byte_2ms
+OK   hep_split_1byte_2ms
+RUN  hep_split_1byte_0ms
+OK   hep_split_1byte_0ms
+RUN  hep_count_same_name_10000
+  NOTE OBS many_headers_10000_same idx 9999 -> 1 v9999
+  NOTE OBS many_headers_10000_same | ok=1 st=200 n=2 body=hi
+  NOTE many_headers_10000_same: 16 ms
+OK   hep_count_same_name_10000
+RUN  hep_count_same_name_1000
+  NOTE OBS many_headers_1000_same idx 999 -> 1 v999
+  NOTE OBS many_headers_1000_same | ok=1 st=200 n=2 body=hi
+  NOTE many_headers_1000_same: 0 ms
+OK   hep_count_same_name_1000
+RUN  hep_count_headers_20000
+  NOTE OBS many_headers_20000_distinct last -> 1 v19999
+  NOTE OBS many_headers_20000_distinct | ok=1 st=200 n=2 body=hi
+  NOTE many_headers_20000_distinct: 31 ms
+OK   hep_count_headers_20000
+RUN  hep_count_headers_5000
+  NOTE OBS many_headers_5000_distinct last -> 1 v4999
+  NOTE OBS many_headers_5000_distinct | ok=1 st=200 n=2 body=hi
+  NOTE many_headers_5000_distinct: 0 ms
+OK   hep_count_headers_5000
+RUN  hep_count_headers_1000
+  NOTE OBS many_headers_1000_distinct last -> 1 v999
+  NOTE OBS many_headers_1000_distinct | ok=1 st=200 n=2 body=hi
+  NOTE many_headers_1000_distinct: 0 ms
+OK   hep_count_headers_1000
+RUN  hep_count_headers_100
+  NOTE OBS many_headers_100_distinct last -> 1 v99
+  NOTE OBS many_headers_100_distinct | ok=1 st=200 n=2 body=hi
+  NOTE many_headers_100_distinct: 0 ms
+OK   hep_count_headers_100
+RUN  hep_size_long_header_value_roundtrip_64k
+  NOTE OBS 64k header send ok=1 err=0
+OK   hep_size_long_header_value_roundtrip_64k
+RUN  hep_size_header_value_1m
+  NOTE OBS long_header_1048576 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_1m
+RUN  hep_size_header_value_256k
+  NOTE OBS long_header_262144 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_256k
+RUN  hep_size_header_value_128k
+  NOTE OBS long_header_131072 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_128k
+RUN  hep_size_header_value_64k
+  NOTE OBS long_header_65536 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_64k
+RUN  hep_size_header_value_16k
+  NOTE OBS long_header_16384 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_16k
+RUN  hep_size_header_value_8k
+  NOTE OBS long_header_8192 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_8k
+RUN  hep_size_header_value_1k
+  NOTE OBS long_header_1024 | ok=1 st=200 n=2 body=hi
+OK   hep_size_header_value_1k
+RUN  hep_ct_charset_body_bytes_identical
+OK   hep_ct_charset_body_bytes_identical
+RUN  hep_hdr_ct_no_type
+  NOTE OBS ct_no_type | ok=1 st=200 ver=HTTP/1.1 txt=OK h= n=2 body=hi
+OK   hep_hdr_ct_no_type
+RUN  hep_hdr_ct_charset_bogus
+  NOTE OBS ct_charset_bogus | ok=1 st=200 ver=HTTP/1.1 txt=OK h=text/html; charset="x-bogus" n=2 body=hi
+OK   hep_hdr_ct_charset_bogus
+RUN  hep_hdr_ct_charset_utf16
+  NOTE OBS ct_charset_utf16 | ok=1 st=200 ver=HTTP/1.1 txt=OK h=text/plain; charset=utf-16 n=4 body=\xff\xfeh\x00
+OK   hep_hdr_ct_charset_utf16
+RUN  hep_hdr_ct_charset_latin1
+  NOTE OBS ct_charset_latin1 | ok=1 st=200 ver=HTTP/1.1 txt=OK h=text/plain; charset=iso-8859-1 n=2 body=\xe9\xe9
+OK   hep_hdr_ct_charset_latin1
+RUN  hep_hdr_ct_charset_utf8
+  NOTE OBS ct_charset_utf8 | ok=1 st=200 ver=HTTP/1.1 txt=OK h=text/plain; charset=utf-8 n=4 body=\xc3\xa9\xc3\xa9
+OK   hep_hdr_ct_charset_utf8
+RUN  hep_hdr_adv_426_upgrade_required
+  NOTE OBS adv_426_upgrade_required | ok=1 st=426 ver=HTTP/1.1 txt=Upgrade Required h=TLS/1.2, HTTP/1.1 n=2 body=hi
+OK   hep_hdr_adv_426_upgrade_required
+RUN  hep_hdr_adv_http2_settings
+  NOTE OBS adv_http2_settings | ok=1 st=200 ver=HTTP/1.1 txt=OK h=AAMAAABkAAQAAP__ n=2 body=hi
+OK   hep_hdr_adv_http2_settings
+RUN  hep_hdr_adv_upgrade_h2
+  NOTE OBS adv_upgrade_h2 | ok=1 st=200 ver=HTTP/1.1 txt=OK h=h2,h2c n=2 body=hi
+OK   hep_hdr_adv_upgrade_h2
+RUN  hep_hdr_adv_upgrade_h2c
+  NOTE OBS adv_upgrade_h2c | ok=1 st=200 ver=HTTP/1.1 txt=OK h=h2c n=2 body=hi
+OK   hep_hdr_adv_upgrade_h2c
+RUN  hep_hdr_adv_alt_svc_h3
+  NOTE OBS adv_alt_svc_h3 | ok=1 st=200 ver=HTTP/1.1 txt=OK h=h3=":443"; ma=86400 n=2 body=hi
+OK   hep_hdr_adv_alt_svc_h3
+RUN  hep_cl_te_chunk_missing_last
+  NOTE OBS te_chunk_missing_last | ok=1 st=200 cl=?12150 n=2 body=hi
+OK   hep_cl_te_chunk_missing_last
+RUN  hep_cl_te_chunk_bad_size
+  NOTE OBS te_chunk_bad_size | ok=0 err=12004
+OK   hep_cl_te_chunk_bad_size
+RUN  hep_cl_te_chunk_lf_only
+  NOTE OBS te_chunk_lf_only | ok=0 err=12004
+OK   hep_cl_te_chunk_lf_only
+RUN  hep_cl_te_chunk_size_leading_zeros
+  NOTE OBS te_chunk_size_leading_zeros | ok=1 st=200 cl=?12150 n=2 body=hi
+OK   hep_cl_te_chunk_size_leading_zeros
+RUN  hep_cl_te_chunk_size_uppercase_hex
+  NOTE OBS te_chunk_size_uppercase_hex | ok=1 st=200 cl=?12150 n=10 body=0123456789
+OK   hep_cl_te_chunk_size_uppercase_hex
+RUN  hep_cl_te_chunk_ext_and_trailer
+  NOTE OBS te_chunk_ext_and_trailer | ok=1 st=200 cl=?12150 n=2 body=hi
+OK   hep_cl_te_chunk_ext_and_trailer
+RUN  hep_cl_te_chunked_space_value
+  NOTE OBS te_chunked_space_value | ok=1 st=200 cl=?12150 n=2 body=hi
+OK   hep_cl_te_chunked_space_value
+RUN  hep_cl_te_chunked_http10
+  NOTE OBS te_chunked_http10 | ok=1 st=200 cl=?12150 n=12 body=2\r\nhi\r\n0\r\n\r\n
+OK   hep_cl_te_chunked_http10
+RUN  hep_cl_te_two_headers
+  NOTE OBS te_two_headers | ok=1 st=200 cl=?12150 n=12 body=2\r\nhi\r\n0\r\n\r\n
+OK   hep_cl_te_two_headers
+RUN  hep_cl_te_unknown_close
+  NOTE OBS te_unknown_close | ok=1 st=200 cl=?12150 n=2 body=hi
+OK   hep_cl_te_unknown_close
+RUN  hep_cl_te_identity_with_cl
+  NOTE OBS te_identity_with_cl | ok=1 st=200 cl=2 n=2 body=hi
+OK   hep_cl_te_identity_with_cl
+RUN  hep_cl_te_chunked_identity
+  NOTE OBS te_chunked_identity | ok=1 st=200 cl=?12150 n=12 body=2\r\nhi\r\n0\r\n\r\n
+OK   hep_cl_te_chunked_identity
+RUN  hep_cl_te_gzip_chunked
+  NOTE OBS te_gzip_chunked | ok=1 st=200 cl=?12150 n=12 body=2\r\nhi\r\n0\r\n\r\n
+OK   hep_cl_te_gzip_chunked
+RUN  hep_cl_te_chunked_caps
+  NOTE OBS te_chunked_caps | ok=1 st=200 cl=?12150 n=2 body=hi
+OK   hep_cl_te_chunked_caps
+RUN  hep_cl_te_cl_then_chunked_order
+  NOTE OBS te_cl_then_chunked_order | ok=1 st=200 cl=50 n=2 body=hi
+OK   hep_cl_te_cl_then_chunked_order
+RUN  hep_cl_te_chunked_plus_cl
+  NOTE OBS te_chunked_plus_cl | ok=1 st=200 cl=1 n=2 body=hi
+OK   hep_cl_te_chunked_plus_cl
+RUN  hep_cl_cl_on_head_like_304
+  NOTE OBS cl_on_head_like_304 | ok=1 st=304 cl=2 n=2 body=hi
+OK   hep_cl_cl_on_head_like_304
+RUN  hep_cl_cl_float
+  NOTE OBS cl_float | ok=1 st=200 cl=1.5 n=1 body=h
+OK   hep_cl_cl_float
+RUN  hep_cl_cl_lowercase_name
+  NOTE OBS cl_lowercase_name | ok=1 st=200 cl=1 n=1 body=h
+OK   hep_cl_cl_lowercase_name
+RUN  hep_cl_cl_empty
+  NOTE OBS cl_empty | ok=1 st=200 cl= n=0 body=
+OK   hep_cl_cl_empty
+RUN  hep_cl_cl_inner_space
+  NOTE OBS cl_inner_space | ok=1 st=200 cl=1 1 n=1 body=h
+OK   hep_cl_cl_inner_space
+RUN  hep_cl_cl_spaces_around
+  NOTE OBS cl_spaces_around | ok=1 st=200 cl=1 n=1 body=h
+OK   hep_cl_cl_spaces_around
+RUN  hep_cl_cl_leading_zeros
+  NOTE OBS cl_leading_zeros | ok=1 st=200 cl=0001 n=1 body=h
+OK   hep_cl_cl_leading_zeros
+RUN  hep_cl_cl_hex
+  NOTE OBS cl_hex | ok=1 st=200 cl=0x1 n=0 body=
+OK   hep_cl_cl_hex
+RUN  hep_cl_cl_plus_sign
+  NOTE OBS cl_plus_sign | ok=1 st=200 cl=+1 n=0 body=
+OK   hep_cl_cl_plus_sign
+RUN  hep_cl_cl_numeric_prefix
+  NOTE OBS cl_numeric_prefix | ok=1 st=200 cl=1abc n=1 body=h
+OK   hep_cl_cl_numeric_prefix
+RUN  hep_cl_cl_non_numeric
+  NOTE OBS cl_non_numeric | ok=1 st=200 cl=abc n=0 body=
+OK   hep_cl_cl_non_numeric
+RUN  hep_cl_cl_list_conflict
+  NOTE OBS cl_list_conflict | ok=1 st=200 cl=1, 2 n=1 body=h
+OK   hep_cl_cl_list_conflict
+RUN  hep_cl_cl_list_equal
+  NOTE OBS cl_list_equal | ok=1 st=200 cl=2, 2 n=2 body=hi
+OK   hep_cl_cl_list_equal
+RUN  hep_cl_cl_dup_conflict_big_first
+  NOTE OBS cl_dup_conflict_big_first | ok=1 st=200 cl=2 n=2 body=hi
+OK   hep_cl_cl_dup_conflict_big_first
+RUN  hep_cl_cl_dup_conflict_small_first
+  NOTE OBS cl_dup_conflict_small_first | ok=1 st=200 cl=1 n=1 body=h
+OK   hep_cl_cl_dup_conflict_small_first
+RUN  hep_cl_cl_dup_equal
+  NOTE OBS cl_dup_equal | ok=1 st=200 cl=2 n=2 body=hi
+OK   hep_cl_cl_dup_equal
+RUN  hep_cl_cl_4294967298
+  NOTE OBS cl_4294967298 | ok=1 st=200 cl=4294967298 n=2 body=hi
+OK   hep_cl_cl_4294967298
+RUN  hep_cl_cl_4294967296
+  NOTE OBS cl_4294967296 | ok=1 st=200 cl=4294967296 n=2 body=hi
+OK   hep_cl_cl_4294967296
+RUN  hep_cl_cl_4294967295
+  NOTE OBS cl_4294967295 | ok=1 st=200 cl=4294967295 n=2 body=hi
+OK   hep_cl_cl_4294967295
+RUN  hep_cl_cl_huge_20_digits
+  NOTE OBS cl_huge_20_digits | ok=0 err=12153
+OK   hep_cl_cl_huge_20_digits
+RUN  hep_cl_cl_negative_big
+  NOTE OBS cl_negative_big | ok=1 st=200 cl=-100 n=0 body=
+OK   hep_cl_cl_negative_big
+RUN  hep_cl_cl_negative
+  NOTE OBS cl_negative | ok=1 st=200 cl=-1 n=0 body=
+OK   hep_cl_cl_negative
+RUN  hep_cl_cl_larger_then_close
+  NOTE OBS cl_larger_then_close | ok=1 st=200 cl=5 n=2 body=hi
+OK   hep_cl_cl_larger_then_close
+RUN  hep_cl_cl_smaller
+  NOTE OBS cl_smaller | ok=1 st=200 cl=1 n=1 body=h
+OK   hep_cl_cl_smaller
+RUN  hep_cl_cl_zero_with_bytes
+  NOTE OBS cl_zero_with_bytes | ok=1 st=200 cl=0 n=0 body=
+OK   hep_cl_cl_zero_with_bytes
+RUN  hep_cl_cl_exact
+  NOTE OBS cl_exact | ok=1 st=200 cl=2 n=2 body=hi
+OK   hep_cl_cl_exact
+RUN  hep_hdr_split_set_cookie_injected_by_lf
+  NOTE OBS split_set_cookie_injected_by_lf | ok=1 st=200 ver=HTTP/1.1 txt=OK h=inj=1 n=2 body=hi
+OK   hep_hdr_split_set_cookie_injected_by_lf
+RUN  hep_hdr_split_header_value_crlf_crlf
+  NOTE OBS split_header_value_crlf_crlf | ok=1 st=200 ver=HTTP/1.1 txt=OK h=?12150 n=49 body=HTTP/1.1 200 OK\r\nX-Evil: 1\r\nContent-Length: 0\r\n\r
+OK   hep_hdr_split_header_value_crlf_crlf
+RUN  hep_hdr_split_second_status_in_headers
+  NOTE OBS split_second_status_in_headers | ok=1 st=200 ver=HTTP/1.1 txt=OK h=/evil n=2 body=hi
+OK   hep_hdr_split_second_status_in_headers
+RUN  hep_hdr_high_bytes_value
+  NOTE OBS high_bytes_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=\xff\xfe\x80 n=2 body=hi
+OK   hep_hdr_high_bytes_value
+RUN  hep_hdr_ctl_esc_in_name
+  NOTE OBS ctl_esc_in_name | ok=1 st=200 ver=HTTP/1.1 txt=OK h=w n=2 body=hi
+OK   hep_hdr_ctl_esc_in_name
+RUN  hep_hdr_ctl_bare_cr_in_value
+  NOTE OBS ctl_bare_cr_in_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=2 body=hi
+OK   hep_hdr_ctl_bare_cr_in_value
+RUN  hep_hdr_ctl_del_in_value
+  NOTE OBS ctl_del_in_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a\x7fb n=2 body=hi
+OK   hep_hdr_ctl_del_in_value
+RUN  hep_hdr_ctl_bell_in_value
+  NOTE OBS ctl_bell_in_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a\x07b n=2 body=hi
+OK   hep_hdr_ctl_bell_in_value
+RUN  hep_hdr_nul_in_content_length
+  NOTE OBS nul_in_content_length | ok=1 st=200 ver=HTTP/1.1 txt=OK h=2\x000 n=2 body=hi
+OK   hep_hdr_nul_in_content_length
+RUN  hep_hdr_nul_before_terminator
+  NOTE OBS nul_before_terminator | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_nul_before_terminator
+RUN  hep_hdr_nul_line
+  NOTE OBS nul_line | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_nul_line
+RUN  hep_hdr_nul_in_name
+  NOTE OBS nul_in_name | ok=1 st=200 ver=HTTP/1.1 txt=OK h=w n=2 body=hi
+OK   hep_hdr_nul_in_name
+RUN  hep_hdr_nul_at_value_start
+  NOTE OBS nul_at_value_start | ok=1 st=200 ver=HTTP/1.1 txt=OK h=\x00b n=2 body=hi
+OK   hep_hdr_nul_at_value_start
+RUN  hep_hdr_nul_in_value
+  NOTE OBS nul_in_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a\x00b n=2 body=hi
+OK   hep_hdr_nul_in_value
+RUN  hep_hdr_duplicate_first_wins
+  NOTE OBS duplicate_first_wins | ok=1 st=200 ver=HTTP/1.1 txt=OK h=one n=2 body=hi
+OK   hep_hdr_duplicate_first_wins
+RUN  hep_hdr_name_utf8
+  NOTE OBS name_utf8 | ok=1 st=200 ver=HTTP/1.1 txt=OK h=w n=2 body=hi
+OK   hep_hdr_name_utf8
+RUN  hep_hdr_name_lowercase
+  NOTE OBS name_lowercase | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_name_lowercase
+RUN  hep_hdr_name_with_space
+  NOTE OBS name_with_space | ok=1 st=200 ver=HTTP/1.1 txt=OK h=?87 n=2 body=hi
+OK   hep_hdr_name_with_space
+RUN  hep_hdr_empty_name
+  NOTE OBS empty_name | ok=1 st=200 ver=HTTP/1.1 txt=OK h=w n=2 body=hi
+OK   hep_hdr_empty_name
+RUN  hep_hdr_no_colon_line_after
+  NOTE OBS no_colon_line_after | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_no_colon_line_after
+RUN  hep_hdr_no_colon_line_before
+  NOTE OBS no_colon_line_before | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_no_colon_line_before
+RUN  hep_hdr_double_colon
+  NOTE OBS double_colon | ok=1 st=200 ver=HTTP/1.1 txt=OK h=: v n=2 body=hi
+OK   hep_hdr_double_colon
+RUN  hep_hdr_colon_in_value
+  NOTE OBS colon_in_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a:b: c n=2 body=hi
+OK   hep_hdr_colon_in_value
+RUN  hep_hdr_empty_value_space
+  NOTE OBS empty_value_space | ok=1 st=200 ver=HTTP/1.1 txt=OK h= n=2 body=hi
+OK   hep_hdr_empty_value_space
+RUN  hep_hdr_empty_value
+  NOTE OBS empty_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h= n=2 body=hi
+OK   hep_hdr_empty_value
+RUN  hep_hdr_ws_inner_spaces
+  NOTE OBS ws_inner_spaces | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a   b n=2 body=hi
+OK   hep_hdr_ws_inner_spaces
+RUN  hep_hdr_ws_trailing_tabs
+  NOTE OBS ws_trailing_tabs | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_ws_trailing_tabs
+RUN  hep_hdr_ws_many_spaces_value
+  NOTE OBS ws_many_spaces_value | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_ws_many_spaces_value
+RUN  hep_hdr_ws_no_space_after_colon
+  NOTE OBS ws_no_space_after_colon | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_ws_no_space_after_colon
+RUN  hep_hdr_ws_tab_before_colon
+  NOTE OBS ws_tab_before_colon | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_ws_tab_before_colon
+RUN  hep_hdr_ws_before_colon
+  NOTE OBS ws_before_colon | ok=1 st=200 ver=HTTP/1.1 txt=OK h=v n=2 body=hi
+OK   hep_hdr_ws_before_colon
+RUN  hep_hdr_fold_into_content_length
+  NOTE OBS fold_into_content_length | ok=1 st=200 ver=HTTP/1.1 txt=OK h= n=0 body=
+OK   hep_hdr_fold_into_content_length
+RUN  hep_hdr_fold_after_status_line
+  NOTE OBS fold_after_status_line | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=2 body=hi
+OK   hep_hdr_fold_after_status_line
+RUN  hep_hdr_fold_lf_only
+  NOTE OBS fold_lf_only | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=2 body=hi
+OK   hep_hdr_fold_lf_only
+RUN  hep_hdr_fold_empty_first
+  NOTE OBS fold_empty_first | ok=1 st=200 ver=HTTP/1.1 txt=OK h= n=2 body=hi
+OK   hep_hdr_fold_empty_first
+RUN  hep_hdr_fold_only_ws_line
+  NOTE OBS fold_only_ws_line | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=23 body=Content-Length: 2\r\n\r\nhi
+OK   hep_hdr_fold_only_ws_line
+RUN  hep_hdr_fold_many_lines
+  NOTE OBS fold_many_lines | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=2 body=hi
+OK   hep_hdr_fold_many_lines
+RUN  hep_hdr_fold_tab
+  NOTE OBS fold_tab | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=2 body=hi
+OK   hep_hdr_fold_tab
+RUN  hep_hdr_fold_space
+  NOTE OBS fold_space | ok=1 st=200 ver=HTTP/1.1 txt=OK h=a n=2 body=hi
+OK   hep_hdr_fold_space
+RUN  hep_ka_many_requests_one_socket
+OK   hep_ka_many_requests_one_socket
+RUN  hep_ka_close_delimited_http11_new_connection
+OK   hep_ka_close_delimited_http11_new_connection
+RUN  hep_interim_103_link_headers_not_merged
+  NOTE OBS 103 send ok=1 err=0
+  NOTE OBS 103 raw: HTTP/1.1 200 OK\r\nX-Final: y\r\nContent-Length: 2\r\n\r\n
+  NOTE OBS 103 Link visible=0
+OK   hep_interim_103_link_headers_not_merged
+RUN  hep_expect_100_headers_not_merged
+  NOTE OBS interim header visible=0 (ERROR_HTTP_HEADER_NOT_FOUND)
+OK   hep_expect_100_headers_not_merged
+RUN  hep_unsolicited_100_without_expect
+OK   hep_unsolicited_100_without_expect
+RUN  hep_expect_final_200_without_100
+  NOTE OBS expect_final_200 | ok=1 st=200 n=4 body=skip
+  NOTE OBS expect_final_200: Expect header on wire=100-continue body seen=payload! (0 ms)
+OK   hep_expect_final_200_without_100
+RUN  hep_expect_417_without_reading_body
+  NOTE OBS expect_417 | ok=1 st=417 n=2 body=no
+  NOTE OBS expect_417: Expect header on wire=100-continue body seen=(not read) (0 ms)
+OK   hep_expect_417_without_reading_body
+RUN  hep_expect_no_100_server_waits_body
+  NOTE OBS expect_no_100: Expect header on wire=100-continue body seen=payload! (0 ms)
+OK   hep_expect_no_100_server_waits_body
+RUN  hep_expect_slow_100
+  NOTE OBS expect_slow_100: Expect header on wire=100-continue body seen=payload! (1500 ms)
+OK   hep_expect_slow_100
+RUN  hep_expect_100_then_200
+  NOTE OBS expect_100_200: Expect header on wire=100-continue body seen=payload! (0 ms)
+OK   hep_expect_100_then_200
+RUN  hep_early_reply_large_post_not_read
+  NOTE OBS early_large_noread | ok=1 st=413 n=3 body=big
+  NOTE early_large_noread: 31 ms, server events 3
+OK   hep_early_reply_large_post_not_read
+RUN  hep_early_reply_large_post_drained
+  NOTE OBS early_large_drain | ok=1 st=200 n=5 body=early
+  NOTE early_large_drain: 16 ms, server events 3
+OK   hep_early_reply_large_post_drained
+RUN  hep_early_reply_small_post_not_read
+  NOTE OBS early_small_noread | ok=1 st=413 n=3 body=big
+  NOTE early_small_noread: 0 ms, server events 3
+OK   hep_early_reply_small_post_not_read
+RUN  hep_early_reply_small_post_drained
+  NOTE early_small_drain: 0 ms, server events 6
+OK   hep_early_reply_small_post_drained
+RUN  hep_early_close_before_last_chunk
+  NOTE OBS close_no_last | ok=1 st=200 n=4 body=abcd
+OK   hep_early_close_before_last_chunk
+RUN  hep_early_close_mid_chunk_size
+  NOTE OBS close_chunk_size | ok=1 st=200 n=0 body=
+OK   hep_early_close_mid_chunk_size
+RUN  hep_early_shutwr_after_headers_cl
+  NOTE OBS shut_after_hdr | ok=1 st=200 n=0 body=
+OK   hep_early_shutwr_after_headers_cl
+RUN  hep_early_shutwr_mid_chunked
+  NOTE OBS shut_mid_chunk | ok=1 st=200 n=2 body=ab
+OK   hep_early_shutwr_mid_chunked
+RUN  hep_early_shutwr_mid_body
+  NOTE OBS shut_mid_body | ok=1 st=200 n=2 body=ab
+OK   hep_early_shutwr_mid_body
+RUN  hep_early_reset_close_delimited
+  NOTE OBS rst_closedelim | ok=1 st=200 rerr=12031 n=0 body=
+OK   hep_early_reset_close_delimited
+RUN  hep_early_reset_mid_chunked
+  NOTE OBS rst_mid_chunk | ok=1 st=200 rerr=12031 n=0 body=
+OK   hep_early_reset_mid_chunked
+RUN  hep_early_reset_mid_body
+  NOTE OBS rst_mid_body | ok=1 st=200 rerr=12031 n=0 body=
+OK   hep_early_reset_mid_body
+RUN  hep_early_reset_after_headers
+  NOTE OBS rst_after_hdr | ok=1 st=200 rerr=12031 n=0 body=
+OK   hep_early_reset_after_headers
+RUN  hep_early_reset_mid_headers
+  NOTE OBS rst_mid_hdr | ok=0 err=12031
+OK   hep_early_reset_mid_headers
+RUN  hep_early_reset_after_status
+  NOTE OBS rst_after_status | ok=0 err=12031
+OK   hep_early_reset_after_status
+RUN  hep_early_reset_mid_status
+  NOTE OBS rst_status | ok=0 err=12031
+OK   hep_early_reset_mid_status
+RUN  hep_early_reset_before_any_byte
+  NOTE OBS rst_0 | ok=0 err=12031
+OK   hep_early_reset_before_any_byte
+RUN  hep_early_close_before_any_byte
+  NOTE OBS close_0 | ok=0 err=12152
+OK   hep_early_close_before_any_byte
+RUN  hep_stale_close_after_reading_second_head_post
+  NOTE OBS stale race post 2 | ok=1 st=200 n=3 body=two
+  NOTE OBS stale race POST: conns=2 reqs=3
+OK   hep_stale_close_after_reading_second_head_post
+RUN  hep_stale_reset_after_reading_second_head
+  NOTE OBS stale rst race 2 | ok=1 st=200 n=3 body=two
+  NOTE OBS stale rst race GET: conns=2 reqs=3
+OK   hep_stale_reset_after_reading_second_head
+RUN  hep_stale_close_after_reading_second_head
+  NOTE OBS stale race 2 | ok=1 st=200 n=3 body=two
+  NOTE OBS stale race GET: conns=2 reqs=3
+OK   hep_stale_close_after_reading_second_head
+RUN  hep_stale_server_reset_after_reply
+OK   hep_stale_server_reset_after_reply
+RUN  hep_stale_server_closed_after_reply
+OK   hep_stale_server_closed_after_reply
+RUN  hep_ka_http10_reply_keepalive_token_case
+  NOTE OBS HTTP/1.0 Connection: [Keep-Alive] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE OBS HTTP/1.0 Connection: [keep-alive] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE OBS HTTP/1.0 Connection: [KEEP-ALIVE] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE OBS HTTP/1.0 Connection: [keepalive] -> second=ok=1 st=200 n=5 body=fresh conns=2
+OK   hep_ka_http10_reply_keepalive_token_case
+RUN  hep_ka_connection_token_table
+  NOTE OBS Connection: [close] -> second=ok=1 st=200 n=5 body=fresh conns=2
+  NOTE OBS Connection: [Close] -> second=ok=1 st=200 n=5 body=fresh conns=2
+  NOTE OBS Connection: [CLOSE] -> second=ok=1 st=200 n=5 body=fresh conns=2
+  NOTE OBS Connection: [keep-alive, close] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE OBS Connection: [close, keep-alive] -> second=ok=1 st=200 n=5 body=fresh conns=2
+  NOTE OBS Connection: [Upgrade, close] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE OBS Connection: [ close ] -> second=ok=1 st=200 n=5 body=fresh conns=2
+  NOTE OBS Connection: [closed] -> second=ok=1 st=200 n=5 body=fresh conns=2
+  NOTE OBS Connection: [clos] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE OBS Connection: [TE, close] -> second=ok=1 st=200 n=6 body=reused conns=1
+  NOTE timing: hep_ka_connection_token_table took 10094 ms
+OK   hep_ka_connection_token_table
+RUN  hep_ka_connection_close_honoured_even_if_socket_stays
+OK   hep_ka_connection_close_honoured_even_if_socket_stays
+RUN  hep_ka_204_reply_with_body_bytes
+  NOTE OBS 204 body first | ok=1 st=204 n=0 body=
+  NOTE OBS 204 body second | ok=1 st=200 n=5 body=fresh
+  NOTE OBS 204 body: conns=2
+OK   hep_ka_204_reply_with_body_bytes
+RUN  hep_ka_304_reply_with_body_bytes
+  NOTE OBS 304 body first | ok=1 st=304 n=4 body=body
+  NOTE OBS 304 body second | ok=1 st=200 n=6 body=second
+  NOTE OBS 304 body: conns=1
+OK   hep_ka_304_reply_with_body_bytes
+RUN  hep_ka_head_reply_with_body_bytes
+  NOTE OBS head body second | ok=1 st=200 n=5 body=fresh
+  NOTE OBS head body: conns=2
+OK   hep_ka_head_reply_with_body_bytes
+RUN  hep_ka_chunked_then_garbage
+  NOTE OBS chunked garbage second | ok=1 st=200 n=6 body=second
+  NOTE OBS chunked garbage: conns=1
+OK   hep_ka_chunked_then_garbage
+RUN  hep_ka_cl_shorter_than_body
+  NOTE OBS short cl second | ok=1 st=200 n=5 body=fresh
+  NOTE OBS short cl: conns=2
+OK   hep_ka_cl_shorter_than_body
+RUN  hep_ka_extra_full_response_in_same_write
+  NOTE OBS split second | ok=1 st=200 n=5 body=fresh
+  NOTE OBS split: conns=2 reqs=2
+OK   hep_ka_extra_full_response_in_same_write
+RUN  hep_ka_trailing_garbage_after_body
+  NOTE OBS garbage second | ok=1 st=200 n=5 body=fresh
+  NOTE OBS garbage: conns=2 reqs=2
+OK   hep_ka_trailing_garbage_after_body
+SUMMARY tests=350 failed=0 skipped=0 checks_pass=1316 checks_fail=0
+@@I7 END http_edge_protocol exit=0x0 ms=167345 timeout=0 bytes=75542

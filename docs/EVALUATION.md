@@ -82,3 +82,36 @@ Pattern across areas: each had one or more Win10-validated boots, and then a lat
 - To get master in a usable state quickly, merge the infrastructure plus the areas whose validated cores have run (see the list above), flag the unrun files in the commit message, and leave the four unfinished areas on the branch.
 - Per your request, delete the `workflow` branch and push to master only after this evaluation is accepted. This run did neither.
 - Keep `workflows/RESUME.md` and the journals, for example under `docs/`, because they are the only record of what each agent returned.
+
+
+## Win10 run at tip (added after the evaluation above)
+
+The evaluation above was written before a VM was available. The corpus was then run on local Win10 22H2 guests (base `bb depot get m2`, ntdll 10.0.19041.2788, UBR 2965; `win10vm.sh` from industrial7 with `tools/vm_run_local.sh`, one boot per area, 7 in parallel). Transcripts are in `results/win10/`.
+
+Result: 7 of 21 areas PASS, 14 FAIL, none crashed or timed out. Failures are not triaged: each is either a wrong expectation (the unrun post-VM review files predicted in the evaluation) or a real harness issue (several involve HTTPS, e.g. `rsp_life_https_response_headers`, `ck_wire_https_secure_cookie_sent`, `netlb_https_tls12_only_server`).
+
+| area | result | tests | failed tests | failed checks |
+|---|---|---|---|---|
+| async_callbacks | FAIL | 243 | 1 | 2 |
+| cookies | FAIL | 359 | 1 | 4 |
+| core_smoke | PASS | 3 | 0 | 0 |
+| ftp_client | FAIL | 289 | 6 | 11 |
+| gopher_and_stubs | PASS | 195 | 0 | 0 |
+| http_auth | FAIL | 237 | 2 | 4 |
+| http_body_io | PASS | 508 | 0 | 0 |
+| http_cache_integration | PASS | 250 | 0 | 0 |
+| http_edge_protocol | PASS | 350 | 0 | 0 |
+| http_redirect_status | FAIL | 358 | 2 | 2 |
+| http_request_wire | PASS | 362 | 0 | 0 |
+| http_response_headers | FAIL | 190 | 2 | 7 |
+| https_tls | PASS | 203 | 0 | 0 |
+| net_loopback | FAIL | 26 | 1 | 1 |
+| options_table | FAIL | 143 | 4 | 5 |
+| proxy_connectivity | FAIL | 239 | 1 | 1 |
+| session_handles | FAIL | 222 | 1 | 1 |
+| time_and_misc_helpers | FAIL | 164 | 4 | 5 |
+| url_crack | PASS | 934 | 0 | 0 |
+| urlcache_entries | FAIL | 304 | 1 | 2 |
+| urlcache_enum_groups | FAIL | 183 | 20 | 48 |
+
+Note `urlcache_enum_groups` (20 failed, 25 skipped) has never passed and is the largest gap; the others are 1-6 failures each. `https_tls`, `http_request_wire`, `http_edge_protocol`, `http_body_io` and `http_cache_integration` pass completely at tip.

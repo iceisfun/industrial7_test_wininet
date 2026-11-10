@@ -1,0 +1,960 @@
+RUN  hrw_zz_phase_timing
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE round 0 ms: srv_start=0 open=31 send=47 read=0 wait=0 close_req=0 close_conn=0 close_sess=0 srv_stop=1000
+  NOTE round 1 ms: srv_start=0 open=0 send=0 read=0 wait=0 close_req=0 close_conn=0 close_sess=0 srv_stop=1000
+OK   hrw_zz_phase_timing
+RUN  hrw_conn2_proxy_connection_header_dropped_direct
+OK   hrw_conn2_proxy_connection_header_dropped_direct
+RUN  hrw_conn2_close_via_addheaders
+OK   hrw_conn2_close_via_addheaders
+RUN  hrw_conn2_explicit_keepalive_header
+OK   hrw_conn2_explicit_keepalive_header
+RUN  hrw_cache2_no_validators_unconditional
+  NOTE revalidation names: User-Agent|Host
+OK   hrw_cache2_no_validators_unconditional
+RUN  hrw_cache2_weak_etag
+  NOTE revalidation names: User-Agent|Host|If-None-Match
+OK   hrw_cache2_weak_etag
+RUN  hrw_cache2_etag_only
+  NOTE revalidation names: User-Agent|Host|If-None-Match
+OK   hrw_cache2_etag_only
+RUN  hrw_cache2_last_modified_only
+  NOTE revalidation names: User-Agent|Host|If-Modified-Since
+OK   hrw_cache2_last_modified_only
+RUN  hrw_redir2_same_server_reuses_connection
+OK   hrw_redir2_same_server_reuses_connection
+RUN  hrw_redir2_no_auto_redirect_single_request
+OK   hrw_redir2_no_auto_redirect_single_request
+RUN  hrw_redir2_custom_header_cross_port
+  NOTE cross-port redirect: X-Carry=c Authorization=(null) Referer=http://ref.example/
+  NOTE req 0 conn 0: GET /h HTTP/1.1\r\nReferer: http://ref.example/\r\nX-Carry: c\r\nUser-Agent: xr/2\r\nCache-Control: no-cache\r\nHost: 127.0.0.1:49696\r\nConnection: Keep-Alive\r\n\r\n
+OK   hrw_redir2_custom_header_cross_port
+RUN  hrw_redir2_post_cross_port_becomes_get
+  NOTE POST redirected to other port: names Referer|User-Agent|Cache-Control|Host|Connection
+  NOTE req 0 conn 0: GET /landing?q=1 HTTP/1.1\r\nReferer: http://ref.example/\r\nUser-Agent: xr/1\r\nCache-Control: no-cache\r\nHost: 127.0.0.1:49700\r\nConnection: Keep-Alive\r\n\r\n
+OK   hrw_redir2_post_cross_port_becomes_get
+RUN  hrw_redir2_get_cross_port
+  NOTE GET redirected to other port: names Referer|User-Agent|Cache-Control|Host|Connection
+  NOTE req 0 conn 0: GET /landing?q=1 HTTP/1.1\r\nReferer: http://ref.example/\r\nUser-Agent: xr/1\r\nCache-Control: no-cache\r\nHost: 127.0.0.1:49704\r\nConnection: Keep-Alive\r\n\r\n
+OK   hrw_redir2_get_cross_port
+RUN  hrw_proxy2_post_header_set
+  NOTE proxy POST names: User-Agent|Host|Content-Length|Pragma
+OK   hrw_proxy2_post_header_set
+RUN  hrw_proxy2_no_reload_header_set
+  NOTE proxy without RELOAD: User-Agent|Host
+OK   hrw_proxy2_no_reload_header_set
+RUN  hrw_proxy2_all_schemes_form
+OK   hrw_proxy2_all_schemes_form
+RUN  hrw_proxy2_bypass_wildcard
+OK   hrw_proxy2_bypass_wildcard
+RUN  hrw_proxy2_bypass_other_host_uses_proxy
+OK   hrw_proxy2_bypass_other_host_uses_proxy
+RUN  hrw_proxy2_bypass_ip_goes_direct
+OK   hrw_proxy2_bypass_ip_goes_direct
+RUN  hrw_ka_retry_post_resends_body
+  NOTE POST after RST: ok=1 status=200 requests=3 conns=2
+OK   hrw_ka_retry_post_resends_body
+RUN  hrw_ka_retry_after_server_close
+  NOTE second request after FIN without reply: ok=1 status=200 requests=3 conns=2
+OK   hrw_ka_retry_after_server_close
+RUN  hrw_ka_retry_after_server_reset
+  NOTE second request after RST on the pooled socket: ok=1 err=0 status=200 requests=3 conns=2
+OK   hrw_ka_retry_after_server_reset
+RUN  hrw_body2_sendex_buffer_length_ignored_without_ptr
+OK   hrw_body2_sendex_buffer_length_ignored_without_ptr
+RUN  hrw_body2_sendex_get_with_total
+OK   hrw_body2_sendex_get_with_total
+RUN  hrw_body2_post_keepalive_reuse
+OK   hrw_body2_post_keepalive_reuse
+RUN  hrw_body2_head_with_optional
+OK   hrw_body2_head_with_optional
+RUN  hrw_body2_send_w_optional
+OK   hrw_body2_send_w_optional
+RUN  hrw_ref2_w_empty_ok
+OK   hrw_ref2_w_empty_ok
+RUN  hrw_ref2_w_nonascii_send_fails
+  NOTE W referer stored: q=1 err=0 value=http://r.example/café
+OK   hrw_ref2_w_nonascii_send_fails
+RUN  hrw_ref2_w_ascii_send_fails
+  NOTE W referer stored: q=1 err=0 value=http://r.example/
+OK   hrw_ref2_w_ascii_send_fails
+RUN  hrw_verb2_w_ver10_upgraded
+OK   hrw_verb2_w_ver10_upgraded
+RUN  hrw_verb2_w_lowercase
+OK   hrw_verb2_w_lowercase
+RUN  hrw_verb2_long
+OK   hrw_verb2_long
+RUN  hrw_obj2_https_absolute_direct
+OK   hrw_obj2_https_absolute_direct
+RUN  hrw_obj2_reserved_chars
+OK   hrw_obj2_reserved_chars
+RUN  hrw_obj2_semicolon_params
+OK   hrw_obj2_semicolon_params
+RUN  hrw_obj2_encoded_dot_segment
+OK   hrw_obj2_encoded_dot_segment
+RUN  hrw_obj2_trailing_dot_segment
+OK   hrw_obj2_trailing_dot_segment
+RUN  hrw_obj2_query_only
+OK   hrw_obj2_query_only
+RUN  hrw_obj2_tab
+OK   hrw_obj2_tab
+RUN  hrw_obj2_lone_percent
+OK   hrw_obj2_lone_percent
+RUN  hrw_obj2_backslash
+OK   hrw_obj2_backslash
+RUN  hrw_obj2_query_space
+OK   hrw_obj2_query_space
+RUN  hrw_inject_accept_crlf
+OK   hrw_inject_accept_crlf
+RUN  hrw_inject_object_crlf
+OK   hrw_inject_object_crlf
+RUN  hrw_inject_referer_crlf
+OK   hrw_inject_referer_crlf
+RUN  hrw_inject_agent_crlf
+OK   hrw_inject_agent_crlf
+RUN  hrw_resend_post_without_optional
+  NOTE POST re-send without optional: ok=0 err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE status=0; wire CL 5 body 
+OK   hrw_resend_post_without_optional
+RUN  hrw_resend_same_send_headers_not_duplicated
+OK   hrw_resend_same_send_headers_not_duplicated
+RUN  hrw_resend_send_headers_persist
+  NOTE re-send names: X-Once|User-Agent|Host|Cache-Control|Connection
+OK   hrw_resend_send_headers_persist
+RUN  hrw_add2_w_empty_rejected
+OK   hrw_add2_w_empty_rejected
+RUN  hrw_add2_w_replace
+OK   hrw_add2_w_replace
+RUN  hrw_add2_w_lf_only_lines
+OK   hrw_add2_w_lf_only_lines
+RUN  hrw_add2_value_with_crlf_continuation
+OK   hrw_add2_value_with_crlf_continuation
+RUN  hrw_add2_space_inside_name
+OK   hrw_add2_space_inside_name
+RUN  hrw_add2_coalesce_and_replace
+OK   hrw_add2_coalesce_and_replace
+RUN  hrw_add2_replace_and_if_new
+OK   hrw_add2_replace_and_if_new
+RUN  hrw_add2_user_agent_empty_value_allowed
+OK   hrw_add2_user_agent_empty_value_allowed
+RUN  hrw_add2_host_lowercase_name
+OK   hrw_add2_host_lowercase_name
+RUN  hrw_add2_replace_host_before_send_adds
+OK   hrw_add2_replace_host_before_send_adds
+RUN  hrw_add2_replace_user_agent_before_send_adds
+OK   hrw_add2_replace_user_agent_before_send_adds
+RUN  hrw_add2_remove_accept_from_open
+OK   hrw_add2_remove_accept_from_open
+RUN  hrw_add2_if_new_accept_from_open
+OK   hrw_add2_if_new_accept_from_open
+RUN  hrw_add2_add_second_referer
+OK   hrw_add2_add_second_referer
+RUN  hrw_add2_replace_referer_from_open
+OK   hrw_add2_replace_referer_from_open
+RUN  hrw_add2_if_new_referer_from_open
+OK   hrw_add2_if_new_referer_from_open
+RUN  hrw_add2_coalesce_duplicate_target
+OK   hrw_add2_coalesce_duplicate_target
+RUN  hrw_add2_semicolon_cookie_manual
+OK   hrw_add2_semicolon_cookie_manual
+RUN  hrw_add2_coalesce_same_call
+OK   hrw_add2_coalesce_same_call
+RUN  hrw_add2_if_new_same_name_twice_one_call
+OK   hrw_add2_if_new_same_name_twice_one_call
+RUN  hrw_add2_same_name_twice_one_call
+OK   hrw_add2_same_name_twice_one_call
+RUN  hrw_add2_lfcr_separator
+OK   hrw_add2_lfcr_separator
+RUN  hrw_add2_cr_only_separator
+OK   hrw_add2_cr_only_separator
+RUN  hrw_qi_version_request
+  NOTE request VERSION query for HTTP/1.0 open: HTTP/1.1 err 0
+OK   hrw_qi_version_request
+RUN  hrw_qi_raw_crlf_before_send
+  NOTE request block before send: DELETE /qr?x HTTP/1.1
+
+
+OK   hrw_qi_raw_crlf_before_send
+RUN  hrw_qi_before_send_no_ua_host
+OK   hrw_qi_before_send_no_ua_host
+RUN  hrw_qi_matrix_head
+OK   hrw_qi_matrix_head
+RUN  hrw_qi_matrix_put_manual
+OK   hrw_qi_matrix_put_manual
+RUN  hrw_qi_matrix_post_body
+OK   hrw_qi_matrix_post_body
+RUN  hrw_qi_matrix_get_ref_accept
+OK   hrw_qi_matrix_get_ref_accept
+RUN  hrw_qi_matrix_get
+OK   hrw_qi_matrix_get
+RUN  hrw_redirect_307_post_needs_confirmation
+OK   hrw_redirect_307_post_needs_confirmation
+RUN  hrw_redirect_303_put_becomes_get
+OK   hrw_redirect_303_put_becomes_get
+RUN  hrw_redirect_301_get_keeps_custom_headers
+OK   hrw_redirect_301_get_keeps_custom_headers
+RUN  hrw_redirect_302_post_becomes_get
+OK   hrw_redirect_302_post_becomes_get
+RUN  hrw_blocked_port_993
+OK   hrw_blocked_port_993
+RUN  hrw_blocked_port_143
+OK   hrw_blocked_port_143
+RUN  hrw_blocked_port_110
+OK   hrw_blocked_port_110
+RUN  hrw_blocked_port_21
+OK   hrw_blocked_port_21
+RUN  hrw_blocked_port_25
+OK   hrw_blocked_port_25
+RUN  hrw_no_decoding_user_accept_encoding_verbatim
+OK   hrw_no_decoding_user_accept_encoding_verbatim
+RUN  hrw_decoding_user_accept_encoding_kept
+OK   hrw_decoding_user_accept_encoding_kept
+RUN  hrw_decoding_option_on_session
+OK   hrw_decoding_option_on_session
+RUN  hrw_decoding_option_adds_accept_encoding
+OK   hrw_decoding_option_adds_accept_encoding
+RUN  hrw_openurl_userinfo_basic
+OK   hrw_openurl_userinfo_basic
+RUN  hrw_openurl_fragment_kept
+OK   hrw_openurl_fragment_kept
+RUN  hrw_openurl_no_path_is_slash
+OK   hrw_openurl_no_path_is_slash
+RUN  hrw_openurl_headers_param
+OK   hrw_openurl_headers_param
+RUN  hrw_https_ignored_cert_not_reused
+  NOTE TLS attempt 0: err=12030 ERROR_INTERNET_CONNECTION_ABORTED conns=1 (retrying)
+OK   hrw_https_ignored_cert_not_reused
+RUN  hrw_https_post_body
+OK   hrw_https_post_body
+RUN  hrw_https_request_line_and_host
+OK   hrw_https_request_line_and_host
+RUN  hrw_queryinfo_request_headers_match_wire
+OK   hrw_queryinfo_request_headers_match_wire
+RUN  hrw_resend_same_handle
+OK   hrw_resend_same_handle
+RUN  hrw_host_custom_in_send_headers
+OK   hrw_host_custom_in_send_headers
+RUN  hrw_host_custom_header_wins
+  NOTE req 0 conn 0: GET /hc HTTP/1.1\r\nHost: virtual.example:8080\r\nUser-Agent: hc/1\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_host_custom_header_wins
+RUN  hrw_host_ipv6_openurl
+OK   hrw_host_ipv6_openurl
+RUN  hrw_host_ipv6_bracketed
+OK   hrw_host_ipv6_bracketed
+RUN  hrw_host_ipv6_literal
+OK   hrw_host_ipv6_literal
+RUN  hrw_host_localhost_upper
+OK   hrw_host_localhost_upper
+RUN  hrw_host_localhost
+OK   hrw_host_localhost
+RUN  hrw_host_ipv4_port
+OK   hrw_host_ipv4_port
+RUN  hrw_ua_option_after_request_open
+OK   hrw_ua_option_after_request_open
+RUN  hrw_ua_option_on_session
+OK   hrw_ua_option_on_session
+RUN  hrw_ua_w_nonascii
+  NOTE req 0 conn 0: GET /uw HTTP/1.1\r\nUser-Agent: agent-\xe9\r\nHost: 127.0.0.1:49903\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_ua_w_nonascii
+RUN  hrw_ua_inner_spaces_kept
+OK   hrw_ua_inner_spaces_kept
+RUN  hrw_ua_long
+OK   hrw_ua_long
+RUN  hrw_ua_null_absent
+OK   hrw_ua_null_absent
+RUN  hrw_ua_blank_absent
+OK   hrw_ua_blank_absent
+RUN  hrw_ua_empty_absent
+OK   hrw_ua_empty_absent
+RUN  hrw_ua_trimmed
+OK   hrw_ua_trimmed
+RUN  hrw_ua_plain
+OK   hrw_ua_plain
+RUN  hrw_accept_w_types
+OK   hrw_accept_w_types
+RUN  hrw_accept_with_referer_order
+OK   hrw_accept_with_referer_order
+RUN  hrw_accept_empty_string_entry
+OK   hrw_accept_empty_string_entry
+RUN  hrw_accept_padded_entry
+OK   hrw_accept_padded_entry
+RUN  hrw_accept_duplicates_kept
+OK   hrw_accept_duplicates_kept
+RUN  hrw_accept_three_types_q
+OK   hrw_accept_three_types_q
+RUN  hrw_accept_empty_array
+OK   hrw_accept_empty_array
+RUN  hrw_accept_star
+OK   hrw_accept_star
+RUN  hrw_accept_two_types
+OK   hrw_accept_two_types
+RUN  hrw_ref_relative_text_kept
+OK   hrw_ref_relative_text_kept
+RUN  hrw_ref_empty_not_sent
+OK   hrw_ref_empty_not_sent
+RUN  hrw_ref_header_sent
+OK   hrw_ref_header_sent
+RUN  hrw_ver_global_option_10
+  NOTE req 0 conn 0: GET /gv HTTP/1.1\r\nUser-Agent: gv/1\r\nHost: 127.0.0.1:49943\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_ver_global_option_10
+RUN  hrw_ver_garbage
+OK   hrw_ver_garbage
+RUN  hrw_ver_prefix_only
+  NOTE version 'HTTP/' -> line "GET /ver HTTP/1.1"
+OK   hrw_ver_prefix_only
+RUN  hrw_ver_malformed_number
+  NOTE version 'HTTP/a.b' -> line "GET /ver HTTP/1.1"
+OK   hrw_ver_malformed_number
+RUN  hrw_ver_lowercase
+OK   hrw_ver_lowercase
+RUN  hrw_ver_20_text
+OK   hrw_ver_20_text
+RUN  hrw_ver_10_upgraded_no_connection_header
+OK   hrw_ver_10_upgraded_no_connection_header
+RUN  hrw_ver_10_lowercase_upgraded
+OK   hrw_ver_10_lowercase_upgraded
+RUN  hrw_ver_12_verbatim
+OK   hrw_ver_12_verbatim
+RUN  hrw_ver_09_upgraded_to_11
+OK   hrw_ver_09_upgraded_to_11
+RUN  hrw_ver_10_upgraded_to_11
+OK   hrw_ver_10_upgraded_to_11
+RUN  hrw_ver_explicit_11
+OK   hrw_ver_explicit_11
+RUN  hrw_ver_empty_is_11
+OK   hrw_ver_empty_is_11
+RUN  hrw_ver_null_is_11
+OK   hrw_ver_null_is_11
+RUN  hrw_obj_w_ascii_same_as_a
+OK   hrw_obj_w_ascii_same_as_a
+RUN  hrw_obj_long_path
+OK   hrw_obj_long_path
+RUN  hrw_obj_quote_and_angle
+OK   hrw_obj_quote_and_angle
+RUN  hrw_obj_double_slash
+OK   hrw_obj_double_slash
+RUN  hrw_obj_absolute_uri_direct
+OK   hrw_obj_absolute_uri_direct
+RUN  hrw_obj_star
+OK   hrw_obj_star
+RUN  hrw_obj_dotdot_above_root_kept
+OK   hrw_obj_dotdot_above_root_kept
+RUN  hrw_obj_dot_segments_with_query
+OK   hrw_obj_dot_segments_with_query
+RUN  hrw_obj_dot_segments_removed
+OK   hrw_obj_dot_segments_removed
+RUN  hrw_obj_no_leading_slash
+OK   hrw_obj_no_leading_slash
+RUN  hrw_obj_fragment
+OK   hrw_obj_fragment
+RUN  hrw_obj_space_escaped
+OK   hrw_obj_space_escaped
+RUN  hrw_obj_percent_kept
+OK   hrw_obj_percent_kept
+RUN  hrw_obj_query_kept
+OK   hrw_obj_query_kept
+RUN  hrw_obj_empty_is_slash
+OK   hrw_obj_empty_is_slash
+RUN  hrw_obj_null_is_slash
+OK   hrw_obj_null_is_slash
+RUN  hrw_verb_blank_rejected
+OK   hrw_verb_blank_rejected
+RUN  hrw_verb_crlf_rejected
+OK   hrw_verb_crlf_rejected
+RUN  hrw_verb_inner_space_rejected
+OK   hrw_verb_inner_space_rejected
+RUN  hrw_verb_track_rejected
+OK   hrw_verb_track_rejected
+RUN  hrw_verb_trace_rejected
+OK   hrw_verb_trace_rejected
+RUN  hrw_verb_empty_is_get
+OK   hrw_verb_empty_is_get
+RUN  hrw_verb_null_is_get
+OK   hrw_verb_null_is_get
+RUN  hrw_verb_token_chars
+  NOTE verb 'X-CUSTOM_VERB.1': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_token_chars
+RUN  hrw_verb_tabs
+  NOTE verb '	PUT	': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_tabs
+RUN  hrw_verb_trailing_space
+  NOTE verb 'GET  ': User-Agent|Host|Cache-Control
+OK   hrw_verb_trailing_space
+RUN  hrw_verb_leading_space
+  NOTE verb '  GET': User-Agent|Host|Cache-Control
+OK   hrw_verb_leading_space
+RUN  hrw_verb_mixedcase_post
+  NOTE verb 'Post': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_mixedcase_post
+RUN  hrw_verb_lowercase_get
+  NOTE verb 'get': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_lowercase_get
+RUN  hrw_verb_custom
+  NOTE verb 'FOO': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_custom
+RUN  hrw_verb_propfind
+  NOTE verb 'PROPFIND': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_propfind
+RUN  hrw_verb_mkcol
+  NOTE verb 'MKCOL': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_mkcol
+RUN  hrw_verb_patch
+  NOTE verb 'PATCH': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_patch
+RUN  hrw_verb_options
+  NOTE verb 'OPTIONS': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_options
+RUN  hrw_verb_delete
+  NOTE verb 'DELETE': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_delete
+RUN  hrw_verb_put_nobody
+  NOTE verb 'PUT': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_put_nobody
+RUN  hrw_verb_post_nobody
+  NOTE verb 'POST': User-Agent|Host|Content-Length|Cache-Control
+OK   hrw_verb_post_nobody
+RUN  hrw_verb_head
+  NOTE verb 'HEAD': User-Agent|Host|Cache-Control
+OK   hrw_verb_head
+RUN  hrw_verb_get
+  NOTE verb 'GET': User-Agent|Host|Cache-Control
+OK   hrw_verb_get
+RUN  hrw_def_flags_hyperlink
+OK   hrw_def_flags_hyperlink
+RUN  hrw_def_flags_resynchronize
+OK   hrw_def_flags_resynchronize
+RUN  hrw_def_flags_no_auth
+OK   hrw_def_flags_no_auth
+RUN  hrw_def_flags_no_auto_redirect
+OK   hrw_def_flags_no_auto_redirect
+RUN  hrw_def_flags_keep_connection
+OK   hrw_def_flags_keep_connection
+RUN  hrw_def_flags_no_cache_write_only
+OK   hrw_def_flags_no_cache_write_only
+RUN  hrw_def_flags_no_reload
+OK   hrw_def_flags_no_reload
+RUN  hrw_def_flags_reload_and_pragma
+OK   hrw_def_flags_reload_and_pragma
+RUN  hrw_def_flags_pragma_nocache_only
+OK   hrw_def_flags_pragma_nocache_only
+RUN  hrw_def_flags_reload_only
+OK   hrw_def_flags_reload_only
+RUN  hrw_def_get_raw_head_exact
+OK   hrw_def_get_raw_head_exact
+RUN  hrw_def_get_header_order_reload
+OK   hrw_def_get_header_order_reload
+RUN  hrw_def_get_request_line
+  NOTE req 0 conn 0: GET /p HTTP/1.1\r\nUser-Agent: hrw-agent/1.0\r\nHost: 127.0.0.1:50068\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_def_get_request_line
+RUN  hrw_cache_reload_skips_conditionals
+  NOTE trace: send /wininet_7440_26_cache2.txt flags 0x80200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /wininet_7440_26_cache2.txt flags 0x80080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cache_reload_skips_conditionals
+RUN  hrw_cache_revalidate_conditional_headers
+  NOTE trace: send /wininet_7440_27_cache.txt flags 0x80200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /wininet_7440_27_cache.txt flags 0x80a00
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE revalidation status seen by caller: 200, requests=2
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cache_revalidate_conditional_headers
+RUN  hrw_auth_proxy_basic
+  NOTE req 0 conn 0: GET http://wire.i7test.example/p HTTP/1.1\r\nUser-Agent: pa/1\r\nHost: wire.i7test.example\r\nPragma: no-cache\r\n\r\n
+OK   hrw_auth_proxy_basic
+RUN  hrw_auth_options_on_request_handle
+OK   hrw_auth_options_on_request_handle
+RUN  hrw_auth_manual_header_sent_verbatim
+OK   hrw_auth_manual_header_sent_verbatim
+RUN  hrw_auth_no_credentials_returns_401
+  NOTE trace: send /secret flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 401
+  NOTE trace: closed
+OK   hrw_auth_no_credentials_returns_401
+RUN  hrw_auth_no_auth_flag_returns_401
+  NOTE trace: send /secret flags 0x840c0200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 401
+  NOTE trace: closed
+OK   hrw_auth_no_auth_flag_returns_401
+RUN  hrw_auth_basic_preemptive_second_request
+  NOTE trace: send /dir/a flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /dir/b flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE second request after Basic success: requests=3 req2 auth=Basic dXNlcjpwYXNz
+OK   hrw_auth_basic_preemptive_second_request
+RUN  hrw_auth_basic_retry_after_401
+  NOTE trace: send /secret flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_auth_basic_retry_after_401
+RUN  hrw_cookie_manual_header_with_no_cookies
+OK   hrw_cookie_manual_header_with_no_cookies
+RUN  hrw_cookie_no_cookies_flag_ignores_set_cookie
+  NOTE trace: send /wininet_7440_28_ck5/set flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /wininet_7440_28_ck5/get flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cookie_no_cookies_flag_ignores_set_cookie
+RUN  hrw_cookie_from_set_cookie_sent_back
+  NOTE trace: send /wininet_7440_29_ck4/set flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /wininet_7440_29_ck4/get flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cookie_from_set_cookie_sent_back
+RUN  hrw_cookie_path_scoped
+  NOTE trace: send /wininet_7440_30_ck3/inner/x flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /wininet_7440_30_ck3/other flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cookie_path_scoped
+RUN  hrw_cookie_two_cookies_joined
+  NOTE trace: send /wininet_7440_31_ck2/ flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE two cookies: a=1; b=2
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cookie_two_cookies_joined
+RUN  hrw_cookie_set_via_api_sent
+  NOTE trace: send /wininet_7440_32_ck1/x flags 0x84000200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /wininet_7440_32_ck1/x flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE cookie position: User-Agent|Host|Cache-Control|Cookie
+  NOTE trace: cleanup
+  NOTE trace: cleanup done
+OK   hrw_cookie_set_via_api_sent
+RUN  hrw_proxy_connect_for_https
+  NOTE CONNECT 502: ok=1 err=0 ? status=502
+  NOTE req 0 conn 0: CONNECT secure.i7test.example:443 HTTP/1.0\r\nUser-Agent: pxs/1\r\nHost: secure.i7test.example:443\r\nContent-Length: 0\r\nProxy-Connection: Keep-Alive\r\nPragma: no-cache\r\n\r\n
+OK   hrw_proxy_connect_for_https
+RUN  hrw_proxy_keepalive_reuse
+  NOTE trace: send /1 flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE trace: send /2 flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_keepalive_reuse
+RUN  hrw_proxy_post_absolute
+OK   hrw_proxy_post_absolute
+RUN  hrw_proxy_idn_host_w
+  NOTE trace: send /idn flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE IDN via proxy: line=GET http://xn--bcher-kva.i7test.example/idn HTTP/1.1
+  NOTE req 0 conn 0: GET http://xn--bcher-kva.i7test.example/idn HTTP/1.1\r\nUser-Agent: px/1\r\nHost: xn--bcher-kva.i7test.example\r\nPragma: no-cache\r\n\r\n
+OK   hrw_proxy_idn_host_w
+RUN  hrw_proxy_ipv6_host_port
+  NOTE trace: send /six flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_ipv6_host_port
+RUN  hrw_proxy_ipv6_host
+  NOTE trace: send /six flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_ipv6_host
+RUN  hrw_proxy_host_case_preserved
+  NOTE trace: send /c flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_host_case_preserved
+RUN  hrw_proxy_absolute_uri_root
+  NOTE trace: send (null) flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_absolute_uri_root
+RUN  hrw_proxy_absolute_uri_explicit_port
+  NOTE trace: send /x flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_absolute_uri_explicit_port
+RUN  hrw_proxy_header_set
+  NOTE trace: send /p flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+OK   hrw_proxy_header_set
+RUN  hrw_proxy_absolute_uri_default_port
+  NOTE trace: send /p?q=1 flags 0x84080200
+  NOTE trace: sent ok=1 err=0
+  NOTE trace: read done status 200
+  NOTE trace: closed
+  NOTE req 0 conn 0: GET http://wire.i7test.example/p?q=1 HTTP/1.1\r\nUser-Agent: px/1\r\nHost: wire.i7test.example\r\nPragma: no-cache\r\n\r\n
+OK   hrw_proxy_absolute_uri_default_port
+RUN  hrw_conn_default_limit_allows_two
+OK   hrw_conn_default_limit_allows_two
+RUN  hrw_conn_max_conns_session_set_refused
+OK   hrw_conn_max_conns_session_set_refused
+RUN  hrw_conn_max_conns_default_value
+  NOTE MAX_CONNS_PER_SERVER default (global) = 2
+  NOTE MAX_CONNS_PER_1_0_SERVER default (global) = 4
+OK   hrw_conn_max_conns_default_value
+RUN  hrw_conn_unread_body_forces_second_connection
+OK   hrw_conn_unread_body_forces_second_connection
+RUN  hrw_conn_keep_connection_flag_header
+OK   hrw_conn_keep_connection_flag_header
+RUN  hrw_conn_client_http10_keepalive_header
+  NOTE HTTP/1.0 client, HTTP/1.1 server reply (no Connection header): conns=1
+  NOTE req 0 conn 0: GET /c10 HTTP/1.1\r\nUser-Agent: c10/1\r\nHost: 127.0.0.1:50130\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_conn_client_http10_keepalive_header
+RUN  hrw_conn_http10_server_without_header_reused_by_length
+  NOTE HTTP/1.0 reply without Connection header, server keeps socket open: conns=2
+OK   hrw_conn_http10_server_without_header_reused_by_length
+RUN  hrw_conn_http10_server_keepalive_reused
+  NOTE HTTP/1.0 + Connection: Keep-Alive reply: conns=1
+OK   hrw_conn_http10_server_keepalive_reused
+RUN  hrw_conn_http10_server_no_keepalive
+OK   hrw_conn_http10_server_no_keepalive
+RUN  hrw_conn_close_delimited_new_socket
+OK   hrw_conn_close_delimited_new_socket
+RUN  hrw_conn_server_connection_close_new_socket
+OK   hrw_conn_server_connection_close_new_socket
+RUN  hrw_conn_request_connection_close_new_socket
+OK   hrw_conn_request_connection_close_new_socket
+RUN  hrw_conn_reuse_across_sessions_observed
+  NOTE two sessions (different agents): conns=1
+OK   hrw_conn_reuse_across_sessions_observed
+RUN  hrw_conn_reuse_across_connect_handles
+  NOTE two connect handles, one session: conns=1
+OK   hrw_conn_reuse_across_connect_handles
+RUN  hrw_conn_keepalive_three_requests_one_connection
+OK   hrw_conn_keepalive_three_requests_one_connection
+RUN  hrw_child_limit_third_request_waits
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE limit child: 2 2 2 0 1 0 0
+OK   hrw_child_limit_third_request_waits
+RUN  hrw_zz_encoding_flip_probe
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  0 none                               rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  1 global HTTP_VERSION 1.0 then 1.1   rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  2 InternetOpenUrlA                   rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  3 InternetOpenW non-ASCII agent      rc=0x0 before|after: /café|/caf%C3%A9
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  4 HttpOpenRequestW                   rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  5 HttpOpenRequestW + referer         rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  6 InternetSetCookieA                 rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  7 HttpOpenRequestW accept types      rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  8 proxy session                      rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe  9 IPv6 ::1 request                   rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe 10 HTTPS request (ignored CA)         rc=0x0 before|after: /café|/café
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE encoding probe 11 object with a space                rc=0x0 before|after: /café|/café
+OK   hrw_zz_encoding_flip_probe
+RUN  hrw_child_obj_space_escaped
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   hrw_child_obj_space_escaped
+RUN  hrw_child_obj_ascii_unchanged
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   hrw_child_obj_ascii_unchanged
+RUN  hrw_child_obj_w_unicode_utf8_raw
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   hrw_child_obj_w_unicode_utf8_raw
+RUN  hrw_child_obj_high_ansi_raw
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   hrw_child_obj_high_ansi_raw
+RUN  hrw_child_obj_utf8_bytes_raw
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+OK   hrw_child_obj_utf8_bytes_raw
+RUN  hrw_endrequest_without_sendex_fails
+  NOTE HttpEndRequest without SendRequestEx: err 12017 ERROR_INTERNET_OPERATION_CANCELLED
+OK   hrw_endrequest_without_sendex_fails
+RUN  hrw_writefile_before_sendex_fails
+  NOTE InternetWriteFile before send: err 12019 ERROR_INTERNET_INCORRECT_HANDLE_STATE wr=0
+OK   hrw_writefile_before_sendex_fails
+RUN  hrw_expect_no_100_from_server
+OK   hrw_expect_no_100_from_server
+RUN  hrw_expect_100_continue
+OK   hrw_expect_100_continue
+RUN  hrw_chunked_with_optional_data
+OK   hrw_chunked_with_optional_data
+RUN  hrw_chunked_header_via_add
+OK   hrw_chunked_header_via_add
+RUN  hrw_chunked_upload_caller_framed
+  NOTE req 0 conn 0: POST /chunk HTTP/1.1\r\nTransfer-Encoding: chunked\r\nUser-Agent: ch/1\r\nHost: 127.0.0.1:50247\r\nContent-Length: 0\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_chunked_upload_caller_framed
+RUN  hrw_ex_head_sent_at_sendrequestex
+  NOTE head received before any InternetWriteFile: 1
+OK   hrw_ex_head_sent_at_sendrequestex
+RUN  hrw_ex_w_variant
+OK   hrw_ex_w_variant
+RUN  hrw_ex_large_writes
+OK   hrw_ex_large_writes
+RUN  hrw_ex_total_zero_get
+OK   hrw_ex_total_zero_get
+RUN  hrw_ex_null_buffers_post
+OK   hrw_ex_null_buffers_post
+RUN  hrw_ex_headers_in_buffers
+OK   hrw_ex_headers_in_buffers
+RUN  hrw_ex_initial_buffer_only
+OK   hrw_ex_initial_buffer_only
+RUN  hrw_ex_initial_buffer_plus_write
+OK   hrw_ex_initial_buffer_plus_write
+RUN  hrw_ex_write_pieces
+OK   hrw_ex_write_pieces
+RUN  hrw_body_post_resend_keeps_first_content_length
+  NOTE re-send body: sec (CL 3) conns=1
+  NOTE req 1 conn 0: POST /rs HTTP/1.1\r\nUser-Agent: rs/1\r\nHost: 127.0.0.1:50267\r\nContent-Length: 3\r\nCache-Control: no-cache\r\nConnection: Keep-Alive\r\n\r\n
+OK   hrw_body_post_resend_keeps_first_content_length
+RUN  hrw_body_user_content_length_replaced
+  NOTE user CL position: Content-Length|User-Agent|Host|Cache-Control
+OK   hrw_body_user_content_length_replaced
+RUN  hrw_body_post_nobody_header_order
+OK   hrw_body_post_nobody_header_order
+RUN  hrw_body_post_header_order
+  NOTE req 0 conn 0: POST /o HTTP/1.1\r\nContent-Type: text/plain\r\nUser-Agent: o/1\r\nHost: 127.0.0.1:50273\r\nContent-Length: 3\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_body_post_header_order
+RUN  hrw_body_post_large_256k
+OK   hrw_body_post_large_256k
+RUN  hrw_body_post_one_byte
+OK   hrw_body_post_one_byte
+RUN  hrw_body_head_null
+OK   hrw_body_head_null
+RUN  hrw_body_get_null
+OK   hrw_body_get_null
+RUN  hrw_body_post_null
+OK   hrw_body_post_null
+RUN  hrw_body_post_zero_len_ptr
+OK   hrw_body_post_zero_len_ptr
+RUN  hrw_body_post_binary_nuls
+OK   hrw_body_post_binary_nuls
+RUN  hrw_body_get_with_body
+OK   hrw_body_get_with_body
+RUN  hrw_body_custom_verb_body
+OK   hrw_body_custom_verb_body
+RUN  hrw_body_delete_with_body
+OK   hrw_body_delete_with_body
+RUN  hrw_body_patch_small
+OK   hrw_body_patch_small
+RUN  hrw_body_put_small
+OK   hrw_body_put_small
+RUN  hrw_body_post_small
+OK   hrw_body_post_small
+RUN  hrw_query_request_header_before_send
+OK   hrw_query_request_header_before_send
+RUN  hrw_add_after_send_applies_to_resend
+OK   hrw_add_after_send_applies_to_resend
+RUN  hrw_send_hdrs_w_minus1
+OK   hrw_send_hdrs_w_minus1
+RUN  hrw_send_hdrs_w_len0_is_nul_terminated
+OK   hrw_send_hdrs_w_len0_is_nul_terminated
+RUN  hrw_send_hdrs_connection_close_sent
+OK   hrw_send_hdrs_connection_close_sent
+RUN  hrw_send_hdrs_cache_control_override
+OK   hrw_send_hdrs_cache_control_override
+RUN  hrw_send_hdrs_user_agent_overrides
+OK   hrw_send_hdrs_user_agent_overrides
+RUN  hrw_send_hdrs_replace_added_header
+OK   hrw_send_hdrs_replace_added_header
+RUN  hrw_send_hdrs_empty_value
+OK   hrw_send_hdrs_empty_value
+RUN  hrw_send_hdrs_no_colon
+OK   hrw_send_hdrs_no_colon
+RUN  hrw_send_hdrs_double_crlf_terminated
+OK   hrw_send_hdrs_double_crlf_terminated
+RUN  hrw_send_hdrs_only_crlf
+OK   hrw_send_hdrs_only_crlf
+RUN  hrw_send_hdrs_empty_string
+OK   hrw_send_hdrs_empty_string
+RUN  hrw_send_hdrs_null_len_minus1
+OK   hrw_send_hdrs_null_len_minus1
+RUN  hrw_send_hdrs_len0_nonnull_a
+OK   hrw_send_hdrs_len0_nonnull_a
+RUN  hrw_send_hdrs_prefix_len
+OK   hrw_send_hdrs_prefix_len
+RUN  hrw_send_hdrs_no_trailing_crlf
+OK   hrw_send_hdrs_no_trailing_crlf
+RUN  hrw_send_hdrs_exact_len
+OK   hrw_send_hdrs_exact_len
+RUN  hrw_send_hdrs_minus1
+OK   hrw_send_hdrs_minus1
+RUN  hrw_remove_referer_with_replace
+OK   hrw_remove_referer_with_replace
+RUN  hrw_replace_accept_types
+OK   hrw_replace_accept_types
+RUN  hrw_coalesce_with_accept_types
+OK   hrw_coalesce_with_accept_types
+RUN  hrw_coalesce_case_insensitive_name
+OK   hrw_coalesce_case_insensitive_name
+RUN  hrw_coalesce_absent_adds
+OK   hrw_coalesce_absent_adds
+RUN  hrw_coalesce_semicolon
+OK   hrw_coalesce_semicolon
+RUN  hrw_coalesce_plain_flag_is_comma
+OK   hrw_coalesce_plain_flag_is_comma
+RUN  hrw_coalesce_comma
+OK   hrw_coalesce_comma
+RUN  hrw_replace_duplicate_replaces_first
+OK   hrw_replace_duplicate_replaces_first
+RUN  hrw_replace_case_insensitive_keeps_new_name
+OK   hrw_replace_case_insensitive_keeps_new_name
+RUN  hrw_replace_empty_value_removes
+OK   hrw_replace_empty_value_removes
+RUN  hrw_replace_or_add_present_replaces
+OK   hrw_replace_or_add_present_replaces
+RUN  hrw_replace_or_add_absent_adds
+OK   hrw_replace_or_add_absent_adds
+RUN  hrw_replace_absent_adds
+OK   hrw_replace_absent_adds
+RUN  hrw_replace_existing
+OK   hrw_replace_existing
+RUN  hrw_add_user_agent_lowercase_name
+OK   hrw_add_user_agent_lowercase_name
+RUN  hrw_add_user_agent_overrides_session
+OK   hrw_add_user_agent_overrides_session
+RUN  hrw_add_if_new_user_agent_before_send
+OK   hrw_add_if_new_user_agent_before_send
+RUN  hrw_add_if_new_present_fails
+OK   hrw_add_if_new_present_fails
+RUN  hrw_add_if_new_absent_ok
+OK   hrw_add_if_new_absent_ok
+RUN  hrw_add_flags0_twice_duplicates
+OK   hrw_add_flags0_twice_duplicates
+RUN  hrw_add_twice_duplicates
+OK   hrw_add_twice_duplicates
+RUN  hrw_add_success_lasterror
+OK   hrw_add_success_lasterror
+RUN  hrw_add_connect_handle
+OK   hrw_add_connect_handle
+RUN  hrw_add_session_handle
+OK   hrw_add_session_handle
+RUN  hrw_add_null_handle
+OK   hrw_add_null_handle
+RUN  hrw_add_low_word_flags_ok
+OK   hrw_add_low_word_flags_ok
+RUN  hrw_add_flag_add_plus_reserved_rejected
+OK   hrw_add_flag_add_plus_reserved_rejected
+RUN  hrw_add_flag_0x08000000_rejected
+OK   hrw_add_flag_0x08000000_rejected
+RUN  hrw_add_flag_0x00800000_rejected
+OK   hrw_add_flag_0x00800000_rejected
+RUN  hrw_add_flag_0x00010000_rejected
+OK   hrw_add_flag_0x00010000_rejected
+RUN  hrw_add_first_line_good_second_bad
+OK   hrw_add_first_line_good_second_bad
+RUN  hrw_add_first_line_bad_second_good
+OK   hrw_add_first_line_bad_second_good
+RUN  hrw_add_allow_empty_values
+  NOTE req 0 conn 0: GET /a HTTP/1.1\r\nX-Empty: \r\nUser-Agent: ah/1\r\nHost: 127.0.0.1:50390\r\nCache-Control: no-cache\r\n\r\n
+OK   hrw_add_allow_empty_values
+RUN  hrw_add_empty_name_rejected
+OK   hrw_add_empty_name_rejected
+RUN  hrw_add_empty_value_rejected
+OK   hrw_add_empty_value_rejected
+RUN  hrw_add_no_colon_rejected
+OK   hrw_add_no_colon_rejected
+RUN  hrw_add_empty_string_rejected
+OK   hrw_add_empty_string_rejected
+RUN  hrw_add_null_rejected
+OK   hrw_add_null_rejected
+RUN  hrw_add_len_zero_rejected
+OK   hrw_add_len_zero_rejected
+RUN  hrw_add_len_cuts_name_rejected
+OK   hrw_add_len_cuts_name_rejected
+RUN  hrw_add_len_prefix_drops_second_line
+OK   hrw_add_len_prefix_drops_second_line
+RUN  hrw_add_len_prefix_truncates_value
+OK   hrw_add_len_prefix_truncates_value
+RUN  hrw_add_len_exact
+OK   hrw_add_len_exact
+RUN  hrw_add_w_length_chars
+OK   hrw_add_w_length_chars
+RUN  hrw_add_w_ascii
+OK   hrw_add_w_ascii
+RUN  hrw_add_w_nonascii_value
+  NOTE W header value bytes: é中
+OK   hrw_add_w_nonascii_value
+RUN  hrw_add_high_bytes_raw
+OK   hrw_add_high_bytes_raw
+RUN  hrw_add_big_value
+OK   hrw_add_big_value
+RUN  hrw_add_many_headers
+OK   hrw_add_many_headers
+RUN  hrw_add_separate_calls_keep_order
+OK   hrw_add_separate_calls_keep_order
+RUN  hrw_add_only_crlf_is_ok_noop
+OK   hrw_add_only_crlf_is_ok_noop
+RUN  hrw_add_multi_lines_blank_lines_skipped
+OK   hrw_add_multi_lines_blank_lines_skipped
+RUN  hrw_add_multi_lines_lf_only
+OK   hrw_add_multi_lines_lf_only
+RUN  hrw_add_multi_lines_crlf
+OK   hrw_add_multi_lines_crlf
+RUN  hrw_add_double_colon
+OK   hrw_add_double_colon
+RUN  hrw_add_value_with_colons
+OK   hrw_add_value_with_colons
+RUN  hrw_add_no_space_after_colon
+OK   hrw_add_no_space_after_colon
+RUN  hrw_add_name_whitespace_trimmed
+OK   hrw_add_name_whitespace_trimmed
+RUN  hrw_add_value_whitespace_trimmed
+OK   hrw_add_value_whitespace_trimmed
+RUN  hrw_add_name_casing_preserved
+OK   hrw_add_name_casing_preserved
+RUN  hrw_add_flags_zero
+OK   hrw_add_flags_zero
+RUN  hrw_add_simple
+OK   hrw_add_simple
+SUMMARY tests=362 failed=0 skipped=0 checks_pass=2163 checks_fail=0
+@@I7 END http_request_wire exit=0x0 ms=391143 timeout=0 bytes=38978

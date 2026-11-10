@@ -1,0 +1,684 @@
+RUN  uce_rv_create_unicode_leaf_w
+  NOTE unicode leaf -> café-中[1].txt (utf-8)
+OK   uce_rv_create_unicode_leaf_w
+RUN  uce_rv_create_awkward_leaves
+  NOTE leaf a%20b.txt -> a%20b[1].txt
+  NOTE leaf x%3Ay.txt -> x_y[1].txt
+  NOTE leaf p%2Aq.txt -> p_q[1].txt
+  NOTE leaf dq%22.txt -> dq_[1].txt
+  NOTE leaf lt%3Cgt%3E.txt -> lt_gt_[1].txt
+  NOTE leaf pct%25.txt -> pct%25[1].txt
+  NOTE leaf semi;colon.txt -> semi;colon[1].txt
+  NOTE leaf co,ma.txt -> co,ma[1].txt
+  NOTE leaf tilde~1.txt -> tilde~1[1].txt
+  NOTE leaf UPPER.TXT -> UPPER[1].txt
+OK   uce_rv_create_awkward_leaves
+RUN  uce_rv_large_file_stream_chunks
+  FAIL tests/urlcache_entries/uce_review.c:419: !bad && off == len (read 262144 of 300000)
+  FAIL tests/urlcache_entries/uce_review.c:420: off == len && !memcmp(back, data, len)
+FAIL uce_rv_large_file_stream_chunks
+RUN  uce_rv_hitrate_wrap
+  NOTE hit rate after retrieve at 0xFFFFFFFF: 0xffffffff
+OK   uce_rv_hitrate_wrap
+RUN  uce_rv_set_sparse_hides_entry
+  NOTE after Set(SPARSE): exists 0 err 2
+  NOTE Set(NORMAL) on the hidden entry -> 1 err 0
+OK   uce_rv_set_sparse_hides_entry
+RUN  uce_rv_sparse_stream_hidden
+OK   uce_rv_sparse_stream_hidden
+RUN  uce_rv_delete_after_file_unlock_of_stream
+  NOTE stream unlock after its entry was deleted -> 0 err 2
+  NOTE file after delete with the stream open: gone
+OK   uce_rv_delete_after_file_unlock_of_stream
+RUN  uce_rv_commit_over_stream_locked
+OK   uce_rv_commit_over_stream_locked
+RUN  uce_rv_pending_delete_w_api
+OK   uce_rv_pending_delete_w_api
+RUN  uce_rv_two_streams_pending_delete
+OK   uce_rv_two_streams_pending_delete
+RUN  uce_rv_stream_cookies_reused
+  NOTE cookie 0000000000000003 then 0000000000000003
+OK   uce_rv_stream_cookies_reused
+RUN  uce_rv_stream_handle_is_not_a_find
+OK   uce_rv_stream_handle_is_not_a_find
+RUN  uce_rv_find_handle_is_not_a_stream
+OK   uce_rv_find_handle_is_not_a_stream
+RUN  uce_rv_stream_bogus_cookies
+OK   uce_rv_stream_bogus_cookies
+RUN  uce_rv_open_stream_delete_file
+  NOTE DeleteFile under an open stream -> 1 err 3735928559
+OK   uce_rv_open_stream_delete_file
+RUN  uce_rv_open_stream_blocks_writers
+OK   uce_rv_open_stream_blocks_writers
+RUN  uce_rv_stream_with_writer_open
+OK   uce_rv_stream_with_writer_open
+RUN  uce_rv_stream_with_shared_reader
+OK   uce_rv_stream_with_shared_reader
+RUN  uce_rv_set_edited_then_delete_keeps_file
+OK   uce_rv_set_edited_then_delete_keeps_file
+RUN  uce_rv_delete_edited_w_keeps_file
+OK   uce_rv_delete_edited_w_keeps_file
+RUN  uce_rv_delete_edited_keeps_outside_file
+OK   uce_rv_delete_edited_keeps_outside_file
+RUN  uce_rv_delete_edited_keeps_container_file
+OK   uce_rv_delete_edited_keeps_container_file
+RUN  uce_delete_stream_locked
+OK   uce_delete_stream_locked
+RUN  uce_delete_sticky_and_edited
+OK   uce_delete_sticky_and_edited
+RUN  uce_delete_entry_without_file
+OK   uce_delete_entry_without_file
+RUN  uce_delete_file_already_gone
+OK   uce_delete_file_already_gone
+RUN  uce_delete_a_then_w_view
+OK   uce_delete_a_then_w_view
+RUN  uce_delete_twice
+OK   uce_delete_twice
+RUN  uce_delete_invalid_url
+OK   uce_delete_invalid_url
+RUN  uce_delete_missing
+OK   uce_delete_missing
+RUN  uce_delete_null
+OK   uce_delete_null
+RUN  uce_stream_two_handles
+OK   uce_stream_two_handles
+RUN  uce_stream_locks_entry
+OK   uce_stream_locks_entry
+RUN  uce_stream_stale_handle
+OK   uce_stream_stale_handle
+RUN  uce_stream_unlock_null_handle
+OK   uce_stream_unlock_null_handle
+RUN  uce_stream_read_null_handle
+OK   uce_stream_read_null_handle
+RUN  uce_stream_read_ex
+OK   uce_stream_read_ex
+RUN  uce_stream_sequential_reads
+OK   uce_stream_sequential_reads
+RUN  uce_stream_offsets_table
+OK   uce_stream_offsets_table
+RUN  uce_stream_w_read_all
+OK   uce_stream_w_read_all
+RUN  uce_stream_a_read_all
+OK   uce_stream_a_read_all
+RUN  uce_stream_missing_entry
+OK   uce_stream_missing_entry
+RUN  uce_stream_w_validation
+OK   uce_stream_w_validation
+RUN  uce_stream_a_validation
+OK   uce_stream_a_validation
+RUN  uce_unlock_not_locked
+OK   uce_unlock_not_locked
+RUN  uce_unlock_missing_entry
+OK   uce_unlock_missing_entry
+RUN  uce_unlock_alias_same_entry
+OK   uce_unlock_alias_same_entry
+RUN  uce_unlock_null_and_reserved
+OK   uce_unlock_null_and_reserved
+RUN  uce_retr_file_deleted_externally
+OK   uce_retr_file_deleted_externally
+RUN  uce_retr_entry_without_file
+OK   uce_retr_entry_without_file
+RUN  uce_retr_updates_use_count
+OK   uce_retr_updates_use_count
+RUN  uce_retr_lock_counts
+OK   uce_retr_lock_counts
+RUN  uce_retr_delete_while_locked
+OK   uce_retr_delete_while_locked
+RUN  uce_retr_small_buffer_not_locked
+OK   uce_retr_small_buffer_not_locked
+RUN  uce_retr_w_basic_and_unlock
+OK   uce_retr_w_basic_and_unlock
+RUN  uce_retr_a_basic_and_unlock
+OK   uce_retr_a_basic_and_unlock
+RUN  uce_retr_invalid_url
+OK   uce_retr_invalid_url
+RUN  uce_retr_missing_entry
+OK   uce_retr_missing_entry
+RUN  uce_retr_w_null_args
+OK   uce_retr_w_null_args
+RUN  uce_retr_a_reserved_nonzero
+OK   uce_retr_a_reserved_nonzero
+RUN  uce_retr_a_buffer_size_zero
+OK   uce_retr_a_buffer_size_zero
+RUN  uce_retr_a_null_size
+OK   uce_retr_a_null_size
+RUN  uce_retr_a_null_url
+OK   uce_retr_a_null_url
+RUN  uce_more_set_edited_relative_name
+OK   uce_more_set_edited_relative_name
+RUN  uce_more_info_after_file_grows_retrieve
+OK   uce_more_info_after_file_grows_retrieve
+RUN  uce_more_delete_then_recommit
+OK   uce_more_delete_then_recommit
+RUN  uce_more_commit_file_in_container_root
+OK   uce_more_commit_file_in_container_root
+RUN  uce_more_commit_local_file_case
+OK   uce_more_commit_local_file_case
+RUN  uce_more_w_commit_a_read
+OK   uce_more_w_commit_a_read
+RUN  uce_more_a_commit_w_read
+OK   uce_more_a_commit_w_read
+RUN  uce_more_get_does_not_lock
+OK   uce_more_get_does_not_lock
+RUN  uce_more_set_while_locked
+OK   uce_more_set_while_locked
+RUN  uce_more_sparse_entry
+OK   uce_more_sparse_entry
+RUN  uce_more_stream_w_sizes
+OK   uce_more_stream_w_sizes
+RUN  uce_more_exa_null_url
+OK   uce_more_exa_null_url
+RUN  uce_more_exw_matches_w
+OK   uce_more_exw_matches_w
+RUN  uce_more_exw_fixed_only_flag
+OK   uce_more_exw_fixed_only_flag
+RUN  uce_mx_cross_aw_table
+OK   uce_mx_cross_aw_table
+RUN  uce_mx_create_url_lengths
+  NOTE url leaf 1 chars -> file leaf 8 chars
+  NOTE url leaf 50 chars -> file leaf 57 chars
+  NOTE url leaf 150 chars -> file leaf 157 chars
+  NOTE url leaf 300 chars -> file leaf 12 chars
+  NOTE url leaf 1000 chars -> file leaf 12 chars
+  NOTE url leaf 2000 chars -> file leaf 12 chars
+OK   uce_mx_create_url_lengths
+RUN  uce_mx_url_lengths_roundtrip
+OK   uce_mx_url_lengths_roundtrip
+RUN  uce_mx_commit_ext_w_table
+OK   uce_mx_commit_ext_w_table
+RUN  uce_mx_commit_ext_verbatim
+OK   uce_mx_commit_ext_verbatim
+RUN  uce_mx_commit_ext_lengths
+OK   uce_mx_commit_ext_lengths
+RUN  uce_mx_usecount_nested_locks
+OK   uce_mx_usecount_nested_locks
+RUN  uce_mx_hitrate_counts_retrievals
+OK   uce_mx_hitrate_counts_retrievals
+RUN  uce_mx_hitrate_set_table
+OK   uce_mx_hitrate_set_table
+RUN  uce_mx_exempt_table_w
+OK   uce_mx_exempt_table_w
+RUN  uce_mx_types_set_w
+OK   uce_mx_types_set_w
+RUN  uce_mx_types_commit_w
+OK   uce_mx_types_commit_w
+RUN  uce_mx_set_times_independent
+OK   uce_mx_set_times_independent
+RUN  uce_mx_times_set_table
+OK   uce_mx_times_set_table
+RUN  uce_mx_times_commit_w
+OK   uce_mx_times_commit_w
+RUN  uce_mx_times_commit_a
+OK   uce_mx_times_commit_a
+RUN  uce_mx_header_utf8_table_w
+OK   uce_mx_header_utf8_table_w
+RUN  uce_mx_header_sizes_w
+OK   uce_mx_header_sizes_w
+RUN  uce_mx_header_sizes_a
+OK   uce_mx_header_sizes_a
+RUN  uce_mx_sweep_stream_no_lock
+OK   uce_mx_sweep_stream_no_lock
+RUN  uce_mx_sweep_retrieve_no_lock
+OK   uce_mx_sweep_retrieve_no_lock
+RUN  uce_mx_sweep_w_sizes
+OK   uce_mx_sweep_w_sizes
+RUN  uce_mx_sweep_a_sizes
+OK   uce_mx_sweep_a_sizes
+RUN  uce_mx_layout_w_table
+OK   uce_mx_layout_w_table
+RUN  uce_mx_layout_a_table
+OK   uce_mx_layout_a_table
+RUN  uce_life_info_ex_flags_table
+  NOTE ExA flags 0x1 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x2 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x4 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x10 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x100 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x800 -> 1 err 0 size 4096 (plain 260)
+  NOTE ExA flags 0x2000 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x10000 -> 1 err 0 size 260 (plain 260)
+  NOTE ExA flags 0x80000000 -> 1 err 0 size 260 (plain 260)
+OK   uce_life_info_ex_flags_table
+RUN  uce_life_commit_w_original_url
+OK   uce_life_commit_w_original_url
+RUN  uce_life_cookie_entry_retrieve
+OK   uce_life_cookie_entry_retrieve
+RUN  uce_life_visited_entry_w_and_set
+OK   uce_life_visited_entry_w_and_set
+RUN  uce_life_stream_122_hit_count
+OK   uce_life_stream_122_hit_count
+RUN  uce_life_info_122_counts_no_hit
+OK   uce_life_info_122_counts_no_hit
+RUN  uce_life_create_unique_across_processes
+UCEPATH C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\lcxp[1].txt
+  NOTE parent paths C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\QS51XU72\lcxp[1].txt / C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\QS51XU72\lcxp[2].txt
+  NOTE removed 1 leftover child file(s) from C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\QS51XU72\
+OK   uce_life_create_unique_across_processes
+RUN  uce_life_commit_file_of_other_url
+OK   uce_life_commit_file_of_other_url
+RUN  uce_life_xproc_child_stream_released_at_exit
+OK   uce_life_xproc_child_stream_released_at_exit
+RUN  uce_life_xproc_child_sees_parent_lock
+OK   uce_life_xproc_child_sees_parent_lock
+RUN  uce_life_xproc_child_sets_info
+OK   uce_life_xproc_child_sets_info
+RUN  uce_life_xproc_child_streams
+OK   uce_life_xproc_child_streams
+RUN  uce_life_pending_delete_second_retrieve
+OK   uce_life_pending_delete_second_retrieve
+RUN  uce_life_pending_delete_set_still_works
+OK   uce_life_pending_delete_set_still_works
+RUN  uce_life_pending_delete_blocks_recommit
+OK   uce_life_pending_delete_blocks_recommit
+RUN  uce_life_unlock_by_other_spelling
+OK   uce_life_unlock_by_other_spelling
+RUN  uce_life_unlock_w_variants
+OK   uce_life_unlock_w_variants
+RUN  uce_life_create_exw_reserved
+OK   uce_life_create_exw_reserved
+RUN  uce_life_create_exw_preserve_variants
+  NOTE ExW(hint.dat, ext bin, preserve 0) -> hint[1].bin
+  NOTE ExW(hint.dat, ext bin, preserve 1) -> hint[1].bin
+  NOTE ExW(noext, ext txt, preserve 1) -> noext[1].txt
+  NOTE ExW(a.b.c, ext NULL, preserve 1) -> a.b[1]
+OK   uce_life_create_exw_preserve_variants
+RUN  uce_life_prefix_not_confused_with_http
+OK   uce_life_prefix_not_confused_with_http
+RUN  uce_life_cookie_prefix_entry
+  NOTE Cookie: create -> 1 err 0 path C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCookies\ZQSHSDRW.txt
+  NOTE Cookie: commit -> 1 err 0
+OK   uce_life_cookie_prefix_entry
+RUN  uce_life_visited_prefix_entry
+  NOTE Visited: commit -> 1 err 0
+OK   uce_life_visited_prefix_entry
+RUN  uce_life_retrieve_with_file_open_exclusive
+OK   uce_life_retrieve_with_file_open_exclusive
+RUN  uce_life_delete_with_file_open
+  NOTE file after delete + close: still there
+OK   uce_life_delete_with_file_open
+RUN  uce_life_two_urls_one_file
+OK   uce_life_two_urls_one_file
+RUN  uce_life_threads_shared_locks
+OK   uce_life_threads_shared_locks
+RUN  uce_life_threads_independent_entries
+OK   uce_life_threads_independent_entries
+RUN  uce_life_stream_sees_same_size_rewrite
+OK   uce_life_stream_sees_same_size_rewrite
+RUN  uce_life_stream_file_size_changed
+OK   uce_life_stream_file_size_changed
+RUN  uce_life_stream_handle_not_win32
+  NOTE GetHandleInformation(stream handle 0000000000000001) -> 0
+OK   uce_life_stream_handle_not_win32
+RUN  uce_life_stream_double_unlock
+OK   uce_life_stream_double_unlock
+RUN  uce_life_stream_many_handles
+OK   uce_life_stream_many_handles
+RUN  uce_life_stream_unlock_by_file_api
+OK   uce_life_stream_unlock_by_file_api
+RUN  uce_life_stream_and_file_lock_together
+OK   uce_life_stream_and_file_lock_together
+RUN  uce_life_stream_file_deleted
+OK   uce_life_stream_file_deleted
+RUN  uce_life_stream_entry_without_file
+OK   uce_life_stream_entry_without_file
+RUN  uce_life_stream_read_reserved_ignored
+OK   uce_life_stream_read_reserved_ignored
+RUN  uce_life_stream_reserved_param
+OK   uce_life_stream_reserved_param
+RUN  uce_life_stream_ex_null_handle
+OK   uce_life_stream_ex_null_handle
+RUN  uce_life_stream_ex_offsets
+OK   uce_life_stream_ex_offsets
+RUN  uce_life_stream_byte_by_byte
+OK   uce_life_stream_byte_by_byte
+RUN  uce_life_stream_backwards_reads
+OK   uce_life_stream_backwards_reads
+RUN  uce_life_stream_read_longer_than_file
+OK   uce_life_stream_read_longer_than_file
+RUN  uce_life_stream_read_zero_len
+OK   uce_life_stream_read_zero_len
+RUN  uce_life_replace_drops_header_and_ext
+OK   uce_life_replace_drops_header_and_ext
+RUN  uce_life_replace_keeps_set_fields
+OK   uce_life_replace_keeps_set_fields
+RUN  uce_life_replace_resets_times
+OK   uce_life_replace_resets_times
+RUN  uce_life_access_time_is_commit_time
+OK   uce_life_access_time_is_commit_time
+RUN  uce_life_future_lastmod_kept
+OK   uce_life_future_lastmod_kept
+RUN  uce_life_expired_entry_visible
+OK   uce_life_expired_entry_visible
+RUN  uce_xproc_replace_by_child
+OK   uce_xproc_replace_by_child
+RUN  uce_xproc_child_lock_released_at_exit
+OK   uce_xproc_child_lock_released_at_exit
+RUN  uce_xproc_child_deletes_parent_locked
+OK   uce_xproc_child_deletes_parent_locked
+RUN  uce_xproc_child_delete_missing
+OK   uce_xproc_child_delete_missing
+RUN  uce_xproc_parent_sees_child_entry
+OK   uce_xproc_parent_sees_child_entry
+RUN  uce_xproc_child_sees_parent_entry
+OK   uce_xproc_child_sees_parent_entry
+RUN  uce_key_long_url
+OK   uce_key_long_url
+RUN  uce_key_max_port
+OK   uce_key_max_port
+RUN  uce_key_bad_http_never_stored
+OK   uce_key_bad_http_never_stored
+RUN  uce_key_opaque_scheme
+OK   uce_key_opaque_scheme
+RUN  uce_key_ftp_verbatim
+OK   uce_key_ftp_verbatim
+RUN  uce_key_utf8_path_w_vs_a
+OK   uce_key_utf8_path_w_vs_a
+RUN  uce_key_idn_host_w
+OK   uce_key_idn_host_w
+RUN  uce_key_userinfo
+OK   uce_key_userinfo
+RUN  uce_key_ipv4_and_ipv6_hosts
+OK   uce_key_ipv4_and_ipv6_hosts
+RUN  uce_key_http_vs_https_distinct
+OK   uce_key_http_vs_https_distinct
+RUN  uce_key_host_only_vs_root
+OK   uce_key_host_only_vs_root
+RUN  uce_key_trailing_slash_distinct
+OK   uce_key_trailing_slash_distinct
+RUN  uce_key_query_distinct
+OK   uce_key_query_distinct
+RUN  uce_key_fragment
+OK   uce_key_fragment
+RUN  uce_key_path_case_distinct
+OK   uce_key_path_case_distinct
+RUN  uce_key_scheme_case
+OK   uce_key_scheme_case
+RUN  uce_key_host_case
+OK   uce_key_host_case
+RUN  uce_key_port_explicit_rewritten
+OK   uce_key_port_explicit_rewritten
+RUN  uce_key_port_leading_zeros
+OK   uce_key_port_leading_zeros
+RUN  uce_key_nondefault_ports_distinct
+OK   uce_key_nondefault_ports_distinct
+RUN  uce_key_https_default_port_dropped
+OK   uce_key_https_default_port_dropped
+RUN  uce_key_http_default_port_dropped
+OK   uce_key_http_default_port_dropped
+RUN  uce_set_does_not_change_strings
+OK   uce_set_does_not_change_strings
+RUN  uce_set_struct_size_not_checked
+OK   uce_set_struct_size_not_checked
+RUN  uce_set_w_fields
+OK   uce_set_w_fields
+RUN  uce_set_type_table
+OK   uce_set_type_table
+RUN  uce_set_exempt_zero_unsticks
+OK   uce_set_exempt_zero_unsticks
+RUN  uce_set_exempt_delta_clamped
+OK   uce_set_exempt_delta_clamped
+RUN  uce_set_attribute_alias_0x1000
+OK   uce_set_attribute_alias_0x1000
+RUN  uce_set_unknown_flags_ignored
+OK   uce_set_unknown_flags_ignored
+RUN  uce_set_headerinfo_flag_ignored
+OK   uce_set_headerinfo_flag_ignored
+RUN  uce_set_no_flags_noop
+OK   uce_set_no_flags_noop
+RUN  uce_set_all_flags
+OK   uce_set_all_flags
+RUN  uce_set_each_flag_table
+OK   uce_set_each_flag_table
+RUN  uce_set_invalid_url
+OK   uce_set_invalid_url
+RUN  uce_set_missing_entry
+OK   uce_set_missing_entry
+RUN  uce_set_w_null_args
+OK   uce_set_w_null_args
+RUN  uce_set_a_null_args
+OK   uce_set_a_null_args
+RUN  uce_info_exa_fixed_only_flag
+OK   uce_info_exa_fixed_only_flag
+RUN  uce_info_exa_matches_plain
+OK   uce_info_exa_matches_plain
+RUN  uce_info_exw_reserved_params
+OK   uce_info_exw_reserved_params
+RUN  uce_info_exa_reserved_params
+OK   uce_info_exa_reserved_params
+RUN  uce_info_a_vs_w_fields
+OK   uce_info_a_vs_w_fields
+RUN  uce_info_w_small_buffer_untouched
+OK   uce_info_w_small_buffer_untouched
+RUN  uce_info_w_null_buffer_large_size
+OK   uce_info_w_null_buffer_large_size
+RUN  uce_info_w_required_size
+OK   uce_info_w_required_size
+RUN  uce_info_w_missing_entry
+OK   uce_info_w_missing_entry
+RUN  uce_info_w_null_args
+OK   uce_info_w_null_args
+RUN  uce_info_a_no_strings_entry
+OK   uce_info_a_no_strings_entry
+RUN  uce_info_a_struct_size_ignored_on_input
+OK   uce_info_a_struct_size_ignored_on_input
+RUN  uce_info_a_struct_offsets
+OK   uce_info_a_struct_offsets
+RUN  uce_info_a_exact_and_larger
+OK   uce_info_a_exact_and_larger
+RUN  uce_info_a_small_buffers
+OK   uce_info_a_small_buffers
+RUN  uce_info_a_null_buffer_large_size
+OK   uce_info_a_null_buffer_large_size
+RUN  uce_info_a_url_length_padding
+OK   uce_info_a_url_length_padding
+RUN  uce_info_a_required_size_formula
+OK   uce_info_a_required_size_formula
+RUN  uce_info_a_invalid_url
+OK   uce_info_a_invalid_url
+RUN  uce_info_a_missing_entry
+OK   uce_info_a_missing_entry
+RUN  uce_info_a_existence_probe
+OK   uce_info_a_existence_probe
+RUN  uce_info_a_buffer_size_zero
+OK   uce_info_a_buffer_size_zero
+RUN  uce_info_a_buffer_without_size
+OK   uce_info_a_buffer_without_size
+RUN  uce_info_a_null_url
+OK   uce_info_a_null_url
+RUN  uce_create_many_distinct_urls
+OK   uce_create_many_distinct_urls
+RUN  uce_create_without_commit_no_entry
+OK   uce_create_without_commit_no_entry
+RUN  uce_create_exw_filename_hint
+OK   uce_create_exw_filename_hint
+RUN  uce_create_exw_matches_w
+OK   uce_create_exw_matches_w
+RUN  uce_create_unknown_scheme_ok
+OK   uce_create_unknown_scheme_ok
+RUN  uce_create_empty_url
+OK   uce_create_empty_url
+RUN  uce_create_invalid_http_urls_w
+OK   uce_create_invalid_http_urls_w
+RUN  uce_create_invalid_http_urls
+OK   uce_create_invalid_http_urls
+RUN  uce_create_name_non_http_scheme
+OK   uce_create_name_non_http_scheme
+RUN  uce_create_name_cookie_url_random
+OK   uce_create_name_cookie_url_random
+RUN  uce_create_name_root_url
+OK   uce_create_name_root_url
+RUN  uce_create_name_from_url
+  NOTE /dir/page.html -> page[1].dat
+  NOTE /a/b/c/leaf.txt -> leaf[1].dat
+  NOTE /noext -> noext[1].dat
+  NOTE /x.y.z -> x.y[1].dat
+  NOTE /q.txt?a=1&b=2 -> q[1].dat
+  NOTE /f.txt#frag -> f[1].dat
+OK   uce_create_name_from_url
+RUN  uce_create_ext_too_long_a
+OK   uce_create_ext_too_long_a
+RUN  uce_create_ext_too_long_w
+OK   uce_create_ext_too_long_w
+RUN  uce_create_ext_leading_dot
+OK   uce_create_ext_leading_dot
+RUN  uce_create_ext_null_and_empty
+  NOTE NULL ext -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\extnull[1]
+  NOTE "" ext -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\extempty[1]
+OK   uce_create_ext_null_and_empty
+RUN  uce_create_ext_percent_decoded
+OK   uce_create_ext_percent_decoded
+RUN  uce_create_ext_sanitized
+OK   uce_create_ext_sanitized
+RUN  uce_create_ext_table_w
+OK   uce_create_ext_table_w
+RUN  uce_create_ext_table_a
+OK   uce_create_ext_table_a
+RUN  uce_create_reserved_ignored
+OK   uce_create_reserved_ignored
+RUN  uce_create_large_expected_size
+OK   uce_create_large_expected_size
+RUN  uce_create_suffix_increments
+OK   uce_create_suffix_increments
+RUN  uce_create_unique_paths
+  NOTE unique[0] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[1].txt
+  NOTE unique[1] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[2].txt
+  NOTE unique[2] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[3].txt
+  NOTE unique[3] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[4].txt
+  NOTE unique[4] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[5].txt
+  NOTE unique[5] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[6].txt
+OK   uce_create_unique_paths
+RUN  uce_create_path_in_inetcache
+OK   uce_create_path_in_inetcache
+RUN  uce_create_a_w_same_directory
+  NOTE container C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\
+OK   uce_create_a_w_same_directory
+RUN  uce_create_w_basic_file
+  NOTE created C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\cwbasic[1].htm
+OK   uce_create_w_basic_file
+RUN  uce_create_a_basic_file
+  NOTE created C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\cbasic[1].txt
+OK   uce_create_a_basic_file
+RUN  uce_create_exw_null_args
+OK   uce_create_exw_null_args
+RUN  uce_create_w_null_filename
+OK   uce_create_w_null_filename
+RUN  uce_create_w_null_url
+OK   uce_create_w_null_url
+RUN  uce_create_a_both_null
+OK   uce_create_a_both_null
+RUN  uce_create_a_null_filename
+OK   uce_create_a_null_filename
+RUN  uce_create_a_null_url
+OK   uce_create_a_null_url
+RUN  uce_commit_many_entries
+OK   uce_commit_many_entries
+RUN  uce_commit_edited_replaced_by_normal
+OK   uce_commit_edited_replaced_by_normal
+RUN  uce_commit_over_locked_entry
+OK   uce_commit_over_locked_entry
+RUN  uce_commit_replace_type_change
+OK   uce_commit_replace_type_change
+RUN  uce_commit_replace_file_with_none
+OK   uce_commit_replace_file_with_none
+RUN  uce_commit_replace_same_file
+OK   uce_commit_replace_same_file
+RUN  uce_commit_replace_entry
+OK   uce_commit_replace_entry
+RUN  uce_commit_invalid_url
+OK   uce_commit_invalid_url
+RUN  uce_commit_original_url_invalid
+OK   uce_commit_original_url_invalid
+RUN  uce_commit_original_url
+OK   uce_commit_original_url
+RUN  uce_commit_ext_table
+OK   uce_commit_ext_table
+RUN  uce_commit_w_header_readback_w
+OK   uce_commit_w_header_readback_w
+RUN  uce_commit_w_header_empty_string
+OK   uce_commit_w_header_empty_string
+RUN  uce_commit_w_header_explicit_len
+OK   uce_commit_w_header_explicit_len
+RUN  uce_commit_w_header_utf8
+OK   uce_commit_w_header_utf8
+RUN  uce_commit_a_header_partial_len
+OK   uce_commit_a_header_partial_len
+RUN  uce_commit_a_header_len_zero
+OK   uce_commit_a_header_len_zero
+RUN  uce_commit_a_header_binary_len
+OK   uce_commit_a_header_binary_len
+RUN  uce_commit_a_header_roundtrip
+OK   uce_commit_a_header_roundtrip
+RUN  uce_commit_w_times
+OK   uce_commit_w_times
+RUN  uce_commit_times_table
+OK   uce_commit_times_table
+RUN  uce_commit_urlhistory_type_no_file
+OK   uce_commit_urlhistory_type_no_file
+RUN  uce_commit_cookie_type_no_file
+OK   uce_commit_cookie_type_no_file
+RUN  uce_commit_nonsticky_no_exempt
+OK   uce_commit_nonsticky_no_exempt
+RUN  uce_commit_sticky_exempt_delta
+OK   uce_commit_sticky_exempt_delta
+RUN  uce_commit_types_roundtrip
+OK   uce_commit_types_roundtrip
+RUN  uce_commit_size_taken_at_commit
+OK   uce_commit_size_taken_at_commit
+RUN  uce_commit_size_matches_file
+OK   uce_commit_size_matches_file
+RUN  uce_commit_zero_byte_file
+OK   uce_commit_zero_byte_file
+RUN  uce_commit_empty_local_file_string
+OK   uce_commit_empty_local_file_string
+RUN  uce_commit_no_local_file
+OK   uce_commit_no_local_file
+RUN  uce_commit_w_basic
+OK   uce_commit_w_basic
+RUN  uce_commit_a_basic
+OK   uce_commit_a_basic
+RUN  uce_commit_edited_file_outside_container
+OK   uce_commit_edited_file_outside_container
+RUN  uce_commit_file_outside_container
+OK   uce_commit_file_outside_container
+RUN  uce_commit_missing_dir
+OK   uce_commit_missing_dir
+RUN  uce_commit_w_missing_local_file
+OK   uce_commit_w_missing_local_file
+RUN  uce_commit_a_missing_local_file
+OK   uce_commit_a_missing_local_file
+RUN  uce_commit_w_null_url
+OK   uce_commit_w_null_url
+RUN  uce_commit_a_null_url
+OK   uce_commit_a_null_url
+RUN  uce_amx_nonhttp_keys_verbatim
+OK   uce_amx_nonhttp_keys_verbatim
+RUN  uce_amx_empty_url_lookups
+  NOTE GetInfoA(probe)("") -> 0 err 2
+  NOTE GetInfoA(buf)("") -> 0 err 2
+  NOTE GetInfoW(probe)("") -> 0 err 2
+  NOTE GetInfoW(buf)("") -> 0 err 2
+  NOTE GetInfoExA("") -> 0 err 2
+  NOTE GetInfoExW("") -> 0 err 2
+  NOTE RetrieveFileA("") -> 0 err 2
+  NOTE RetrieveFileW("") -> 0 err 2
+  NOTE RetrieveStreamA("") -> 0 err 2
+  NOTE RetrieveStreamW("") -> 0 err 2
+OK   uce_amx_empty_url_lookups
+RUN  uce_amx_null_url_every_op
+OK   uce_amx_null_url_every_op
+RUN  uce_amx_distinct_spellings_every_op
+OK   uce_amx_distinct_spellings_every_op
+RUN  uce_amx_https_equivalent_spellings
+OK   uce_amx_https_equivalent_spellings
+RUN  uce_amx_equivalent_spellings_every_op
+OK   uce_amx_equivalent_spellings_every_op
+RUN  uce_amx_existing_every_op
+OK   uce_amx_existing_every_op
+RUN  uce_amx_missing_every_op
+OK   uce_amx_missing_every_op
+RUN  uce_amx_invalid_url_delete_create_commit
+OK   uce_amx_invalid_url_delete_create_commit
+RUN  uce_amx_invalid_url_every_op
+OK   uce_amx_invalid_url_every_op
+SUMMARY tests=304 failed=1 skipped=0 checks_pass=4799 checks_fail=2
+@@I7 END urlcache_entries exit=0x1 ms=3402 timeout=0 bytes=25470

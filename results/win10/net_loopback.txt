@@ -2,8 +2,8 @@ RUN  netlb_srv_stop_is_bounded
 OK   netlb_srv_stop_is_bounded
 RUN  netlb_https_tls12_only_server
   NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
-  NOTE tls: proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
-OK   netlb_https_tls12_only_server
+  FAIL tests/net_loopback/net_loopback.c:471: e == 0 && code == 200 (err=12030 code=0)
+FAIL netlb_https_tls12_only_server
 RUN  netlb_https_client_cert_requested
   NOTE client cert requested, none configured: err=12044 ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED status=0
   NOTE tls: TLS_ABORT handshake recv=0 round=1
@@ -83,5 +83,5 @@ RUN  netlb_srv_selftest_chunked_upload_and_pipelining
 OK   netlb_srv_selftest_chunked_upload_and_pipelining
 RUN  netlb_srv_selftest_raw
 OK   netlb_srv_selftest_raw
-SUMMARY tests=26 failed=0 skipped=0 checks_pass=132 checks_fail=0
-@@I7 END net_loopback exit=0x0 ms=40764 timeout=0 bytes=3297
+SUMMARY tests=26 failed=1 skipped=0 checks_pass=130 checks_fail=1
+@@I7 END net_loopback exit=0x1 ms=56589 timeout=0 bytes=3319
