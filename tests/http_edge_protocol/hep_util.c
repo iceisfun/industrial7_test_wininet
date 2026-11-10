@@ -58,13 +58,25 @@ void hep_stop(hep_srv *h) {
 }
 
 /* ---------------------------------------------------------------- sessions */
+/* Keeper: one extra session handle kept open for the life of the process (see hep_zz_timing_probe and EVIDENCE.md:
+ * on the Win10 VM every test cost ~3 s when each test's session was the only open INTERNET handle). */
+static HINTERNET g_keeper;
+int hep_keeper_on(void) {
+    if (!g_keeper && U(InternetOpenA)) g_keeper = U(InternetOpenA)("hep-keeper", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    return g_keeper != NULL;
+}
+void hep_keeper_off(void) { if (g_keeper) { U(InternetCloseHandle)(g_keeper); g_keeper = NULL; } }
+static int g_keeper_auto = 1;
+void hep_keeper_auto(int on) { g_keeper_auto = on; }
 HINTERNET hep_session(const char *agent, DWORD to) {
     t_net_prepare();
+    if (g_keeper_auto) hep_keeper_on();
     return t_inet_open_ex(agent ? agent : "hep", INTERNET_OPEN_TYPE_DIRECT, 0, to ? to : 3000);
 }
 HINTERNET hep_proxy_session(hep_srv *h, const char *agent) {
     char px[64]; snprintf(px, sizeof px, "http=127.0.0.1:%u", srv_port(h->s));
     t_net_prepare();
+    if (g_keeper_auto) hep_keeper_on();
     HINTERNET hi = U(InternetOpenA)(agent ? agent : "hep-proxy", INTERNET_OPEN_TYPE_PROXY, px, "", 0);
     if (hi) {
         DWORD to = 3000;
@@ -198,13 +210,16 @@ void hep_rcase(const char *tag, const char *raw, size_t n, int mode, const char 
     if (!h) return;
     rc_ctx *c = (rc_ctx *)calloc(1, sizeof *c);
     c->h = h; c->rq.qname = qname; c->rq.obj = "/edge";
+    DWORD t0 = GetTickCount();
     HANDLE th = CreateThread(NULL, 0, rc_thread, c, 0, NULL);
     DWORD w = WaitForSingleObject(th, 20000);
     CloseHandle(th);
     if (w != WAIT_OBJECT_0) { t_check(0, __FILE__, __LINE__, tag, "request hung > 20 s"); return; /* leak c, h */ }
     EXPECT_SIG(tag, hep_sig(&c->r, what), want);
-    if (c->r.ms > 2500) t_note("%s took %lu ms", tag, c->r.ms);
+    DWORD t1 = GetTickCount();
     hep_stop(h);
+    DWORD t2 = GetTickCount();
+    if (t2 - t0 > 1500) t_note("timing: %s request+session %lu ms (send+read %lu), server stop %lu ms", tag, t1 - t0, c->r.ms, t2 - t1);
     free(c);
 }
 
@@ -232,10 +247,44 @@ void hep_dump(srv *s, int i) { t_note("req %d conn %d: %s", i, srv_req_conn(s, i
 
 static DWORD WINAPI guard_thread(void *p) { ((void (*)(void))p)(); return 0; }
 int hep_guard(const char *name, void (*fn)(void), DWORD ms) {
+    if (g_keeper_auto) hep_keeper_on();
     HANDLE th = CreateThread(NULL, 0, guard_thread, (void *)fn, 0, NULL);
     if (!th) { fn(); return 1; }
+    DWORD t0 = GetTickCount();
     DWORD r = WaitForSingleObject(th, ms);
     CloseHandle(th);
+    if (GetTickCount() - t0 > 8000) t_note("timing: %s took %lu ms", name, GetTickCount() - t0);
     t_check(r == WAIT_OBJECT_0, __FILE__, __LINE__, "guarded test finished", "%s still running after %lu ms (hang)", name, ms);
     return r == WAIT_OBJECT_0;
+}
+
+/* ---------------------------------------------------------------- timing probe (runs first: last registered) */
+static void probe_round(const char *label, int n) {
+    DWORD tot_open = 0, tot_req = 0, tot_close = 0, tot_stop = 0;
+    for (int i = 0; i < n; i++) {
+        hep_srv *h = hep_start_ok(); if (!h) return;
+        DWORD a = GetTickCount();
+        HINTERNET hi = t_inet_open_ex("hep-probe", INTERNET_OPEN_TYPE_DIRECT, 0, 3000);
+        HINTERNET hc = hep_connect(hi, h);
+        DWORD b = GetTickCount();
+        hep_req rq = {0}; hep_res r; hep_do_on(hc, &rq, &r);
+        DWORD c = GetTickCount();
+        U(InternetCloseHandle)(hc); t_inet_close(hi);
+        DWORD d = GetTickCount();
+        hep_stop(h);
+        DWORD e = GetTickCount();
+        tot_open += b - a; tot_req += c - b; tot_close += d - c; tot_stop += e - d;
+        CHECK(r.ok && r.status == 200);
+    }
+    t_note("timing probe %s (%d rounds): open %lu ms, request %lu ms, close %lu ms, server stop %lu ms", label, n, tot_open, tot_req, tot_close, tot_stop);
+}
+TEST(hep_zz_timing_probe) {
+    /* measures where per-test time goes with and without a long-lived extra session handle; never fails on timing */
+    HEP_REQUIRE_HTTP();
+    t_net_prepare();
+    hep_keeper_auto(0); hep_keeper_off();
+    probe_round("no keeper", 4);
+    hep_keeper_on();
+    probe_round("keeper", 4);
+    hep_keeper_auto(1);
 }

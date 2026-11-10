@@ -36,7 +36,7 @@ GTEST(hep_url_openurl_len_2084, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2084)
 GTEST(hep_url_openurl_len_2085, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2085); }
 GTEST(hep_url_openurl_len_4096, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(4096); }
 GTEST(hep_url_openurl_len_8192, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(8192); }
-GTEST(hep_url_openurl_len_32768, 60000) { HEP_REQUIRE_HTTP(); long_openurl(32768); }
+GTEST(hep_url_openurl_len_32768, 150000) { HEP_REQUIRE_HTTP(); long_openurl(32768); }
 TEST(hep_url_openurl_len_100000){ HEP_REQUIRE_HTTP(); long_openurl(100000); }
 
 static void long_query_openurl(size_t qlen) {
@@ -55,7 +55,7 @@ static void long_query_openurl(size_t qlen) {
     t_inet_close(hi); free(url); hep_stop(h);
 }
 GTEST(hep_url_openurl_query_2100, 60000)  { HEP_REQUIRE_HTTP(); long_query_openurl(2100); }
-GTEST(hep_url_openurl_query_16000, 60000) { HEP_REQUIRE_HTTP(); long_query_openurl(16000); }
+GTEST(hep_url_openurl_query_16000, 150000) { HEP_REQUIRE_HTTP(); long_query_openurl(16000); }
 
 /* ------------------------------------------------------------ long objects through HttpOpenRequestA */
 static void long_object(size_t len) {
@@ -74,7 +74,7 @@ GTEST(hep_url_object_len_2048, 60000)   { HEP_REQUIRE_HTTP(); long_object(2048);
 GTEST(hep_url_object_len_2084, 60000)   { HEP_REQUIRE_HTTP(); long_object(2084); }
 GTEST(hep_url_object_len_8192, 60000)   { HEP_REQUIRE_HTTP(); long_object(8192); }
 GTEST(hep_url_object_len_65536, 60000)  { HEP_REQUIRE_HTTP(); long_object(65536); }
-GTEST(hep_url_object_len_200000, 60000) { HEP_REQUIRE_HTTP(); long_object(200000); }
+GTEST(hep_url_object_len_200000, 150000) { HEP_REQUIRE_HTTP(); long_object(200000); }
 
 /* ------------------------------------------------------------ long host names (via proxy: no DNS) */
 static void long_host(size_t label, size_t total) {
@@ -119,7 +119,7 @@ static const frag_case frags[] = {
     { "/f#frag", "/f#frag" }, { "/f?q=1#frag", "/f?q=1#frag" }, { "/f#", "/f#" }, { "/#x", "/#x" }, { "/f#a#b", "/f#a#b" },
     { "/f#frag?notquery", "/f#frag?notquery" }, { "/f%23notfrag", "/f%23notfrag" },
 };
-GTEST(hep_url_fragment_sent_openurl, 60000) {
+GTEST(hep_url_fragment_sent_openurl, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof frags / sizeof frags[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -133,7 +133,7 @@ GTEST(hep_url_fragment_sent_openurl, 60000) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-GTEST(hep_url_fragment_openurl_w, 60000) {
+GTEST(hep_url_fragment_openurl_w, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW));
     HEP_SRV(h, hep_start_ok());
     WCHAR url[128]; swprintf(url, 128, L"http://127.0.0.1:%u/fw?x=1#frag", srv_port(h->s));
@@ -204,10 +204,10 @@ static void path_run(const path_case *c, int mode) {
 }
 GTEST(hep_url_path_bytes_openurl_a, 60000)     { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 0); }
 GTEST(hep_url_path_bytes_openurl_w, 60000)     { HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 1); }
-GTEST(hep_url_path_bytes_openrequest_a, 60000) { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 2); }
-GTEST(hep_url_path_bytes_openrequest_w, 60000) { HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 3); }
+GTEST(hep_url_path_bytes_openrequest_a, 150000) { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 2); }
+GTEST(hep_url_path_bytes_openrequest_w, 150000) { HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 3); }
 
-GTEST(hep_url_openrequest_w_object_is_utf8, 60000) {
+GTEST(hep_url_openrequest_w_object_is_utf8, 150000) {
     /* decomp HttpOpenRequestW@0xbea10: the object name is converted with CP_UTF8 */
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     HEP_SRV(h, hep_start_ok());
@@ -222,7 +222,7 @@ GTEST(hep_url_openrequest_w_object_is_utf8, 60000) {
 }
 
 /* ------------------------------------------------------------ code page options */
-GTEST(hep_url_codepage_options_defaults, 60000) {
+GTEST(hep_url_codepage_options_defaults, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetQueryOptionA));
     HINTERNET hi = hep_session(NULL, 0);
     static const DWORD opts[] = { INTERNET_OPTION_CODEPAGE, INTERNET_OPTION_CODEPAGE_PATH, INTERNET_OPTION_CODEPAGE_EXTRA, INTERNET_OPTION_IDN };
@@ -258,7 +258,7 @@ static void cp_case(DWORD opt, DWORD val, int on_session, const WCHAR *wpath, co
     if (tg) { char w[64]; WideCharToMultiByte(CP_UTF8, 0, wpath, -1, w, sizeof w, NULL, NULL); EXPECT_STR(tg, w); }
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_url_codepage_path_option_effect, 60000) {
+GTEST(hep_url_codepage_path_option_effect, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(InternetSetOptionA));
     cp_case(INTERNET_OPTION_CODEPAGE_PATH, CP_UTF8, 0, L"/\x00e9", "path_utf8_req");
     cp_case(INTERNET_OPTION_CODEPAGE_PATH, 1252, 0, L"/\x00e9", "path_1252_req");
@@ -266,7 +266,7 @@ GTEST(hep_url_codepage_path_option_effect, 60000) {
     cp_case(INTERNET_OPTION_CODEPAGE_EXTRA, 1252, 0, L"/p?q=\x00e9", "extra_1252_req");
     cp_case(INTERNET_OPTION_CODEPAGE, 1252, 0, L"/\x00e9", "codepage_1252_req");
 }
-GTEST(hep_url_codepage_path_openurl_w, 60000) {
+GTEST(hep_url_codepage_path_openurl_w, 150000) {
     /* set CODEPAGE_PATH / EXTRA on the session and use InternetOpenUrlW */
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); REQUIRE(U(InternetSetOptionA));
     static const struct { DWORD opt, val; const char *tag; } cs[] = {
@@ -287,7 +287,7 @@ GTEST(hep_url_codepage_path_openurl_w, 60000) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-GTEST(hep_url_codepage_invalid_values, 60000) {
+GTEST(hep_url_codepage_invalid_values, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetSetOptionA));
     HINTERNET hi = hep_session(NULL, 0);
     static const DWORD opts[] = { INTERNET_OPTION_CODEPAGE, INTERNET_OPTION_CODEPAGE_PATH, INTERNET_OPTION_CODEPAGE_EXTRA };
@@ -330,7 +330,7 @@ static void idn_case(const WCHAR *host, DWORD idn_opt, int set_idn, const char *
     if (got) { char wt[256]; snprintf(wt, sizeof wt, "http://%s/idn", want_host); EXPECT_STR(tg, wt); EXPECT_STR(hh, want_host); }
     t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_idn_openurl_w_default, 60000) {
+GTEST(hep_idn_openurl_w_default, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW));
     idn_case(L"b\x00fc" L"cher.example", 0, 0, "buecher", "xn--bcher-kva.example");
     idn_case(L"\x4e2d\x6587.example", 0, 0, "cjk", "xn--fiq228c.example");
@@ -338,14 +338,14 @@ GTEST(hep_idn_openurl_w_default, 60000) {
     idn_case(L"xn--bcher-kva.example", 0, 0, "already_puny", "xn--bcher-kva.example");
     idn_case(L"\x00e9.\x00e9.example", 0, 0, "two_labels", "xn--9ca.xn--9ca.example");
 }
-GTEST(hep_idn_option_values, 60000) {
+GTEST(hep_idn_option_values, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); REQUIRE(U(InternetSetOptionA));
     idn_case(L"b\x00fc" L"cher.example", 0, 1, "idn0", "xn--bcher-kva.example");
     idn_case(L"b\x00fc" L"cher.example", 1, 1, "idn1_direct", "xn--bcher-kva.example");
     idn_case(L"b\x00fc" L"cher.example", 2, 1, "idn2_proxy", "xn--bcher-kva.example");
     idn_case(L"b\x00fc" L"cher.example", 3, 1, "idn3", "xn--bcher-kva.example");
 }
-GTEST(hep_idn_openurl_a_high_bytes, 60000) {
+GTEST(hep_idn_openurl_a_high_bytes, 150000) {
     HEP_REQUIRE_HTTP();
     static const char *hosts[] = { "b\xfc" "cher.example", "b\xc3\xbc" "cher.example" };
     for (int i = 0; i < 2; i++) {
@@ -363,7 +363,7 @@ GTEST(hep_idn_openurl_a_high_bytes, 60000) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-GTEST(hep_idn_connect_w_host_header, 60000) {
+GTEST(hep_idn_connect_w_host_header, 150000) {
     /* InternetConnectW with a Unicode server name through the proxy: HostWCharToCharEx (IDN aware) per decomp */
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetConnectW)); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     HEP_SRV(h, hep_start_ok());
@@ -396,7 +396,7 @@ static const dp_case dps[] = {
     { "http://dp.example?q", "http://dp.example/?q", "dp.example" },
     { "http://dp.example:443/x", "http://dp.example:443/x", "dp.example:443" },
 };
-GTEST(hep_default_port_host_header_via_proxy, 60000) {
+GTEST(hep_default_port_host_header_via_proxy, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof dps / sizeof dps[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -409,7 +409,7 @@ GTEST(hep_default_port_host_header_via_proxy, 60000) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-GTEST(hep_default_port_connect_port_values_via_proxy, 60000) {
+GTEST(hep_default_port_connect_port_values_via_proxy, 150000) {
     HEP_REQUIRE_HTTP();
     static const INTERNET_PORT ports[] = { 0, 80, 443, 8080, 65535 };
     for (int i = 0; i < 5; i++) {
@@ -432,7 +432,7 @@ GTEST(hep_default_port_connect_port_values_via_proxy, 60000) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-GTEST(hep_direct_host_header_has_port, 60000) {
+GTEST(hep_direct_host_header_has_port, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     hep_req rq = {0}; hep_res r; hep_do(h, &rq, &r);
@@ -443,7 +443,7 @@ GTEST(hep_direct_host_header_has_port, 60000) {
 }
 
 /* ------------------------------------------------------------ IPv6 literals */
-GTEST(hep_ipv6_openurl_brackets, 60000) {
+GTEST(hep_ipv6_openurl_brackets, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     if (!srv_has_v6(h->s)) { t_skip("no [::1] listener in this guest"); hep_stop(h); return; }
@@ -457,7 +457,7 @@ GTEST(hep_ipv6_openurl_brackets, 60000) {
     }
     t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_ipv6_connect_forms, 60000) {
+GTEST(hep_ipv6_connect_forms, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     if (!srv_has_v6(h->s)) { t_skip("no [::1] listener in this guest"); hep_stop(h); return; }
@@ -485,7 +485,7 @@ GTEST(hep_ipv6_connect_forms, 60000) {
     }
     hep_stop(h);
 }
-GTEST(hep_ipv6_openurl_variants, 60000) {
+GTEST(hep_ipv6_openurl_variants, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     if (!srv_has_v6(h->s)) { t_skip("no [::1] listener in this guest"); hep_stop(h); return; }
@@ -539,7 +539,7 @@ static void userinfo_case(const char *ui, const char *tag, const char *want_deco
     }
     t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_userinfo_table, 60000) {
+GTEST(hep_userinfo_table, 150000) {
     HEP_REQUIRE_HTTP();
     userinfo_case("user:pass", "plain", "user:pass", 0);
     userinfo_case("user", "user_only", NULL, 0);
@@ -549,7 +549,7 @@ GTEST(hep_userinfo_table, 60000) {
     userinfo_case("u:p:q", "colon_in_pass", NULL, ERROR_INTERNET_INVALID_URL);   /* second ':' -> port parse fails */
     userinfo_case("d%5Cu:p", "domain_backslash", "d\\\\u:p", 0);
 }
-GTEST(hep_userinfo_basic_preemptive_or_challenge, 60000) {
+GTEST(hep_userinfo_basic_preemptive_or_challenge, 150000) {
     /* the userinfo credentials end up in a Basic Authorization header; record whether the first request carries it */
     HEP_REQUIRE_HTTP();
     static const srv_step st[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"r\"\r\n", "no"), S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP_TO(2) };
@@ -567,7 +567,7 @@ GTEST(hep_userinfo_basic_preemptive_or_challenge, 60000) {
     for (int i = 0; i < srv_req_count(h->s); i++) EXPECT_STR(srv_req_target(h->s, i), "/ui");
     t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_userinfo_not_in_host_header, 60000) {
+GTEST(hep_userinfo_not_in_host_header, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     char url[256]; snprintf(url, sizeof url, "http://u:p@127.0.0.1:%u/h", srv_port(h->s));
@@ -582,7 +582,7 @@ GTEST(hep_userinfo_not_in_host_header, 60000) {
     }
     t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_userinfo_via_proxy_absolute_form, 60000) {
+GTEST(hep_userinfo_via_proxy_absolute_form, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_proxy_session(h, "hep-ui");

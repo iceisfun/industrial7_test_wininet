@@ -109,7 +109,7 @@ RCASEH(ct_charset_bogus,        S200 "Content-Type: text/html; charset=\"x-bogus
 RCASEH(ct_no_type,              S200 "Content-Type:\r\n" CL2, "Content-Type", NULL)
 
 /* ------------------------------------------------------------ the body bytes are never transcoded */
-GTEST(hep_ct_charset_body_bytes_identical, 60000) {
+GTEST(hep_ct_charset_body_bytes_identical, 150000) {
     HEP_REQUIRE_HTTP();
     static const char *types[] = { "text/plain; charset=utf-8", "text/plain; charset=iso-8859-1", "text/html; charset=shift_jis",
                                    "application/json; charset=utf-16", "text/plain; charset=koi8-r", "application/octet-stream" };
@@ -148,11 +148,11 @@ GTEST(hep_size_header_value_1k, 60000)   { HEP_REQUIRE_HTTP(); long_header_case(
 GTEST(hep_size_header_value_8k, 60000)   { HEP_REQUIRE_HTTP(); long_header_case(8192, NULL, 1); }
 GTEST(hep_size_header_value_16k, 60000)  { HEP_REQUIRE_HTTP(); long_header_case(16384, NULL, 1); }
 GTEST(hep_size_header_value_64k, 60000)  { HEP_REQUIRE_HTTP(); long_header_case(65536, NULL, 1); }
-GTEST(hep_size_header_value_128k, 60000) { HEP_REQUIRE_HTTP(); long_header_case(131072, NULL, 1); }
-GTEST(hep_size_header_value_256k, 60000) { HEP_REQUIRE_HTTP(); long_header_case(262144, NULL, 1); }
+GTEST(hep_size_header_value_128k, 150000) { HEP_REQUIRE_HTTP(); long_header_case(131072, NULL, 1); }
+GTEST(hep_size_header_value_256k, 150000) { HEP_REQUIRE_HTTP(); long_header_case(262144, NULL, 1); }
 GTEST(hep_size_header_value_1m, 60000)   { HEP_REQUIRE_HTTP(); long_header_case(1048576, NULL, 1); }
 
-GTEST(hep_size_long_header_value_roundtrip_64k, 60000) {
+GTEST(hep_size_long_header_value_roundtrip_64k, 150000) {
     /* when a 64 KB value is accepted, HttpQueryInfo returns it byte for byte */
     HEP_REQUIRE_HTTP();
     size_t vlen = 65536, cap = vlen + 256; char *raw = (char *)malloc(cap);
@@ -232,7 +232,7 @@ GTEST(hep_split_1byte_2ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_1_2"
 GTEST(hep_split_2byte_5ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_2_5", 2, 5, SPLIT_WANT); }
 GTEST(hep_split_3byte_1ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_3_1", 3, 1, SPLIT_WANT); }
 GTEST(hep_split_7byte_10ms, 60000)  { HEP_REQUIRE_HTTP(); split_case("split_7_10", 7, 10, SPLIT_WANT); }
-GTEST(hep_split_17byte_20ms, 60000) { HEP_REQUIRE_HTTP(); split_case("split_17_20", 17, 20, SPLIT_WANT); }
+GTEST(hep_split_17byte_20ms, 150000) { HEP_REQUIRE_HTTP(); split_case("split_17_20", 17, 20, SPLIT_WANT); }
 
 static int split_at_call(srv_conn *c, const srv_step *st, void *user) {
     /* send the response in two writes split exactly at offset *(int*)user, 60 ms apart */
@@ -244,7 +244,7 @@ static int split_at_call(srv_conn *c, const srv_step *st, void *user) {
     srv_conn_send(c, raw + at, sizeof raw - 1 - (size_t)at);
     return -1;
 }
-GTEST(hep_split_every_boundary, 60000) {
+GTEST(hep_split_every_boundary, 150000) {
     /* a two-segment response, split at every offset of the head: CR|LF, inside the status line, inside "\r\n\r\n" */
     HEP_REQUIRE_HTTP();
     static const char raw[] = "HTTP/1.1 200 OK\r\nX-T: split-value\r\nContent-Length: 10\r\n\r\n0123456789";

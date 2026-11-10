@@ -45,7 +45,7 @@ static const verb_case verbs[] = {
     { "PROPFIND", NULL }, { "MKCOL", NULL }, { "M-SEARCH", NULL }, { "FOO", NULL }, { "foo_bar", NULL }, { "X", NULL },
     { "VERYLONGMETHODNAMEVERYLONGMETHODNAMEVERYLONGMETHODNAMEVERYLONGMETHODNAME", NULL },
 };
-GTEST(hep_method_token_table, 60000) {
+GTEST(hep_method_token_table, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof verbs / sizeof verbs[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -56,12 +56,16 @@ GTEST(hep_method_token_table, 60000) {
         if (o.ok && srv_req_count(h->s) > 0) {
             /* the method is sent exactly as given (no case folding) */
             EXPECT_STR(srv_req_method(h->s, 0), verbs[i].verb);
+            /* Win10 VM: only the exact upper-case tokens GET and HEAD are body-less; every other method (including
+             * "get"/"head") gets "Content-Length: 0" */
+            int bodyless = !strcmp(verbs[i].verb, "GET") || !strcmp(verbs[i].verb, "HEAD");
+            if (bodyless) EXPECT_NOHDR(h->s, 0, "Content-Length"); else EXPECT_HDR(h->s, 0, "Content-Length", "0");
             if (verbs[i].want_line_prefix) EXPECT_STR(srv_req_line(h->s, 0), verbs[i].want_line_prefix);
         }
         hep_stop(h);
     }
 }
-GTEST(hep_method_trace_track_rejected, 60000) {
+GTEST(hep_method_trace_track_rejected, 150000) {
     /* decomp InternalHttpOpenRequestA@0x8b9b0: verb compared with CompareStringA(NORM_IGNORECASE) against "TRACE" and
      * "TRACK" -> 0x2ef0 = 12016 ERROR_INTERNET_INVALID_OPERATION, no handle */
     HEP_REQUIRE_HTTP();
@@ -75,8 +79,18 @@ GTEST(hep_method_trace_track_rejected, 60000) {
         EXPECT_ERR(ERROR_INTERNET_INVALID_OPERATION);
         if (hr) U(InternetCloseHandle)(hr);
     }
+    /* the comparison covers at most 5 characters (decomp: length capped at 5), so "TRACES"/"TRACKING" are refused too
+     * (Win10 VM: TRACES -> 12016) */
+    static const char *pre[] = { "TRACES", "trackx", "TRACKING" };
+    for (int i = 0; i < 3; i++) {
+        SetLastError(0);
+        HINTERNET hr = U(HttpOpenRequestA)(hc, pre[i], "/t", NULL, NULL, NULL, HEP_F, 0);
+        CHECKF(hr == NULL, "%s accepted", pre[i]);
+        EXPECT_ERR(ERROR_INTERNET_INVALID_OPERATION);
+        if (hr) U(InternetCloseHandle)(hr);
+    }
     /* near misses are ordinary methods */
-    static const char *ok[] = { "TRACES", "TRAC", "XTRACE" };
+    static const char *ok[] = { "TRAC", "XTRACE", "TRAKE" };
     for (int i = 0; i < 3; i++) {
         HINTERNET hr = U(HttpOpenRequestA)(hc, ok[i], "/t", NULL, NULL, NULL, HEP_F, 0);
         CHECKF(hr != NULL, "%s rejected err %lu", ok[i], GetLastError());
@@ -84,7 +98,7 @@ GTEST(hep_method_trace_track_rejected, 60000) {
     }
     U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_method_trace_rejected_w, 60000) {
+GTEST(hep_method_trace_rejected_w, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -95,7 +109,7 @@ GTEST(hep_method_trace_rejected_w, 60000) {
     if (hr) U(InternetCloseHandle)(hr);
     U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_method_lowercase_head_reads_body, 60000) {
+GTEST(hep_method_lowercase_head_reads_body, 150000) {
     /* "head" in lower case: is it treated as HEAD (no body expected) or as an unknown method that has a body? */
     HEP_REQUIRE_HTTP();
     static const srv_step st[] = { S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nbody"), S_CLOSE() };
@@ -106,30 +120,37 @@ GTEST(hep_method_lowercase_head_reads_body, 60000) {
         hep_do(h, &rq, &r);
         t_note("OBS verb %s on CL:4 reply -> %s", vs[i], hep_sig(&r, 0));
         CHECK(r.ok);
-        if (i == 0) EXPECT_EQ(r.nbody, 0);
+        /* Win10 VM: only "HEAD" in upper case suppresses the body; "head"/"Head" read the 4 bytes */
+        EXPECT_EQ(r.nbody, i == 0 ? 0 : 4);
         hep_stop(h);
     }
 }
-GTEST(hep_method_null_is_get, 60000) {
+GTEST(hep_method_null_is_get, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     rq_out o; CHECK(one(h, NULL, "/n", NULL, NULL, 0, NULL, 0, &o));
     EXPECT_STR(srv_req_line(h->s, 0), "GET /n HTTP/1.1");
     hep_stop(h);
 }
-GTEST(hep_method_empty_string, 60000) {
+GTEST(hep_method_empty_string, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     rq_out o; one(h, "", "/n", NULL, NULL, 0, NULL, 0, &o);
     t_note("OBS empty verb -> %s", wire_sig(h, &o));
+    CHECK(o.ok);   /* decomp InternalHttpOpenRequestA: NULL or "" -> "GET" */
+    if (o.ok) EXPECT_STR(srv_req_line(h->s, 0), "GET /n HTTP/1.1");
     hep_stop(h);
 }
-GTEST(hep_method_with_space_and_ctl, 60000) {
+GTEST(hep_method_with_space_and_ctl, 150000) {
     HEP_REQUIRE_HTTP();
     static const char *vs[] = { "GE T", "GET ", " GET", "G\tET", "GET\r\nX-Inj: 1\r\n", "GET /evil HTTP/1.1\r\nX:", "G\x80T", "G\xc3\xa9T" };
+    /* Win10 VM: leading/trailing blanks are trimmed; an inner blank, control or non-ASCII byte -> open fails 87 */
+    static const int ok_[] = { 0, 1, 1, 0, 0, 0, 0, 0 };
     for (size_t i = 0; i < sizeof vs / sizeof vs[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
         rq_out o; one(h, vs[i], "/v", NULL, NULL, 0, NULL, 0, &o);
+        if (ok_[i]) { CHECK(o.ok); if (o.ok) EXPECT_STR(srv_req_line(h->s, 0), "GET /v HTTP/1.1"); }
+        else { CHECK(!o.open_ok); EXPECT_EQ(o.open_err, ERROR_INVALID_PARAMETER); }
         t_note("OBS verb [%s] -> %s raw=%s", hep_esc(vs[i], strlen(vs[i])), wire_sig(h, &o), o.ok ? hep_raw(h->s, 0) : "-");
         hep_stop(h);
     }
@@ -138,17 +159,17 @@ GTEST(hep_method_with_space_and_ctl, 60000) {
 /* ------------------------------------------------------------ object (request target) */
 typedef struct { const char *obj; const char *want_target; } obj_case;
 static const obj_case objs[] = {
-    { NULL, "/" }, { "", NULL }, { "/", "/" }, { "x", NULL }, { "x/y", NULL }, { "*", NULL }, { "//double", NULL },
-    { "/a/../b", NULL }, { "/a/./b", NULL }, { "/a b", NULL }, { "/a%20b", "/a%20b" }, { "/a+b", "/a+b" },
-    { "/%41%42", NULL }, { "/%zz", NULL }, { "/%", NULL }, { "/%2", NULL }, { "/%00x", NULL }, { "/%2F", NULL },
-    { "/p?q=1&r=2", "/p?q=1&r=2" }, { "/p?q=a b", NULL }, { "/p?", NULL }, { "/p#frag", NULL }, { "/p?q#f", NULL },
-    { "/back\\slash", NULL }, { "/tab\there", NULL }, { "/quote\"x", NULL }, { "/lt<gt>", NULL }, { "/brace{}|^`", NULL },
-    { "/\x7f", NULL }, { "/\xe9", NULL }, { "/\xc3\xa9", NULL }, { "/\xe4\xb8\xad", NULL },
-    { "http://other.example/abs", NULL }, { "http://127.0.0.1/abs", NULL }, { "HTTP://X/Y", NULL }, { "ftp://x/y", NULL },
-    { "/crlf\r\nX-Inj: 1", NULL }, { "/lf\nX-Inj: 1", NULL }, { "/cr\rX", NULL },
+    { NULL, "/" }, { "", "/" }, { "/", "/" }, { "x", "/x" }, { "x/y", "/x/y" }, { "*", "/*" }, { "//double", "//double" },
+    { "/a/../b", "/b" }, { "/a/./b", "/a/b" }, { "/a b", "/a%20b" }, { "/a%20b", "/a%20b" }, { "/a+b", "/a+b" },
+    { "/%41%42", "/%41%42" }, { "/%zz", "/%zz" }, { "/%", "/%" }, { "/%2", "/%2" }, { "/%00x", "/%00x" }, { "/%2F", "/%2F" },
+    { "/p?q=1&r=2", "/p?q=1&r=2" }, { "/p?q=a b", "/p?q=a%20b" }, { "/p?", "/p?" }, { "/p#frag", "/p#frag" }, { "/p?q#f", "/p?q#f" },
+    { "/back\\slash", "/back/slash" }, { "/tab\there", "/tabhere" }, { "/quote\"x", "/quote\"x" }, { "/lt<gt>", "/lt<gt>" }, { "/brace{}|^`", "/brace{}|^`" },
+    { "/\x7f", "/\x7f" }, { "/\xe9", "/\xe9" }, { "/\xc3\xa9", "/\xc3\xa9" }, { "/\xe4\xb8\xad", "/\xe4\xb8\xad" },
+    { "http://other.example/abs", "/http://other.example/abs" }, { "http://127.0.0.1/abs", "/http://127.0.0.1/abs" }, { "HTTP://X/Y", "/HTTP://X/Y" }, { "ftp://x/y", "/ftp://x/y" },
+    { "/crlf\r\nX-Inj: 1", "/crlfX-Inj:%201" }, { "/lf\nX-Inj: 1", NULL }, { "/cr\rX", NULL },
     { "/space HTTP/1.0\r\nX-Inj: 1\r\n\r\nGET /smuggled", NULL },
 };
-GTEST(hep_object_table, 60000) {
+GTEST(hep_object_table, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof objs / sizeof objs[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -157,6 +178,7 @@ GTEST(hep_object_table, 60000) {
         t_note("OBS obj [%s] -> %s | %s", nm, o.ok ? hep_esc(srv_req_target(h->s, 0) ? srv_req_target(h->s, 0) : "", srv_req_target(h->s, 0) ? strlen(srv_req_target(h->s, 0)) : 0) : "-",
                o.ok ? hep_raw(h->s, 0) : wire_sig(h, &o));
         if (objs[i].want_target) { CHECK(o.ok); if (o.ok) EXPECT_STR(srv_req_target(h->s, 0), objs[i].want_target); }
+        else t_note("OBS obj [%s] not frozen yet", nm);
         hep_stop(h);
     }
 }
@@ -164,20 +186,24 @@ GTEST(hep_object_table, 60000) {
 /* ------------------------------------------------------------ version */
 typedef struct { const char *ver; const char *want_line; } ver_case;
 static const ver_case vers[] = {
-    { NULL, "GET /v HTTP/1.1" }, { "HTTP/1.1", "GET /v HTTP/1.1" }, { "HTTP/1.0", NULL }, { "", NULL }, { "HTTP/2.0", NULL },
-    { "HTTP/0.9", NULL }, { "http/1.1", NULL }, { "FOO/9", NULL }, { "HTTP/1.1\r\nX-Inj: 1", NULL }, { "HTTP/1.1 extra", NULL },
+    /* Win10 VM: 1.0 and 0.9 are raised to 1.1 (GlobalEnableHttp1_1), other versions kept verbatim (case too), a non-HTTP
+     * token falls back to the default; trailing text or CR/LF after the number -> open fails 12153 (12153 = ERROR_HTTP_INVALID_HEADER) */
+    { NULL, "GET /v HTTP/1.1" }, { "HTTP/1.1", "GET /v HTTP/1.1" }, { "HTTP/1.0", "GET /v HTTP/1.1" }, { "", "GET /v HTTP/1.1" },
+    { "HTTP/2.0", "GET /v HTTP/2.0" }, { "HTTP/0.9", "GET /v HTTP/1.1" }, { "http/1.1", "GET /v http/1.1" }, { "FOO/9", "GET /v HTTP/1.1" },
+    { "HTTP/1.1\r\nX-Inj: 1", "!12153" }, { "HTTP/1.1 extra", "!12153" },
 };
-GTEST(hep_version_table, 60000) {
+GTEST(hep_version_table, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof vers / sizeof vers[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
         rq_out o; one(h, "GET", "/v", vers[i].ver, NULL, 0, NULL, 0, &o);
         t_note("OBS version [%s] -> %s raw=%s", vers[i].ver ? hep_esc(vers[i].ver, strlen(vers[i].ver)) : "(null)", wire_sig(h, &o), o.ok ? hep_raw(h->s, 0) : "-");
-        if (vers[i].want_line) { CHECK(o.ok); if (o.ok) EXPECT_STR(srv_req_line(h->s, 0), vers[i].want_line); }
+        if (vers[i].want_line && vers[i].want_line[0] == '!') { CHECK(!o.open_ok); EXPECT_EQ(o.open_err, (DWORD)atoi(vers[i].want_line + 1)); }
+        else if (vers[i].want_line) { CHECK(o.ok); if (o.ok) EXPECT_STR(srv_req_line(h->s, 0), vers[i].want_line); }
         hep_stop(h);
     }
 }
-GTEST(hep_all_null_open_request, 60000) {
+GTEST(hep_all_null_open_request, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -191,7 +217,7 @@ GTEST(hep_all_null_open_request, 60000) {
     CHECK(U(HttpQueryInfoA)(hr, HTTP_QUERY_REQUEST_METHOD, b, &l, NULL)); EXPECT_STR(b, "GET");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_all_null_open_request_w, 60000) {
+GTEST(hep_all_null_open_request_w, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -214,7 +240,7 @@ static const hlen_case hlens[] = {
     { "\r\n\r\nX-A: 1\r\n", (DWORD)-1, "leading_blank_lines" }, { "X-A: 1\nX-B: 2\n", (DWORD)-1, "lf_only" },
     { "X-A: 1\rX-B: 2\r", (DWORD)-1, "cr_only" }, { "X-A: 1", (DWORD)-1, "no_crlf" },
 };
-GTEST(hep_send_header_length_table, 60000) {
+GTEST(hep_send_header_length_table, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof hlens / sizeof hlens[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -224,7 +250,7 @@ GTEST(hep_send_header_length_table, 60000) {
         hep_stop(h);
     }
 }
-GTEST(hep_send_header_length_exact_and_minus1_agree, 60000) {
+GTEST(hep_send_header_length_exact_and_minus1_agree, 150000) {
     HEP_REQUIRE_HTTP();
     hep_srv *h1 = hep_start_ok(); if (!h1) return;
     hep_srv *h2 = hep_start_ok(); if (!h2) { hep_stop(h1); return; }
@@ -235,14 +261,14 @@ GTEST(hep_send_header_length_exact_and_minus1_agree, 60000) {
     EXPECT_HDR(h1->s, 0, "X-C", "3"); EXPECT_HDR(h2->s, 0, "X-C", "3");
     hep_stop(h1); hep_stop(h2);
 }
-GTEST(hep_send_header_length_two_lines_prefix, 60000) {
+GTEST(hep_send_header_length_two_lines_prefix, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     rq_out o; CHECK(one(h, "GET", "/h", NULL, H3, 16, NULL, 0, &o));
     EXPECT_HDR(h->s, 0, "X-A", "1"); EXPECT_HDR(h->s, 0, "X-B", "2"); EXPECT_NOHDR(h->s, 0, "X-C");
     hep_stop(h);
 }
-GTEST(hep_send_header_length_w_table, 60000) {
+GTEST(hep_send_header_length_w_table, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     static const WCHAR hw[] = L"X-A: 1\r\nX-B: 2\r\nX-C: 3\r\n";
     static const DWORD lens[] = { (DWORD)-1, 24, 16, 8, 0, 48, 25 };
@@ -275,7 +301,7 @@ static const inj_case injs[] = {
     { "X-A: \x80\xff", HTTP_ADDREQ_FLAG_ADD, "high_bytes" },
     { "X-A: \t v \t", HTTP_ADDREQ_FLAG_ADD, "ws_value" },
 };
-GTEST(hep_inject_add_request_headers_table, 60000) {
+GTEST(hep_inject_add_request_headers_table, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     for (size_t i = 0; i < sizeof injs / sizeof injs[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -295,7 +321,7 @@ GTEST(hep_inject_add_request_headers_table, 60000) {
         U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
     }
 }
-GTEST(hep_inject_crlf_in_add_gives_two_headers, 60000) {
+GTEST(hep_inject_crlf_in_add_gives_two_headers, 150000) {
     /* documented: lpszHeaders may hold several CRLF-separated headers */
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     HEP_SRV(h, hep_start_ok());
@@ -318,7 +344,7 @@ static const send_inj send_injs[] = {
     { "X-A: v\r\n X-Fold: 1\r\n", 0, "X-A|X-Fold|User-Agent|Host|Connection|Cache-Control" },             /* no folding */
     { "X-A: v\r\nUser-Agent: other\r\n", 0, NULL },
 };
-GTEST(hep_inject_send_headers_table, 60000) {
+GTEST(hep_inject_send_headers_table, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof send_injs / sizeof send_injs[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -373,7 +399,7 @@ GTEST(hep_inject_send_connection_close_header, 30000) {
     U(InternetCloseHandle)(hc); t_inet_close(hi); t_note("step closed session");
     hep_stop(h); t_note("step server stopped");
 }
-GTEST(hep_inject_user_agent_crlf, 60000) {
+GTEST(hep_inject_user_agent_crlf, 150000) {
     HEP_REQUIRE_HTTP();
     static const char *agents[] = { "ua\r\nX-Inj: 1", "ua\nX-Inj: 1", "ua\rX", "ua\r\n\r\nGET /smuggled HTTP/1.1" };
     for (int i = 0; i < 4; i++) {
@@ -389,7 +415,7 @@ GTEST(hep_inject_user_agent_crlf, 60000) {
         hep_stop(h);
     }
 }
-GTEST(hep_inject_referrer_crlf, 60000) {
+GTEST(hep_inject_referrer_crlf, 150000) {
     HEP_REQUIRE_HTTP();
     static const char *refs[] = { "http://r.example/\r\nX-Inj: 1", "http://r.example/a b", "http://r.example/\xe9" };
     for (int i = 0; i < 3; i++) {
@@ -409,7 +435,7 @@ GTEST(hep_inject_referrer_crlf, 60000) {
 }
 
 /* ------------------------------------------------------------ A vs W non-ASCII headers */
-GTEST(hep_nonascii_send_headers_a_verbatim, 60000) {
+GTEST(hep_nonascii_send_headers_a_verbatim, 150000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     rq_out o; CHECK(one(h, "GET", "/a", NULL, "X-U: \xc3\xa9\xe9\x80\xff\r\n", (DWORD)-1, NULL, 0, &o));
@@ -434,7 +460,7 @@ static void w_send_case(const WCHAR *hdr, const char *tag, int via_add, const ch
     }
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_nonascii_w_send_headers, 60000) {
+GTEST(hep_nonascii_w_send_headers, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     w_send_case(L"X-U: \x00e9\r\n", "e_acute", 0, "\\xc3\\xa9");
     w_send_case(L"X-U: \x20ac\r\n", "euro", 0, "\\xe2\\x82\\xac");
@@ -444,14 +470,14 @@ GTEST(hep_nonascii_w_send_headers, 60000) {
     w_send_case(L"X-U: \xd83d\r\n", "lone_surrogate", 0, "\\xef\\xbf\\xbd");
     w_send_case(L"X-U: \x0080\x00ff\r\n", "latin1_range", 0, "\\xc2\\x80\\xc3\\xbf");
 }
-GTEST(hep_nonascii_w_add_headers, 60000) {
+GTEST(hep_nonascii_w_add_headers, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW)); REQUIRE(U(HttpAddRequestHeadersW));
     w_send_case(L"X-U: \x00e9", "e_acute", 1, "\\xc3\\xa9");
     w_send_case(L"X-U: \x20ac", "euro", 1, "\\xe2\\x82\\xac");
     w_send_case(L"X-U: \x4e2d\x6587", "cjk", 1, "\\xe4\\xb8\\xad\\xe6\\x96\\x87");
     w_send_case(L"X-U: \x2603", "snowman", 1, "\\xe2\\x98\\x83");
 }
-GTEST(hep_nonascii_w_add_headers_utf8, 60000) {
+GTEST(hep_nonascii_w_add_headers_utf8, 150000) {
     /* decomp: HttpAddRequestHeadersW converts with CP_UTF8 */
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW)); REQUIRE(U(HttpAddRequestHeadersW));
     HEP_SRV(h, hep_start_ok());
@@ -465,7 +491,7 @@ GTEST(hep_nonascii_w_add_headers_utf8, 60000) {
     if (v) EXPECT_STR(hep_esc(v, strlen(v)), "\\xe4\\xb8\\xad");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_nonascii_w_header_name, 60000) {
+GTEST(hep_nonascii_w_header_name, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW)); REQUIRE(U(HttpAddRequestHeadersW));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -479,7 +505,7 @@ GTEST(hep_nonascii_w_header_name, 60000) {
     if (ok) EXPECT_STR(srv_req_header(h->s, 0, "X-\xc3\xa9"), "v");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_nonascii_w_query_request_header_back, 60000) {
+GTEST(hep_nonascii_w_query_request_header_back, 150000) {
     /* request header stored as UTF-8 bytes, HttpQueryInfoW converts back with ACP (decomp HttpQueryInfoW) */
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpAddRequestHeadersW)); REQUIRE(U(HttpQueryInfoW));
     HEP_SRV(h, hep_start_ok());
@@ -498,7 +524,7 @@ GTEST(hep_nonascii_w_query_request_header_back, 60000) {
     if (q) EXPECT_STR(hep_esc(a, al), "\\xc3\\xa9");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_nonascii_w_verb_and_version, 60000) {
+GTEST(hep_nonascii_w_verb_and_version, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     static const WCHAR *verbs_w[] = { L"G\x00e9T", L"G\x4e2dT" };
     for (int i = 0; i < 2; i++) {
@@ -516,7 +542,7 @@ GTEST(hep_nonascii_w_verb_and_version, 60000) {
 }
 
 /* ------------------------------------------------------------ HttpAddRequestHeaders on a sent request */
-GTEST(hep_add_after_send_succeeds_and_applies_to_resend, 60000) {
+GTEST(hep_add_after_send_succeeds_and_applies_to_resend, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -534,7 +560,7 @@ GTEST(hep_add_after_send_succeeds_and_applies_to_resend, 60000) {
     EXPECT_HDR(h->s, 1, "X-Late", "1");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_add_after_send_replace_host, 60000) {
+GTEST(hep_add_after_send_replace_host, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -552,7 +578,7 @@ GTEST(hep_add_after_send_replace_host, 60000) {
     EXPECT_HDR(h->s, 0, "Host", hep_hostport(h));
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_add_between_send_and_read, 60000) {
+GTEST(hep_add_between_send_and_read, 150000) {
     /* adding while the response body is still unread does not disturb the read */
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     HEP_SRV(h, hep_start_ok());
@@ -567,7 +593,7 @@ GTEST(hep_add_between_send_and_read, 60000) {
     EXPECT_STR(q, "1");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_add_remove_after_send, 60000) {
+GTEST(hep_add_remove_after_send, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
@@ -583,7 +609,7 @@ GTEST(hep_add_remove_after_send, 60000) {
     EXPECT_NOHDR(h->s, 1, "X-Gone");
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-GTEST(hep_send_headers_not_sticky_across_resend, 60000) {
+GTEST(hep_send_headers_not_sticky_across_resend, 150000) {
     /* headers passed to HttpSendRequest: are they kept for the next HttpSendRequest on the same handle? */
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
@@ -616,8 +642,8 @@ static void big_req_header(size_t vlen) {
 }
 GTEST(hep_req_header_value_8k, 60000)   { HEP_REQUIRE_HTTP(); big_req_header(8192); }
 GTEST(hep_req_header_value_64k, 60000)  { HEP_REQUIRE_HTTP(); big_req_header(65536); }
-GTEST(hep_req_header_value_200k, 60000) { HEP_REQUIRE_HTTP(); big_req_header(200000); }
-GTEST(hep_req_header_count_500, 60000) {
+GTEST(hep_req_header_value_200k, 150000) { HEP_REQUIRE_HTTP(); big_req_header(200000); }
+GTEST(hep_req_header_count_500, 150000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpAddRequestHeadersA));
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);

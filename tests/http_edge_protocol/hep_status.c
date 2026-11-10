@@ -20,27 +20,27 @@ RCASE(st_699,                   "HTTP/1.1 699 X\r\n" CL2, "ok=1 st=699 ver=HTTP/
 RCASE(st_999,                   "HTTP/1.1 999 X\r\n" CL2, "ok=1 st=999 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_1000,                  "HTTP/1.1 1000 X\r\n" CL2, "ok=1 st=1000 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_12345,                 "HTTP/1.1 12345 X\r\n" CL2, "ok=1 st=12345 ver=HTTP/1.1 txt=X n=2 body=hi")
-RCASE(st_4294967295,            "HTTP/1.1 4294967295 X\r\n" CL2, NULL)
+RCASE(st_4294967295,            "HTTP/1.1 4294967295 X\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_4294967296,            "HTTP/1.1 4294967296 X\r\n" CL2, "ok=0 err=12152")
 RCASE(st_99999999999999999999,  "HTTP/1.1 99999999999999999999 X\r\n" CL2, "ok=0 err=12152")
 RCASE(st_099,                   "HTTP/1.1 099 X\r\n" CL2, "ok=1 st=99 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_099_no_reason,         "HTTP/1.1 099\r\n" CL2, "ok=1 st=99 ver=HTTP/1.1 txt= n=2 body=hi")
-RCASE(st_0,                     "HTTP/1.1 0 Zero\r\n" CL2, NULL)
-RCASE(st_000,                   "HTTP/1.1 000 Zero\r\n" CL2, NULL)
+RCASE(st_0,                     "HTTP/1.1 0 Zero\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=Zero n=2 body=hi")
+RCASE(st_000,                   "HTTP/1.1 000 Zero\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=Zero n=2 body=hi")
 RCASE(st_001,                   "HTTP/1.1 001 X\r\n" CL2, "ok=1 st=1 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_42_two_digits,         "HTTP/1.1 42 X\r\n" CL2, "ok=1 st=42 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_7_one_digit,           "HTTP/1.1 7 X\r\n" CL2, "ok=1 st=7 ver=HTTP/1.1 txt=X n=2 body=hi")
 RCASE(st_0200_leading_zero,     "HTTP/1.1 0200 OK\r\n" CL2, "ok=1 st=200 ver=HTTP/1.1 txt=OK n=2 body=hi")
-RCASE(st_minus_1,               "HTTP/1.1 -1 X\r\n" CL2, NULL)
-RCASE(st_plus_200,              "HTTP/1.1 +200 OK\r\n" CL2, NULL)
-RCASE(st_letters,               "HTTP/1.1 abc OK\r\n" CL2, NULL)
+RCASE(st_minus_1,               "HTTP/1.1 -1 X\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=X n=2 body=hi")
+RCASE(st_plus_200,              "HTTP/1.1 +200 OK\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=OK n=2 body=hi")
+RCASE(st_letters,               "HTTP/1.1 abc OK\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=OK n=2 body=hi")
 RCASE(st_2OO_letter_o,          "HTTP/1.1 2OO OK\r\n" CL2, "ok=1 st=2 ver=HTTP/1.1 txt=OK n=2 body=hi")
 RCASE(st_200x_suffix,           "HTTP/1.1 200x OK\r\n" CL2, "ok=1 st=200 ver=HTTP/1.1 txt=OK n=2 body=hi")
 RCASE(st_20_0_space_inside,     "HTTP/1.1 20 0 OK\r\n" CL2, "ok=1 st=20 ver=HTTP/1.1 txt=0 OK n=2 body=hi")
 RCASE(st_200_dot_5,             "HTTP/1.1 200.5 OK\r\n" CL2, "ok=1 st=200 ver=HTTP/1.1 txt=OK n=2 body=hi")
-RCASE(st_hex_0xc8,              "HTTP/1.1 0xC8 OK\r\n" CL2, NULL)
-RCASE(st_fullwidth_digits,      "HTTP/1.1 \xef\xbc\x92\xef\xbc\x90\xef\xbc\x90 OK\r\n" CL2, NULL)
-RCASE(st_high_byte_status,      "HTTP/1.1 \xb2\x30\x30 OK\r\n" CL2, NULL)
+RCASE(st_hex_0xc8,              "HTTP/1.1 0xC8 OK\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=OK n=2 body=hi")
+RCASE(st_fullwidth_digits,      "HTTP/1.1 \xef\xbc\x92\xef\xbc\x90\xef\xbc\x90 OK\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=OK n=2 body=hi")
+RCASE(st_high_byte_status,      "HTTP/1.1 \xb2\x30\x30 OK\r\n" CL2, "ok=1 st=4294967295 ver=HTTP/1.1 txt=OK n=2 body=hi")
 /* 1xx/2xx without body semantics as a final status */
 RCASE(st_199,                   "HTTP/1.1 199 X\r\n" CL2, "ok=1 st=200 ver=HTTP/1.0 txt=OK n=2 body=hi")
 RCASE(st_299,                   "HTTP/1.1 299 X\r\n" CL2, "ok=1 st=299 ver=HTTP/1.1 txt=X n=2 body=hi")
@@ -127,7 +127,7 @@ RCASE(le_lfcr,                  "HTTP/1.1 200 OK\n\rContent-Length: 2\n\r\n\rhi"
 RCASE(le_status_crlf_cr_cr,     "HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\r\nhi", "ok=1 st=200 ver=HTTP/1.1 txt=OK n=2 body=hi")
 
 /* ------------------------------------------------------------ status queries in more detail */
-GTEST(hep_status_600_is_not_an_error_class, 60000) {
+GTEST(hep_status_600_is_not_an_error_class, 150000) {
     /* HttpSendRequest succeeds for any status, and the number round-trips through FLAG_NUMBER and as a string */
     HEP_REQUIRE_HTTP();
     static const int codes[] = { 600, 601, 650, 700, 800, 900, 999 };
@@ -153,7 +153,7 @@ GTEST(hep_status_600_is_not_an_error_class, 60000) {
     }
 }
 
-GTEST(hep_status_raw_headers_keep_original_line, 60000) {
+GTEST(hep_status_raw_headers_keep_original_line, 150000) {
     /* RAW_HEADERS_CRLF rebuilds the status line from version/code/text: record how an odd line comes back */
     HEP_REQUIRE_HTTP();
     static const char *lines[] = { "HTTP/1.1 600 Six", "HTTP/1.1 099 X", "http/1.1 200 ok", "HTTP/1.1  200  OK",
@@ -178,7 +178,7 @@ GTEST(hep_status_raw_headers_keep_original_line, 60000) {
     }
 }
 
-GTEST(hep_status_downlevel_query_errors, 60000) {
+GTEST(hep_status_downlevel_query_errors, 150000) {
     /* HTTP/0.9 response: which queries answer and which fail */
     HEP_REQUIRE_HTTP();
     static const char raw[] = "plain body with no status line";

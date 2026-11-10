@@ -135,7 +135,7 @@ GTEST(hep_ka_connection_close_honoured_even_if_socket_stays, 30000) {
 }
 static const char *const conn_tokens[] = { "close", "Close", "CLOSE", "keep-alive, close", "close, keep-alive", "Upgrade, close",
                                            " close ", "closed", "clos", "TE, close" };
-GTEST(hep_ka_connection_token_table, 60000) {
+GTEST(hep_ka_connection_token_table, 150000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof conn_tokens / sizeof conn_tokens[0]; i++) {
         char *resp = (char *)malloc(256);

@@ -107,6 +107,9 @@ const char *hep_esc(const void *p, size_t n);
 HINTERNET hep_session(const char *agent, DWORD timeout_ms);              /* DIRECT */
 HINTERNET hep_proxy_session(hep_srv *h, const char *agent);             /* PROXY http=127.0.0.1:port, no bypass */
 HINTERNET hep_connect(HINTERNET hi, hep_srv *h);                         /* 127.0.0.1:port */
+int  hep_keeper_on(void);      /* keep one extra session open for the process lifetime (default: on) */
+void hep_keeper_off(void);
+void hep_keeper_auto(int on);
 
 /* ---------------------------------------------------------------- recorder helpers */
 const char *hep_names(srv *s, int i);          /* "A|B|C" header names in order */
