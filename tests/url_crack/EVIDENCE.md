@@ -106,6 +106,10 @@ rows or moved to hand-written, ACP-gated tests.
 | `create2.c` | 67 component sets: per-scheme default ports, opaque schemes (CREATE_Q), scheme string vs nScheme precedence, userinfo with 0x2000, ICU_ESCAPE, host forms | [VM] + [D] _InternetCreateUrlA |
 | `crack_wrapper.c` | W wrapper mechanics, A/W component boundary matrices, ACP retry, pointer mode with escapes, dwUrlLength extremes and sweep, Create/Canonicalize/Combine buffer sweeps, long inputs | [D] InternetCrackUrlW@0x2d690, FixStrings@0x2dc98, InternetCreateUrlW + [VM] |
 
+VM runs of the committed area: `ucrun1-20261110-073702-b1` (915 tests, 1 failure: a misread hand expectation for
+W `file:///C:/%E9`, fixed from the probe row), `ucrun2-20261110-091045-b1`: **PASS, 915 tests, 54695 checks, 0 failures**.
+A/W non-ASCII behaviour that depends on the ANSI code page is gated on `GetACP() == 1252` (the VM's ACP).
+
 ### Facts added in pass 2
 - [D][VM] **W buffer with length 0** is sized from `inetstrlenW(buffer)`: `L"xxxxxxxx"` -> success, length 4, buffer
   NOT written (copy-back with cch 0 only counts); `L""` -> 122, nothing written, nScheme untouched. A with length 0 ->
