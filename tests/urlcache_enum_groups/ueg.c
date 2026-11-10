@@ -15,7 +15,9 @@ const WCHAR *ueg_w(const char *s) {
     b[i] = 0; return b;
 }
 
-const char *ueg_url(const char *tag) { return t_uniq_cache_url(tag); }
+/* t_uniq_cache_url returns one of 16 rotating buffers and uses two per call (host + url): a test holding more
+ * than 8 URLs would see earlier ones overwritten. Keep a private copy (a few hundred bytes per test, never freed). */
+const char *ueg_url(const char *tag) { return _strdup(t_uniq_cache_url(tag)); }
 
 int ueg_make_entry(const char *url, DWORD type, FILETIME expire, FILETIME lastmod, const char *hdr, const char *ext, const char *body) {
     if (!U(CreateUrlCacheEntryA) || !U(CommitUrlCacheEntryA)) return 0;
