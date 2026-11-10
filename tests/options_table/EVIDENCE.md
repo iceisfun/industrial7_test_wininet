@@ -112,4 +112,4 @@ VM (it takes about 8 s), then:
 | optprobe-20261109-170901 | set probe (frozen into ot_stab.c) | data |
 | optr2-20261110-050542 | probe (query + round trip, 2 passes), every hand-written group in its own process, inheritance observation | data. Hand-written failures were triaged: 9 expectations corrected from the observed values, 2 relaxed to t_note |
 | optr3-20261110-061011 | full area, one process | 125/128 pass. Every generated matrix passes. 3 fixes: REQUEST_FLAGS constant name, MAX_CONNS on unused connects (state-dependent, relaxed) |
-| optr4 | full area after the fixes | see the commit that follows |
+| optr4-20261110-074816 | full area after the fixes, one process | **PASS** 128/128 tests, 4752 checks in the parent plus every matrix child (0 mismatches) |
