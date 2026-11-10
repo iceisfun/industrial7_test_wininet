@@ -320,7 +320,7 @@ TEST(ac_x_reentrant_context_query_every_status) {
     int n = ac_count() - n0;
     EXPECT_EQ(g_re.fired, 0);
     EXPECT_EQ((int)g_re.val, n);
-    EXPECT_EQ(n, 8);
+    EXPECT_EQ(n - ac_count_iplit(0), 8);   /* 80,20,21,30,31,40,41,100 (+ an optional IP-literal 10/11 pair, ac.h) */
     ac_flow_close(&f); re_done();
 }
 static void hook_remove_cb_in_complete(HINTERNET h, DWORD_PTR ctx, DWORD st, LPVOID info, DWORD len) {

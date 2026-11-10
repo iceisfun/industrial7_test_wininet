@@ -49,6 +49,7 @@ typedef struct {
     int wide;             /* delivered to the W callback */
     unsigned char info[AC_INFO];  /* first bytes of the status information */
     DWORD seq;            /* global arrival index */
+    int iplit;            /* RESOLVING_NAME / NAME_RESOLVED of an IP literal (see ac_seq) */
 } ac_ev;
 
 /* contexts used everywhere */
@@ -75,11 +76,21 @@ int  ac_count_st_ctx(DWORD st, DWORD_PTR ctx);
 int  ac_find(DWORD st, DWORD_PTR ctx, int from);   /* index of first event st (ctx 0 = any) at or after from, -1 */
 int  ac_find_h(DWORD st, HINTERNET h, int from);   /* by handle */
 int  ac_count_cb2(void);                    /* events delivered to ac_cb2 */
+int  ac_count_iplit(DWORD_PTR ctx);         /* IP-literal 10/11 events (ctx 0 = any) */
+/* hard checks on IP-literal 10/11 of ctx: at most one pair, 10 directly followed by 11 and both before 20,
+ * 10 carries the literal. Returns the number of pairs (0 or 1). */
+int  ac_check_iplit_pairs(DWORD_PTR ctx, const char *literal);
 /* wait until at least n events with status st (ctx 0 = any) exist; 1 reached, 0 timeout */
 int  ac_wait_st(DWORD st, DWORD_PTR ctx, int n, DWORD ms);
 /* REQUEST_COMPLETE helpers: wait for the k-th (1-based) completion on ctx, return its INTERNET_ASYNC_RESULT */
 int  ac_wait_complete(DWORD_PTR ctx, int k, DWORD ms, INTERNET_ASYNC_RESULT *res);
-/* "60,10,11,..." of statuses for ctx (0 = all), skipping statuses in skip[] (0-terminated, may be NULL) */
+/* "60,10,11,..." of statuses for ctx (0 = all), skipping statuses in skip[] (0-terminated, may be NULL).
+ * RESOLVING_NAME (10) whose name is an IP literal ("127.0.0.1") and the NAME_RESOLVED (11) that follows it on the same
+ * context are always left out: [W10] whether WinINet runs its resolver step (and reports 10/11) for an IP literal
+ * depends on per-process address-list state (CAddressList::ResolveHost_Fsm raises 10 only when the list is
+ * (re)resolved, [D wininet!0x3e0d4]); identical requests in one run differed (sync GET to 127.0.0.1 reported
+ * 10/11 in one test and not three tests later). Such pairs are counted by ac_count_iplit and checked by
+ * ac_check_iplit_pairs. A host NAME ("localhost") is never left out. */
 const char *ac_seq(DWORD_PTR ctx, const DWORD *skip);
 const char *ac_seq_range(DWORD_PTR ctx, int from, int to, const DWORD *skip);
 void ac_dump(const char *tag);              /* t_note every event (status, ctx, len, tid, info) */

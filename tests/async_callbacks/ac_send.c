@@ -62,7 +62,9 @@ TEST(ac_async_send_sequence_fresh_connection) {
     ac_quiesce(100, 500);
     t_note("full sequence: %s", ac_seq(0, NULL));
     ac_dump("async fresh send");
-    /* IP literal: no RESOLVING_NAME / NAME_RESOLVED; DETECTING_PROXY (80) even on a DIRECT session [W10] */
+    /* IP literal: RESOLVING_NAME / NAME_RESOLVED only as an optional IP-literal pair (left out of ac_seq, see ac.h);
+     * DETECTING_PROXY (80) even on a DIRECT session [W10] */
+    ac_check_iplit_pairs(CTX_REQ, "127.0.0.1");
     EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "80,20,21,30,31,40,41,100");
     EXPECT_STR(ac_seq_range(CTX_REQ, n0, -1, SKIP_NOISE), "20,21,30,31,40,41,100");
     /* every send-phase event belongs to the request handle */
@@ -80,9 +82,9 @@ TEST(ac_async_send_relative_order) {
         CHECKF(ac_before(chain[i], chain[i + 1], CTX_REQ), "%lu before %lu (seq %s)", chain[i], chain[i + 1], ac_seq(CTX_REQ, NULL));
     for (unsigned i = 0; i < sizeof chain / sizeof chain[0]; i++)
         CHECKF(ac_count_st_ctx(chain[i], CTX_REQ) >= 1, "status %lu present", chain[i]);
-    /* 127.0.0.1 is not resolved: neither 10 nor 11 */
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ), 0);
-    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ), 0);
+    /* 127.0.0.1: 10/11 only as one IP-literal pair before 20, or not at all (resolver state, see ac.h) */
+    ac_check_iplit_pairs(CTX_REQ, "127.0.0.1");
+    EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ) + ac_count_st_ctx(INTERNET_STATUS_NAME_RESOLVED, CTX_REQ), ac_count_iplit(CTX_REQ));
     EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_DETECTING_PROXY, CTX_REQ), 1);
     EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_CONNECTING_TO_SERVER, CTX_REQ), 1);
     EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_CONNECTED_TO_SERVER, CTX_REQ), 1);
@@ -507,8 +509,10 @@ TEST(ac_sync_send_payloads_match_async) {
     size_t hn = 0; srv_req_head_raw(f.s, 0, &hn);
     ac_ev ev; int i = ac_find(INTERNET_STATUS_REQUEST_SENT, CTX_REQ, 0);
     if (i >= 0 && ac_get(i, &ev)) EXPECT_EQ(ac_info_dword(&ev), hn); else CHECK(i >= 0);
-    i = ac_find(INTERNET_STATUS_RESOLVING_NAME, CTX_REQ, 0);
-    if (i >= 0 && ac_get(i, &ev)) EXPECT_STR((char *)ev.info, "127.0.0.1"); else CHECK(i >= 0);
+    /* [W10] RESOLVING_NAME for the 127.0.0.1 literal is reported in some runs only (resolver state, see ac.h):
+     * when present it names the literal and is paired with NAME_RESOLVED before CONNECTING_TO_SERVER */
+    int np = ac_check_iplit_pairs(CTX_REQ, "127.0.0.1");
+    t_note("sync GET to 127.0.0.1: IP-literal resolution pairs %d", np);
     ac_flow_close(&f);
 }
 TEST(ac_sync_connect_refused_events) {

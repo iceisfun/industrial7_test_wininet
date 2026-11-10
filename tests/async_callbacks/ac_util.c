@@ -12,6 +12,17 @@ DWORD ac_main_tid;
 static void lock(void) { if (!g_cs_init) { InitializeCriticalSection(&g_cs); g_cs_init = 1; g_any = CreateEventA(NULL, FALSE, FALSE, NULL); } EnterCriticalSection(&g_cs); }
 static void unlock(void) { LeaveCriticalSection(&g_cs); }
 
+/* name in a RESOLVING_NAME is an IPv4 / bracketed or bare IPv6 literal */
+static int is_ip_literal_a(const char *s, size_t n) {
+    if (!n || !s[0]) return 0;
+    int digits_dots = 1, v6 = 0;
+    for (size_t i = 0; i < n && s[i]; i++) {
+        char c = s[i];
+        if (c == ':' || c == '[' || c == ']') v6 = 1;
+        else if (!((c >= '0' && c <= '9') || c == '.' || (v6 && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))))) digits_dots = 0;
+    }
+    return digits_dots;
+}
 static void record(HINTERNET h, DWORD_PTR ctx, DWORD st, LPVOID info, DWORD len, int wide) {
     lock();
     if (g_n < AC_MAXEV) {
@@ -29,6 +40,18 @@ static void record(HINTERNET h, DWORD_PTR ctx, DWORD st, LPVOID info, DWORD len,
                 while (c + 2 < AC_INFO && w[c / 2]) c += 2;
             }
             memcpy(e->info, info, c);
+        }
+        if (st == INTERNET_STATUS_RESOLVING_NAME && e->has_info) {
+            char nb[AC_INFO / 2 + 1]; size_t k = 0;
+            if (wide == 1) { const WCHAR *w = (const WCHAR *)e->info; while (k < AC_INFO / 2 && k + 1 < sizeof nb && w[k]) { nb[k] = w[k] < 128 ? (char)w[k] : '?'; k++; } }
+            else { while (k < AC_INFO && k + 1 < sizeof nb && e->info[k]) { nb[k] = (char)e->info[k]; k++; } }
+            nb[k] = 0;
+            e->iplit = is_ip_literal_a(nb, k);
+        } else if (st == INTERNET_STATUS_NAME_RESOLVED) {
+            for (int j = (int)g_n - 1; j >= 0; j--)
+                if (g_ev[j].ctx == ctx && (g_ev[j].st == INTERNET_STATUS_RESOLVING_NAME || g_ev[j].st == INTERNET_STATUS_NAME_RESOLVED)) {
+                    e->iplit = g_ev[j].st == INTERNET_STATUS_RESOLVING_NAME && g_ev[j].iplit; break;
+                }
         }
         g_n++;
     } else g_dropped++;
@@ -48,6 +71,28 @@ void ac_begin(void) {
 }
 int ac_count(void) { lock(); int n = g_n; unlock(); return n; }
 int ac_count_cb2(void) { return (int)g_cb2; }
+int ac_count_iplit(DWORD_PTR ctx) {
+    lock(); int c = 0; for (int i = 0; i < g_n; i++) if (g_ev[i].iplit && (!ctx || g_ev[i].ctx == ctx)) c++; unlock(); return c;
+}
+int ac_check_iplit_pairs(DWORD_PTR ctx, const char *literal) {
+    int n10 = 0, n11 = 0, i10 = -1, i11 = -1, i20 = ac_find(INTERNET_STATUS_CONNECTING_TO_SERVER, ctx, 0);
+    lock();
+    for (int i = 0; i < g_n; i++) {
+        if (!g_ev[i].iplit || (ctx && g_ev[i].ctx != ctx)) continue;
+        if (g_ev[i].st == INTERNET_STATUS_RESOLVING_NAME) { n10++; if (i10 < 0) i10 = i; }
+        else { n11++; if (i11 < 0) i11 = i; }
+    }
+    char name[64] = ""; if (i10 >= 0) { memcpy(name, g_ev[i10].info, sizeof name - 1); name[sizeof name - 1] = 0; }
+    int w = i10 >= 0 && g_ev[i10].wide == 1;
+    unlock();
+    CHECKF(n10 == n11 && n10 <= 1, "IP-literal 10/11 counts %d/%d", n10, n11);
+    if (n10 == 1 && n11 == 1) {
+        CHECKF(i11 > i10, "11@%d after 10@%d", i11, i10);
+        if (i20 >= 0) CHECKF(i11 < i20, "11@%d before 20@%d", i11, i20);
+        if (literal && !w) CHECKF(!strcmp(name, literal), "RESOLVING_NAME '%s' want '%s'", name, literal);
+    }
+    return n10;
+}
 int ac_get(int i, ac_ev *out) { lock(); int ok = i >= 0 && i < g_n; if (ok) *out = g_ev[i]; unlock(); return ok; }
 int ac_count_st_ctx(DWORD st, DWORD_PTR ctx) {
     lock(); int c = 0; for (int i = 0; i < g_n; i++) if (g_ev[i].st == st && (!ctx || g_ev[i].ctx == ctx)) c++; unlock(); return c;
@@ -82,6 +127,7 @@ static const char *seq_impl(DWORD_PTR ctx, int from, int to, const DWORD *skip) 
     if (to < 0 || to > g_n) to = g_n;
     for (int i = from < 0 ? 0 : from; i < to; i++) {
         if (ctx && g_ev[i].ctx != ctx) continue;
+        if (g_ev[i].iplit) continue;
         int sk = 0; for (const DWORD *p = skip; p && *p; p++) if (*p == g_ev[i].st) sk = 1;
         if (sk) continue;
         if (n + 12 < sizeof buf[0]) n += snprintf(o + n, sizeof buf[0] - n, "%s%lu", n ? "," : "", g_ev[i].st);
