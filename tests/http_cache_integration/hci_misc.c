@@ -414,6 +414,12 @@ TEST(hci_misc_https_cache_hit) {
     /* VM boot 1: the second HTTPS GET (ignore-unknown-CA request) went to the network: 2 requests, 2 handshakes */
     t_note("HTTPS second GET: requests=%d from_cache=%d reqflags=0x%lx handshakes=%d; FROM_CACHE: ok=%d err=%lu body=%s requests=%d",
            n2, hci_from_cache(&b), b.reqflags, srv_count_events(s, SRV_EV_TLS_DONE), c.ok, c.err, c.body, n3);
+    /* VM (2 boots): the HTTPS entry is written (type 0x41, fresh) but a request made with SECURITY_FLAG_IGNORE_UNKNOWN_CA
+       (needed for the self-signed loopback certificate) never reads it: network again, and FROM_CACHE misses with 2 */
+    EXPECT_EQ(n2, 2);
+    CHECK(!hci_from_cache(&b));
+    CHECK(!c.ok); EXPECT_EQ(c.err, ERROR_FILE_NOT_FOUND);
+    EXPECT_EQ(n3, 2);
     srv_stop(s);
 }
 

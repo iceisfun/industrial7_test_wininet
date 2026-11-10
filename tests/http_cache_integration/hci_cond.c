@@ -44,7 +44,7 @@ TEST(hci_cond_request_header_order) {
 /* ETag values are copied verbatim into If-None-Match */
 static const struct { const char *etag; int verbatim; } g_etags[] = {
     { "\"a\"", 1 }, { "W/\"weak\"", 1 }, { "\"with space\"", 1 }, { "\"\"", 1 }, { "unquoted-tag", 1 },
-    { "\"123456789012345678901234567890123456789012345678901234567890\"", 1 }, { "\"a,b\"", 1 }, { "\"x\", \"y\"", 0 },
+    { "\"123456789012345678901234567890123456789012345678901234567890\"", 1 }, { "\"a,b\"", 1 }, { "\"x\", \"y\"", 1 },
     { "\"UPPER-lower-09\"", 1 }, { "w/\"lowerweak\"", 1 },
 };
 TEST(hci_cond_etag_values_table) {
@@ -82,7 +82,9 @@ TEST(hci_cond_long_etag) {
         hci_reqs(s, 2);
         const char *inm = hci_rh(s, 1, "If-None-Match");
         t_note("ETag of %d chars -> If-None-Match %s (len %zu)", lens[k] + 2, inm ? "sent" : "absent", inm ? strlen(inm) : 0);
-        if (lens[k] <= 400) CHECKF(inm && !strcmp(inm, tag), "len %d", lens[k]);
+        /* VM: the stored ETag is read into a 0x200 buffer: up to 511 characters are sent, longer ones are dropped */
+        if (lens[k] + 2 <= 511) CHECKF(inm && !strcmp(inm, tag), "len %d", lens[k]);
+        else CHECKF(inm == NULL, "len %d sent", lens[k]);
         srv_stop(s);
     }
 }
@@ -95,7 +97,7 @@ static const struct { const char *lm; const char *ims; } g_ims[] = {
     { "Mon, 01 Jan 2001 00:00:00 GMT", "Mon, 01 Jan 2001 00:00:00 GMT" },
     { "Wed, 31 Dec 2025 12:00:00 GMT", "Wed, 31 Dec 2025 12:00:00 GMT" },
     { "Sun, 06 Nov 1994 08:49:37 GMT", "Sun, 06 Nov 1994 08:49:37 GMT" },
-    { "garbage",                       NULL },
+    { "garbage",                       "" },        /* VM: unparsable Last-Modified -> LastModifiedTime ~ now -> IMS ~ now */
 };
 TEST(hci_cond_if_modified_since_format_table) {
     REQUIRE(U(InternetOpenUrlA));
@@ -110,7 +112,10 @@ TEST(hci_cond_if_modified_since_format_table) {
         const char *ims = hci_rh(s, 1, "If-Modified-Since");
         t_note("LM [%s] -> IMS [%s]", g_ims[k].lm, ims ? ims : "(none)");
         CHECKF(n == 2, "LM [%s] requests %d", g_ims[k].lm, n);
-        if (g_ims[k].ims) {
+        if (g_ims[k].ims && !g_ims[k].ims[0]) {
+            CHECKF(ims != NULL && strstr(ims, " GMT") && !strstr(ims, "garbage"), "LM [%s] IMS [%s]", g_ims[k].lm, ims ? ims : "(none)");
+            CHECKF(!strcmp(b.body, "ims"), "LM [%s] body %s", g_ims[k].lm, b.body);
+        } else if (g_ims[k].ims) {
             CHECKF(ims && !strcmp(ims, g_ims[k].ims), "LM [%s] IMS [%s] want [%s]", g_ims[k].lm, ims ? ims : "(none)", g_ims[k].ims);
             CHECKF(!strcmp(b.body, "ims"), "LM [%s] body %s", g_ims[k].lm, b.body);
         } else {
@@ -206,12 +211,15 @@ TEST(hci_cond_304_new_etag_stored) {
     hci_resp a, b, c; prime_then_expire(url, &a);
     INTERNET_CACHE_ENTRY_INFOA *e = hci_fetch(url, NULL, 0, &b);
     if (e) t_note("after 304 with a new ETag: blob has one=%d two=%d", hci_hdr_has(e, "\"one\""), hci_hdr_has(e, "\"two\""));
+    CHECK(e && hci_hdr_has(e, "ETag: \"one\""));    /* VM: the ETag of a 304 is not merged */
+    CHECK(e && !hci_hdr_has(e, "\"two\""));
     free(e);
     hci_set_times(url, -60, HCI_KEEP, HCI_KEEP);
     free(hci_fetch(url, NULL, 0, &c));
     hci_reqs(s, 3);
     const char *inm = hci_rh(s, 2, "If-None-Match");
     t_note("third request If-None-Match %s", inm ? inm : "(none)");
+    EXPECT_STR(inm, "\"one\"");
     EXPECT_EQ(p.cond_served, 2);
     EXPECT_STR(c.body, "etag-upd");
     srv_stop(s);
@@ -230,6 +238,8 @@ TEST(hci_cond_304_header_replaces_stored_value) {
         t_note("304 X-Val: blob old=%d new=%d; response raw has old=%d new=%d", hci_hdr_has(e, "X-Val: old"), hci_hdr_has(e, "X-Val: new"),
                strstr(b.rawhdrs, "X-Val: old") != NULL, strstr(b.rawhdrs, "X-Val: new") != NULL);
         CHECK(hci_hdr_has(e, "X-Val: new"));
+        CHECK(!hci_hdr_has(e, "X-Val: old"));          /* VM: a 304 header replaces the stored one */
+        CHECK(strstr(b.rawhdrs, "X-Val: new") && !strstr(b.rawhdrs, "X-Val: old"));
     }
     free(e);
     srv_stop(s);
@@ -244,6 +254,7 @@ TEST(hci_cond_304_content_type_change) {
     hci_resp a, b; prime_then_expire(url, &a);
     INTERNET_CACHE_ENTRY_INFOA *e = hci_fetch(url, NULL, 0, &b);
     if (e) t_note("304 Content-Type: blob plain=%d html=%d local=%s", hci_hdr_has(e, "text/plain"), hci_hdr_has(e, "text/html"), e->lpszLocalFileName);
+    CHECK(e && hci_hdr_has(e, "Content-Type: text/plain") && !hci_hdr_has(e, "text/html"));   /* VM: Content-Type of a 304 is ignored */
     EXPECT_STR(b.body, "ct");
     free(e);
     srv_stop(s);
@@ -260,6 +271,7 @@ TEST(hci_cond_304_with_no_store) {
     t_note("304 + no-store: status=%d body=%s entry exists=%d", b.status, b.body, hci_exists(url));
     EXPECT_EQ(b.status, 200);
     EXPECT_STR(b.body, "ns304");
+    CHECK(hci_exists(url));                           /* VM: no-store on a 304 does not delete the entry */
     srv_stop(s);
 }
 
@@ -277,6 +289,9 @@ TEST(hci_cond_conditional_answered_with_error_status) {
         t_note("conditional answered %d: app status=%d body=%s entry exists=%d", sts[k], b.status, b.body, ex);
         CHECKF(b.status == sts[k], "%d: status %d", sts[k], b.status);
         CHECKF(!hci_from_cache(&b), "%d from cache", sts[k]);
+        int want = !(sts[k] == 404 || sts[k] == 410);   /* VM: 404 and 410 delete the entry, 412 and 500 keep it */
+        CHECKF(ex == want, "%d: entry exists %d", sts[k], ex);
+        CHECKF(b.len == 0, "%d: body len %zu", sts[k], b.len);
         srv_stop(s);
     }
 }
@@ -295,6 +310,12 @@ TEST(hci_cond_app_if_none_match_on_stale_entry) {
     const char *inm = hci_rh(s, 1, "If-None-Match");
     t_note("app INM + stale entry: sent [%s] occurrences=%d status=%d body=%s", inm ? inm : "(none)", srv_req_count(s) > 1 ? srv_req_header_occurrences(s, 1, "If-None-Match") : -1, b.status, b.body);
     CHECK(inm != NULL);
+    /* VM: an app conditional header makes the request the app's own: its INM is sent alone and the 304 reaches the app */
+    EXPECT_STR(inm, "\"app\"");
+    EXPECT_EQ(srv_req_header_occurrences(s, 1, "If-None-Match"), 1);
+    EXPECT_EQ(b.status, 304);
+    EXPECT_EQ(b.len, 0);
+    EXPECT_EQ(p.cond_served, 1);
     srv_stop(s);
 }
 
@@ -307,6 +328,12 @@ TEST(hci_cond_app_if_modified_since_on_fresh_entry) {
     hci_resp a, b; free(hci_fetch(url, NULL, 0, &a));
     free(hci_fetch(url, "If-Modified-Since: Mon, 01 Jan 2001 00:00:00 GMT\r\n", 0, &b));
     t_note("app IMS + fresh entry: requests=%d status=%d body=%s from_cache=%d", hci_reqs(s, 0), b.status, b.body, hci_from_cache(&b));
+    EXPECT_EQ(hci_reqs(s, 2), 2);                     /* VM: an app If-Modified-Since bypasses even a fresh entry */
+    EXPECT_EQ(b.status, 304);
+    EXPECT_EQ(b.len, 0);
+    CHECK(!hci_from_cache(&b));
+    EXPECT_STR(hci_rh(s, 1, "If-Modified-Since"), "Mon, 01 Jan 2001 00:00:00 GMT");
+    CHECK(hci_exists(url));
     srv_stop(s);
 }
 
@@ -519,6 +546,9 @@ TEST(hci_cond_no_cache_write_still_revalidates) {
     free(hci_fetch(url, NULL, INTERNET_FLAG_NO_CACHE_WRITE, &b));
     t_note("NO_CACHE_WRITE over stale entry: requests=%d INM=%s cond=%ld body=%s", hci_reqs(s, 2), hci_rh(s, 1, "If-None-Match") ? hci_rh(s, 1, "If-None-Match") : "-", p.cond_served, b.body);
     EXPECT_EQ(hci_reqs(s, 2), 2);
+    EXPECT_STR(hci_rh(s, 1, "If-None-Match"), "\"w\"");   /* VM */
+    EXPECT_EQ(p.cond_served, 1);
+    EXPECT_STR(b.body, "ncw304");
     srv_stop(s);
 }
 
@@ -536,5 +566,7 @@ TEST(hci_cond_pragma_nocache_stale_entry) {
     t_note("PRAGMA_NOCACHE over stale entry: INM=%s Cache-Control=%s body=%s", hci_rh(s, 1, "If-None-Match") ? hci_rh(s, 1, "If-None-Match") : "-",
            hci_rh(s, 1, "Cache-Control") ? hci_rh(s, 1, "Cache-Control") : "-", b.body);
     EXPECT_EQ(srv_req_count(s), 2);
-    srv_stop(s);
+    EXPECT_STR(hci_rh(s, 1, "If-None-Match"), "\"p\"");   /* VM: still conditional, plus Cache-Control: no-cache */
+    EXPECT_STR(hci_rh(s, 1, "Cache-Control"), "no-cache");
+    EXPECT_STR(b.body, "pnc");
 }

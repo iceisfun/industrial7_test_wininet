@@ -46,20 +46,20 @@ static const exp_row g_exp[] = {
     { "max-age=7200",              "Age: 2400\r\n", 1, -1800, 1, 4800, 1 },
     { "max-age=7200",              NULL, 1, -9000, 1, -3600, 2 },
     { "max-age=3600, stale-while-revalidate=1800", NULL, 0, 0, 1, 5400, 1 },
-    { "max-age=abc",               NULL, 0, 0, 0, 0, 1 },
+    { "max-age=abc",               NULL, 0, 0, 1, -3600, 2 },   /* VM: unparsable max-age counts as stale */
     { "max-age",                   NULL, 0, 0, 0, 0, 1 },
     { "no-cache",                  NULL, 0, 0, 1, -3600, 2 },
     { "no-cache=\"Set-Cookie\"",   NULL, 0, 0, 1, -3600, 2 },
     { "max-age=600, no-cache",     NULL, 0, 0, 1, -3600, 2 },
-    { "no-cache, max-age=600",     NULL, 0, 0, 2, 600, 0 },
+    { "no-cache, max-age=600",     NULL, 0, 0, 1, 600, 1 },     /* tokens in order: the later max-age wins */
     { "nocache",                   NULL, 0, 0, 0, 0, 1 },
-    { "no-cachex",                 NULL, 0, 0, 2, 0, 0 },
+    { "no-cachex",                 NULL, 0, 0, 0, 0, 1 },
     { "s-maxage=600",              NULL, 0, 0, 0, 0, 1 },
     { "immutable",                 NULL, 0, 0, 0, 0, 1 },
     { "must-revalidate",           NULL, 0, 0, 0, 0, 1 },
     { "max-age=600, immutable",    NULL, 0, 0, 1, 600, 1 },
-    { "pre-check=600, post-check=300", NULL, 0, 0, 2, 600, 0 },
-    { "post-check=0, pre-check=0", NULL, 0, 0, 2, 0, 0 },
+    { "pre-check=600, post-check=300", NULL, 0, 0, 1, 600, 1 }, /* pre-check acts as max-age when there is no other */
+    { "post-check=0, pre-check=0", NULL, 0, 0, 0, 0, 1 },
     { "max-age=900",               "Expires: Thu, 01 Dec 2033 16:00:00 GMT\r\n", 0, 0, 1, 900, 1 },
     { NULL,                        "Age: 100000\r\n", 0, 0, 0, 0, 1 },
 };
@@ -89,7 +89,9 @@ TEST(hci_exp_expire_time_table) {
             if (w->kind == 1) CHECKF(hci_near(ex, t0 + w->want * HCI_SEC, 30), "row %zu [%s]: ExpireTime now%+lld want now%+lld", k, w->cc ? w->cc : "-", (ex - t0) / HCI_SEC, w->want);
             CHECKF(e->dwSizeLow == 7, "row %zu size %lu", k, e->dwSizeLow);
             CHECKF(!hci_hdr_has(e, "Cache-Control"), "row %zu Cache-Control kept in blob", k);
-            CHECKF(e->CacheEntryType == HCI_HTTP_ENTRY, "row %zu type 0x%lx", k, e->CacheEntryType);
+            /* VM: must-revalidate sets entry type bit 0x100 */
+            DWORD wt = (w->cc && strstr(w->cc, "must-revalidate")) ? HCI_HTTP_ENTRY | 0x100 : HCI_HTTP_ENTRY;
+            CHECKF(e->CacheEntryType == wt, "row %zu type 0x%lx want 0x%lx", k, e->CacheEntryType, wt);
         }
         HINTERNET hi = hci_open(); hci_get(hi, url, NULL, 0, &b); t_inet_close(hi);
         int n = hci_reqs(s, 0);
@@ -103,22 +105,22 @@ TEST(hci_exp_expire_time_table) {
 }
 
 /* ---------------------------------------------------------------- Expires formats */
-typedef struct { const char *v; int kind; int y, mo, d, h, mi, sc; } expires_row;   /* kind 1 exact, 2 note, 3 ~now-3600 */
+typedef struct { const char *v; int kind; int y, mo, d, h, mi, sc; } expires_row;   /* kind 1 exact, 2 note, 3 ~now (stale) */
 static const expires_row g_expires[] = {
     { "Thu, 01 Dec 2033 16:00:00 GMT", 1, 2033, 12, 1, 16, 0, 0 },
     { "Fri, 31 Dec 2032 23:59:59 GMT", 1, 2032, 12, 31, 23, 59, 59 },
     { "Thu Dec  1 16:00:00 2033",      1, 2033, 12, 1, 16, 0, 0 },
-    { "Thursday, 01-Dec-33 16:00:00 GMT", 2, 2033, 12, 1, 16, 0, 0 },
-    { "thu, 01 dec 2033 16:00:00 gmt", 2, 2033, 12, 1, 16, 0, 0 },
-    { "Thu, 01 Dec 2033 16:00:00",     2, 2033, 12, 1, 16, 0, 0 },
-    { "Thu, 1 Dec 2033 16:00:00 GMT",  2, 2033, 12, 1, 16, 0, 0 },
-    { "Thu, 01 Dec 2033 16:00:00 UTC", 2, 2033, 12, 1, 16, 0, 0 },
+    { "Thursday, 01-Dec-33 16:00:00 GMT", 1, 2033, 12, 1, 16, 0, 0 },
+    { "thu, 01 dec 2033 16:00:00 gmt", 1, 2033, 12, 1, 16, 0, 0 },
+    { "Thu, 01 Dec 2033 16:00:00",     1, 2033, 12, 1, 16, 0, 0 },
+    { "Thu, 1 Dec 2033 16:00:00 GMT",  1, 2033, 12, 1, 16, 0, 0 },
+    { "Thu, 01 Dec 2033 16:00:00 UTC", 1, 2033, 12, 1, 16, 0, 0 },
     { "Mon, 01 Jan 2001 00:00:00 GMT", 1, 2001, 1, 1, 0, 0, 0 },
     { "Thu, 01 Jan 1970 00:00:00 GMT", 1, 1970, 1, 1, 0, 0, 0 },
-    { "garbage",                       2, 0 },
-    { "0",                             2, 0 },
-    { "-1",                            2, 0 },
-    { "",                              2, 0 },
+    { "garbage",                       3, 0 },
+    { "0",                             3, 0 },
+    { "-1",                            3, 0 },
+    { "",                              3, 0 },
 };
 TEST(hci_exp_expires_formats_table) {
     REQUIRE(U(InternetOpenUrlA)); REQUIRE(U(GetUrlCacheEntryInfoA));
@@ -140,6 +142,10 @@ TEST(hci_exp_expires_formats_table) {
                 CHECKF(ex == want, "Expires [%s]: %llx want %llx", w->v, ex, want);
                 int fresh = want > t0;
                 CHECKF(n == (fresh ? 1 : 2), "Expires [%s]: requests %d", w->v, n);
+            }
+            if (w->kind == 3) {     /* VM: an unparsable Expires is stored as about "now": stale */
+                CHECKF(hci_near(ex, t0, 60), "Expires [%s]: now%+lld", w->v, (ex - t0) / HCI_SEC);
+                CHECKF(n == 2, "Expires [%s]: requests %d", w->v, n);
             }
         }
         free(e);
@@ -203,8 +209,8 @@ static const expires_row g_lm[] = {
     { "Tuesday, 15-Nov-94 08:12:31 GMT", 2, 1994, 11, 15, 8, 12, 31 },
     { "Sat, 29 Feb 2020 23:59:59 GMT", 1, 2020, 2, 29, 23, 59, 59 },
     { "Mon, 01 Jan 2001 00:00:00 GMT", 1, 2001, 1, 1, 0, 0, 0 },
-    { "garbage",                       0, 0 },
-    { "",                              2, 0 },
+    { "garbage",                       3, 0 },
+    { "",                              3, 0 },
 };
 TEST(hci_exp_last_modified_formats_table) {
     REQUIRE(U(InternetOpenUrlA)); REQUIRE(U(GetUrlCacheEntryInfoA));
@@ -219,8 +225,8 @@ TEST(hci_exp_last_modified_formats_table) {
             LONGLONG lm = hci_ft(e->LastModifiedTime), want = w->y ? hci_ft_utc(w->y, w->mo, w->d, w->h, w->mi, w->sc) : 0;
             t_note("Last-Modified [%s] -> %llx (want %llx)", w->v, lm, want);
             if (w->kind == 1) CHECKF(lm == want, "LM [%s]: %llx want %llx", w->v, lm, want);
-            if (w->kind == 0) CHECKF(lm == 0, "LM [%s]: %llx want 0", w->v, lm);
-            CHECKF(hci_hdr_has(e, "Last-Modified:") || !w->v[0], "LM [%s] header not kept", w->v);
+            if (w->kind == 3) CHECKF(hci_near(lm, hci_ft_now(), 120), "LM [%s]: %llx want ~now", w->v, lm);   /* VM: unparsable -> about now */
+            CHECKF(!hci_hdr_has(e, "Last-Modified:"), "LM [%s] header kept in blob", w->v);   /* VM: stripped from the blob */
         }
         free(e);
         srv_stop(s);
@@ -253,6 +259,8 @@ TEST(hci_exp_fwd_back_no_cache_entry) {
     hci_resp a, b; INTERNET_CACHE_ENTRY_INFOA *e = hci_fetch(url, NULL, 0, &a); free(e);
     HINTERNET hi = hci_open(); hci_get(hi, url, NULL, INTERNET_FLAG_FWD_BACK, &b); t_inet_close(hi);
     t_note("FWD_BACK over a no-cache entry: body=%s requests=%d", b.body, hci_reqs(s, 0));
+    EXPECT_EQ(hci_reqs(s, 0), 1);                     /* VM: FWD_BACK overrides even no-cache */
+    EXPECT_STR(b.body, "nc-history");
     srv_stop(s);
 }
 
@@ -451,6 +459,8 @@ TEST(hci_exp_no_cache_entry_made_fresh_by_api) {
     CHECK(hci_set_times(url, 86400, HCI_KEEP, HCI_KEEP));
     HINTERNET hi = hci_open(); hci_get(hi, url, NULL, 0, &b); t_inet_close(hi);
     t_note("no-cache entry with future ExpireTime: requests=%d body=%s", hci_reqs(s, 0), b.body);
+    EXPECT_EQ(hci_reqs(s, 0), 1);                     /* VM: only the stored times count, no-cache is not remembered */
+    EXPECT_STR(b.body, "nc-api");
     srv_stop(s);
 }
 
@@ -569,8 +579,11 @@ TEST(hci_exp_304_without_freshness_headers) {
     INTERNET_CACHE_ENTRY_INFOA *e = hci_fetch(url, NULL, 0, &b);
     EXPECT_EQ(p.cond_served, 1);
     if (e) t_note("304 without Cache-Control/Expires: expire now%+lld (0 = %d)", (hci_ft(e->ExpireTime) - t0) / HCI_SEC, hci_ft(e->ExpireTime) == 0);
+    CHECK(e && hci_near(hci_ft(e->ExpireTime), t0 - 60 * HCI_SEC, 10));   /* VM: a bare 304 keeps the old ExpireTime */
     free(hci_fetch(url, NULL, 0, &c));
     t_note("third GET after a bare 304: requests=%d cond=%ld", hci_reqs(s, 0), p.cond_served);
+    EXPECT_EQ(hci_reqs(s, 3), 3);
+    EXPECT_EQ(p.cond_served, 2);
     free(e);
     srv_stop(s);
 }

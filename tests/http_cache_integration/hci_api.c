@@ -47,13 +47,13 @@ TEST(hci_api_blob_header_order_and_case) {
 
 /* which response headers are kept in the blob */
 typedef struct { const char *line; int kept; } blobrow;     /* kept: 1 yes, 0 no, -1 note */
-static const blobrow g_blob[] = {
-    { "X-Custom: c", 1 }, { "ETag: \"b\"", 1 }, { "Last-Modified: Mon, 01 Jan 2001 00:00:00 GMT", -1 }, { "Expires: Thu, 01 Dec 2033 16:00:00 GMT", -1 },
-    { "Date: Mon, 01 Jan 2001 00:00:00 GMT", -1 }, { "Server: i7", -1 }, { "Pragma: x-private", -1 }, { "Age: 5", -1 },
-    { "Vary: X-Something", -1 }, { "Set-Cookie: hcib=1; Path=/blobtest", 0 }, { "Set-Cookie2: x=1", -1 }, { "Keep-Alive: timeout=5", -1 },
-    { "Accept-Ranges: bytes", -1 }, { "P3P: CP=\"x\"", -1 }, { "Strict-Transport-Security: max-age=1", -1 }, { "X-Frame-Options: DENY", -1 },
-    { "WWW-Authenticate: Basic realm=\"r\"", -1 }, { "Proxy-Connection: keep-alive", -1 }, { "Content-Language: en", -1 }, { "Content-Location: /x", -1 },
-    { "Location: /elsewhere", -1 }, { "Refresh: 5", -1 }, { "Link: </s.css>; rel=preload", -1 }, { "Content-Disposition: inline", -1 },
+static const blobrow g_blob[] = {    /* all values VM-observed (boot 1 of pass 2) */
+    { "X-Custom: c", 1 }, { "ETag: \"b\"", 1 }, { "Last-Modified: Mon, 01 Jan 2001 00:00:00 GMT", 0 }, { "Expires: Thu, 01 Dec 2033 16:00:00 GMT", 0 },
+    { "Date: Mon, 01 Jan 2001 00:00:00 GMT", 0 }, { "Server: i7", 0 }, { "Pragma: x-private", 1 }, { "Age: 5", 0 },
+    { "Vary: X-Something", 1 }, { "Set-Cookie: hcib=1; Path=/blobtest", 0 }, { "Set-Cookie2: x=1", 1 }, { "Keep-Alive: timeout=5", 1 },
+    { "Accept-Ranges: bytes", 0 }, { "P3P: CP=\"x\"", 1 }, { "Strict-Transport-Security: max-age=1", 1 }, { "X-Frame-Options: DENY", 1 },
+    { "WWW-Authenticate: Basic realm=\"r\"", 1 }, { "Proxy-Connection: keep-alive", 0 }, { "Content-Language: en", 1 }, { "Content-Location: /x", 1 },
+    { "Location: /elsewhere", 1 }, { "Refresh: 5", 1 }, { "Link: </s.css>; rel=preload", 1 }, { "Content-Disposition: inline", 1 },
 };
 TEST(hci_api_blob_kept_headers_table) {
     REQUIRE(U(InternetOpenUrlA));
@@ -86,6 +86,9 @@ TEST(hci_api_blob_content_length_regenerated) {
     if (e) {
         hci_note_entry("close-delimited", e);
         t_note("close-delimited blob has Content-Length: 11 -> %d", hci_hdr_has(e, "Content-Length: 11"));
+        CHECK(!hci_hdr_has(e, "Content-Length"));     /* VM: no length is invented for a close-delimited body */
+        static const char want[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+        CHECK(e->dwHeaderInfoSize == sizeof want - 1 && !memcmp(e->lpHeaderInfo, want, sizeof want - 1));
         EXPECT_EQ(e->dwSizeLow, 11);
     }
     CHECK(e != NULL);
@@ -97,18 +100,18 @@ TEST(hci_api_blob_content_length_regenerated) {
 typedef struct { const char *path; const char *ctype; const char *leaf_prefix; const char *ext; } namerow;  /* NULL = note only */
 TEST(hci_api_local_file_name_table) {
     REQUIRE(U(InternetOpenUrlA));
-    static const namerow rows[] = {
-        { "/d1/%s.txt", "text/plain", "%s[", "txt" },
-        { "/d1/d2/%s.htm", "text/html", "%s[", "htm" },
-        { "/%s.TXT", "text/plain", "%s[", NULL },
-        { "/%s.tar.gz", "application/octet-stream", NULL, NULL },
-        { "/%s", "application/octet-stream", NULL, NULL },
-        { "/%s/", "text/html", NULL, NULL },
-        { "/%s?x=1&y=2", "text/plain", NULL, "txt" },
-        { "/%s.txt?x=1", "text/plain", NULL, "txt" },
-        { "/a%%20b%s.txt", "text/plain", NULL, "txt" },
-        { "/%s.json", "application/json", NULL, NULL },
-        { "/%s.unknownext", "application/x-unknown-i7", NULL, NULL },
+    static const namerow rows[] = {     /* VM-observed leaves (wininet_<pid>_<n>_nm = %s) */
+        { "/d1/%s.txt", "text/plain", "%s[1].txt", "txt" },
+        { "/d1/d2/%s.htm", "text/html", "%s[1].htm", "htm" },
+        { "/%s.TXT", "text/plain", "%s[1].TXT", "TXT" },
+        { "/%s.tar.gz", "application/octet-stream", "%s.tar[1].gz", "gz" },
+        { "/%s", "application/octet-stream", "%s[1]", "" },
+        { "/%s/", "text/html", "%s[1].htm", "htm" },
+        { "/%s?x=1&y=2", "text/plain", "%s[1].txt", "txt" },
+        { "/%s.txt?x=1", "text/plain", "%s[1].txt", "txt" },
+        { "/a%%20b%s.txt", "text/plain", "a%%20b%s[1].txt", "txt" },
+        { "/%s.json", "application/json", "%s[1].json", "json" },
+        { "/%s.unknownext", "application/x-unknown-i7", "%s[1].unknownext", "unknownext" },
     };
     for (size_t k = 0; k < sizeof rows / sizeof rows[0]; k++) {
         hci_plan p = {0}; hci_set(&p, 0, 200, "named", "Content-Type: %s\r\nCache-Control: max-age=3600\r\n", rows[k].ctype);
@@ -122,8 +125,8 @@ TEST(hci_api_local_file_name_table) {
             const char *leaf = strrchr(e->lpszLocalFileName, '\\'); leaf = leaf ? leaf + 1 : e->lpszLocalFileName;
             t_note("path %-28s ctype %-28s -> leaf %s", path, rows[k].ctype, leaf);
             CHECKF(hci_file_eq(e->lpszLocalFileName, "named", 5), "%s file content", path);
-            if (rows[k].leaf_prefix) { char want[200]; snprintf(want, sizeof want, rows[k].leaf_prefix, u); CHECKF(!_strnicmp(leaf, want, strlen(want)), "%s leaf %s want %s*", path, leaf, want); }
-            if (rows[k].ext) CHECKF(!_stricmp(hci_local_ext(e), rows[k].ext), "%s ext %s want %s", path, hci_local_ext(e), rows[k].ext);
+            if (rows[k].leaf_prefix) { char want[200]; snprintf(want, sizeof want, rows[k].leaf_prefix, u); CHECKF(!strcmp(leaf, want), "%s leaf %s want %s", path, leaf, want); }
+            if (rows[k].ext) CHECKF(!strcmp(hci_local_ext(e), rows[k].ext), "%s ext %s want %s", path, hci_local_ext(e), rows[k].ext);
             CHECK(strstr(e->lpszLocalFileName, "\\INetCache\\IE\\") != NULL);
             CHECK(!strchr(leaf, '?') && !strchr(leaf, '/') && !strchr(leaf, ':'));
         }
@@ -148,6 +151,10 @@ TEST(hci_api_same_leaf_two_urls) {
         CHECK(_stricmp(e1->lpszLocalFileName, e2->lpszLocalFileName) != 0);
         CHECK(hci_file_eq(e1->lpszLocalFileName, "first", 5));
         CHECK(hci_file_eq(e2->lpszLocalFileName, "second", 6));
+        /* VM: same leaf name "<leaf>[1].txt" in two different cache subdirectories */
+        const char *l1 = strrchr(e1->lpszLocalFileName, '\\'), *l2 = strrchr(e2->lpszLocalFileName, '\\');
+        CHECK(l1 && l2 && !strcmp(l1, l2));
+        char want[200]; snprintf(want, sizeof want, "\\%s[1].txt", u); CHECK(l1 && !strcmp(l1, want));
     }
     free(e1); free(e2);
     srv_stop(s);
@@ -166,6 +173,7 @@ TEST(hci_api_refetch_new_local_file) {
     if (e2) {
         t_note("refetch: %s -> %s; old file exists=%d", f1, e2->lpszLocalFileName, hci_file_exists(f1));
         CHECK(hci_file_eq(e2->lpszLocalFileName, "gen-two", 7));
+        CHECK(_stricmp(f1, e2->lpszLocalFileName) != 0);   /* VM: a refetch gets a new file (another subdirectory) */
         if (_stricmp(f1, e2->lpszLocalFileName)) { int gone = 0; for (int i = 0; i < 20 && !gone; i++) { gone = !hci_file_exists(f1); if (!gone) Sleep(50); } CHECK(gone); }
     }
     free(e1); free(e2);
@@ -194,14 +202,19 @@ TEST(hci_api_lock_request_file_network) {
     CHECK(hci_exists(url));
     CHECK(hci_file_eq(df, "locked-body", 11));
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
-    if (e) { t_note("use count with a request-file lock after close: %lu", e->dwUseCount); EXPECT_EQ(e->dwUseCount, 1); }
+    if (e) { t_note("use count with a request-file lock after close: %lu", e->dwUseCount); EXPECT_EQ(e->dwUseCount, 0); }  /* VM: the lock is not a use count */
     free(e);
     if (lock) {
         SetLastError(0); BOOL del = U(DeleteUrlCacheEntryA)(url); DWORD de = GetLastError();
         t_note("DeleteUrlCacheEntry with a request-file lock: ok=%d err=%lu; entry=%d file=%d", del, de, hci_exists(url), hci_file_exists(df));
-        CHECK(!del); EXPECT_EQ(de, ERROR_SHARING_VIOLATION);
+        /* VM: the entry can be deleted, but the locked file stays until InternetUnlockRequestFile */
+        CHECK(del);
+        CHECK(!hci_exists(url));
+        CHECK(hci_file_exists(df));
         CHECK(U(InternetUnlockRequestFile)(lock));
         t_note("after unlock: entry=%d file=%d", hci_exists(url), hci_file_exists(df));
+        int gone = 0; for (int i = 0; i < 20 && !gone; i++) { gone = !hci_file_exists(df); if (!gone) Sleep(50); }
+        CHECK(gone);
     }
     srv_stop(s);
 }
@@ -218,6 +231,7 @@ TEST(hci_api_lock_request_file_before_read) {
         HANDLE lock = NULL; SetLastError(0);
         BOOL ok = U(InternetLockRequestFile)(h, &lock);
         t_note("lock before reading: ok=%d err=%lu", ok, GetLastError());
+        CHECK(ok); CHECK(lock != NULL);
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
         U(InternetCloseHandle)(h);
         if (ok && lock) { CHECK(U(InternetUnlockRequestFile)(lock)); }
@@ -241,6 +255,7 @@ TEST(hci_api_lock_request_file_no_cache_write) {
         BOOL ok = U(InternetLockRequestFile)(h, &lock);
         DWORD e = GetLastError();
         t_note("lock on NO_CACHE_WRITE handle: ok=%d err=%lu lock=%p", ok, e, lock);
+        CHECK(!ok); EXPECT_EQ(e, ERROR_FILE_NOT_FOUND);
         if (ok && lock) U(InternetUnlockRequestFile)(lock);
         U(InternetCloseHandle)(h);
     }
@@ -265,6 +280,7 @@ TEST(hci_api_lock_request_file_cache_hit) {
         U(InternetCloseHandle)(h);
         DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
         if (e) t_note("two request-file locks after close: use count %lu", e->dwUseCount);
+        CHECK(e && e->dwUseCount == 0);
         free(e);
         if (lock) CHECK(U(InternetUnlockRequestFile)(lock));
         if (lock2) CHECK(U(InternetUnlockRequestFile)(lock2));
@@ -289,6 +305,7 @@ TEST(hci_api_lock_request_file_bad_handles) {
     SetLastError(0); BOOL r3 = U(InternetLockRequestFile)(hr, &lock); DWORD e3 = GetLastError();
     t_note("InternetLockRequestFile: session err=%lu connect err=%lu unsent request ok=%d err=%lu", e1, e2, r3, e3);
     CHECK(!r3);
+    EXPECT_EQ(e1, ERROR_INVALID_HANDLE); EXPECT_EQ(e2, ERROR_INVALID_HANDLE); EXPECT_EQ(e3, ERROR_FILE_NOT_FOUND);   /* VM */
     t_inet_close(hr); t_inet_close(hc); t_inet_close(hi);
 }
 
@@ -335,7 +352,9 @@ TEST(hci_api_use_count_during_download) {
         CHECK(e == NULL);
         free(e);
         SetLastError(0); BOOL del = U(DeleteUrlCacheEntryA)(url);
-        t_note("DeleteUrlCacheEntry during the download: ok=%d err=%lu", del, GetLastError());
+        DWORD de = GetLastError();
+        t_note("DeleteUrlCacheEntry during the download: ok=%d err=%lu", del, de);
+        CHECK(!del); EXPECT_EQ(de, ERROR_FILE_NOT_FOUND);   /* VM: nothing committed yet */
         size_t tot = rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) tot += rd;
         EXPECT_EQ(tot, sizeof big);
         U(InternetCloseHandle)(h);
@@ -343,6 +362,7 @@ TEST(hci_api_use_count_during_download) {
     t_inet_close(hi);
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
     t_note("after a delete during the download, entry exists=%d", e != NULL);
+    CHECK(e != NULL);
     if (e) EXPECT_EQ(e->dwSizeLow, sizeof big);
     free(e);
     srv_stop(s);
@@ -376,6 +396,7 @@ TEST(hci_api_unlock_without_lock) {
     hci_resp a; free(hci_fetch(url, NULL, 0, &a));
     SetLastError(0); BOOL ok = U(UnlockUrlCacheEntryFileA)(url, 0);
     t_note("UnlockUrlCacheEntryFile on an unlocked HTTP entry: ok=%d err=%lu", ok, GetLastError());
+    CHECK(ok);                                        /* VM */
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
     CHECK(e != NULL);
     if (e) EXPECT_EQ(e->dwUseCount, 0);
@@ -422,7 +443,7 @@ TEST(hci_api_cache_read_large_body) {
     if (h) {
         DWORD av = 0; CHECK(U(InternetQueryDataAvailable)(h, &av, 0, 0));
         t_note("cache-served 150000-byte body: first QueryDataAvailable=%lu", av);
-        CHECK(av > 0 && av <= sizeof big);
+        EXPECT_EQ(av, sizeof big);                    /* VM: the whole cached file is available at once */
         char *buf = malloc(sizeof big + 16); size_t tot = 0; DWORD rd;
         for (int g = 0; g < 10000; g++) { if (!U(InternetReadFile)(h, buf + tot, 7000, &rd) || !rd) break; tot += rd; }
         EXPECT_EQ(tot, sizeof big);
@@ -474,6 +495,7 @@ TEST(hci_api_cache_timestamps_on_handles) {
         BOOL ok = U(InternetQueryOptionA)(h, INTERNET_OPTION_CACHE_TIMESTAMPS, &ts, &l);
         t_note("CACHE_TIMESTAMPS (%s): ok=%d err=%lu len=%lu exp=%llx lm=%llx", k ? "cache" : "net", ok, GetLastError(), l, hci_ft(ts.ftExpires), hci_ft(ts.ftLastModified));
         CHECK(ok);
+        EXPECT_EQ(l, 0);                              /* VM: the length is set to 0 on success */
         EXPECT_EQ(hci_ft(ts.ftExpires), hci_ft_utc(2033, 12, 1, 16, 0, 0));
         EXPECT_EQ(hci_ft(ts.ftLastModified), hci_ft_utc(2001, 1, 1, 0, 0, 0));
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
@@ -497,6 +519,7 @@ TEST(hci_api_cache_timestamps_no_headers) {
         BOOL ok = U(InternetQueryOptionA)(h, INTERNET_OPTION_CACHE_TIMESTAMPS, &ts, &l);
         t_note("CACHE_TIMESTAMPS without Expires/LM: ok=%d err=%lu len=%lu exp=%llx lm=%llx", ok, GetLastError(), l, hci_ft(ts.ftExpires), hci_ft(ts.ftLastModified));
         CHECK(ok);
+        EXPECT_EQ(l, 0);
         EXPECT_EQ(hci_ft(ts.ftExpires), 0);
         EXPECT_EQ(hci_ft(ts.ftLastModified), 0);
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
@@ -525,6 +548,7 @@ TEST(hci_api_datafile_name_wide_matches) {
         CHECK(!U(InternetQueryOptionW)(h, INTERNET_OPTION_DATAFILE_NAME, tiny, &lt));
         EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
         t_note("DATAFILE_NAME W too small: needed=%lu (wcslen %zu)", lt, wcslen(w));
+        EXPECT_EQ(lt, (wcslen(w) + 1) * sizeof(WCHAR));   /* VM: bytes incl. NUL on failure, characters on success */
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
         U(InternetCloseHandle)(h);
     }
@@ -557,6 +581,11 @@ TEST(hci_api_interrupted_download_resume) {
     t_note("second GET: requests=%d Range=%s If-Range=%s status=%d len=%zu", srv_req_count(s), hci_rh(s, 1, "Range") ? hci_rh(s, 1, "Range") : "-",
            hci_rh(s, 1, "If-Range") ? hci_rh(s, 1, "If-Range") : "-", r.status, r.len);
     EXPECT_EQ(r.status, 200);
+    /* VM: the interrupted download is not visible as an entry, but the next GET resumes it with Range + If-Range */
+    CHECK(e == NULL);
+    const char *rg = hci_rh(s, 1, "Range");
+    CHECK(rg && !strncmp(rg, "bytes=", 6) && rg[strlen(rg) - 1] == '-');
+    EXPECT_STR(hci_rh(s, 1, "If-Range"), "\"rng\"");
     srv_stop(s);
 }
 
@@ -578,6 +607,8 @@ TEST(hci_api_empty_body_entry_file) {
     free(e);
     free(hci_fetch(url, NULL, 0, &b));
     t_note("second GET of an empty cached body: requests=%d status=%d len=%zu", hci_reqs(s, 0), b.status, b.len);
+    EXPECT_EQ(hci_reqs(s, 0), 1);
+    EXPECT_EQ(b.len, 0);
     EXPECT_EQ(b.status, 200);
     srv_stop(s);
 }
@@ -593,8 +624,12 @@ TEST(hci_api_info_ex_redirect_entry) {
     hci_resp r; free(hci_fetch(src, NULL, 0, &r));
     char buf[8192]; INTERNET_CACHE_ENTRY_INFOA *e = (void *)buf; DWORD n = sizeof buf;
     char redir[1024] = ""; DWORD rl = sizeof redir; SetLastError(0);
-    BOOL ok = U(GetUrlCacheEntryInfoExA)(src, e, &n, redir, &rl, NULL, 0);
-    t_note("GetUrlCacheEntryInfoEx(301 source): ok=%d err=%lu url=%s type=0x%lx redirect=[%s] rl=%lu", ok, GetLastError(), ok ? e->lpszSourceUrlName : "", ok ? e->CacheEntryType : 0, redir, rl);
+    BOOL bad = U(GetUrlCacheEntryInfoExA)(src, e, &n, redir, &rl, NULL, 0);
+    DWORD be = GetLastError();
+    CHECK(!bad); EXPECT_EQ(be, ERROR_INVALID_PARAMETER);   /* VM: lpszRedirectUrl must be NULL */
+    n = sizeof buf; SetLastError(0);
+    BOOL ok = U(GetUrlCacheEntryInfoExA)(src, e, &n, NULL, NULL, NULL, 0);
+    t_note("GetUrlCacheEntryInfoEx(301 source): ok=%d err=%lu url=%s type=0x%lx", ok, GetLastError(), ok ? e->lpszSourceUrlName : "", ok ? e->CacheEntryType : 0);
     CHECK(ok);
     if (ok) {
         EXPECT_STR(e->lpszSourceUrlName, src);
@@ -662,6 +697,9 @@ TEST(hci_api_set_header_info_affects_cache_response) {
     DWORD err = GetLastError();
     free(hci_fetch(url, NULL, 0, &b));
     t_note("SetUrlCacheEntryInfo(HEADERINFO_FC): ok=%d err=%lu; next response X-Swapped=%d X-Orig=%d", ok, err, strstr(b.rawhdrs, "X-Swapped") != NULL, strstr(b.rawhdrs, "X-Orig") != NULL);
+    CHECK(ok);                                        /* VM: accepted but ignored */
+    CHECK(!strstr(b.rawhdrs, "X-Swapped"));
+    CHECK(strstr(b.rawhdrs, "X-Orig: 1") != NULL);
     EXPECT_EQ(hci_reqs(s, 0), 1);
     EXPECT_STR(b.body, "blobswap");
     srv_stop(s);
@@ -697,6 +735,7 @@ TEST(hci_api_key_includes_port) {
     CHECK(!hci_exists(host));
     char upper[512]; snprintf(upper, sizeof upper, "HTTP://127.0.0.1:%u%s", srv_port(s), path);
     t_note("cache key lookups: upper-case scheme exists=%d", hci_exists(upper));
+    CHECK(!hci_exists(upper));                        /* VM: lookups are by exact string */
     srv_stop(s);
 }
 
