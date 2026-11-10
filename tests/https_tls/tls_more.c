@@ -146,13 +146,14 @@ TEST(tls_more_query_data_available_large) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/big", 0));
     SEND_EQ(&t, 0);
-    size_t tot = 0; char *buf = malloc(100001); int bad = 0, rounds = 0;
+    size_t tot = 0; char *buf = malloc(100000 + 65536); int bad = 0, rounds = 0;
     for (; rounds < 2000; rounds++) {
         DWORD av = 0;
         if (!U(InternetQueryDataAvailable)(t.hr, &av, 0, 0)) { bad = 1; break; }
         if (av == 0) break;
         CHECKF(av <= 100000 - tot, "available %lu > remaining %zu", av, 100000 - tot);
         DWORD got = 0;
+        if (av > 65536) av = 65536;
         if (!U(InternetReadFile)(t.hr, buf + tot, av, &got)) { bad = 1; break; }
         if (got != av) t_note("read %lu of %lu available", got, av);
         if (!got) break;
@@ -173,10 +174,10 @@ TEST(tls_more_readfileex_chunks) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(open_ok(&t, s, "GET", "/c", 0));
     SEND_EQ(&t, 0);
-    char *buf = malloc(50001); size_t tot = 0;
+    char *buf = malloc(50000 + 8192); size_t tot = 0;
     for (int i = 0; i < 1000 && tot < 50000; i++) {
         INTERNET_BUFFERSA ib; memset(&ib, 0, sizeof ib); ib.dwStructSize = sizeof ib;
-        ib.lpvBuffer = buf + tot; ib.dwBufferLength = 4096;
+        ib.lpvBuffer = buf + tot; ib.dwBufferLength = (DWORD)(50000 - tot < 4096 ? 50000 - tot : 4096);
         if (!U(InternetReadFileExA)(t.hr, &ib, IRF_SYNC, 0)) { CHECKF(0, "ReadFileEx %lu", GetLastError()); break; }
         if (!ib.dwBufferLength) break;
         CHECK(ib.dwBufferLength <= 4096);
@@ -201,18 +202,21 @@ static DWORD WINAPI cthread(LPVOID p) {
 }
 TEST(tls_more_concurrent_sessions) {
     REQUIRE(U(HttpSendRequestA));
-    srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
-    cjob j[6]; HANDLE th[6];
-    for (int i = 0; i < 6; i++) { memset(&j[i], 0, sizeof j[i]); j[i].s = s; th[i] = CreateThread(NULL, 0, cthread, &j[i], 0, NULL); }
+    /* one server per thread (the request bundles run concurrently; each server sees one request) */
+    cjob j[6]; HANDLE th[6]; srv *sv[6];
+    for (int i = 0; i < 6; i++) { sv[i] = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!sv[i]) { for (int k = 0; k < i; k++) srv_stop(sv[k]); TLS_SKIP_SRV(); } }
+    for (int i = 0; i < 6; i++) { memset(&j[i], 0, sizeof j[i]); j[i].s = sv[i]; th[i] = CreateThread(NULL, 0, cthread, &j[i], 0, NULL); }
     DWORD w = WaitForMultipleObjects(6, th, TRUE, 20000);
     EXPECT_EQ(w, WAIT_OBJECT_0);
     for (int i = 0; i < 6; i++) {
         CHECKF(j[i].err == 0 && j[i].status == 200 && j[i].n == 5, "job %d: err %lu status %lu n %zu", i, j[i].err, j[i].status, j[i].n);
         CloseHandle(th[i]);
     }
-    EXPECT_EQ(srv_req_count(s), 6);
-    EXPECT_EQ(tls_count(s, SRV_EV_TLS_DONE), 6);
-    srv_stop(s);
+    for (int i = 0; i < 6; i++) {
+        EXPECT_EQ(srv_req_count(sv[i]), 1);
+        EXPECT_EQ(tls_count(sv[i], SRV_EV_TLS_DONE), 1);
+        srv_stop(sv[i]);
+    }
 }
 
 /* ------------------------------------------------------------------ where INTERNET_FLAG_SECURE takes effect */
@@ -316,7 +320,7 @@ TEST(tls_more_secflags_set_after_success_no_effect_on_result) {
     CHECK(tls_set_secflags(t.hr, 0x2000));
     DWORD f1 = tls_secflags(t.hr);
     EXPECT_EQ(f1, f0 | 0x2000);
-    char b[16]; EXPECT_EQ(treq_body(&t, b, sizeof b), 5);
+    char b[16]; size_t bn = treq_body(&t, b, sizeof b); EXPECT_EQ(bn, 5);
     treq_close(&t); srv_stop(s);
 }
 

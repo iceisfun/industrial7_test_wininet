@@ -405,14 +405,16 @@ void mts_stop(mts *m) {
     if (!m) return;
     SetEvent(m->stop);
     WaitForSingleObject(m->thr, 3000); CloseHandle(m->thr);
+    int alive = 0;
     for (int i = 0; i < m->nconn && i < MTS_MAXC; i++) if (m->cthr[i]) {
         if (WaitForSingleObject(m->cthr[i], 6000) != WAIT_OBJECT_0) {
-            SOCKET s = m->csock[i]; if (s != INVALID_SOCKET) SWS.closesocket(s);
-            WaitForSingleObject(m->cthr[i], 2000);
+            SWS.shutdown(m->csock[i], SD_BOTH);   /* wakes a blocked recv; the thread closes the socket itself */
+            if (WaitForSingleObject(m->cthr[i], 2000) != WAIT_OBJECT_0) alive = 1;
         }
         CloseHandle(m->cthr[i]);
     }
     SWS.closesocket(m->ls);
+    if (alive) { t_note("mts: a connection thread did not finish; server state leaked"); return; }
     if (m->have_cred) SSP->FreeCredentialsHandle(&m->cred);
     CloseHandle(m->stop);
     free(m);
