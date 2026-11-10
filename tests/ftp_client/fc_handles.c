@@ -549,7 +549,7 @@ static const struct { const char *line; const char *name; DWORD attr; DWORD lo; 
     { "-rw-r--r--    1 0        0              10 Jan 01  2020 numeric ids.txt", "numeric ids.txt", FILE_ATTRIBUTE_NORMAL, 10 },
     { "drwxr-xr-x    2 ftp      ftp          4096 Feb 29  2020 leapdir", "leapdir", FILE_ATTRIBUTE_DIRECTORY, 4096 },
     { "-rw-r--r--    1 user     group  1234567890 Dec 31  1999 y2k.bin", "y2k.bin", FILE_ATTRIBUTE_NORMAL, 1234567890 },
-    { "-rw-r--r--    1 user     group           0 Jul 04  2010   lead spaces", "  lead spaces", FILE_ATTRIBUTE_NORMAL, 0 },
+    { "-rw-r--r--    1 user     group           0 Jul 04  2010   lead spaces", "lead spaces", FILE_ATTRIBUTE_NORMAL, 0 },   /* ParseUnixDirectory: SkipSpaces(' ') before _ExtractFilename */
     { "-rwxrwxrwx    1 user     group          42 Aug 15  2018 tab\there", "tab\there", FILE_ATTRIBUTE_NORMAL, 42 },
 };
 
