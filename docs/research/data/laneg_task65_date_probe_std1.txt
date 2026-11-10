@@ -1,0 +1,226 @@
+WID env session=1 connect=1
+WID v00.last_modified.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v00.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v00.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v00.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v00.date.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v00.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v00.date.systemtime_buf8 ok=0 err=122 len=16
+WID v00.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v00.expires.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v00.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v00.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v00.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v00.custom_xdate.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v00.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v00.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v00.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v01.last_modified.text ok=1 err=0 len=62 text=[Tuesday, 15-Nov-94 12:45:26 GMT]
+WID v01.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v01.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v01.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v01.date.text ok=1 err=0 len=62 text=[Tuesday, 15-Nov-94 12:45:26 GMT]
+WID v01.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v01.date.systemtime_buf8 ok=0 err=122 len=16
+WID v01.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v01.expires.text ok=1 err=0 len=62 text=[Tuesday, 15-Nov-94 12:45:26 GMT]
+WID v01.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v01.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v01.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v01.custom_xdate.text ok=1 err=0 len=62 text=[Tuesday, 15-Nov-94 12:45:26 GMT]
+WID v01.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v01.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v01.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v02.last_modified.text ok=1 err=0 len=48 text=[Tue Nov 15 12:45:26 1994]
+WID v02.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v02.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v02.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v02.date.text ok=1 err=0 len=48 text=[Tue Nov 15 12:45:26 1994]
+WID v02.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v02.date.systemtime_buf8 ok=0 err=122 len=16
+WID v02.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v02.expires.text ok=1 err=0 len=48 text=[Tue Nov 15 12:45:26 1994]
+WID v02.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v02.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v02.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v02.custom_xdate.text ok=1 err=0 len=48 text=[Tue Nov 15 12:45:26 1994]
+WID v02.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v02.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v02.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v03.last_modified.text ok=1 err=0 len=22 text=[Tue, 15 Nov]
+WID v03.last_modified.systemtime_buf16 ok=1 len=16 y=2000 m=11 dow=2 d=15 h=19 mi=0 s=54 ms=0
+WID v03.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v03.last_modified.systemtime_buf32 ok=1 len=16 y=2000 m=11 dow=2 d=15 h=19 mi=0 s=54 ms=0
+WID v03.date.text ok=1 err=0 len=22 text=[Tue, 15 Nov]
+WID v03.date.systemtime_buf16 ok=1 len=16 y=2000 m=11 dow=2 d=15 h=19 mi=0 s=54 ms=0
+WID v03.date.systemtime_buf8 ok=0 err=122 len=16
+WID v03.date.systemtime_buf32 ok=1 len=16 y=2000 m=11 dow=2 d=15 h=19 mi=0 s=54 ms=0
+WID v03.expires.text ok=1 err=0 len=22 text=[Tue, 15 Nov]
+WID v03.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v03.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v03.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v03.custom_xdate.text ok=1 err=0 len=22 text=[Tue, 15 Nov]
+WID v03.custom_xdate.systemtime_buf16 ok=1 len=16 y=2000 m=11 dow=2 d=15 h=19 mi=0 s=54 ms=0
+WID v03.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v03.custom_xdate.systemtime_buf32 ok=1 len=16 y=2000 m=11 dow=2 d=15 h=19 mi=0 s=54 ms=0
+WID v04.last_modified.text ok=1 err=0 len=20 text=[not a date]
+WID v04.last_modified.systemtime_buf16 ok=0 err=12154 len=16
+WID v04.last_modified.systemtime_buf8 ok=0 err=12154 len=8
+WID v04.last_modified.systemtime_buf32 ok=0 err=12154 len=32
+WID v04.date.text ok=1 err=0 len=20 text=[not a date]
+WID v04.date.systemtime_buf16 ok=0 err=12154 len=16
+WID v04.date.systemtime_buf8 ok=0 err=12154 len=8
+WID v04.date.systemtime_buf32 ok=0 err=12154 len=32
+WID v04.expires.text ok=1 err=0 len=20 text=[not a date]
+WID v04.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v04.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v04.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v04.custom_xdate.text ok=1 err=0 len=20 text=[not a date]
+WID v04.custom_xdate.systemtime_buf16 ok=0 err=12154 len=16
+WID v04.custom_xdate.systemtime_buf8 ok=0 err=12154 len=8
+WID v04.custom_xdate.systemtime_buf32 ok=0 err=12154 len=32
+WID v05.last_modified.text ok=1 err=0 len=4 text=[15]
+WID v05.last_modified.systemtime_buf16 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=927
+WID v05.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v05.last_modified.systemtime_buf32 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=927
+WID v05.date.text ok=1 err=0 len=4 text=[15]
+WID v05.date.systemtime_buf16 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=927
+WID v05.date.systemtime_buf8 ok=0 err=122 len=16
+WID v05.date.systemtime_buf32 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=927
+WID v05.expires.text ok=1 err=0 len=4 text=[15]
+WID v05.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v05.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v05.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v05.custom_xdate.text ok=1 err=0 len=4 text=[15]
+WID v05.custom_xdate.systemtime_buf16 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=927
+WID v05.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v05.custom_xdate.systemtime_buf32 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=927
+WID v06.last_modified.text ok=1 err=0 len=0 text=[]
+WID v06.last_modified.systemtime_buf16 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=959
+WID v06.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v06.last_modified.systemtime_buf32 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=959
+WID v06.date.text ok=1 err=0 len=0 text=[]
+WID v06.date.systemtime_buf16 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=974
+WID v06.date.systemtime_buf8 ok=0 err=122 len=16
+WID v06.date.systemtime_buf32 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=974
+WID v06.expires.text ok=1 err=0 len=0 text=[]
+WID v06.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v06.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v06.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v06.custom_xdate.text ok=1 err=0 len=0 text=[]
+WID v06.custom_xdate.systemtime_buf16 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=974
+WID v06.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v06.custom_xdate.systemtime_buf32 ok=1 len=16 y=2026 m=9 dow=3 d=30 h=19 mi=0 s=54 ms=974
+WID v07.last_modified.text ok=1 err=0 len=58 text=[Mon, 32 Feb 2024 25:61:61 GMT]
+WID v07.last_modified.systemtime_buf16 ok=0 err=12154 len=16
+WID v07.last_modified.systemtime_buf8 ok=0 err=12154 len=8
+WID v07.last_modified.systemtime_buf32 ok=0 err=12154 len=32
+WID v07.date.text ok=1 err=0 len=58 text=[Mon, 32 Feb 2024 25:61:61 GMT]
+WID v07.date.systemtime_buf16 ok=0 err=12154 len=16
+WID v07.date.systemtime_buf8 ok=0 err=12154 len=8
+WID v07.date.systemtime_buf32 ok=0 err=12154 len=32
+WID v07.expires.text ok=1 err=0 len=58 text=[Mon, 32 Feb 2024 25:61:61 GMT]
+WID v07.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v07.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v07.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v07.custom_xdate.text ok=1 err=0 len=58 text=[Mon, 32 Feb 2024 25:61:61 GMT]
+WID v07.custom_xdate.systemtime_buf16 ok=0 err=12154 len=16
+WID v07.custom_xdate.systemtime_buf8 ok=0 err=12154 len=8
+WID v07.custom_xdate.systemtime_buf32 ok=0 err=12154 len=32
+WID v08.last_modified.text ok=1 err=0 len=50 text=[Tue, 15 Nov 1994 12:45:26]
+WID v08.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v08.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v08.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v08.date.text ok=1 err=0 len=50 text=[Tue, 15 Nov 1994 12:45:26]
+WID v08.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v08.date.systemtime_buf8 ok=0 err=122 len=16
+WID v08.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v08.expires.text ok=1 err=0 len=50 text=[Tue, 15 Nov 1994 12:45:26]
+WID v08.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v08.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v08.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v08.custom_xdate.text ok=1 err=0 len=50 text=[Tue, 15 Nov 1994 12:45:26]
+WID v08.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v08.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v08.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v09.last_modified.text ok=1 err=0 len=32 text=[Tue, 15 Nov 1994]
+WID v09.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=0 mi=0 s=0 ms=0
+WID v09.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v09.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=0 mi=0 s=0 ms=0
+WID v09.date.text ok=1 err=0 len=32 text=[Tue, 15 Nov 1994]
+WID v09.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=0 mi=0 s=0 ms=0
+WID v09.date.systemtime_buf8 ok=0 err=122 len=16
+WID v09.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=0 mi=0 s=0 ms=0
+WID v09.expires.text ok=1 err=0 len=32 text=[Tue, 15 Nov 1994]
+WID v09.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v09.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v09.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v09.custom_xdate.text ok=1 err=0 len=32 text=[Tue, 15 Nov 1994]
+WID v09.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=0 mi=0 s=0 ms=0
+WID v09.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v09.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=0 mi=0 s=0 ms=0
+WID v10.last_modified.text ok=1 err=0 len=58 text=[Wed, 15 Nov 1994 12:45:26 GMT]
+WID v10.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=3 d=15 h=12 mi=45 s=26 ms=0
+WID v10.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v10.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=3 d=15 h=12 mi=45 s=26 ms=0
+WID v10.date.text ok=1 err=0 len=58 text=[Wed, 15 Nov 1994 12:45:26 GMT]
+WID v10.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=3 d=15 h=12 mi=45 s=26 ms=0
+WID v10.date.systemtime_buf8 ok=0 err=122 len=16
+WID v10.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=3 d=15 h=12 mi=45 s=26 ms=0
+WID v10.expires.text ok=1 err=0 len=58 text=[Wed, 15 Nov 1994 12:45:26 GMT]
+WID v10.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v10.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v10.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v10.custom_xdate.text ok=1 err=0 len=58 text=[Wed, 15 Nov 1994 12:45:26 GMT]
+WID v10.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=3 d=15 h=12 mi=45 s=26 ms=0
+WID v10.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v10.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=3 d=15 h=12 mi=45 s=26 ms=0
+WID v11.last_modified.text ok=1 err=0 len=54 text=[Tue, 15 Nov 94 12:45:26 GMT]
+WID v11.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v11.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v11.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v11.date.text ok=1 err=0 len=54 text=[Tue, 15 Nov 94 12:45:26 GMT]
+WID v11.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v11.date.systemtime_buf8 ok=0 err=122 len=16
+WID v11.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v11.expires.text ok=1 err=0 len=54 text=[Tue, 15 Nov 94 12:45:26 GMT]
+WID v11.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v11.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v11.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v11.custom_xdate.text ok=1 err=0 len=54 text=[Tue, 15 Nov 94 12:45:26 GMT]
+WID v11.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v11.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v11.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v12.last_modified.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v12.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v12.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v12.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v12.date.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v12.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v12.date.systemtime_buf8 ok=0 err=122 len=16
+WID v12.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v12.expires.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v12.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v12.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v12.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v12.custom_xdate.text ok=1 err=0 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WID v12.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v12.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v12.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v13.last_modified.text ok=1 err=0 len=62 text=[Tue, 15 Nov 1994 12:45:26 +0100]
+WID v13.last_modified.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v13.last_modified.systemtime_buf8 ok=0 err=122 len=16
+WID v13.last_modified.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v13.date.text ok=1 err=0 len=62 text=[Tue, 15 Nov 1994 12:45:26 +0100]
+WID v13.date.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v13.date.systemtime_buf8 ok=0 err=122 len=16
+WID v13.date.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v13.expires.text ok=1 err=0 len=62 text=[Tue, 15 Nov 1994 12:45:26 +0100]
+WID v13.expires.systemtime_buf16 ok=0 err=12154 len=16
+WID v13.expires.systemtime_buf8 ok=0 err=12154 len=8
+WID v13.expires.systemtime_buf32 ok=0 err=12154 len=32
+WID v13.custom_xdate.text ok=1 err=0 len=62 text=[Tue, 15 Nov 1994 12:45:26 +0100]
+WID v13.custom_xdate.systemtime_buf16 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID v13.custom_xdate.systemtime_buf8 ok=0 err=122 len=16
+WID v13.custom_xdate.systemtime_buf32 ok=1 len=16 y=1994 m=11 dow=2 d=15 h=12 mi=45 s=26 ms=0
+WID done end=1

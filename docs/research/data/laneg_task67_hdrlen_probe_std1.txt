@@ -1,0 +1,22 @@
+WHL w_h1_sentinel ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL w_h1_len8 ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL w_h1_len16_bytes ok=0 err=12150 echo=[-]
+WHL w_h1_len7 ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL w_h1_len9 ok=0 err=12150 echo=[-]
+WHL w_h1_len0 ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL w_h2_sentinel ok=1 err=0 echo=[X-T=1|X-A=2]
+WHL w_h2_len_full ok=0 err=12150 echo=[-]
+WHL w_h2_len8_cut ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL w_null_sentinel ok=1 err=0 echo=[X-T=None|X-A=None]
+WHL w_null_len8 ok=1 err=0 echo=[X-T=None|X-A=None]
+WHL a_h1_sentinel ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL a_h1_len8 ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL a_h1_len0 ok=0 err=87 echo=[-]
+WHL a_h2_sentinel ok=1 err=0 echo=[X-T=1|X-A=2]
+WHL addhdr_w_sentinel add=1 adderr=0
+WHL addhdr_w_sentinel.send ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL addhdr_w_len8 add=1 adderr=0
+WHL addhdr_w_len8.send ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL addhdr_a_sentinel add=1 adderr=0
+WHL addhdr_a_sentinel.send ok=1 err=0 echo=[X-T=1|X-A=None]
+WHL done end=1

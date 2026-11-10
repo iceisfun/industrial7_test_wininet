@@ -1,0 +1,128 @@
+WIN open.direct ok=1 err=0
+WIN open.proxy_null_proxy ok=0 err=87
+WIN open.async ok=1 err=0
+WIN open.null_agent ok=1 err=0
+WIN open.bad_access_type ok=0 err=87
+WIN connect.null_server ok=0 err=87
+WIN connect.empty_server ok=0 err=123
+WIN connect.bad_session ok=0 err=6
+WIN connect.bad_service ok=0 err=87
+WIN connect.ftp ok=0 err=12029
+WIN connect.http ok=1 err=0
+WIN openreq.on_session ok=0 err=12018
+WIN openreq.bad_connect ok=0 err=6
+WIN openreq.defaults ok=1 err=0
+WIN openreq.defaults.method ok=1 err=0 len=6 text=GET
+WIN openreq.defaults.version ok=1 err=0 len=16 text=HTTP/1.1
+WIN query.before_send_status ok=1 err=0
+WIN query.before_send_rawheaders ok=1 err=0
+WIN read.before_send ok=1 err=0 got=0
+WIN qda.before_send ok=1 err=0 avail=0
+WIN close.twice ok=0 err=6
+WIN close.garbage ok=0 err=6
+WIN send.on_session ok=0 err=12018
+WIN send.garbage ok=0 err=6
+WIN read.null_all ok=0 err=6
+WIN setopt.session_connect_timeout ok=1 err=0
+WIN setopt.session_connect_timeout_zero ok=1 err=0
+WIN setopt.session_connect_timeout_len2 ok=0 err=12010
+WIN setopt.global_connect_timeout ok=1 err=0
+WIN setopt.global_connect_timeout_zero ok=1 err=0
+WIN setopt.global_connect_timeout_len2 ok=0 err=12010
+WIN setopt.useragent_on_connect ok=0 err=12018
+WIN setopt.useragent_on_session ok=1 err=0
+WIN setopt.handle_type ok=0 err=12011
+WIN setopt.unknown_option ok=0 err=12009
+WIN setopt.callback_on_session ok=0 err=12011
+WIN setopt.callback_global ok=0 err=12018
+WIN queryopt.session_connect_timeout ok=1 err=0 val=12345
+WIN queryopt.global_connect_timeout ok=1 err=0 val=12345
+WIN queryopt.short_buffer ok=0 err=122 need=4
+WIN queryopt.handle_type_session ok=1 err=0 val=1
+WIN queryopt.handle_type_connect ok=1 err=0 val=4
+WIN queryopt.useragent_from_connect ok=0 err=12018 len=128 text=-
+WIN queryopt.useragent_short ok=0 err=12018 need=2
+WIN queryopt.garbage_handle ok=0 err=6
+WIN queryopt.null_length ok=0 err=87
+WIN hello.send ok=1 err=0
+WIN hello.status ok=1 err=0 code=200 len=4
+WIN hello.statustext ok=1 err=0 len=4 text=OK
+WIN hello.version ok=1 len=16 text=HTTP/1.1
+WIN hello.contentlength_number ok=1 err=0 val=12
+WIN hello.statustext_short ok=0 err=122 need=6
+WIN hello.statustext_A ok=1 len=2 text=OK
+WIN hello.statustext_A_short ok=0 err=122 need=3
+WIN hello.rawheaders_crlf ok=1 len=362
+WIN hello.rawheaders_text HTTP/1.1 200 OK\r\nServer: i7probe\r\nContent-Type: text/plain\r\nLast-Modified: Tue, 15 Nov 1994 12:45:26 GMT\r\nX-Test: 42\r\nX-Multi: a\r\nX-Multi: b\r\nSet-Cookie: c=1\r\nContent-Length: 12\r\n\r\n
+WIN hello.custom_xtest ok=1 err=0 len=4 text=[42]
+WIN hello.custom_xtest_number ok=0 err=12150 val=57005
+WIN hello.custom_xtest_number_len8 ok=0 err=12150
+WIN hello.custom_multi_first ok=1 len=2 text=[a]
+WIN hello.custom_multi_second ok=1 len=2 text=[b] idx_after=2
+WIN hello.custom_missing ok=0 err=12150
+WIN hello.lastmodified_systemtime ok=1 err=0 len=16 y=1994 m=11 d=15 dow=2 h=12 mi=45 s=26
+WIN hello.lastmodified_systemtime_short ok=0 err=122 need=16
+WIN hello.lastmodified_text ok=1 len=58 text=[Tue, 15 Nov 1994 12:45:26 GMT]
+WIN hello.contenttype ok=1 len=20 text=[text/plain]
+WIN hello.setcookie ok=1 len=6 text=[c=1]
+WIN hello.reqmethod_without_request_flag ok=1 err=0 text=[GET]
+WIN hello.request_headers_crlf ok=1 err=0 len_ge_20=1\nWIN hello.status_with_request_flag ok=0 err=12154\nWIN hello.null_length ok=0 err=87\nWIN hello.custom_null_buffer ok=0 err=87\nWIN hello.qda ok=1 err=0 avail=12
+WIN hello.read_zero_len ok=1 err=0 got=0
+WIN hello.read_loop total=12 chunks_ge1=1
+WIN hello.read_after_eof ok=1 err=0 got=0
+WIN hello.qda_after_eof ok=1 avail=0
+WIN notfound.send ok=1 err=0
+WIN notfound.status ok=1 err=0 code=404 len=4
+WIN notfound.statustext ok=1 err=0 len=18 text=Not Found
+WIN notfound.version ok=1 len=16 text=HTTP/1.1
+WIN notfound.contentlength_number ok=1 err=0 val=4
+WIN notfound.statustext_short ok=0 err=122 need=20
+WIN notfound.statustext_A ok=1 len=9 text=Not Found
+WIN notfound.statustext_A_short ok=0 err=122 need=10
+WIN notfound.rawheaders_crlf ok=1 len=142
+WIN notfound.rawheaders_text HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: 4\r\n\r\n
+WIN notfound.qda ok=1 err=0 avail=4
+WIN notfound.read_zero_len ok=1 err=0 got=0
+WIN notfound.read_loop total=4 chunks_ge1=1
+WIN notfound.read_after_eof ok=1 err=0 got=0
+WIN notfound.qda_after_eof ok=1 avail=0
+WIN empty.send ok=1 err=0
+WIN empty.status ok=1 err=0 code=204 len=4
+WIN empty.statustext ok=1 err=0 len=20 text=No Content
+WIN empty.version ok=1 len=16 text=HTTP/1.1
+WIN empty.contentlength_number ok=1 err=0 val=0
+WIN empty.statustext_short ok=0 err=122 need=22
+WIN empty.statustext_A ok=1 len=10 text=No Content
+WIN empty.statustext_A_short ok=0 err=122 need=11
+WIN empty.rawheaders_crlf ok=1 len=92
+WIN empty.rawheaders_text HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n
+WIN empty.qda ok=1 err=0 avail=0
+WIN empty.read_zero_len ok=1 err=0 got=0
+WIN empty.read_loop total=0 chunks_ge1=0
+WIN empty.read_after_eof ok=1 err=0 got=0
+WIN empty.qda_after_eof ok=1 avail=0
+WIN redir.send ok=1 err=0
+WIN redir.status ok=1 err=0 code=302 len=4
+WIN redir.statustext ok=1 err=0 len=10 text=Found
+WIN redir.version ok=1 len=16 text=HTTP/1.1
+WIN redir.contentlength_number ok=1 err=0 val=0
+WIN redir.statustext_short ok=0 err=122 need=12
+WIN redir.statustext_A ok=1 len=5 text=Found
+WIN redir.statustext_A_short ok=0 err=122 need=6
+WIN redir.rawheaders_crlf ok=1 len=118
+WIN redir.rawheaders_text HTTP/1.1 302 Found\r\nLocation: /hello\r\nContent-Length: 0\r\n\r\n
+WIN redir.qda ok=1 err=0 avail=0
+WIN redir.read_zero_len ok=1 err=0 got=0
+WIN redir.read_loop total=0 chunks_ge1=0
+WIN redir.read_after_eof ok=1 err=0 got=0
+WIN redir.qda_after_eof ok=1 avail=0
+WIN big.first_qda_ge1=1 le20000=1
+WIN big.read total=20000 reads_ge1=1 single_read_returned_all=1
+WIN post.send_len_minus1 ok=1 err=0
+WIN post.response text=posted:7:text/x-i7
+WIN post.send_len8_nobody ok=0 err=12150
+WIN post.resend ok=1 err=0
+WIN get.send ok=1
+WIN get.resend_after_send ok=0 err=12002
+WIN get.status_after_resend ok=1 code=0
+WIN done end=1

@@ -1,0 +1,61 @@
+WN8 setup.wininet present=1
+WN8 setup.pac started=1
+WN8 ie.a_disabled ok=1 err=0 autodetect=1 pac=NULL proxy=NULL bypass=NULL
+WN8 default.a_disabled ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.a_disabled ok=1 flags=9 server=NULL bypass=NULL pac=NULL disco=0
+WN8 open.default ok=1 qo_ok=1 qo_err=0 access=1 proxy=NULL bypass=NULL
+WN8 open.default.sizequery ok=0 err=122 need_nonzero=1
+WN8 open.noproxy ok=1 qo_ok=1 qo_err=0 access=1 proxy=NULL bypass=NULL
+WN8 open.noproxy.sizequery ok=0 err=122 need_nonzero=1
+WN8 open.automatic ok=1 qo_ok=1 qo_err=0 access=1 proxy=NULL bypass=NULL
+WN8 open.automatic.sizequery ok=0 err=122 need_nonzero=1
+WN8 open.named ok=1 qo_ok=1 qo_err=0 access=3 proxy=np:3128 bypass=<local>
+WN8 open.named.sizequery ok=0 err=122 need_nonzero=1
+WN8 ie.b_server ok=1 err=0 autodetect=1 pac=NULL proxy=host:8080 bypass=NULL
+WN8 gfree.ie.proxy ok=1
+WN8 default.b_server ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.b_server ok=1 flags=11 server=host:8080 bypass=NULL pac=NULL disco=0
+WN8 gfree.pc.server ok=1
+WN8 ie.c_perproto ok=1 err=0 autodetect=1 pac=NULL proxy=http=a:1;https=b:2;ftp=c:3 bypass=NULL
+WN8 gfree.ie.proxy ok=1
+WN8 default.c_perproto ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.c_perproto ok=1 flags=11 server=http=a:1;https=b:2;ftp=c:3 bypass=NULL pac=NULL disco=0
+WN8 gfree.pc.server ok=1
+WN8 ie.d_override ok=1 err=0 autodetect=1 pac=NULL proxy=host:8080 bypass=<local>;*.example.test
+WN8 gfree.ie.proxy ok=1
+WN8 gfree.ie.bypass ok=1
+WN8 default.d_override ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.d_override ok=1 flags=11 server=host:8080 bypass=<local>;*.example.test pac=NULL disco=0
+WN8 gfree.pc.server ok=1
+WN8 gfree.pc.bypass ok=1
+WN8 ie.e_pac ok=1 err=0 autodetect=1 pac=set proxy=NULL bypass=NULL
+WN8 gfree.ie.pac ok=1
+WN8 default.e_pac ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.e_pac ok=1 flags=13 server=NULL bypass=NULL pac=set disco=0
+WN8 gfree.pc.pac ok=1
+WN8 ie.f_autodetect0 ok=1 err=0 autodetect=1 pac=set proxy=NULL bypass=NULL
+WN8 gfree.ie.pac ok=1
+WN8 default.f_autodetect0 ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.f_autodetect0 ok=1 flags=13 server=NULL bypass=NULL pac=set disco=0
+WN8 gfree.pc.pac ok=1
+WN8 ie.f_autodetect1 ok=1 err=0 autodetect=1 pac=set proxy=NULL bypass=NULL
+WN8 gfree.ie.pac ok=1
+WN8 default.f_autodetect1 ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 perconn.f_autodetect1 ok=1 flags=13 server=NULL bypass=NULL pac=set disco=0
+WN8 gfree.pc.pac ok=1
+WN8 gpu.session ok=1
+WN8 gpu.pac_direct ok=1 err=0 access=1 proxy=NULL bypass=NULL
+WN8 gpu.pac_proxy ok=1 err=0 access=3 proxy=p:80 bypass=NULL
+WN8 gfree.gpu.proxy ok=1
+WN8 gpu.pac_garbage ok=0 err=12166 access=0 proxy=NULL bypass=NULL
+WN8 gpu.pac_nullurl_option ok=0 err=87 access=0 proxy=NULL bypass=NULL
+WN8 gpu.autodetect_noflags ok=0 err=87 access=0 proxy=NULL bypass=NULL
+WN8 gpu.noflags ok=0 err=87 access=0 proxy=NULL bypass=NULL
+WN8 gpu.null_url ok=0 err=87 access=0 proxy=NULL bypass=NULL
+WN8 gpu.null_options ok=0 err=87 access=0 proxy=NULL bypass=NULL
+WN8 gpu.empty_url ok=0 err=12006 access=0 proxy=NULL bypass=NULL
+WN8 gpu.null_session ok=0 err=6
+WN8 detect.zero_flags ok=0 err=87
+WN8 detect.dhcp ok=0 class=autodetection_failed url=NULL
+WN8 wininet.connected called=1 ret_is_bool=1
+WN8 end.done restored=1

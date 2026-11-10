@@ -1,0 +1,82 @@
+SSP env.token elevated=0
+SSP reg.secprov.securityproviders open=0 query=0 type=sz text="credssp.dll"
+SSP reg.lsa.security_packages open=0 query=0 type=multi_sz n=1 names="\x22\x22"
+SSP reg.lsa_osconfig.security_packages open=0 query=2
+SSP reg.schannel.key open=0
+SSP reg.schannel.protocols open=0 n=0 names=""
+SSP isi.secur32.load ok=1 gle=0
+SSP isi.export present=1
+SSP isi.table ok=1 gle=0 version=1 enum=1 qpi=1 ach=1 fch=1 isc=1 dsc=1 fcb=1 qca=1
+SSP isi.fns enum=1 qpi=1 ach=1 fch=1 isc=1 dsc=1 fcb=1
+SSP enum.call st=0x00000000 count=12
+SSP enum.pkg.0 name="Negotiate" caps=0x00883bb3 ver=1 rpcid=9 maxtoken=48256 commentlen=28
+SSP enum.pkg.1 name="NegoExtender" caps=0x00913913 ver=1 rpcid=30 maxtoken=12000 commentlen=29
+SSP enum.pkg.2 name="Kerberos" caps=0x028f3bbf ver=1 rpcid=16 maxtoken=48000 commentlen=23
+SSP enum.pkg.3 name="NTLM" caps=0x02882b37 ver=1 rpcid=10 maxtoken=2888 commentlen=21
+SSP enum.pkg.4 name="TSSSP" caps=0x00810230 ver=1 rpcid=22 maxtoken=13000 commentlen=27
+SSP enum.pkg.5 name="pku2u" caps=0x00a11113 ver=1 rpcid=31 maxtoken=12000 commentlen=22
+SSP enum.pkg.6 name="CloudAP" caps=0x00602000 ver=1 rpcid=36 maxtoken=0 commentlen=25
+SSP enum.pkg.7 name="WDigest" caps=0x00800304 ver=1 rpcid=21 maxtoken=4096 commentlen=33
+SSP enum.pkg.8 name="Schannel" caps=0x004107b3 ver=1 rpcid=14 maxtoken=24576 commentlen=25
+SSP enum.pkg.9 name="Microsoft Unified Security Protocol Provider" caps=0x004107b3 ver=1 rpcid=14 maxtoken=24576 commentlen=25
+SSP enum.pkg.10 name="Default TLS SSP" caps=0x004107b3 ver=1 rpcid=14 maxtoken=24576 commentlen=25
+SSP enum.pkg.11 name="CREDSSP" caps=0x00810733 ver=1 rpcid=65535 maxtoken=73032 commentlen=35
+SSP enum.names list="Negotiate,NegoExtender,Kerberos,NTLM,TSSSP,pku2u,CloudAP,WDigest,Schannel,Microsoft Unified Security Protocol Provider,Default TLS SSP,CREDSSP"
+SSP enum.free st=0x00000000
+SSP qpi.schannel st=0x00000000 name="Schannel" caps=0x004107b3 ver=1 rpcid=14 maxtoken=24576
+SSP qpi.negotiate st=0x00000000 name="Negotiate" caps=0x00883bb3 ver=1 rpcid=9 maxtoken=48256
+SSP qpi.ntlm st=0x00000000 name="NTLM" caps=0x02882b37 ver=1 rpcid=10 maxtoken=2888
+SSP qpi.kerberos st=0x00000000 name="Kerberos" caps=0x028f3bbf ver=1 rpcid=16 maxtoken=48000
+SSP qpi.unisp st=0x00000000 name="Microsoft Unified Security Protocol Provider" caps=0x004107b3 ver=1 rpcid=14 maxtoken=24576
+SSP qpi.wdigest st=0x00000000 name="WDigest" caps=0x00800304 ver=1 rpcid=21 maxtoken=4096
+SSP qpi.credssp st=0x00000000 name="CREDSSP" caps=0x00810733 ver=1 rpcid=65535 maxtoken=73032
+SSP mods.before_ach schannel=1 sspicli=1 ncrypt=0 bcrypt=1 ncryptsslp=0
+SSP ach.schannel.cred4.acquire st=0x00000000
+SSP ach.schannel.cred4.free st=0x00000000
+SSP ach.schannel.cred5.acquire st=0x00000000
+SSP ach.schannel.cred5.free st=0x00000000
+SSP ach.schannel.null.acquire st=0x00000000
+SSP ach.schannel.null.free st=0x00000000
+SSP ach.unisp.cred4.acquire st=0x00000000
+SSP ach.unisp.cred4.free st=0x00000000
+SSP ach.unisp.null.acquire st=0x00000000
+SSP ach.unisp.null.free st=0x00000000
+SSP ach.ntlm.out.acquire st=0x00000000
+SSP ach.ntlm.out.free st=0x00000000
+SSP ach.ntlm.in.acquire st=0x00000000
+SSP ach.ntlm.in.free st=0x00000000
+SSP ach.negotiate.out.acquire st=0x00000000
+SSP ach.negotiate.out.free st=0x00000000
+SSP ach.negotiate.in.acquire st=0x00000000
+SSP ach.negotiate.in.free st=0x00000000
+SSP mods.after_ach schannel=1 sspicli=1 ncrypt=0 bcrypt=1 ncryptsslp=0
+SSP isc.schannel.cred4.localhost.acquire st=0x00000000
+SSP isc.schannel.cred4.localhost.first st=0x00090312 req=0x0000811c attrs=0x0000811c outtype=2 outlen=128-255 outbuf=1
+SSP isc.schannel.cred4.localhost.freebuf st=0x00000000
+SSP isc.schannel.cred4.localhost.delete st=0x00000000
+SSP isc.schannel.cred4.localhost.freecred st=0x00000000
+SSP isc.schannel.cred4.invalid.acquire st=0x00000000
+SSP isc.schannel.cred4.invalid.first st=0x00090312 req=0x0000811c attrs=0x0000811c outtype=2 outlen=128-255 outbuf=1
+SSP isc.schannel.cred4.invalid.freebuf st=0x00000000
+SSP isc.schannel.cred4.invalid.delete st=0x00000000
+SSP isc.schannel.cred4.invalid.freecred st=0x00000000
+SSP isc.schannel.null.localhost.acquire st=0x00000000
+SSP isc.schannel.null.localhost.first st=0x00090312 req=0x0000811c attrs=0x0000811c outtype=2 outlen=128-255 outbuf=1
+SSP isc.schannel.null.localhost.freebuf st=0x00000000
+SSP isc.schannel.null.localhost.delete st=0x00000000
+SSP isc.schannel.null.localhost.freecred st=0x00000000
+SSP isc.schannel.null.invalid.acquire st=0x00000000
+SSP isc.schannel.null.invalid.first st=0x00090312 req=0x0000811c attrs=0x0000811c outtype=2 outlen=128-255 outbuf=1
+SSP isc.schannel.null.invalid.freebuf st=0x00000000
+SSP isc.schannel.null.invalid.delete st=0x00000000
+SSP isc.schannel.null.invalid.freecred st=0x00000000
+SSP dll.schannel.load pre=1 ok=1 gle=0
+SSP dll.schannel.exports AcquireCredentialsHandleW=1 InitSecurityInterfaceW=1 InitializeSecurityContextW=1 EnumerateSecurityPackagesW=1
+SSP dll.schannel.sp SpLsaModeInitialize=1 SpUserModeInitialize=1
+SSP dll.sspicli.load pre=1 ok=1 gle=0
+SSP dll.sspicli.exports AcquireCredentialsHandleW=1 InitSecurityInterfaceW=1 InitializeSecurityContextW=1 EnumerateSecurityPackagesW=1
+SSP dll.secur32.load pre=1 ok=1 gle=0
+SSP dll.secur32.exports AcquireCredentialsHandleW=1 InitSecurityInterfaceW=1 InitializeSecurityContextW=1 EnumerateSecurityPackagesW=1
+SSP dll.ncrypt.load pre=0 ok=1 gle=0
+SSP dll.bcrypt.load pre=1 ok=1 gle=0
+SSP end.done rows=81

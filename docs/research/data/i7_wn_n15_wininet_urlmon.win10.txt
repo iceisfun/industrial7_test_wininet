@@ -1,0 +1,54 @@
+WN15 wininet.load ok=1
+WN15 wininet.len10.open ok=1
+WN15 wininet.len10.hdr status=200 content_length=10 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.len10.body total=10 term=eof
+WN15 wininet.len10.server req=GET /len10
+WN15 wininet.chunked.open ok=1
+WN15 wininet.chunked.hdr status=200 content_length=ERR12150 transfer_encoding=chunked location=ERR12150 content_range=ERR12150
+WN15 wininet.chunked.body total=13 term=eof
+WN15 wininet.chunked.server req=GET /chunked
+WN15 wininet.close.open ok=1
+WN15 wininet.close.hdr status=200 content_length=ERR12150 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.close.body total=17 term=eof
+WN15 wininet.close.server req=GET /close
+WN15 wininet.range.open ok=1
+WN15 wininet.range.hdr status=206 content_length=4 transfer_encoding=ERR12150 location=ERR12150 content_range=bytes 2-5/10
+WN15 wininet.range.body total=4 term=eof
+WN15 wininet.range.server req=GET /range
+WN15 wininet.head.send ok=1
+WN15 wininet.head.hdr status=200 content_length=10 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.head.body total=0 term=eof
+WN15 wininet.head.server req=HEAD /len10
+WN15 wininet.r301_default.open ok=1
+WN15 wininet.r301_default.hdr status=200 content_length=10 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.r301_default.body total=10 term=eof
+WN15 wininet.r301_default.server req=GET /len10
+WN15 wininet.r302_default.open ok=1
+WN15 wininet.r302_default.hdr status=200 content_length=10 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.r302_default.body total=10 term=eof
+WN15 wininet.r302_default.server req=GET /len10
+WN15 wininet.r302_noauto.open ok=1
+WN15 wininet.r302_noauto.hdr status=302 content_length=5 transfer_encoding=ERR12150 location=http://127.0.0.1:PORT/len10 content_range=ERR12150
+WN15 wininet.r302_noauto.body total=5 term=eof
+WN15 wininet.r302_noauto.server req=GET /r302
+WN15 wininet.404.open ok=1
+WN15 wininet.404.hdr status=404 content_length=9 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.404.body total=9 term=eof
+WN15 wininet.404.server req=GET /404
+WN15 wininet.trunc.open ok=1
+WN15 wininet.trunc.hdr status=200 content_length=100 transfer_encoding=ERR12150 location=ERR12150 content_range=ERR12150
+WN15 wininet.trunc.body total=40 term=eof
+WN15 wininet.trunc.server req=GET /trunc
+WN15 urlmon.load ok=1
+WN15 urlmon.len10.download hr=0x00000000 size=10
+WN15 urlmon.len10.server req=GET /len10
+WN15 urlmon.chunked.download hr=0x00000000 size=13
+WN15 urlmon.chunked.server req=GET /chunked
+WN15 urlmon.close.download hr=0x00000000 size=17
+WN15 urlmon.close.server req=GET /close
+WN15 urlmon.r302.download hr=0x00000000 size=10
+WN15 urlmon.r302.server req=GET /len10
+WN15 urlmon.404.download hr=0x800c0006 size=0
+WN15 urlmon.404.server req=GET /404
+WN15 urlmon.trunc.download hr=0x00000000 size=40
+WN15 urlmon.trunc.server req=GET /trunc
