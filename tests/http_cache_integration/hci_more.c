@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 /* ---------------------------------------------------------------- methods on one URL */
-TEST(hci_more_post_keeps_get_entry_fresh) {
+TEST(hci_more_post_invalidates_get_entry) {
     REQUIRE(U(HttpSendRequestA));
     hci_plan p = {0}; hci_set(&p, 0, 200, "get-1", "Content-Type: text/plain\r\nCache-Control: max-age=3600\r\n");
     hci_set(&p, 1, 200, "post-1", "Content-Type: text/plain\r\n");
@@ -22,8 +22,11 @@ TEST(hci_more_post_keeps_get_entry_fresh) {
     t_inet_close(hi);
     t_note("GET, POST, GET: requests=%d third=%s from_cache=%d", hci_reqs(s, 0), c.body, hci_from_cache(&c));
     EXPECT_STR(b.body, "post-1");
-    EXPECT_EQ(hci_reqs(s, 2), 2);
-    EXPECT_STR(c.body, "get-1");
+    /* VM: after a POST to the URL the GET entry is kept but no longer served: the next GET goes to the network */
+    EXPECT_EQ(hci_reqs(s, 3), 3);
+    EXPECT_STR(c.body, "get-2");
+    CHECK(!hci_from_cache(&c));
+    CHECK(hci_exists(url));
     srv_stop(s);
 }
 
@@ -78,11 +81,12 @@ TEST(hci_more_post_with_key_303) {
     hci_req(hi, s, "POST", src, 0, NULL, "a=1", 3, set_key_more, "KEY", &r);
     t_inet_close(hi);
     t_note("POST 303 keyed source: src=%d keyed=%d dst=%d", hci_exists(src), hci_exists(keyed), hci_exists(dst));
+    CHECK(!hci_exists(src)); CHECK(!hci_exists(keyed)); CHECK(hci_exists(dst));   /* VM: a 303 is never cached, keyed or not */
     EXPECT_STR(r.body, "keyed-target");
     srv_stop(s);
 }
 
-/* PUT/DELETE/POST to a URL: what happens to a fresh GET entry (VM: PUT keeps it) */
+/* PUT/DELETE/POST/PATCH to a URL: the fresh GET entry stays but the next GET goes to the network (VM) */
 TEST(hci_more_unsafe_methods_vs_get_entry) {
     REQUIRE(U(HttpSendRequestA));
     static const char *verbs[] = { "POST", "PUT", "DELETE", "PATCH" };
@@ -98,10 +102,12 @@ TEST(hci_more_unsafe_methods_vs_get_entry) {
         hci_get(hi, url, NULL, 0, &c);
         t_inet_close(hi);
         int n = hci_reqs(s, 0);
+        DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
         t_note("%s between two GETs: requests=%d entry=%d third=%s", verbs[k], n, hci_exists(url), c.body);
+        free(e);
         CHECKF(!strcmp(b.body, "unsafe"), "%s body %s", verbs[k], b.body);
         CHECKF(hci_exists(url), "%s removed the GET entry", verbs[k]);
-        CHECKF(n == 2 && !strcmp(c.body, "get-entry"), "%s: requests %d third %s", verbs[k], n, c.body);
+        CHECKF(n == 3 && !strcmp(c.body, "get-again"), "%s: requests %d third %s", verbs[k], n, c.body);
         srv_stop(s);
     }
 }
@@ -129,12 +135,22 @@ TEST(hci_more_decoding_stored_form_table) {
         t_note("decoding=%d %s(mode %d): app got plain=%d len=%zu; stored plain=%d compressed=%d size=%lu CE kept=%d; second len=%zu requests=%d",
                dec, rows[k].enc, rows[k].mode, got_plain, a.len, stored_plain, stored_z, e ? e->dwSizeLow : 0, e ? hci_hdr_has(e, "Content-Encoding") : -1, b.len, hci_reqs(s, 0));
         CHECKF(e != NULL, "dec %d %s not stored", dec, rows[k].enc);
-        int known = strcmp(rows[k].enc, "x-gzip") != 0;
-        if (known) {
+        int zlib_dec = dec && rows[k].mode == 1;
+        if (zlib_dec) {
+            /* VM: with decoding on, a zlib-wrapped "deflate" body is not decoded: the app reads nothing and the
+               broken entry is not served again */
+            CHECKF(!got_plain && a.len == 0, "zlib deflate decoded? len %zu", a.len);
+            CHECKF(hci_reqs(s, 2) == 2, "zlib deflate requests %d", srv_req_count(s));
+            free(e); srv_stop(s); free(z);
+            continue;
+        }
+        {
             CHECKF(got_plain == dec, "dec %d %s/%d app plain %d", dec, rows[k].enc, rows[k].mode, got_plain);
             CHECKF(dec ? stored_plain : stored_z, "dec %d %s/%d stored form", dec, rows[k].enc, rows[k].mode);
         }
         CHECKF(hci_reqs(s, 0) == 1, "dec %d %s requests %d", dec, rows[k].enc, srv_req_count(s));
+        CHECKF(e && hci_hdr_has(e, "Content-Encoding") == !dec, "dec %d %s CE in blob", dec, rows[k].enc);   /* VM: dropped when decoded */
+        CHECKF(e && e->dwSizeLow == (dec ? sizeof plain - 1 : zn), "dec %d %s size %lu", dec, rows[k].enc, e ? e->dwSizeLow : 0);
         CHECKF(b.len == a.len && !memcmp(a.body, b.body, a.len), "dec %d %s: cache hit differs from first read", dec, rows[k].enc);
         free(e);
         srv_stop(s);
@@ -156,7 +172,8 @@ TEST(hci_more_decoded_entry_read_without_decoding) {
     int b_gz = b.len == srv_fox_gzip_len && !memcmp(b.body, srv_fox_gzip, b.len);
     t_note("decoded entry read without decoding: requests=%d len=%zu plain=%d gzip=%d CE header in response=%d", hci_reqs(s, 0), b.len, b_plain, b_gz, strstr(b.rawhdrs, "Content-Encoding") != NULL);
     EXPECT_EQ(hci_reqs(s, 0), 1);
-    CHECK(b_plain || b_gz);
+    CHECK(b_plain);                                   /* VM: the decoded file is served, without Content-Encoding */
+    CHECK(!strstr(b.rawhdrs, "Content-Encoding"));
     srv_stop(s);
 }
 
@@ -213,6 +230,13 @@ TEST(hci_more_status_callbacks_cache_hit) {
     CHECK(!cb_has(&hit, INTERNET_STATUS_RECEIVING_RESPONSE));
     CHECK(cb_has(&hit, INTERNET_STATUS_HANDLE_CREATED));
     CHECK(cb_has(&hit, INTERNET_STATUS_HANDLE_CLOSING));
+    /* VM: a cache hit reports exactly HANDLE_CREATED then HANDLE_CLOSING */
+    EXPECT_EQ(hit.n, 2);
+    EXPECT_EQ(hit.st[0], INTERNET_STATUS_HANDLE_CREATED);
+    EXPECT_EQ(hit.st[1], INTERNET_STATUS_HANDLE_CLOSING);
+    EXPECT_EQ(net.st[0], INTERNET_STATUS_HANDLE_CREATED);
+    CHECK(cb_has(&net, INTERNET_STATUS_REQUEST_SENT));
+    CHECK(cb_has(&net, INTERNET_STATUS_RECEIVING_RESPONSE));
     EXPECT_EQ(hci_reqs(s, 0), 1);
     srv_stop(s);
 }
@@ -235,6 +259,9 @@ TEST(hci_more_status_callbacks_revalidation) {
     cb_note("revalidation", &c);
     CHECK(cb_has(&c, INTERNET_STATUS_SENDING_REQUEST));
     CHECK(cb_has(&c, INTERNET_STATUS_RESPONSE_RECEIVED));
+    CHECK(cb_has(&c, INTERNET_STATUS_REQUEST_SENT));
+    EXPECT_EQ(c.st[0], INTERNET_STATUS_HANDLE_CREATED);
+    EXPECT_EQ(c.st[c.n - 1], INTERNET_STATUS_HANDLE_CLOSING);
     EXPECT_EQ(p.cond_served, 1);
     srv_stop(s);
 }
@@ -268,6 +295,11 @@ TEST(hci_more_host_case_same_entry) {
     t_cache_track(lh); t_cache_track(uh);
     hci_resp a, b; free(hci_fetch(lh, NULL, 0, &a)); free(hci_fetch(uh, NULL, 0, &b));
     t_note("localhost then LOCALHOST: requests=%d second=%s url opt=%s entry(UC)=%d", hci_reqs(s, 0), b.body, b.url_opt, hci_exists(uh));
+    /* VM: the host is lower-cased into the key, so the second request is a cache hit */
+    EXPECT_EQ(hci_reqs(s, 0), 1);
+    EXPECT_STR(b.body, "lc-host");
+    EXPECT_STR(b.url_opt, lh);
+    CHECK(!hci_exists(uh)); CHECK(hci_exists(lh));
     srv_stop(s);
 }
 
@@ -285,6 +317,11 @@ TEST(hci_more_escaped_path_keys) {
     t_note("~ vs %%7E: requests=%d second=%s targets [%s] [%s] entries %d/%d", srv_req_count(s), b.body, srv_req_target(s, 0) ? srv_req_target(s, 0) : "-",
            srv_req_target(s, 1) ? srv_req_target(s, 1) : "-", hci_exists(u1), hci_exists(u2));
     CHECK(hci_exists(u1));
+    /* VM: no canonicalisation of %7E: two requests sent verbatim, two entries */
+    EXPECT_EQ(srv_req_count(s), 2);
+    EXPECT_STR(b.body, "tilde-2");
+    CHECK(hci_exists(u2));
+    CHECK(srv_req_target(s, 1) && strstr(srv_req_target(s, 1), "%7Ex"));
     srv_stop(s);
 }
 
@@ -299,6 +336,9 @@ TEST(hci_more_empty_query_key) {
     hci_reqs(s, 2);
     t_note("URL then URL?: requests=%d second=%s entries %d/%d", srv_req_count(s), b.body, hci_exists(url), hci_exists(q));
     CHECK(hci_exists(url));
+    EXPECT_EQ(srv_req_count(s), 2);                   /* VM: "?" makes a separate entry */
+    EXPECT_STR(b.body, "empty-q");
+    CHECK(hci_exists(q));
     srv_stop(s);
 }
 
@@ -327,7 +367,10 @@ TEST(hci_more_userinfo_url_key) {
     t_note("URL with userinfo: status=%d url opt=%s entry(plain)=%d entry(userinfo)=%d Authorization=%s", r.status, r.url_opt, hci_exists(plain), hci_exists(ui),
            hci_rh(s, 0, "Authorization") ? "sent" : "-");
     EXPECT_EQ(r.status, 200);
-    CHECK(hci_exists(plain) || hci_exists(ui));
+    /* VM: the entry and INTERNET_OPTION_URL drop the userinfo; no Authorization is sent unprompted */
+    CHECK(hci_exists(plain)); CHECK(!hci_exists(ui));
+    EXPECT_STR(r.url_opt, plain);
+    CHECK(!hci_rh(s, 0, "Authorization"));
     srv_stop(s);
 }
 
@@ -361,6 +404,9 @@ TEST(hci_more_app_authorization_header_cached) {
     int stored = hci_exists(url);
     free(hci_fetch(url, NULL, 0, &b));
     t_note("app Authorization header: stored=%d second requests=%d body=%s", stored, hci_reqs(s, 0), b.body);
+    CHECK(stored);                                    /* VM: an app-supplied Authorization header does not stop caching */
+    EXPECT_EQ(hci_reqs(s, 0), 1);
+    EXPECT_STR(b.body, "auth-body");
     EXPECT_STR(a.body, "auth-body");
     srv_stop(s);
 }
@@ -378,6 +424,8 @@ TEST(hci_more_offline_session_ignore_offline_request) {
     CHECK(!r1.ok); EXPECT_EQ(r1.err, ERROR_FILE_NOT_FOUND);
     hci_req(hi, s, "GET", url, INTERNET_FLAG_RELOAD, NULL, NULL, 0, NULL, NULL, &r2);
     t_note("offline session: miss err=%lu; RELOAD on offline session ok=%d err=%lu requests=%d", r1.err, r2.ok, r2.err, hci_reqs(s, 0));
+    CHECK(!r2.ok); EXPECT_EQ(r2.err, ERROR_FILE_NOT_FOUND);   /* VM: RELOAD does not override an offline session */
+    EXPECT_EQ(hci_reqs(s, 0), 0);
     t_inet_close(hi);
     srv_stop(s);
 }
@@ -409,6 +457,10 @@ TEST(hci_more_offline_redirect_entry) {
     HINTERNET hi = hci_open(); hci_get(hi, src, NULL, INTERNET_FLAG_FROM_CACHE, &b); t_inet_close(hi);
     t_note("FROM_CACHE on a cached 301 source: ok=%d err=%lu status=%d body=%s url=%s requests=%d", b.ok, b.err, b.status, b.body, b.url_opt, hci_reqs(s, 0));
     EXPECT_EQ(hci_reqs(s, 0), 2);
+    /* VM: FROM_CACHE follows a cached 301 to its cached target */
+    CHECK(b.ok); EXPECT_EQ(b.status, 200);
+    EXPECT_STR(b.body, "offline-target");
+    EXPECT_STR(b.url_opt, dst);
     srv_stop(s);
 }
 
@@ -434,6 +486,7 @@ TEST(hci_more_secondary_key_wide_set) {
         WCHAR wq[64]; DWORD lw = sizeof wq; CHECK(U(InternetQueryOptionW)(h, INTERNET_OPTION_SECONDARY_CACHE_KEY, wq, &lw));
         EXPECT_WSTR(wq, L"WK");
         t_note("W query length %lu", lw);
+        EXPECT_EQ(lw, 2);
         CHECK(U(HttpSendRequestA)(h, NULL, 0, NULL, 0));
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
         U(InternetCloseHandle)(h);
@@ -461,6 +514,8 @@ TEST(hci_more_secondary_key_after_send) {
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
         U(InternetCloseHandle)(h);
         t_note("SECONDARY_CACHE_KEY after send: ok=%d err=%lu; entries plain=%d keyed=%d", ok, e, hci_exists(url), hci_exists(keyed));
+        /* VM: accepted after the send and still used: the entry is committed (at EOF) under URL + key */
+        CHECK(ok); CHECK(!hci_exists(url)); CHECK(hci_exists(keyed));
     }
     t_inet_close(hc); t_inet_close(hi);
     CHECK(hci_exists(url) || hci_exists(keyed));
@@ -482,7 +537,9 @@ TEST(hci_more_secondary_key_empty) {
     HINTERNET h = U(HttpOpenRequestA)(hc, "POST", path, NULL, NULL, NULL, 0, 0);
     if (h) {
         SetLastError(0); BOOL ok = U(InternetSetOptionA)(h, INTERNET_OPTION_SECONDARY_CACHE_KEY, "", 0);
-        t_note("SECONDARY_CACHE_KEY empty: ok=%d err=%lu", ok, GetLastError());
+        DWORD ke = GetLastError();
+        t_note("SECONDARY_CACHE_KEY empty: ok=%d err=%lu", ok, ke);
+        CHECK(!ok); EXPECT_EQ(ke, ERROR_INVALID_PARAMETER);   /* VM */
         U(InternetCloseHandle)(h);
     }
     t_inet_close(hc); t_inet_close(h2);
@@ -511,6 +568,9 @@ TEST(hci_more_redirect_chain_cache_read) {
     EXPECT_STR(r1.body, "chain-end");
     CHECK(hci_exists(a1)); CHECK(hci_exists(a2)); CHECK(hci_exists(a3));
     EXPECT_STR(r2.body, "chain-end");
+    EXPECT_EQ(hci_reqs(s, 0), 3);                     /* VM: the whole chain is read from the cache */
+    CHECK(hci_from_cache(&r2));
+    EXPECT_STR(r2.url_opt, a3);
     srv_stop(s);
 }
 
@@ -524,6 +584,7 @@ TEST(hci_more_app_range_206_not_cached) {
     EXPECT_EQ(r.status, 206);
     EXPECT_STR(r.body, "part");
     t_note("206 to an app Range request: entry=%d type=0x%lx", e != NULL, e ? e->CacheEntryType : 0);
+    CHECK(e == NULL);
     free(e);
     srv_stop(s);
 }

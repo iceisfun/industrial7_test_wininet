@@ -204,7 +204,7 @@ TEST(hci_misc_put_invalidates_entry) {
     hci_req(hi, s, "PUT", url, 0, NULL, "new", 3, NULL, NULL, &b);
     t_inet_close(hi);
     t_note("GET entry after PUT to the same URL: exists=%d", hci_exists(url));
-    CHECK(hci_exists(url));                           /* VM: a PUT does not invalidate the GET entry */
+    CHECK(hci_exists(url));                           /* VM: a PUT keeps the GET entry (but see hci_more_unsafe_methods_vs_get_entry) */
     EXPECT_EQ(hci_reqs(s, 2), 2);
     srv_stop(s);
 }
