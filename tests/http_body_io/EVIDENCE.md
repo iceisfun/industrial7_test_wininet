@@ -34,7 +34,8 @@ Every hard CHECK in the area passed on the VM (see the boot list at the end).
 | Chunk grammar: byte classes hex/':'/CR/LF/other; size line must start with a hex digit; anything after the digits up to CR is an extension (`5zz`, `5 `, `5:x` = 5, `0x5` = 0); every line end exactly CR LF; data must be followed by CR LF; trailer lines need a ':'; >16 hex digits overflow | [D CHUNK_TRANSFER::GetToken@0x16ea0, ParseChunkInput@0x16af4] |
 | Decoding happens only when the application's own Accept-Encoding lists the coding: exact `gzip, deflate` / `gzip, deflate, br`, else comma tokens trimmed and compared case-insensitively over their full length (`gzip;q=1.0` and `*` do not count, `x-gzip` token does not enable gzip) | [D HTTP_REQUEST_HANDLE_OBJECT::_CheckDecompressionRequestHeaders@0x664d4, StrCmpNICBounded@0xbdfa8] |
 | Response side: exactly one Content-Encoding header with value gzip / x-gzip (needs the gzip token), deflate, br; Content-Types application/x-tar, x-gzip, x-compress, x-compressed (exact, case-insensitive) stay encoded; after decoding Content-Encoding is removed and `Accept-Encoding` is removed from Vary (Vary dropped when empty) | [D CheckDecompression@0xbdd3c, CHttpHeaders::RemoveTokenFromHeaderListByIndex@0x13408 (index 0x41 = Vary), table at 0x1f44b0] |
-| Decompressor: gzip = zlib windowBits 31 only (zlib data labelled gzip fails); deflate = zlib 15 with a retry as raw deflate if nothing was produced (gzip data labelled deflate fails); br = brotli; a CRC32/Adler-32 mismatch ("incorrect data check") ends the stream cleanly; other inflate errors -> 12175 | [D DECOMPRESSOR::Init@0x1ed60, CreateDecompression@0x1ef0c, ZlibDecomp@0x1a50, Decompress@0x1b10, HttpReadData_Fsm@0x77430] |
+| Decompressor: a CRC32/Adler-32 mismatch ("incorrect data check") ends the stream cleanly; other inflate errors (bad ISIZE = "incorrect length check", wrong format) -> 12175 with nothing delivered; br = brotli. My reading of the Init flags (gzip = windowBits 31, deflate = zlib 15 + raw retry) did **not** match the VM: the default path (no `GlobalEnableZlibDeflate`) decodes `deflate` as raw deflate only and `gzip` also accepts zlib data - the tests follow the VM | [D DECOMPRESSOR::Init@0x1ed60, CreateDecompression@0x1ef0c, ZlibDecomp@0x1a50, Decompress@0x1b10, HttpReadData_Fsm@0x77430] + [VM boots 2-3] |
+| Chunk syntax errors that arrive with the head fail HttpSendRequest itself: 12004 for every grammar error, 12152 for the size overflow (17 hex digits) | [D] + [VM boot 2, all 22 invalid runs] |
 
 ## VM-observed
 
@@ -57,18 +58,30 @@ Every hard CHECK in the area passed on the VM (see the boot list at the end).
 | InternetCloseHandle on a request blocked in InternetReadFile: the read returns FALSE 12017 at once | 1 |
 | Unread extra bytes after a CL body: the connection is not reused for the next request | 1 |
 | HttpOpenRequest's lpszVersion "HTTP/1.0" and INTERNET_OPTION_HTTP_VERSION 1.0 do not change the request line (still HTTP/1.1) | 1 |
+| `deflate` = raw deflate only: zlib-wrapped bodies (Huffman or stored, any read size, chunked) fail the first read with 12175 and deliver nothing; `gzip` decodes gzip and zlib data | 2, 3 |
+| After decoding, Content-Encoding and Content-Length queries fail 12150; `Vary: Accept-Encoding` disappears, `Vary: Accept-Encoding, Cookie` becomes `Cookie`; first QDA reports decoded bytes (900) | 2 |
+| Content-Type application/x-spoon is also excluded from decoding; application/zip, application/gzip, application/x-gtar are decoded | 2 |
+| Two gzip members: only the first is delivered (13 bytes); junk after a member and a missing 8-byte trailer are ignored; wrong ISIZE -> 12175, 0 bytes | 2, 3 |
+| Two Accept-Encoding lines in the send headers are merged by wininet into one header carrying the last value (`gzip`) | 2 |
+| Content-Length spellings: first of two differing values wins (3), `5, 5` -> 5, `5x` -> 5, `abc` / `-5` / empty -> 0-byte body, `4294967301` -> query 12153 and a close-delimited body, 23 digits -> send fails 12153; 304 with CL 5 delivers the 5 bytes; 204 delivers none; `Transfer-Encoding: gzip, chunked` / `foo` are not chunked (raw bytes to close) | 2 |
+| A 7-byte read of a body sent in 5-byte chunks may return 4 bytes | 1 |
+| Cache-backed seek: FILE_CURRENT and FILE_END moves can fail 131 while the body is being read; seek past the end succeeds (200000); seeking after EOF succeeded on a handle that had seeked before (12016 on one that had not) - notes | 2 |
 
 ## Knowledge-only / notes
 
 Recorded with `t_note` because they describe values or environment-dependent behaviour: first/largest QDA values (8192 for
 CL bodies, 8173 for chunked), number of reads, connection counts after an abandoned body (drained bodies of 100 bytes
 and 500000 bytes both moved the next request to a new connection), Content-Length after decoding, outcomes of
-contradictory Content-Length headers (`bio_clv_*`), corrupt gzip streams and odd stream ends (`bio_d2_gzip_two_members`,
-`..._trailing_garbage`, `..._no_trailer`, `..._bad_isize`), receive-timeout probes with the timeout set before
-InternetConnect, seek past the end.
+Content-Length query results in `bio_clv_*`, corrupt gzip streams in `bio_dec_corrupt_*`, receive-timeout probes with
+the timeout set before InternetConnect (boot 2: 400 ms and 1000 ms did not cut a 2.5 s stall either), seek past the
+end, HTTPS + decoding (`bio_d2_https_*`: HttpSendRequest failed with 12030 in some boots and not in others, varying
+between the variants - not understood, kept as notes), raw deflate read 1 byte per call (boot 3: 820 of 900 bytes,
+clean end).
 
 ## Boots
 
 | Boot | Run dir (`~/w10lab/runs/`) | Result |
 |---|---|---|
 | 1 | `wininet-bio-20261110-050214-b1` | 329/496 tests before the 780 s cap (srv_stop waited 3 s per test); failures triaged above |
+| 2 | `wininet-bio2-20261110-055254-b1` | 499 tests in 166 s, 13 failed (decoding labels, seek, clv, https probe); triaged |
+| 3 | `wininet-bio3-20261110-073759-b1` | 507 tests in 176 s, 1 failed (raw deflate 1-byte reads, now a note) |
