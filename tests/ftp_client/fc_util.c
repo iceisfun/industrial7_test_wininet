@@ -28,9 +28,9 @@ int fc_start(fcx *x, const srv_ftp_config *cfg) {
 }
 int fc_start_raw(fcx *x, const srv_step *steps, int nsteps) {
     memset(x, 0, sizeof *x);
-    srv_script sc1 = { steps, nsteps };
+    x->script.steps = steps; x->script.nsteps = nsteps;
     srv_config sc; memset(&sc, 0, sizeof sc);
-    sc.kind = SRV_HTTP; sc.scripts = &sc1; sc.nscripts = 1; sc.lifetime_ms = 30000;
+    sc.kind = SRV_HTTP; sc.scripts = &x->script; sc.nscripts = 1; sc.lifetime_ms = 30000;
     int rc = srv_start(&sc, &x->s);
     if (rc) { x->s = NULL; t_skip("server unavailable: %s", srv_strerror(rc)); return 0; }
     return 1;

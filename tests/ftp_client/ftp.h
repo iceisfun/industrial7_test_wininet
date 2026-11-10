@@ -31,6 +31,7 @@ typedef struct {
     srv *s;
     HINTERNET hi, hc;
     srv_ftp_config cfg;
+    srv_script script;   /* raw servers: must outlive srv_start */
 } fcx;
 
 /* Start a server (cfg may be NULL: empty file system). 0 -> t_skip was called, the test must return. */

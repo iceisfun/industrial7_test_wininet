@@ -58,7 +58,7 @@ static const struct { const char *reply; int ok; const char *dir; DWORD err; } p
     { "257 \"\"\"\"", 1, "", 0 },
     { "257 \"/\"", 1, "/", 0 },
     { "257 \"/x y/z\" with spaces", 1, "/x y/z", 0 },
-    { "257 \"/unterminated", -1, NULL, 0 },                /* note only: runs to the end of the stored reply */
+    { "257 \"/unterminated", 1, "/unterminated\r\n", 0 },  /* VM: runs to the end of the stored reply incl. CRLF */
     { "257 \"\" empty", 1, "", 0 },
     { "257-first line\r\n257 \"/multi\" last line", 1, "/multi", 0 },
     { "257 /no/quotes/here", 0, NULL, ERROR_INTERNET_EXTENDED_ERROR },

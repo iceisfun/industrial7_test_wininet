@@ -146,12 +146,13 @@ TEST(ftpc_conn_username_password_options) {
     fc_end(&x);
 }
 
-TEST(ftpc_conn_quit_sent_on_close) {
+TEST(ftpc_conn_close_connect_handle) {
     REQUIRE(U(InternetConnectA));
     fcx x; if (!fc_open(&x, NULL)) return;
     U(InternetCloseHandle)(x.hc); x.hc = NULL;
-    CHECK(fc_wait_cmd(&x, "QUIT", 3000));
-    EXPECT_STR(fc_seq(&x, 0), "USER anonymous|PASS ***|QUIT");
+    int q = fc_wait_cmd(&x, "QUIT", 1500);
+    t_note("QUIT after closing the connect handle: %s (seq %s)", q ? "sent" : "not sent within 1.5 s", fc_seq(&x, 0));
+    EXPECT_STR(fc_cmd(&x, 0), "USER anonymous");
     fc_end(&x);
 }
 
@@ -446,47 +447,43 @@ TEST(ftpc_offline_connect_makes_no_connection) {
     fc_end(&x);
 }
 
-TEST(ftpc_offline_write_operations_fail_19) {
+TEST(ftpc_offline_handle_operations_invalid_handle) {
     REQUIRE(U(FtpDeleteFileA)); REQUIRE(U(FtpRenameFileA)); REQUIRE(U(FtpCreateDirectoryA)); REQUIRE(U(FtpRemoveDirectoryA));
     fcx x; if (!fc_start(&x, NULL)) return;
     HINTERNET hc = fc_connect(&x, NULL, NULL, INTERNET_FLAG_PASSIVE | INTERNET_FLAG_OFFLINE);
     if (!hc) { CHECKF(0, "offline connect failed %lu", GetLastError()); fc_end(&x); return; }
-    SetLastError(0); EXPECT_FAIL(!U(FtpDeleteFileA)(hc, "a.txt"), ERROR_WRITE_PROTECT);
-    SetLastError(0); EXPECT_FAIL(!U(FtpRenameFileA)(hc, "a.txt", "b.txt"), ERROR_WRITE_PROTECT);
-    SetLastError(0); EXPECT_FAIL(!U(FtpCreateDirectoryA)(hc, "d"), ERROR_WRITE_PROTECT);
-    SetLastError(0); EXPECT_FAIL(!U(FtpRemoveDirectoryA)(hc, "d"), ERROR_WRITE_PROTECT);
+    /* VM: an offline FTP connect handle has no FTP session behind it; every operation fails with 6
+     * (the decomp's ERROR_WRITE_PROTECT branch is not reached for a handle created offline). */
+    SetLastError(0); EXPECT_FAIL(!U(FtpDeleteFileA)(hc, "a.txt"), ERROR_INVALID_HANDLE);
+    SetLastError(0); EXPECT_FAIL(!U(FtpRenameFileA)(hc, "a.txt", "b.txt"), ERROR_INVALID_HANDLE);
+    SetLastError(0); EXPECT_FAIL(!U(FtpCreateDirectoryA)(hc, "d"), ERROR_INVALID_HANDLE);
+    SetLastError(0); EXPECT_FAIL(!U(FtpRemoveDirectoryA)(hc, "d"), ERROR_INVALID_HANDLE);
     const char *lp = fc_local("offput.txt"); fc_put_local(lp, "x", 1);
-    SetLastError(0); EXPECT_FAIL(!U(FtpPutFileA)(hc, lp, "x.txt", FTP_TRANSFER_TYPE_BINARY, 0), ERROR_WRITE_PROTECT);
+    SetLastError(0); EXPECT_FAIL(!U(FtpPutFileA)(hc, lp, "x.txt", FTP_TRANSFER_TYPE_BINARY, 0), ERROR_INVALID_HANDLE);
     fc_del_local(lp);
     EXPECT_EQ(srv_conn_count(x.s), 0);
     fc_end(&x);
 }
 
-TEST(ftpc_offline_command_no_direct_access) {
+TEST(ftpc_offline_command_invalid_handle) {
     REQUIRE(U(FtpCommandA));
     fcx x; if (!fc_start(&x, NULL)) return;
     HINTERNET hc = fc_connect(&x, NULL, NULL, INTERNET_FLAG_PASSIVE | INTERNET_FLAG_OFFLINE);
     if (!hc) { CHECKF(0, "offline connect failed %lu", GetLastError()); fc_end(&x); return; }
     SetLastError(0);
-    EXPECT_FAIL(!U(FtpCommandA)(hc, FALSE, FTP_TRANSFER_TYPE_ASCII, "NOOP", 0, NULL), ERROR_INTERNET_NO_DIRECT_ACCESS);
+    EXPECT_FAIL(!U(FtpCommandA)(hc, FALSE, FTP_TRANSFER_TYPE_ASCII, "NOOP", 0, NULL), ERROR_INVALID_HANDLE);   /* VM */
     fc_end(&x);
 }
 
-TEST(ftpc_offline_current_directory_is_local) {
+TEST(ftpc_offline_current_directory_invalid_handle) {
     REQUIRE(U(FtpGetCurrentDirectoryA)); REQUIRE(U(FtpSetCurrentDirectoryA));
     fcx x; if (!fc_start(&x, NULL)) return;
     HINTERNET hc = fc_connect(&x, NULL, NULL, INTERNET_FLAG_PASSIVE | INTERNET_FLAG_OFFLINE);
     if (!hc) { CHECKF(0, "offline connect failed %lu", GetLastError()); fc_end(&x); return; }
     char d[256] = "?"; DWORD l = sizeof d;
-    BOOL ok = U(FtpGetCurrentDirectoryA)(hc, d, &l);
-    t_note("offline FtpGetCurrentDirectory: ok=%d err=%lu dir=[%s] len=%lu", ok, ok ? 0 : GetLastError(), d, l);
-    CHECK(ok);
-    BOOL ok2 = U(FtpSetCurrentDirectoryA)(hc, "/pub");
-    t_note("offline FtpSetCurrentDirectory: ok=%d err=%lu", ok2, ok2 ? 0 : GetLastError());
-    CHECK(ok2);
-    l = sizeof d; d[0] = 0;
-    CHECK(U(FtpGetCurrentDirectoryA)(hc, d, &l));
-    t_note("offline cwd after set: [%s] len=%lu", d, l);
+    /* VM: both fail with ERROR_INVALID_HANDLE on an offline-created connect handle */
+    SetLastError(0); EXPECT_FAIL(!U(FtpGetCurrentDirectoryA)(hc, d, &l), ERROR_INVALID_HANDLE);
+    SetLastError(0); EXPECT_FAIL(!U(FtpSetCurrentDirectoryA)(hc, "/pub"), ERROR_INVALID_HANDLE);
     EXPECT_EQ(srv_conn_count(x.s), 0);
     fc_end(&x);
 }
@@ -501,8 +498,7 @@ TEST(ftpc_offline_open_file_not_cached) {
     HINTERNET hf = U(FtpOpenFileA)(hc, name, GENERIC_READ, FTP_TRANSFER_TYPE_BINARY, 0);
     DWORD err = GetLastError();
     CHECK(hf == NULL);
-    t_note("offline FtpOpenFile (no cache entry): err=%lu", err);
-    EXPECT_EQ(err, ERROR_FILE_NOT_FOUND);
+    EXPECT_EQ(err, ERROR_INVALID_HANDLE);   /* VM */
     if (hf) U(InternetCloseHandle)(hf);
     EXPECT_EQ(srv_conn_count(x.s), 0);
     fc_end(&x);

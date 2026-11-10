@@ -15,7 +15,7 @@ TEST(ftpc_open_read_binary_wire) {
     HINTERNET hf = U(FtpOpenFileA)(x.hc, "hello.txt", GENERIC_READ, FC_BIN, 0);
     CHECKF(hf != NULL, "err=%lu", GetLastError());
     char b[32] = ""; int ok = 0;
-    if (hf) { EXPECT_EQ(fc_read(hf, b, sizeof b, &ok), 5); CHECK(ok); U(InternetCloseHandle)(hf); }
+    if (hf) { size_t n = fc_read(hf, b, sizeof b, &ok); EXPECT_EQ(n, 5); CHECK(ok); U(InternetCloseHandle)(hf); }
     EXPECT_STR(b, "hello");
     EXPECT_STR(fc_seq(&x, 2), "TYPE I|PASV|SIZE hello.txt|RETR hello.txt");
     fc_end(&x);
@@ -495,14 +495,17 @@ TEST(ftpc_getfilesize_wrong_handles) {
     fcx x; if (!std_open(&x)) return;
     DWORD hi = 3;
     SetLastError(0);
-    EXPECT_EQ(U(FtpGetFileSize)(x.hc, &hi), 0xffffffff);
+    DWORD r = U(FtpGetFileSize)(x.hc, &hi);
+    EXPECT_EQ(r, 0xffffffff);
     EXPECT_ERR(ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     EXPECT_EQ(hi, 0);
     SetLastError(0);
-    EXPECT_EQ(U(FtpGetFileSize)(x.hi, NULL), 0xffffffff);
+    r = U(FtpGetFileSize)(x.hi, NULL);
+    EXPECT_EQ(r, 0xffffffff);
     EXPECT_ERR(ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     SetLastError(0);
-    EXPECT_EQ(U(FtpGetFileSize)(NULL, NULL), 0xffffffff);
+    r = U(FtpGetFileSize)(NULL, NULL);
+    EXPECT_EQ(r, 0xffffffff);
     EXPECT_ERR(ERROR_INVALID_HANDLE);
     fc_end(&x);
 }

@@ -14,7 +14,7 @@ TEST(ftpc_command_noop) {
     HINTERNET hcmd = (HINTERNET)(ULONG_PTR)0x1234;
     SetLastError(0xdead);
     CHECKF(U(FtpCommandA)(x.hc, FALSE, FTP_TRANSFER_TYPE_ASCII, "NOOP", 0, &hcmd), "err=%lu", GetLastError());
-    t_note("FtpCommand(fExpectResponse=FALSE) phFtpCommand after: %p", hcmd);
+    EXPECT_EQ(hcmd, (HINTERNET)(ULONG_PTR)0x1234);   /* VM: untouched without fExpectResponse */
     EXPECT_STR(fc_seq(&x, 2), "NOOP");
     DWORD e; const char *r = fc_resp(&e);
     CHECKF(strstr(r, "200 NOOP ok.") != NULL, "resp=[%s]", r);
@@ -165,7 +165,11 @@ TEST(ftpc_command_retr_sends_size_first) {
         EXPECT_STR(b, "hello");
         U(InternetCloseHandle)(h);
     }
-    EXPECT_STR(fc_seq(&x, 2), "TYPE I|PASV|SIZE hello.txt|RETR hello.txt");
+    /* VM: FtpCommand("RETR x") sends a SIZE first, but its argument is not the file name (garbage bytes were seen) */
+    EXPECT_STR(fc_cmd(&x, 2), "TYPE I");
+    EXPECT_STR(fc_cmd(&x, 3), "PASV");
+    CHECKF(!strncmp(fc_cmd(&x, 4), "SIZE ", 5), "got [%s]", fc_cmd(&x, 4));
+    EXPECT_STR(fc_cmd(&x, 5), "RETR hello.txt");
     fc_end(&x);
 }
 
@@ -285,12 +289,11 @@ TEST(ftpc_lastresp_wide) {
     WCHAR w[128] = L""; DWORD e = 5, l = NF(w);
     CHECKF(U(InternetGetLastResponseInfoW)(&e, w, &l), "err=%lu", GetLastError());
     CHECK(!wcsncmp(w, L"200 NOOP ok.", 12));
-    t_note("W response len=%lu", l);
+    EXPECT_EQ(l, 14);   /* VM: "200 NOOP ok.\r\n" in characters */
     DWORD q = 0;
     SetLastError(0);
-    BOOL ok = U(InternetGetLastResponseInfoW)(&e, NULL, &q);
-    t_note("W size query: ok=%d err=%lu len=%lu", ok, ok ? 0 : GetLastError(), q);
-    CHECK(!ok);
+    EXPECT_FAIL(!U(InternetGetLastResponseInfoW)(&e, NULL, &q), ERROR_INSUFFICIENT_BUFFER);
+    EXPECT_EQ(q, 30);   /* VM: size query reports bytes including the NUL */
     fc_end(&x);
 }
 
@@ -508,11 +511,11 @@ TEST(ftpc_url_directory_raw_data) {
         CHECK(U(InternetQueryOptionA)(h, INTERNET_OPTION_HANDLE_TYPE, &t, &l));
         EXPECT_EQ(t, INTERNET_HANDLE_TYPE_FTP_FIND);
         WIN32_FIND_DATAA fd[4]; memset(fd, 0, sizeof fd); DWORD rd = 0;
-        BOOL ok = U(InternetReadFile)(h, fd, sizeof fd, &rd);
-        t_note("RAW_DATA dir read: ok=%d err=%lu bytes=%lu first=[%s]", ok, ok ? 0 : GetLastError(), rd, fd[0].cFileName);
+        SetLastError(0);
+        EXPECT_FAIL(!U(InternetReadFile)(h, fd, sizeof fd, &rd), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);   /* VM */
         WIN32_FIND_DATAA f1; memset(&f1, 0, sizeof f1);
-        BOOL n1 = U(InternetFindNextFileA)(h, &f1);
-        t_note("RAW_DATA InternetFindNextFile: ok=%d err=%lu name=[%s]", n1, n1 ? 0 : GetLastError(), f1.cFileName);
+        CHECK(U(InternetFindNextFileA)(h, &f1));
+        CHECK(!strcmp(f1.cFileName, "readme.txt") || !strcmp(f1.cFileName, "data.bin"));
         U(InternetCloseHandle)(h);
     }
     fc_end(&x);

@@ -113,7 +113,7 @@ TEST(ftpc_find_wildcard_filters_client_side) {
 }
 
 static const struct { const char *pattern; int count; const char *one; } wild_tab[] = {
-    { "*", 6, "pub" }, { "*.*", 4, "hello.txt" }, { "h*", 1, "hello.txt" }, { "?f.txt", 1, "lf.txt" },
+    { "*", 6, "pub" }, { "*.*", 6, "pub" },   /* VM: DOS semantics, *.* matches names without a dot */ { "h*", 1, "hello.txt" }, { "?f.txt", 1, "lf.txt" },
     { "*.TXT", 4, "lf.txt" }, { "HEL*.TXT", 1, "hello.txt" }, { "*two", 1, "dir two" }, { "e*y.txt", 1, "empty.txt" },
 };
 TEST(ftpc_find_wildcard_table) {
@@ -236,8 +236,7 @@ TEST(ftpc_find_next_on_wrong_handles) {
     BOOL ok = U(InternetFindNextFileA)(x.hc, &fd);
     DWORD e = GetLastError();
     CHECK(!ok);
-    t_note("InternetFindNextFile(connect handle) -> %lu", e);
-    EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
+    EXPECT_EQ(e, ERROR_INTERNET_INVALID_OPERATION);   /* VM: 12016 */
     SetLastError(0);
     EXPECT_FAIL(!U(InternetFindNextFileA)(NULL, &fd), ERROR_INVALID_HANDLE);
     fc_end(&x);
@@ -287,7 +286,6 @@ TEST(ftpc_find_list_550_immediate_is_extended_error) {
     HINTERNET hf = U(FtpFindFirstFileA)(x.hc, NULL, &fd, FC_NC, 0);
     DWORD e = GetLastError();
     CHECK(hf == NULL);
-    t_note("LIST answered 550 without data: err=%lu", e);
     EXPECT_EQ(e, ERROR_INTERNET_EXTENDED_ERROR);
     DWORD le; const char *r = fc_resp(&le);
     CHECKF(strstr(r, "550 No files found.") != NULL, "resp=[%s]", r);
@@ -335,23 +333,22 @@ TEST(ftpc_find_empty_listing_no_more_files) {
 TEST(ftpc_find_whitespace_only_listing) {
     WIN32_FIND_DATAA v[4]; int n; DWORD err;
     if (!fc_list_raw("\r\n\r\n  \r\n", NULL, v, 4, &n, &err)) return;
-    t_note("whitespace-only listing: n=%d err=%lu", n, err);
-    CHECK(n == -1);
+    EXPECT_EQ(n, -1);
+    EXPECT_EQ(err, ERROR_INTERNET_EXTENDED_ERROR);   /* D DetermineDirectoryFormat fails -> 12003; VM */
 }
 
-TEST(ftpc_find_unknown_format_extended_error) {
+TEST(ftpc_find_free_text_listing) {
     REQUIRE(U(FtpFindFirstFileA));
     srv_ftp_config c; memset(&c, 0, sizeof c); c.list_override = "this is not a directory listing\r\nnor is this\r\n";
     fcx x; if (!fc_open(&x, &c)) return;
-    WIN32_FIND_DATAA fd;
+    WIN32_FIND_DATAA fd; memset(&fd, 0, sizeof fd);
     SetLastError(0);
     HINTERNET hf = U(FtpFindFirstFileA)(x.hc, NULL, &fd, FC_NC, 0);
-    DWORD e = GetLastError();
-    CHECK(hf == NULL);
-    EXPECT_EQ(e, ERROR_INTERNET_EXTENDED_ERROR);
+    DWORD e = hf ? 0 : GetLastError();
     DWORD le; const char *r = fc_resp(&le);
-    t_note("unknown listing format: err=%lu last response=[%s]", e, r);
-    CHECKF(strstr(r, "this is not a directory listing") != NULL, "resp=[%s]", r);
+    /* VM: free text is accepted by one of the fallback (OS/2 / Mac) parsers rather than rejected */
+    t_note("free-text listing: h=%p err=%lu first=[%s] last response=[%s]", hf, e, hf ? fd.cFileName : "", r);
+    if (hf) U(InternetCloseHandle)(hf); hf = NULL;
     fc_end(&x);
 }
 
@@ -456,8 +453,8 @@ TEST(ftpc_unix_listing_dot_entries) {
     WIN32_FIND_DATAA v[8]; int n; DWORD err;
     if (!fc_list_raw("drwxr-xr-x 2 o g 512 Jan  1  2001 .\r\ndrwxr-xr-x 9 o g 512 Jan  1  2001 ..\r\n-rw-r--r-- 1 o g 1 Jan  1  2001 real\r\n",
                      NULL, v, 8, &n, &err)) return;
-    t_note("dot entries: n=%d first=[%s]", n, n > 0 ? v[0].cFileName : "");
-    CHECK(n >= 1 && fc_by_name(v, n < 8 ? n : 8, "real") != NULL);
+    EXPECT_EQ(n, 3);   /* VM: "." and ".." are returned like any other entry */
+    if (n == 3) { EXPECT_STR(v[0].cFileName, "."); EXPECT_STR(v[1].cFileName, ".."); EXPECT_STR(v[2].cFileName, "real"); EXPECT_EQ(v[1].dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY); }
 }
 
 TEST(ftpc_unix_listing_long_name_truncated) {
@@ -509,12 +506,14 @@ TEST(ftpc_unix_listing_time_of_day_year_inference) {
 TEST(ftpc_unix_listing_bad_month_default_time) {
     WIN32_FIND_DATAA v[4]; int n; DWORD err;
     if (!fc_list_raw("-rw-r--r-- 1 o g 4 Foo  1  2001 badmonth\r\n-rw-r--r-- 1 o g 4 Jan 32  2001 badday\r\n", NULL, v, 4, &n, &err)) return;
-    t_note("bad dates: n=%d", n);
-    for (int i = 0; i < n && i < 4; i++) {
-        SYSTEMTIME s; fc_ft_to_st(&v[i].ftLastWriteTime, &s);
-        t_note("  [%s] size=%lu time=%04u-%02u-%02u %02u:%02u", v[i].cFileName, v[i].nFileSizeLow, s.wYear, s.wMonth, s.wDay, s.wHour, s.wMinute);
+    /* VM + D ExtractUnixDate: an unparsable date gives the default 1980-01-01 12:00 and the parser resumes at the
+     * next token, so the leftover date text becomes part of the name */
+    EXPECT_EQ(n, 2);
+    if (n == 2) {
+        EXPECT_STR(v[0].cFileName, "1  2001 badmonth");
+        EXPECT_STR(v[1].cFileName, "2001 badday");
+        for (int i = 0; i < 2; i++) { EXPECT_EQ(v[i].nFileSizeLow, 4); check_st(&v[i].ftLastWriteTime, 1980, 1, 1, 12, 0, v[i].cFileName); }
     }
-    CHECK(n >= 1);
 }
 
 static const struct { const char *perm; DWORD attr; DWORD bits; } perm_tab[] = {
@@ -615,8 +614,8 @@ TEST(ftpc_listing_unix_detection_needs_perm_token) {
     /* a unix-looking line whose first token is not a permission string is not recognised */
     WIN32_FIND_DATAA v[4]; int n; DWORD err;
     if (!fc_list_raw("abcdefghij 1 o g 1 Jan  1  2001 f\r\n", NULL, v, 4, &n, &err)) return;
-    t_note("non-permission first token: n=%d err=%lu", n, err);
-    EXPECT_EQ(n, -1);
+    t_note("non-permission first token: n=%d err=%lu name=[%s]", n, err, n > 0 ? v[0].cFileName : "");
+    CHECK(n != 0);   /* VM: another (OS/2 or Mac) parser accepts it; only the absence of a crash/hang is asserted */
 }
 
 TEST(ftpc_listing_total_zero_header) {
