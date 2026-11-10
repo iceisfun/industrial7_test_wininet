@@ -111,6 +111,8 @@ const char *rs_err(DWORD e);
 /* cookies allowed (no NO_COOKIES), cache neither read nor written */
 #define RS_FRESH_COOKIES (INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE | INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_NO_UI)
 
+/* built-in "200 hello" keep-alive server with a 1 s idle timeout (fast srv_stop) */
+srv *rs_plain(void);
 /* "127.0.0.1:<port>" of a server */
 const char *rs_hp(srv *s);
 /* number of requests the server recorded after waiting up to ms for at least 'want' */

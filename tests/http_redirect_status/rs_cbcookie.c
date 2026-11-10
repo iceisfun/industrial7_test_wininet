@@ -207,7 +207,7 @@ TEST(rs_reqhdr_view_after_redirect) {
 /* INTERNET_OPTION_URL before the send is the original URL */
 TEST(rs_option_url_before_send) {
     REQUIRE(U(InternetQueryOptionA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/before?x=1", NULL, NULL, NULL, RS_FRESH, 0);
@@ -343,7 +343,7 @@ TEST(rs_keep_connection_across_redirect) {
 
 TEST(rs_keep_connection_flag_visible) {
     REQUIRE(U(InternetQueryOptionA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, RS_FRESH | INTERNET_FLAG_KEEP_CONNECTION, 0);

@@ -97,8 +97,7 @@ TEST(rs_w_sendrequest_redirect_url) {
     CHECK(U(InternetQueryOptionW)(hr, INTERNET_OPTION_URL, w, &l));
     WCHAR want[128]; swprintf(want, 128, L"http://127.0.0.1:%u/wdst?x=1", srv_port(s));
     EXPECT_WSTR(w, want);
-    t_note("InternetQueryOptionW(URL) len=%lu for %d chars", l, lstrlenW(want));
-    EXPECT_EQ(l, (DWORD)lstrlenW(want) * 2);
+    EXPECT_EQ(l, (DWORD)lstrlenW(want));   /* Win10 VM boot rs2: characters, not bytes, without the NUL */
     WCHAR st[16]; l = sizeof st;
     CHECK(U(HttpQueryInfoW)(hr, HTTP_QUERY_STATUS_CODE, st, &l, NULL)); EXPECT_WSTR(st, L"200"); EXPECT_EQ(l, 6);
     EXPECT_EQ(rs_wait(s, 2, 2000), 2);
@@ -149,7 +148,10 @@ static void openurl_case(const ou_case *c) {
             EXPECT_EQ(rs_wait(s, 2, 2000), 2);
             EXPECT_STR(srv_req_target(s, 1), c->want_path);
         } else {
-            EXPECT_EQ(r.status, (DWORD)c->code); EXPECT_STR(r.body, "src-body");
+            EXPECT_EQ(r.status, (DWORD)c->code);
+            /* Win10 VM boot rs2: a refused redirect (3xx in the switch) has its body drained first: nothing to read.
+             * 304/305 never enter the redirect path, so their body is still there. */
+            if (c->code >= 304 && c->code <= 306) EXPECT_STR(r.body, "src-body"); else EXPECT_EQ(r.nbody, 0);
             Sleep(30); EXPECT_EQ(srv_req_count(s), 1);
         }
         U(InternetCloseHandle)(hu);
@@ -249,7 +251,7 @@ TEST(rs_target_drops_connection) {
     static const srv_step st[] = { S_HEAD(), S_REPLY(302, "Location: /dst\r\n", ""), S_HEAD(), S_CLOSE() };
     static const srv_step st2[] = { S_HEAD(), S_CLOSE() };
     static const srv_script sc[] = { SRV_SCRIPT(st), SRV_SCRIPT(st2) };
-    srv_config cfg = { SRV_HTTP, sc, 2 }; srv *s;
+    srv_config cfg = { SRV_HTTP, sc, 2 }; cfg.io_timeout_ms = 1000; srv *s;
     if (srv_start(&cfg, &s)) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
@@ -403,8 +405,9 @@ TEST(rs_query_final_response_forms) {
         CHECK(U(HttpQueryInfoA)(hr, HTTP_QUERY_CUSTOM, v, &l, NULL)); EXPECT_STR(v, "2");
         ULONGLONG n64 = 0; l = sizeof n64;
         BOOL ok64 = U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER64, &n64, &l, NULL);
-        t_note("STATUS_CODE|NUMBER64: ok=%d err=%lu val=%llu len=%lu", ok64, ok64 ? 0 : GetLastError(), n64, l);
-        CHECK(ok64); EXPECT_EQ(n64, 202); EXPECT_EQ(l, 8);
+        DWORD e64 = ok64 ? 0 : GetLastError();
+        /* Win10 VM boot rs2: FLAG_NUMBER64 is not accepted for STATUS_CODE: 12154, length left at 8 */
+        CHECK(!ok64); EXPECT_EQ(e64, ERROR_HTTP_INVALID_QUERY_REQUEST); EXPECT_EQ(l, 8);
         l = sizeof v;
         CHECK(U(HttpQueryInfoA)(hr, HTTP_QUERY_VERSION, v, &l, NULL)); EXPECT_STR(v, "HTTP/1.1"); EXPECT_EQ(l, 8);
         l = sizeof v;
@@ -415,14 +418,17 @@ TEST(rs_query_final_response_forms) {
 
 TEST(rs_query_status_before_send) {
     REQUIRE(U(HttpQueryInfoA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, RS_FRESH, 0);
     DWORD v = 0, l = sizeof v; SET_ERR(0);
     BOOL ok = U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &v, &l, NULL); DWORD e = GetLastError();
-    t_note("STATUS_CODE before send: ok=%d err=%lu(%s)", ok, e, rs_err(e));
-    CHECK(!ok); EXPECT_EQ(e, ERROR_HTTP_HEADER_NOT_FOUND);
+    t_note("STATUS_CODE before send: ok=%d err=%lu(%s) val=%lu len=%lu", ok, e, rs_err(e), v, l);
+    CHECK(ok);   /* Win10 VM boot rs2: succeeds before any response exists */
+    char t[32]; DWORD tl = sizeof t; t[0] = 0; SET_ERR(0);
+    BOOL okt = U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_TEXT, t, &tl, NULL);
+    t_note("STATUS_TEXT before send: ok=%d err=%lu text='%s' len=%lu", okt, okt ? 0 : GetLastError(), okt ? t : "", tl);
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -486,7 +492,7 @@ TEST(rs_async_loop_budget)        { async_redirect(302, "GET", 1, ERROR_HTTP_RED
 /* ------------------------------------------------------------------ option numbers that are WinHTTP-only */
 static void option_probe(DWORD opt, const char *name) {
     REQUIRE(U(InternetQueryOptionA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, RS_FRESH, 0);
@@ -498,8 +504,39 @@ static void option_probe(DWORD opt, const char *name) {
         BOOL oks = U(InternetSetOptionA)(hs[k], opt, &w, sizeof w); DWORD es = GetLastError();
         t_note("option %lu (%s) on %s: query ok=%d err=%lu val=%lu len=%lu; set(5) ok=%d err=%lu", opt, name, hn[k], okq, okq ? 0 : eq, v, l,
                oks, oks ? 0 : es);
+        /* Win10 VM boot rs2: neither option can be queried (87); 88 is settable on a request only, 89 on a session only */
+        CHECK(!okq); EXPECT_EQ(eq, ERROR_INVALID_PARAMETER);
+        int settable = (opt == 88 && k == 2) || (opt == 89 && k == 0);
+        if (settable) CHECKF(oks, "err=%lu", es); else { CHECK(!oks); EXPECT_EQ(es, ERROR_INTERNET_INCORRECT_HANDLE_TYPE); }
     }
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
 TEST(rs_option_probe_89_winhttp_max_redirects) { option_probe(89, "WINHTTP_OPTION_MAX_HTTP_AUTOMATIC_REDIRECTS"); }
 TEST(rs_option_probe_88_winhttp_redirect_policy) { option_probe(88, "WINHTTP_OPTION_REDIRECT_POLICY"); }
+
+/* Option 89 is accepted on a session: record whether it changes the redirect budget (10 by default on Win10) */
+static int budget_with(DWORD *val) {
+    rs_router rt; rs_router_init(&rt);
+    rs_add(&rt, "/loop/*", 302, "Location: /loop/%N\r\n", "");
+    srv *s = rs_start(&rt, SRV_HTTP); if (!s) return -1;
+    HINTERNET hi = t_inet_open(NULL);
+    if (val) { BOOL ok = U(InternetSetOptionA)(hi, 89, val, sizeof *val); if (!ok) t_note("set 89 failed %lu", GetLastError()); }
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/loop/0", NULL, NULL, NULL, RS_FRESH, 0);
+    SET_ERR(0);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0); DWORD e = GetLastError();
+    Sleep(30);
+    int n = srv_req_count(s);
+    t_note("option 89 = %ld: send ok=%d err=%lu requests=%d", val ? (long)*val : -1L, ok, ok ? 0 : e, n);
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
+    return n;
+}
+TEST(rs_option_89_session_budget_probe) {
+    REQUIRE(U(InternetSetOptionA));
+    int d = budget_with(NULL);
+    if (d < 0) { t_skip("server unavailable"); return; }
+    EXPECT_EQ(d, 11);
+    DWORD v3 = 3, v20 = 20;
+    int n3 = budget_with(&v3), n20 = budget_with(&v20);
+    t_note("budget: default %d requests, option89=3 -> %d, option89=20 -> %d", d, n3, n20);
+}

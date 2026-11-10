@@ -130,10 +130,22 @@ srv *rs_start(rs_router *r, srv_kind kind) {
     srv_config cfg; memset(&cfg, 0, sizeof cfg);
     cfg.kind = kind; cfg.scripts = g_router_script; cfg.nscripts = 1; cfg.user = r;
     cfg.cert_profile = SRV_CERT_LOCALHOST; cfg.lifetime_ms = 30000;
+    /* wininet pools idle keep-alive sockets after the handles close and shutdown() does not wake a blocked recv,
+     * so with the default 5 s io timeout every srv_stop waited out its 3 s join (Win10 boot rs2: 145 tests in 400 s).
+     * Every leg of a test is milliseconds apart, so a short idle timeout is safe. */
+    cfg.io_timeout_ms = kind == SRV_HTTP ? 1000 : 2000;
     srv *s = NULL;
     /* r->s must be set before the first request arrives: srv_start returns accepting, so publish via a temp */
     if (srv_start(&cfg, &s) != SRV_OK) return NULL;
     r->s = s;
+    return s;
+}
+
+srv *rs_plain(void) {
+    srv_config cfg; memset(&cfg, 0, sizeof cfg);
+    cfg.kind = SRV_HTTP; cfg.io_timeout_ms = 1000; cfg.lifetime_ms = 30000;   /* built-in script: 200 "hello" */
+    srv *s = NULL;
+    if (srv_start(&cfg, &s) != SRV_OK) return NULL;
     return s;
 }
 

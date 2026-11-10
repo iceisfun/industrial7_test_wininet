@@ -48,7 +48,7 @@ TEST(rs_limit_loop_budget_exact) {
     int n = srv_req_count(s);
     /* the counter is fsm+0x100 = GlobalMaxHttpRedirects (registry MaxHttpRedirects); one request per budget unit + the first */
     t_note("redirect budget: %d requests before %lu", n, r.err);
-    EXPECT_EQ(n, 101);
+    EXPECT_EQ(n, 11);   /* Win10 VM: budget 10 (async loop test boot rs2: 11 requests, 10 REDIRECT callbacks) */
     char last[32]; snprintf(last, sizeof last, "/loop/%d", n - 1);
     EXPECT_STR(srv_req_target(s, n - 1), last);
     srv_stop(s);
@@ -78,7 +78,7 @@ TEST(rs_limit_self_loop) {
     if (n < 0) { t_skip("server unavailable"); return; }
     t_note("self loop: ok=%d err=%lu requests=%d", r.ok, r.err, n);
     CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_HTTP_REDIRECT_FAILED);
-    EXPECT_EQ(n, 101);
+    EXPECT_EQ(n, 11);   /* Win10 VM: budget 10 (async loop test boot rs2: 11 requests, 10 REDIRECT callbacks) */
 }
 
 TEST(rs_limit_two_cycle) {
@@ -88,7 +88,7 @@ TEST(rs_limit_two_cycle) {
     if (n < 0) { t_skip("server unavailable"); return; }
     t_note("a<->b: ok=%d err=%lu requests=%d", r.ok, r.err, n);
     CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_HTTP_REDIRECT_FAILED);
-    EXPECT_EQ(n, 101);
+    EXPECT_EQ(n, 11);   /* Win10 VM: budget 10 (async loop test boot rs2: 11 requests, 10 REDIRECT callbacks) */
 }
 
 TEST(rs_limit_loop_noautoredirect) {
@@ -136,7 +136,9 @@ static void refused(const char *loc, int code) {
     CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err));
     EXPECT_EQ(r.status, (DWORD)code);
     EXPECT_EQ(n, 1);
-    EXPECT_STR(r.body, "refused-body");
+    /* Win10 VM boot rs2 (rs_openurl_302_ftp_refused): Redirect_Fsm drains the 3xx body before Redirect() refuses the
+     * Location, so the returned 3xx has an empty body */
+    EXPECT_EQ(r.nbody, 0);
     srv_stop(s);
 }
 TEST(rs_refuse_ftp_scheme)        { refused("ftp://127.0.0.1:%P/f.txt", 302); }
@@ -484,7 +486,7 @@ TEST(rs_scheme_https_same_server) {
  * option 88 is a request-handle BOOL guarded by GlobalSendUTF8ServerToProxy (12009 when that is off). */
 TEST(rs_option_88_is_not_redirect_policy) {
     REQUIRE(U(InternetSetOptionA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, RS_FRESH, 0);
@@ -500,7 +502,7 @@ TEST(rs_option_88_is_not_redirect_policy) {
 
 TEST(rs_option_enable_redirect_cache_read) {
     REQUIRE(U(InternetSetOptionA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, RS_FRESH, 0);
@@ -520,7 +522,7 @@ TEST(rs_option_enable_redirect_cache_read) {
 /* the request flags (INTERNET_OPTION_REQUEST_FLAGS / FLAGS) reflect NO_AUTO_REDIRECT */
 TEST(rs_option_flags_reflect_noauto) {
     REQUIRE(U(InternetQueryOptionA));
-    srv *s = srv_http(NULL, 0); if (!s) { t_skip("server unavailable"); return; }
+    srv *s = rs_plain(); if (!s) { t_skip("server unavailable"); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, RS_NOREDIR, 0);

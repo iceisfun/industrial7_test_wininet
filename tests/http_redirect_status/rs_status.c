@@ -232,7 +232,11 @@ TEST(rs_retry_after_503_not_retried) {
         char v[16]; DWORD l = sizeof v;
         CHECK(U(HttpQueryInfoA)(hr, HTTP_QUERY_RETRY_AFTER, v, &l, NULL)); EXPECT_STR(v, "1");
         DWORD n = 0; l = sizeof n;
-        CHECK(U(HttpQueryInfoA)(hr, HTTP_QUERY_RETRY_AFTER | HTTP_QUERY_FLAG_NUMBER, &n, &l, NULL)); EXPECT_EQ(n, 1);
+        SET_ERR(0xdeadbeef);
+        BOOL okn = U(HttpQueryInfoA)(hr, HTTP_QUERY_RETRY_AFTER | HTTP_QUERY_FLAG_NUMBER, &n, &l, NULL);
+        /* Win10 VM boot rs2: the FLAG_NUMBER form of RETRY_AFTER fails (only the string form works) */
+        t_note("RETRY_AFTER|FLAG_NUMBER: ok=%d err=%lu val=%lu len=%lu", okn, okn ? 0 : GetLastError(), n, l);
+        CHECK(!okn);
     }
     t_inet_close(hi);
     Sleep(1500);
