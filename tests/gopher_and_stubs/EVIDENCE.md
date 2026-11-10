@@ -16,7 +16,7 @@ The area prefix is `gs_`. The source files are:
 
 `gen_exptab.py` builds `gs_exptab.c` from `tools/<module>_exports.json`.
 
-**Oracle and decomp.** The oracle is the Windows 10 22H2 VM (10.0.19045, wininet 11.0.19041.2193), run through `tools/vm_run.sh`. Boots: `gsb2` crashed, `gsb3` had 9 FAILs, `gsb4` is described below. The decomp comes from the Win10 reference corpus (`/api/function/wininet/<name>/decomp`).
+**Oracle and decomp.** The oracle is the Windows 10 22H2 VM (10.0.19045, wininet 11.0.19041.2193), run through `tools/vm_run.sh`. Boots: `gsb2` crashed (literal URL into ShowSecurityInfoByURLA), `gsb3` had 9 FAILs, `gsb4` had 1 FAIL (#103 return), and `gsb5` passed all 195 tests. The decomp comes from the Win10 reference corpus (`/api/function/wininet/<name>/decomp`).
 
 **Tags in the source.** `[D fn@rva]` means the expectation was read from the decomp. `[VM]` / `[VM boot N]` means it was observed on the guest because the decomp was silent or wrong about it. `[K]` means general WinINet knowledge. Every hard CHECK has passed on the VM. Anything that varies between machines (RAS phonebook, preload list, privacy templates, group list contents) is a `t_note`.
 
@@ -41,7 +41,7 @@ The area prefix is `gs_`. The source files are:
 | #120-#123 GetP3PPolicy: GLE 120, returns 0xFF. #346: returns 0x103. #401: returns 0. #402: zeroes 0x28 bytes of arg2 and returns 0. #410: `*p = NULL`, returns E_FAIL. #411: returns E_INVALIDARG or E_FAIL by arg1. #413: returns E_FAIL. | ordinal bodies |
 | #118 FindP3PPolicySymbol: NULL gives -1. Only 3- and 4-character exact (case-sensitive) tokens match. The bare token equals the `a` form. | @0x167210 |
 | #102 GetDiskInfoA: a path that is NULL, shorter than 2 characters or 260 characters or longer fails with 87. Otherwise it calls GetDiskFreeSpaceExA and sets `*pdw = 1`. | @0x1a7330 |
-| #103 PerformOperationOverUrlCacheA: a FindFirst failure returns FALSE (also for ERROR_NO_MORE_ITEMS on an empty group). The loop path returns `GLE == 259`. The callback context is passed through. | @0x1a7420 |
+| #103 PerformOperationOverUrlCacheA: a FindFirst failure returns FALSE (also for ERROR_NO_MORE_ITEMS on an empty group). The loop path returns `GLE == 259`, but GLE is read **after** FindCloseUrlCache, which resets it to 0, so a complete walk returns FALSE with GLE 0 (VM boot 4). The callback sees every group entry and gets the context. | @0x1a7420 |
 | #403: arg2 NULL, `arg2[0] == 0`, `arg2[1] == 0` or arg3 NULL gives E_INVALIDARG, returned as an HRESULT before any initialisation. | @0x165fc0 |
 | #116/#117 IsDomainLegalCookieDomain: NULL gives 87. Otherwise a reversed-domain match (the parent domain matches, a sibling or partial label does not). | @0x1ea30 |
 | InternetAutodial: `flags & ~0xF` gives 87; valid flags are a no-op that returns TRUE with GLE 0. InternetAutodialHangup: reserved gives 87. InternetDial(A/W) returns a DWORD, sets `*conn = 0` first and never sets GLE. InternetHangUp: reserved gives 87. InternetGoOnline: `flags & ~3` gives 87. InternetSetDialState(A/W): always 120. | @0x13c520.. |

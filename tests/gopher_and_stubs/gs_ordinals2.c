@@ -11,7 +11,8 @@
  *   buf = HeapAlloc(0x470); h = FindFirstUrlCacheEntryExA(a1, a2, a3, a4, buf, &cb, a5, a6, a7)
  *   (retry once with a bigger buffer on 122); h == NULL -> return 0 (whatever the reason);
  *   loop: cb(entry, &cb, a9) until it returns FALSE or FindNext fails; FindCloseUrlCache;
- *   return GetLastError() == ERROR_NO_MORE_ITEMS. GetLastError is never set by the function itself. */
+ *   return GetLastError() == ERROR_NO_MORE_ITEMS - read after FindCloseUrlCache, which resets it to 0 on success,
+ *   so a full walk returns FALSE [VM]. GetLastError is never set by the function itself. */
 typedef BOOL (WINAPI *gs_visit_cb)(INTERNET_CACHE_ENTRY_INFOA *, DWORD *, void *);
 typedef BOOL (WINAPI *gs_PerformOp)(LPCSTR, DWORD, DWORD, GROUPID, void *, DWORD *, void *, gs_visit_cb, void *);
 #define GS_FILTER (NORMAL_CACHE_ENTRY | COOKIE_CACHE_ENTRY | URLHISTORY_CACHE_ENTRY | TRACK_OFFLINE_CACHE_ENTRY | \
@@ -113,8 +114,10 @@ TEST(gs_ord103_visits_group_entries) {
     SET_ERR(0x4242);
     BOOL r = f("", 0, GS_FILTER, g, NULL, NULL, NULL, gs_visit_fn, &v);
     DWORD e = GetLastError();
-    EXPECT_EQ(r, TRUE);
-    EXPECT_EQ(e, ERROR_NO_MORE_ITEMS);
+    /* [VM boot 4] the "GLE == 259 -> TRUE" test runs after FindCloseUrlCache, which succeeds and sets GLE 0:
+     * a complete walk therefore returns FALSE with GLE 0 */
+    EXPECT_EQ(r, FALSE);
+    EXPECT_EQ(e, 0);
     EXPECT_EQ(v.calls, 3);
     EXPECT_EQ(v.ctx_ok, 3);
     EXPECT_EQ(v.size_ok, 3);
