@@ -103,37 +103,49 @@ static void check_one(const uc_crack_vec *v, const uc_crack_t *o, int want_extra
 
 void uc_check_crack_vec(const uc_crack_vec *v, const char *file, int line) {
     static uc_crack_t o;
-    uc_crackA(v->url, 0, 1, &o); check_one(v, &o, 1, "InternetCrackUrlA", 0, file, line);
-    uc_crackA(v->url, 0, 0, &o); check_one(v, &o, 0, "InternetCrackUrlA[noextra]", 0, file, line);
-    uc_crackW(v->url, 0, 1, &o); check_one(v, &o, 1, "InternetCrackUrlW", 1, file, line);
-    uc_crackW(v->url, 0, 0, &o); check_one(v, &o, 0, "InternetCrackUrlW[noextra]", 1, file, line);
+    if (v->only != 2) {
+        uc_crackA(v->url, 0, 1, &o); check_one(v, &o, 1, "InternetCrackUrlA", 0, file, line);
+        uc_crackA(v->url, 0, 0, &o); check_one(v, &o, 0, "InternetCrackUrlA[noextra]", 0, file, line);
+    }
+    if (v->only != 1) {
+        uc_crackW(v->url, 0, 1, &o); check_one(v, &o, 1, "InternetCrackUrlW", 1, file, line);
+        uc_crackW(v->url, 0, 0, &o); check_one(v, &o, 0, "InternetCrackUrlW[noextra]", 1, file, line);
+    }
 }
 
-void uc_check_crack_fvec(const uc_crack_fvec *v, DWORD flags, const char *file, int line) {
+static void fvec_check(const uc_crack_fvec *v, DWORD flags, int wide, const char *file, int line) {
     static uc_crack_t o;
     const char *u = v->url;
-    uc_crackA(u, flags, 1, &o);
+    const char *api = wide ? "InternetCrackUrlW[flags]" : "InternetCrackUrlA[flags]";
+    if (wide) uc_crackW(u, flags, 1, &o); else uc_crackA(u, flags, 1, &o);
     if (!v->r) {
-        VCHK(!o.r && o.err == v->err, "InternetCrackUrlA(\"%s\", 0x%08lx): r=%d err=%lu, want error %lu", u, flags, o.r, o.err, v->err);
+        VCHK(!o.r && o.err == v->err, "%s(\"%s\", 0x%08lx): r=%d err=%lu, want error %lu", api, u, flags, o.r, o.err, v->err);
         return;
     }
-    VCHK(o.r, "InternetCrackUrlA(\"%s\", 0x%08lx) failed %lu", u, flags, o.err);
+    VCHK(o.r, "%s(\"%s\", 0x%08lx) failed %lu", api, u, flags, o.err);
     if (!o.r) return;
-    if (v->ns != UC_NS_ANY) VCHK(o.ns == v->ns, "InternetCrackUrlA(\"%s\", 0x%08lx) nScheme %d want %d", u, flags, o.ns, v->ns);
-    if (v->port >= 0) VCHK(o.port == (unsigned)v->port, "InternetCrackUrlA(\"%s\", 0x%08lx) nPort %u want %d", u, flags, o.port, v->port);
-    cmp_str("scheme", "InternetCrackUrlA[flags]", u, o.scheme, o.lscheme, v->scheme, 0, file, line);
-    cmp_str("host", "InternetCrackUrlA[flags]", u, o.host, o.lhost, v->host, 0, file, line);
-    cmp_str("user", "InternetCrackUrlA[flags]", u, o.user, o.luser, v->user, 0, file, line);
-    cmp_str("password", "InternetCrackUrlA[flags]", u, o.pass, o.lpass, v->pass, 0, file, line);
-    VCHK(!strcmp(o.path, v->path), "InternetCrackUrlA(\"%s\", 0x%08lx) path \"%s\" want \"%s\"", u, flags, o.path, v->path);
-    VCHK(o.lpath == v->lpath, "InternetCrackUrlA(\"%s\", 0x%08lx) path length %lu want %lu", u, flags, o.lpath, v->lpath);
-    VCHK(!strcmp(o.extra, v->extra), "InternetCrackUrlA(\"%s\", 0x%08lx) extra \"%s\" want \"%s\"", u, flags, o.extra, v->extra);
-    VCHK(o.lextra == v->lextra, "InternetCrackUrlA(\"%s\", 0x%08lx) extra length %lu want %lu", u, flags, o.lextra, v->lextra);
+    if (v->ns != UC_NS_ANY) VCHK(o.ns == v->ns, "%s(\"%s\", 0x%08lx) nScheme %d want %d", api, u, flags, o.ns, v->ns);
+    if (v->port >= 0) VCHK(o.port == (unsigned)v->port, "%s(\"%s\", 0x%08lx) nPort %u want %d", api, u, flags, o.port, v->port);
+    cmp_str("scheme", api, u, o.scheme, o.lscheme, v->scheme, wide, file, line);
+    cmp_str("host", api, u, o.host, o.lhost, v->host, wide, file, line);
+    cmp_str("user", api, u, o.user, o.luser, v->user, wide, file, line);
+    cmp_str("password", api, u, o.pass, o.lpass, v->pass, wide, file, line);
+    VCHK(!strcmp(o.path, v->path), "%s(\"%s\", 0x%08lx) path \"%s\" want \"%s\"", api, u, flags, o.path, v->path);
+    VCHK(o.lpath == v->lpath, "%s(\"%s\", 0x%08lx) path length %lu want %lu", api, u, flags, o.lpath, v->lpath);
+    VCHK(!strcmp(o.extra, v->extra), "%s(\"%s\", 0x%08lx) extra \"%s\" want \"%s\"", api, u, flags, o.extra, v->extra);
+    VCHK(o.lextra == v->lextra, "%s(\"%s\", 0x%08lx) extra length %lu want %lu", api, u, flags, o.lextra, v->lextra);
 }
 
+void uc_check_crack_fvec(const uc_crack_fvec *v, DWORD flags, const char *file, int line) { fvec_check(v, flags, 0, file, line); }
+void uc_check_crack_fvecW(const uc_crack_fvec *v, DWORD flags, const char *file, int line) { fvec_check(v, flags, 1, file, line); }
+
 void uc_check_canon(const char *url, DWORD flags, const char *want, DWORD err, const char *file, int line) {
+    uc_check_canon_m(url, flags, want, err, 3, file, line);
+}
+void uc_check_canon_m(const char *url, DWORD flags, const char *want, DWORD err, int which, const char *file, int line) {
     char out[4096]; DWORD n = sizeof out; BOOL r; DWORD e;
     strcpy(out, "~");
+    if (which & 1) {
     SetLastError(0xdeadbeef);
     r = U(InternetCanonicalizeUrlA)(url, out, &n, flags);
     e = GetLastError();
@@ -148,7 +160,9 @@ void uc_check_canon(const char *url, DWORD flags, const char *want, DWORD err, c
         VCHK(!r, "InternetCanonicalizeUrlA(\"%s\", 0x%08lx) succeeded (\"%s\"), want error %lu", url, flags, out, err);
         VCHK(e == err, "InternetCanonicalizeUrlA(\"%s\", 0x%08lx) error: got %lu want %lu", url, flags, e, err);
     }
-    if (!is_ascii(url) || !is_ascii(want)) return;
+    }
+    if (!(which & 2)) return;
+    if (which == 3 && (!is_ascii(url) || !is_ascii(want))) return;
     WCHAR wout[4096]; DWORD wn = 4096;
     wout[0] = 0;
     SetLastError(0xdeadbeef);
@@ -168,8 +182,12 @@ void uc_check_canon(const char *url, DWORD flags, const char *want, DWORD err, c
 }
 
 void uc_check_combine(const char *base, const char *rel, DWORD flags, const char *want, DWORD err, const char *file, int line) {
+    uc_check_combine_m(base, rel, flags, want, err, 3, file, line);
+}
+void uc_check_combine_m(const char *base, const char *rel, DWORD flags, const char *want, DWORD err, int which, const char *file, int line) {
     char out[4096]; DWORD n = sizeof out; BOOL r; DWORD e;
     strcpy(out, "~");
+    if (which & 1) {
     SetLastError(0xdeadbeef);
     r = U(InternetCombineUrlA)(base, rel, out, &n, flags);
     e = GetLastError();
@@ -184,7 +202,9 @@ void uc_check_combine(const char *base, const char *rel, DWORD flags, const char
         VCHK(!r, "InternetCombineUrlA(\"%s\", \"%s\", 0x%08lx) succeeded (\"%s\"), want error %lu", base, rel, flags, out, err);
         VCHK(e == err, "InternetCombineUrlA(\"%s\", \"%s\", 0x%08lx) error: got %lu want %lu", base, rel, flags, e, err);
     }
-    if (!is_ascii(base) || !is_ascii(rel) || !is_ascii(want)) return;
+    }
+    if (!(which & 2)) return;
+    if (which == 3 && (!is_ascii(base) || !is_ascii(rel) || !is_ascii(want))) return;
     WCHAR wout[4096]; DWORD wn = 4096;
     wout[0] = 0;
     SetLastError(0xdeadbeef);

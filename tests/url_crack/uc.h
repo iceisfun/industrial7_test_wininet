@@ -28,6 +28,7 @@ typedef struct {
     int ns; int port;                     /* ns UC_NS_ANY / port -1 = do not check */
     const char *scheme, *host, *user, *pass, *path, *extra;
     const char *fullpath;                 /* path when no extra buffer is supplied (NULL = path+extra) */
+    int only;                             /* 0 = A and W, 1 = A only, 2 = W only (UC_CRACK_VEC2 rows) */
 } uc_crack_vec;
 #define UC_NS_ANY 0x7fff
 void uc_check_crack_vec(const uc_crack_vec *v, const char *file, int line);
@@ -38,17 +39,30 @@ typedef struct {
     const char *scheme, *host, *user, *pass, *path; DWORD lpath; const char *extra; DWORD lextra;
 } uc_crack_fvec;
 void uc_check_crack_fvec(const uc_crack_fvec *v, DWORD flags, const char *file, int line);
+/* Same through InternetCrackUrlW (url UTF-8 -> UTF-16; lengths in characters). */
+void uc_check_crack_fvecW(const uc_crack_fvec *v, DWORD flags, const char *file, int line);
 #define UC_CRACK_VEC(name, ...) \
     static const uc_crack_vec ucv_##name = { __VA_ARGS__ }; \
     TEST(url_crack_v_##name) { REQUIRE(U(InternetCrackUrlA)); REQUIRE(U(InternetCrackUrlW)); uc_check_crack_vec(&ucv_##name, __FILE__, __LINE__); }
+/* Second-pass rows: same columns plus `only` (0 both, 1 A, 2 W). */
+#define UC_CRACK_VEC2(name, ...) \
+    static const uc_crack_vec ucv2_##name = { __VA_ARGS__ }; \
+    TEST(url_crack_v2_##name) { REQUIRE(U(InternetCrackUrlA)); REQUIRE(U(InternetCrackUrlW)); uc_check_crack_vec(&ucv2_##name, __FILE__, __LINE__); }
 
 /* Canonicalize: A and W in one go. want == NULL means "must fail with err". */
 void uc_check_canon(const char *url, DWORD flags, const char *want, DWORD err, const char *file, int line);
+/* which: 1 = A only, 2 = W only (W runs even for non-ASCII input: url is UTF-8), 3 = both (W only for ASCII) */
+void uc_check_canon_m(const char *url, DWORD flags, const char *want, DWORD err, int which, const char *file, int line);
+#define CANON_A(url, flags, want) uc_check_canon_m((url), (flags), (want), 0, 1, __FILE__, __LINE__)
+#define CANON_W(url, flags, want) uc_check_canon_m((url), (flags), (want), 0, 2, __FILE__, __LINE__)
 #define CANON(url, flags, want) uc_check_canon((url), (flags), (want), 0, __FILE__, __LINE__)
 #define CANON_FAIL(url, flags, err) uc_check_canon((url), (flags), NULL, (err), __FILE__, __LINE__)
 
 /* Combine: A and W. */
 void uc_check_combine(const char *base, const char *rel, DWORD flags, const char *want, DWORD err, const char *file, int line);
+void uc_check_combine_m(const char *base, const char *rel, DWORD flags, const char *want, DWORD err, int which, const char *file, int line);
+#define COMBINE_A(b, r, flags, want) uc_check_combine_m((b), (r), (flags), (want), 0, 1, __FILE__, __LINE__)
+#define COMBINE_W(b, r, flags, want) uc_check_combine_m((b), (r), (flags), (want), 0, 2, __FILE__, __LINE__)
 #define COMBINE(b, r, flags, want) uc_check_combine((b), (r), (flags), (want), 0, __FILE__, __LINE__)
 #define COMBINE_FAIL(b, r, flags, err) uc_check_combine((b), (r), (flags), NULL, (err), __FILE__, __LINE__)
 
