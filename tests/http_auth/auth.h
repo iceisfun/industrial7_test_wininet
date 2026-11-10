@@ -62,6 +62,7 @@ struct gate {
 int gate_fn(srv_conn *c, const srv_step *st, void *user);
 /* Start an HTTP server whose every connection runs gate_fn with g. NULL on failure (t_skip done by caller). */
 srv *gate_start(gate *g);
+srv *gate_start_kind(gate *g, int kind);   /* SRV_HTTP or SRV_HTTPS (SRV_CERT_LOCALHOST) */
 
 /* ------------------------------------------------------------------ client helper */
 typedef struct {

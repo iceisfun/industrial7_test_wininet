@@ -2,6 +2,7 @@
  * The gate answers 200 only to an exact expected Authorization value, else 401 + challenge, so a 200 proves the
  * client computed base64(user:pass) exactly; the recorder shows what was sent on every leg. */
 #include "auth.h"
+/* VM_TIMEOUT: 480 */
 
 #define CH_BASIC "WWW-Authenticate: Basic realm=\"i7\"\r\n"
 

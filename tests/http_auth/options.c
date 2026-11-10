@@ -24,9 +24,9 @@ TEST(auth_opt_connect_args_queryable_on_connect) {
     hset h; OPEN_OR_SKIP(h, "cuser", "cpass");
     char b[64]; DWORD l;
     CHECK(a_qopt(h.hc, INTERNET_OPTION_USERNAME, b, sizeof b, &l)); EXPECT_STR(b, "cuser");
-    t_note("A query USERNAME returned length %lu for \"cuser\"", l);
+    EXPECT_EQ(l, 5);   /* A: characters, without the NUL (Win10 VM) */
     CHECK(a_qopt(h.hc, INTERNET_OPTION_PASSWORD, b, sizeof b, &l)); EXPECT_STR(b, "cpass");
-    t_note("A query PASSWORD returned length %lu for \"cpass\"", l);
+    EXPECT_EQ(l, 5);
     close_set(&h);
 }
 
@@ -66,9 +66,9 @@ TEST(auth_opt_null_handle_set_proxy_creds_accepted) {
     /* decomp: InternetSetOptionW case 0x2b/0x2c, param_1 == 0 -> returns TRUE without storing anything */
     SET_ERR(0); CHECK(U(InternetSetOptionW)(NULL, INTERNET_OPTION_PROXY_USERNAME, L"i7nobody", 8));
     SET_ERR(0); CHECK(U(InternetSetOptionW)(NULL, INTERNET_OPTION_PROXY_PASSWORD, L"i7nothing", 9));
-    SET_ERR(0); BOOL a = U(InternetSetOptionA)(NULL, INTERNET_OPTION_PROXY_USERNAME, "i7nobody", 8);
-    t_note("InternetSetOptionA(NULL, PROXY_USERNAME) = %d err=%lu", a, a ? 0 : GetLastError());
-    CHECK(a);
+    /* the A entry point checks the handle itself before forwarding: NULL -> 12018 (Win10 VM) */
+    SET_ERR(0); CHECK(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_PROXY_USERNAME, "i7nobody", 8)); EXPECT_ERR(ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
+    SET_ERR(0); CHECK(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_PROXY_PASSWORD, "i7nothing", 9)); EXPECT_ERR(ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
 }
 
 TEST(auth_opt_request_set_and_query_roundtrip) {
@@ -116,7 +116,7 @@ TEST(auth_opt_connect_set_after_request_open) {
     char b[64];
     CHECK(a_qopt(h.hc, INTERNET_OPTION_USERNAME, b, sizeof b, NULL)); EXPECT_STR(b, "later");
     CHECK(a_qopt(h.hr, INTERNET_OPTION_USERNAME, b, sizeof b, NULL));
-    t_note("request USERNAME after connect changed post-open: [%s]", b);
+    EXPECT_STR(b, "later");   /* the request reads through to the connect object (Win10 VM) */
     close_set(&h);
 }
 
@@ -127,8 +127,8 @@ TEST(auth_opt_no_connect_creds_query) {
         char b[64] = "zz"; DWORD l = sizeof b; SET_ERR(0);
         BOOL ok = U(InternetQueryOptionA)(h.hc, g_cred_opts[i], b, &l);
         DWORD e = ok ? 0 : GetLastError();
-        t_note("no creds: query opt %lu on connect -> ok=%d err=%lu len=%lu val=[%s]", g_cred_opts[i], ok, e, l, ok ? b : "");
-        if (ok) CHECKF(b[0] == 0, "opt %lu: [%s]", g_cred_opts[i], b);
+        CHECKF(ok, "opt %lu err=%lu", g_cred_opts[i], e);
+        CHECKF(ok && b[0] == 0 && l == 0, "opt %lu: [%s] len %lu", g_cred_opts[i], b, l);
         l = sizeof b; ok = U(InternetQueryOptionA)(h.hr, g_cred_opts[i], b, &l);
         if (ok) CHECKF(b[0] == 0, "req opt %lu: [%s]", g_cred_opts[i], b);
     }
@@ -140,11 +140,10 @@ TEST(auth_opt_query_small_buffer_a) {
     hset h; OPEN_OR_SKIP(h, "abcdefgh", "p");
     char b[4]; DWORD l = sizeof b; SET_ERR(0);
     CHECK(!U(InternetQueryOptionA)(h.hc, INTERNET_OPTION_USERNAME, b, &l)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
-    t_note("A small buffer: required length reported %lu for 8 chars", l);
-    CHECK(l == 8 || l == 9);
+    EXPECT_EQ(l, 9);   /* A: required size includes the NUL (Win10 VM) */
     l = 0; SET_ERR(0);
     CHECK(!U(InternetQueryOptionA)(h.hc, INTERNET_OPTION_USERNAME, NULL, &l)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
-    t_note("A NULL buffer: required %lu", l);
+    EXPECT_EQ(l, 9);
     char big[64]; DWORD need = l; l = need;
     CHECK(U(InternetQueryOptionA)(h.hc, INTERNET_OPTION_USERNAME, big, &l)); EXPECT_STR(big, "abcdefgh");
     close_set(&h);
@@ -155,10 +154,10 @@ TEST(auth_opt_query_small_buffer_w) {
     hset h; OPEN_OR_SKIP(h, "abcdefgh", "p");
     WCHAR w[4]; DWORD l = sizeof w; SET_ERR(0);
     CHECK(!U(InternetQueryOptionW)(h.hc, INTERNET_OPTION_USERNAME, w, &l)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
-    t_note("W small buffer: required length reported %lu for 8 chars", l);
+    EXPECT_EQ(l, 18);  /* W: required size in bytes including the NUL (Win10 VM) */
     WCHAR big[64]; l = sizeof big;
     CHECK(U(InternetQueryOptionW)(h.hc, INTERNET_OPTION_USERNAME, big, &l)); EXPECT_WSTR(big, L"abcdefgh");
-    t_note("W query USERNAME returned length %lu for 8 chars", l);
+    EXPECT_EQ(l, 8);   /* W success: characters without the NUL */
     close_set(&h);
 }
 
@@ -188,8 +187,8 @@ TEST(auth_opt_set_length_shorter_than_string) {
     hset h; OPEN_OR_SKIP(h, NULL, NULL);
     BOOL ok = U(InternetSetOptionA)(h.hr, INTERNET_OPTION_USERNAME, "abcdef", 3);
     char b[64] = ""; a_qopt(h.hr, INTERNET_OPTION_USERNAME, b, sizeof b, NULL);
-    t_note("set USERNAME \"abcdef\" with length 3: ok=%d -> [%s]", ok, b);
     CHECK(ok);
+    EXPECT_STR(b, "abcdef");   /* A string options take the NUL-terminated string; the length is not a cut (Win10 VM) */
     close_set(&h);
 }
 
@@ -199,7 +198,8 @@ TEST(auth_opt_set_zero_length) {
     SET_ERR(0); BOOL ok = U(InternetSetOptionA)(h.hr, INTERNET_OPTION_USERNAME, "zl", 0);
     DWORD e = ok ? 0 : GetLastError();
     char b[64] = ""; a_qopt(h.hr, INTERNET_OPTION_USERNAME, b, sizeof b, NULL);
-    t_note("set USERNAME with length 0: ok=%d err=%lu -> [%s]", ok, e, b);
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
+    EXPECT_STR(b, "cuser");
     close_set(&h);
 }
 
@@ -208,7 +208,7 @@ TEST(auth_opt_set_empty_string) {
     hset h; OPEN_OR_SKIP(h, "cuser", "cpass");
     BOOL ok = U(InternetSetOptionA)(h.hr, INTERNET_OPTION_USERNAME, "", 0);
     char b[64] = "zz"; DWORD l = sizeof b; BOOL q = U(InternetQueryOptionA)(h.hr, INTERNET_OPTION_USERNAME, b, &l);
-    t_note("set USERNAME \"\": ok=%d; query ok=%d val=[%s] len=%lu", ok, q, q ? b : "", l);
+    CHECK(!ok); CHECK(q); EXPECT_STR(b, "cuser"); EXPECT_EQ(l, 5);
     close_set(&h);
 }
 
@@ -217,8 +217,7 @@ TEST(auth_opt_set_null_buffer) {
     hset h; OPEN_OR_SKIP(h, "cuser", "cpass");
     SET_ERR(0); BOOL ok = U(InternetSetOptionA)(h.hr, INTERNET_OPTION_USERNAME, NULL, 0);
     DWORD e = ok ? 0 : GetLastError();
-    t_note("set USERNAME NULL,0: ok=%d err=%lu", ok, e);
-    if (!ok) CHECK(e == ERROR_INVALID_PARAMETER || e == ERROR_INTERNET_BAD_OPTION_LENGTH);
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
     close_set(&h);
 }
 
@@ -229,9 +228,8 @@ TEST(auth_opt_long_username) {
     BOOL ok = U(InternetSetOptionA)(h.hr, INTERNET_OPTION_USERNAME, longu, 1000);
     DWORD e = ok ? 0 : GetLastError();
     char b[1100] = ""; DWORD l = sizeof b; BOOL q = U(InternetQueryOptionA)(h.hr, INTERNET_OPTION_USERNAME, b, &l);
-    t_note("1000-char USERNAME: set ok=%d err=%lu, query ok=%d len=%lu strlen=%zu", ok, e, q, l, strlen(b));
-    CHECK(ok);
-    if (q) EXPECT_EQ(strlen(b), 1000);
+    CHECK(ok); CHECK(q); EXPECT_EQ(l, 1000);
+    EXPECT_EQ(strlen(b), 1000);
     close_set(&h);
 }
 
@@ -244,8 +242,11 @@ TEST(auth_opt_suppress_server_auth) {
     BOOL s = U(InternetSetOptionA)(h.hi, INTERNET_OPTION_SUPPRESS_SERVER_AUTH, &v, sizeof v); DWORD es = s ? 0 : GetLastError();
     BOOL n = U(InternetSetOptionA)(h.hr, INTERNET_OPTION_SUPPRESS_SERVER_AUTH, NULL, 0); DWORD en = n ? 0 : GetLastError();
     DWORD q = 0, ql = sizeof q; BOOL qq = U(InternetQueryOptionA)(h.hr, INTERNET_OPTION_SUPPRESS_SERVER_AUTH, &q, &ql); DWORD eq = qq ? 0 : GetLastError();
-    t_note("SUPPRESS_SERVER_AUTH set: request ok=%d err=%lu; connect ok=%d err=%lu; session ok=%d err=%lu; NULL buf ok=%d err=%lu; query ok=%d err=%lu",
-           r, er, c, ec, s, es, n, en, qq, eq);
+    CHECK(r);                      /* request handle only (Win10 VM) */
+    CHECK(!c); EXPECT_EQ(ec, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
+    CHECK(!s); EXPECT_EQ(es, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
+    CHECK(n);                      /* the value is not read */
+    CHECK(!qq); EXPECT_EQ(eq, ERROR_INVALID_PARAMETER);   /* set-only option */
     close_set(&h);
 }
 

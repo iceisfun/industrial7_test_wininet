@@ -102,19 +102,24 @@ TEST(auth_proxy_request_server_creds_used_for_proxy) {
     areq q = {0}; q.ruser = "ruser"; q.rpass = "rpass"; ares r; proxy_once(s, NULL, NULL, &q, &r);
     a_dump(s);
     t_note("407 with only request USERNAME/PASSWORD: status=%lu requests=%d", r.status, srv_req_count(s));
-    EXPECT_EQ(r.status, 200);
+    EXPECT_EQ(r.status, 200);   /* Win10 VM: server creds answer the proxy when no proxy creds exist */
+    EXPECT_EQ(srv_req_count(s), 2);
+    if (srv_req_count(s) >= 2) EXPECT_STR(REQ_PAUTH(s, 1), a_basic("ruser", "rpass"));
     srv_stop(s);
 }
 
-TEST(auth_proxy_creds_preferred_over_server_creds) {
+TEST(auth_proxy_connect_creds_win_over_request_proxy_creds) {
     REQUIRE(U(HttpSendRequestA));
+    /* Win10 VM: with InternetConnect credentials present, the proxy leg answers with THOSE, even though
+       PROXY_USERNAME/PASSWORD were set on the request; the proxy rejects them and the 407 reaches the caller */
     gate g = {0}; g.code = 407; g.challenge = CH_PBASIC; g.accept[0] = a_basic("puser", "ppass");
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
     areq q = {0}; q.puser = "puser"; q.ppass = "ppass"; ares r; proxy_once(s, "cuser", "cpass", &q, &r);
     a_dump(s);
-    EXPECT_EQ(r.status, 200);
+    CHECK(r.ok);
+    EXPECT_EQ(r.status, 407);
     EXPECT_EQ(srv_req_count(s), 2);
-    if (srv_req_count(s) >= 2) EXPECT_STR(REQ_PAUTH(s, 1), a_basic("puser", "ppass"));
+    if (srv_req_count(s) >= 2) EXPECT_STR(REQ_PAUTH(s, 1), a_basic("cuser", "cpass"));
     srv_stop(s);
 }
 
@@ -171,6 +176,9 @@ TEST(auth_proxy_preemptive_second_request) {
     a_dump(s);
     t_note("second request via proxy without per-request creds: status=%lu, %d more requests, first pauth=%s", r.status,
            srv_req_count(s) - before, REQ_PAUTH(s, before) ? REQ_PAUTH(s, before) : "(none)");
+    /* Win10 VM: proxy credentials are cached for the proxy and sent pre-emptively on any later path */
+    EXPECT_EQ(r.status, 200); EXPECT_EQ(srv_req_count(s) - before, 1);
+    EXPECT_STR(REQ_PAUTH(s, before), a_basic("puser", "ppass"));
     a_close(hc); a_close(hi); srv_stop(s);
 }
 
@@ -188,11 +196,24 @@ static int chain_fn(srv_conn *c, const srv_step *st, void *user) {
     }
     return -1;
 }
-TEST(auth_proxy_then_origin_auth) {
+TEST(auth_proxy_connect_creds_answer_proxy_in_chain) {
     REQUIRE(U(HttpSendRequestA));
     static const srv_step st[] = { S_CALL(chain_fn) }; static const srv_script sc[] = { SRV_SCRIPT(st) };
     srv_config cfg = { SRV_HTTP, sc, 1 }; srv *s; START_OR_SKIP(&cfg, &s);
     areq q = {0}; q.path = "/chain"; q.puser = "puser"; q.ppass = "ppass"; ares r; proxy_once(s, "ouser", "opass", &q, &r);
+    a_dump(s);
+    /* Win10 VM: origin creds from InternetConnect are sent to the proxy; the 407 is returned */
+    CHECK(r.ok); EXPECT_EQ(r.status, 407); EXPECT_STR(r.body, "P");
+    EXPECT_EQ(srv_req_count(s), 2);
+    if (srv_req_count(s) >= 2) { EXPECT_STR(REQ_PAUTH(s, 1), a_basic("ouser", "opass")); CHECK(REQ_AUTH(s, 1) == NULL); }
+    srv_stop(s);
+}
+
+TEST(auth_proxy_then_origin_auth) {
+    REQUIRE(U(HttpSendRequestA));
+    static const srv_step st[] = { S_CALL(chain_fn) }; static const srv_script sc[] = { SRV_SCRIPT(st) };
+    srv_config cfg = { SRV_HTTP, sc, 1 }; srv *s; START_OR_SKIP(&cfg, &s);
+    areq q = {0}; q.path = "/chain"; q.puser = "puser"; q.ppass = "ppass"; q.ruser = "ouser"; q.rpass = "opass"; ares r; proxy_once(s, NULL, NULL, &q, &r);
     a_dump(s);
     EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "both");
     int n = srv_req_count(s);

@@ -59,8 +59,8 @@ TEST(auth_dlg_no_ui_after_401_without_cached_creds) {
     DWORD d2 = dlg(NULL, r.hr, 0, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_NO_UI);
     DWORD d3 = dlg(NULL, r.hr, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_NO_UI | FLAGS_ERROR_UI_FLAGS_GENERATE_DATA | FLAGS_ERROR_UI_FLAGS_CHANGE_OPTIONS);
     t_note("NO_UI on 401 without cached creds: 12014 -> %lu, filter -> %lu, filter+gen+chg -> %lu", d1, d2, d3);
-    EXPECT_EQ(d1, d2);
-    CHECK(d1 != ERROR_INTERNET_FORCE_RETRY);
+    /* Win10 VM: no cached credentials -> InetGetCachedCredentialsW fails -> ERROR_CANCELLED -> LaunchCredUI folds it to 0 */
+    EXPECT_EQ(d1, ERROR_SUCCESS); EXPECT_EQ(d2, ERROR_SUCCESS); EXPECT_EQ(d3, ERROR_SUCCESS);
     a_close(r.hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -72,8 +72,7 @@ TEST(auth_dlg_no_ui_on_200_request) {
     EXPECT_EQ(r.status, 200);
     DWORD d1 = dlg(NULL, r.hr, ERROR_INTERNET_INCORRECT_PASSWORD, FLAGS_ERROR_UI_FLAGS_NO_UI);
     DWORD d2 = dlg(NULL, r.hr, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_NO_UI);
-    t_note("NO_UI on a 200 request: 12014 -> %lu; filter with err 0 -> %lu", d1, d2);
-    CHECK(d1 != ERROR_INTERNET_FORCE_RETRY);
+    EXPECT_EQ(d1, ERROR_SUCCESS); EXPECT_EQ(d2, ERROR_SUCCESS);   /* Win10 VM: no auth context -> nothing to do */
     a_close(r.hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -81,8 +80,7 @@ TEST(auth_dlg_session_handle) {
     REQUIRE(U(InternetErrorDlg));
     HINTERNET hi = t_inet_open(NULL);
     DWORD d = dlg(NULL, hi, ERROR_INTERNET_INCORRECT_PASSWORD, FLAGS_ERROR_UI_FLAGS_NO_UI);
-    t_note("InternetErrorDlg on a session handle: %lu", d);
-    CHECK(d != ERROR_INTERNET_FORCE_RETRY);
+    EXPECT_EQ(d, ERROR_SUCCESS);   /* decomp: not an HTTP request object -> returns the (zero) lookup status; Win10 VM */
     t_inet_close(hi);
 }
 
@@ -91,8 +89,7 @@ TEST(auth_dlg_connect_handle) {
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", 9, "u", "p", INTERNET_SERVICE_HTTP, 0, 0);
     DWORD d = dlg(NULL, hc, ERROR_INTERNET_INCORRECT_PASSWORD, FLAGS_ERROR_UI_FLAGS_NO_UI);
-    t_note("InternetErrorDlg on a connect handle: %lu", d);
-    CHECK(d != ERROR_INTERNET_FORCE_RETRY);
+    EXPECT_EQ(d, ERROR_SUCCESS);   /* Win10 VM */
     a_close(hc); t_inet_close(hi);
 }
 
@@ -109,7 +106,7 @@ TEST(auth_dlg_no_ui_after_407) {
     DWORD d2 = dlg(NULL, r.hr, 0, FLAGS_ERROR_UI_FILTER_FOR_ERRORS);
     t_note("407 + filter + NO_UI -> %lu; filter without NO_UI/hwnd -> %lu", d1, d2);
     EXPECT_EQ(d2, ERROR_INVALID_PARAMETER);
-    CHECK(d1 != ERROR_INTERNET_FORCE_RETRY);
+    EXPECT_EQ(d1, ERROR_SUCCESS);   /* Win10 VM */
     a_close(r.hr); a_close(hc); a_close(hi); srv_stop(s);
 }
 
@@ -120,7 +117,7 @@ TEST(auth_dlg_filter_on_200_passes_error_through) {
     areq q = {0}; ares r; a_send(hc, &q, &r, 1);
     /* filter on a 200 leaves dwError 0 untouched: not the credential path; record the result */
     DWORD d = dlg(NULL, r.hr, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_NO_UI);
-    t_note("filter on 200 with ERROR_SUCCESS: %lu", d);
+    EXPECT_EQ(d, ERROR_SUCCESS);   /* Win10 VM */
     a_close(r.hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -138,7 +135,7 @@ TEST(auth_dlg_flow_retry_after_setting_creds) {
         if (st != 401) break;
         char sink[64]; t_inet_read_all(hr, sink, sizeof sink, NULL);
         DWORD d = dlg(NULL, hr, ERROR_SUCCESS, FLAGS_ERROR_UI_FILTER_FOR_ERRORS | FLAGS_ERROR_UI_FLAGS_NO_UI);
-        t_note("round %d: InternetErrorDlg -> %lu", rounds, d);
+        EXPECT_EQ(d, ERROR_SUCCESS);   /* Win10 VM: NO_UI, nothing cached */
         U(InternetSetOptionA)(hr, INTERNET_OPTION_USERNAME, "loop", 4);
         U(InternetSetOptionA)(hr, INTERNET_OPTION_PASSWORD, "pw", 2);
     }

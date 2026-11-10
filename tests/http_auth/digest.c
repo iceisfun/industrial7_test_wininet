@@ -221,8 +221,9 @@ TEST(auth_digest_second_request_nonce_count) {
     int n = srv_req_count(s);
     const char *hv = REQ_AUTH(s, before); char nc[16] = "";
     t_note("second digest request: %d more requests; first carries %s", n - before, hv ? hv : "(none)");
+    EXPECT_EQ(n - before, 1);   /* Win10 VM: pre-emptive Digest on the second request */
+    CHECK(hv && a_param(hv, "nc", nc, sizeof nc)); EXPECT_STR(nc, "00000002");
     if (hv && a_param(hv, "nc", nc, sizeof nc)) {
-        t_note("pre-emptive digest nc=%s", nc);
         digest_check_recorded(s, before, "user", "i7digest", "pw", 0, "auth");
     }
     digest_check_recorded(s, n - 1, "user", "i7digest", "pw", 0, "auth");
@@ -278,6 +279,7 @@ TEST(auth_digest_and_basic_offered) {
     EXPECT_EQ(r.status, 200);
     const char *hv = srv_req_count(s) >= 2 ? REQ_AUTH(s, 1) : NULL;
     t_note("Basic listed first, Digest second -> client chose %.10s", hv ? hv : "(none)");
+    CHECK(hv && !strncmp(hv, "Digest ", 7));   /* Win10 VM: Digest preferred over Basic regardless of order */
     srv_stop(s);
 }
 
@@ -291,6 +293,7 @@ TEST(auth_digest_then_basic_offered) {
     EXPECT_EQ(r.status, 200);
     const char *hv = srv_req_count(s) >= 2 ? REQ_AUTH(s, 1) : NULL;
     t_note("Digest listed first, Basic second -> client chose %.10s", hv ? hv : "(none)");
+    CHECK(hv && !strncmp(hv, "Digest ", 7));
     srv_stop(s);
 }
 
@@ -301,7 +304,9 @@ TEST(auth_digest_unsupported_algorithm) {
     areq q = {0}; q.cuser = "user"; q.cpass = "pw"; ares r; a_once(s, &q, &r);
     a_dump(s);
     t_note("unsupported digest algorithm: ok=%d err=%lu status=%lu requests=%d", r.ok, r.err, r.status, srv_req_count(s));
-    CHECK(r.status != 200);
+    /* Win10 VM: the request is re-sent once without any Authorization, then the 401 goes to the caller */
+    CHECK(r.ok); EXPECT_EQ(r.status, 401); EXPECT_EQ(srv_req_count(s), 2);
+    if (srv_req_count(s) == 2) CHECK(REQ_AUTH(s, 1) == NULL);
     srv_stop(s);
 }
 
@@ -312,7 +317,8 @@ TEST(auth_digest_missing_nonce) {
     areq q = {0}; q.cuser = "user"; q.cpass = "pw"; ares r; a_once(s, &q, &r);
     a_dump(s);
     t_note("digest without nonce: ok=%d err=%lu status=%lu requests=%d", r.ok, r.err, r.status, srv_req_count(s));
-    CHECK(r.status != 200);
+    CHECK(r.ok); EXPECT_EQ(r.status, 401); EXPECT_EQ(srv_req_count(s), 2);   /* Win10 VM, as for an unknown algorithm */
+    if (srv_req_count(s) == 2) CHECK(REQ_AUTH(s, 1) == NULL);
     srv_stop(s);
 }
 

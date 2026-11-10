@@ -204,10 +204,11 @@ int gate_fn(srv_conn *c, const srv_step *st, void *user) {
     }
     return -1;
 }
-srv *gate_start(gate *g) {
+srv *gate_start(gate *g) { return gate_start_kind(g, SRV_HTTP); }
+srv *gate_start_kind(gate *g, int kind) {
     static const srv_step st[] = { S_CALL(gate_fn) };
     static const srv_script sc[] = { SRV_SCRIPT(st) };
-    srv_config cfg = { SRV_HTTP, sc, 1 }; cfg.user = g; cfg.lifetime_ms = 30000;
+    srv_config cfg = { (srv_kind)kind, sc, 1 }; cfg.user = g; cfg.lifetime_ms = 30000;
     srv *s = NULL; if (srv_start(&cfg, &s)) return NULL; return s;
 }
 

@@ -54,6 +54,7 @@ TEST(auth_ntlm_type1_structure) {
         EXPECT_EQ(g32(t + 8), 1);
         unsigned fl = g32(t + 12);
         t_note("type1: %zu bytes flags=0x%08x", n, fl);
+        EXPECT_EQ(n, 40); EXPECT_EQ(fl, 0xa2088207u);   /* Win10 VM, explicit credentials */
         CHECK(fl & 0x00000001);   /* NEGOTIATE_UNICODE */
         CHECK(fl & 0x00000200);   /* NEGOTIATE_NTLM */
         CHECK(fl & 0x00000004);   /* REQUEST_TARGET */
@@ -82,6 +83,9 @@ TEST(auth_ntlm_type3_structure) {
             unsigned lml = g16(t + 12), ntl = g16(t + 20), fl = g32(t + 60);
             t_note("type3: %zu bytes lm=%u nt=%u flags=0x%08x domain=[%s] ws=[%s]", n, lml, ntl, fl, g.ntlm_domain, g.ntlm_ws);
             CHECK(ntl > 24);                  /* NTLMv2 response (16-byte proof + blob) */
+            EXPECT_EQ(lml, 24);               /* Win10 VM */
+            EXPECT_EQ(fl, 0xa2888205u);       /* Win10 VM, answering NTLM_T2_FLAGS 0xE2898215 */
+            char cn[64]; DWORD cl = sizeof cn; if (GetComputerNameA(cn, &cl)) { EXPECT_STR(g.ntlm_domain, cn); EXPECT_STR(g.ntlm_ws, cn); }
             CHECK(fl & 0x00000001);           /* unicode strings */
             /* blob: 0x0101 0000, reserved, timestamp, client challenge */
             unsigned nto = g32(t + 24);
@@ -112,6 +116,7 @@ TEST(auth_ntlm_upn_user) {
     areq q = {0}; q.cuser = "i7user@i7dom.test"; q.cpass = "pw"; ares r; a_once(s, &q, &r);
     t_note("UPN user: status=%lu user=[%s] domain=[%s] v2ok=%d", r.status, g.ntlm_user, g.ntlm_domain, g.ntlm_v2_ok);
     EXPECT_EQ(r.status, 200);
+    EXPECT_STR(g.ntlm_user, "i7user@i7dom.test"); EXPECT_STR(g.ntlm_domain, "");   /* Win10 VM */
     EXPECT_EQ(g.ntlm_v2_ok, 1);
     srv_stop(s);
 }
@@ -165,6 +170,9 @@ TEST(auth_ntlm_post_body) {
         t_note("ntlm POST leg %d: Content-Length=%s body=%zu", i, srv_req_header(s, i, "Content-Length") ? srv_req_header(s, i, "Content-Length") : "(none)", b ? bl : 0);
     }
     if (n >= 1) { size_t bl; const char *b = srv_req_body(s, n - 1, &bl); CHECK(b && bl == 10 && !memcmp(b, "0123456789", 10)); }
+    /* Win10 VM: the type-1 leg is sent with Content-Length: 0 and no body; the anonymous and type-3 legs carry it */
+    EXPECT_EQ(n, 3);
+    if (n == 3) { EXPECT_STR(srv_req_header(s, 0, "Content-Length"), "10"); EXPECT_STR(srv_req_header(s, 1, "Content-Length"), "0"); EXPECT_STR(srv_req_header(s, 2, "Content-Length"), "10"); }
     srv_stop(s);
 }
 
@@ -181,6 +189,10 @@ TEST(auth_ntlm_second_request_same_connection) {
     t_note("second NTLM request: status=%lu, %d more requests, first auth=%.20s", r.status, srv_req_count(s) - before,
            REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
     EXPECT_EQ(r.status, 200);
+    /* Win10 VM: the second request starts anonymously again and runs the full handshake on the same connection */
+    EXPECT_EQ(srv_req_count(s) - before, 3);
+    CHECK(REQ_AUTH(s, before) == NULL);
+    if (srv_req_count(s) >= before + 3) { EXPECT_EQ(srv_req_conn(s, before), srv_req_conn(s, 0)); CHECK(!strncmp(REQ_AUTH(s, before + 1), "NTLM TlRMTVNTUAAB", 17)); }
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -192,6 +204,7 @@ TEST(auth_ntlm_challenge_queryable_without_creds) {
     areq q = {0}; ares r; a_send(hc, &q, &r, 1);
     a_dump(s);
     t_note("NTLM challenge, no explicit creds: status=%lu requests=%d (default-credential policy decides)", r.status, srv_req_count(s));
+    EXPECT_EQ(r.status, 401); EXPECT_EQ(srv_req_count(s), 1);   /* 127.0.0.1: no automatic logon (Win10 VM) */
     char b[128]; DWORD idx = 0;
     if (r.status == 401) { CHECK(a_query(r.hr, HTTP_QUERY_WWW_AUTHENTICATE, &idx, b, sizeof b)); }
     a_close(r.hr); a_close(hc); t_inet_close(hi); srv_stop(s);
@@ -228,7 +241,10 @@ TEST(auth_ntlm_sspi_server_default_creds_localhost) {
     for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_AUTH) t_note("sspi (localhost, default creds): %s", ev[i].data);
     t_note("localhost default creds: ok=%d status=%lu body=%s requests=%d", r.ok, r.status, r.body, srv_req_count(s));
     CHECK(r.ok);
-    CHECK(r.status == 200 || r.status == 401);
+    /* Win10 VM (default zones): "localhost" is Local Intranet -> automatic logon with the process token */
+    EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "ntlm-ok"); EXPECT_EQ(srv_req_count(s), 3);
+    EXPECT_EQ(srv_count_events(s, SRV_EV_AUTH), 1);
+    for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_AUTH) CHECKF(!strncmp(ev[i].data, "ok ", 3), "%s", ev[i].data);
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -242,7 +258,8 @@ TEST(auth_ntlm_sspi_server_default_creds_ip) {
     for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_AUTH) t_note("sspi (127.0.0.1, default creds): %s", ev[i].data);
     t_note("127.0.0.1 default creds: ok=%d status=%lu requests=%d", r.ok, r.status, srv_req_count(s));
     CHECK(r.ok);
-    CHECK(r.status == 200 || r.status == 401);
+    /* Win10 VM (default zones): 127.0.0.1 is not Local Intranet -> no automatic logon, the 401 goes to the caller */
+    EXPECT_EQ(r.status, 401); EXPECT_EQ(srv_req_count(s), 1);
     srv_stop(s);
 }
 
@@ -255,8 +272,8 @@ TEST(auth_negotiate_sspi_server_first_token) {
     const srv_event *ev; int ne = srv_events(s, &ev);
     for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_AUTH) t_note("sspi negotiate: %s", ev[i].data);
     t_note("negotiate: ok=%d status=%lu requests=%d", r.ok, r.status, srv_req_count(s));
-    CHECK(r.ok);
-    CHECK(srv_req_count(s) >= 2);
+    CHECK(r.ok); EXPECT_EQ(r.status, 401);   /* unknown account rejected by the local SAM */
+    EXPECT_EQ(srv_req_count(s), 3);
     CHECK(REQ_AUTH(s, 0) == NULL);
     if (srv_req_count(s) >= 2) {
         const char *a = REQ_AUTH(s, 1);
@@ -282,5 +299,8 @@ TEST(auth_negotiate_challenge_with_custom_ntlm_gate_scheme_choice) {
     const char *a = srv_req_count(s) >= 2 ? REQ_AUTH(s, 1) : NULL;
     t_note("Negotiate+NTLM offered: status=%lu first scheme=%.12s", r.status, a ? a : "(none)");
     CHECK(r.ok);
+    /* Win10 VM: Negotiate is preferred; on a workgroup machine with explicit creds the token is a raw NTLMSSP type 1 */
+    CHECK(a && !strncmp(a, "Negotiate TlRMTVNTUAAB", 22));
+    EXPECT_EQ(r.status, 401);   /* the custom gate only verifies the NTLM scheme */
     srv_stop(s);
 }
