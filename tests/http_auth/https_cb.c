@@ -104,3 +104,30 @@ TEST(auth_callback_sequence_basic_retry) {
     U(InternetSetStatusCallbackA)(hi, NULL);
     t_inet_close(hi); srv_stop(s);
 }
+
+/* ------------------------------------------------------------------ async session */
+static HANDLE g_async_ev; static volatile DWORD g_async_res, g_async_err;
+static void CALLBACK async_cb(HINTERNET h, DWORD_PTR ctx, DWORD st, LPVOID info, DWORD len) {
+    if (st == INTERNET_STATUS_REQUEST_COMPLETE && ctx == 7) {
+        INTERNET_ASYNC_RESULT *ar = info; g_async_res = (DWORD)ar->dwResult; g_async_err = ar->dwError; SetEvent(g_async_ev);
+    }
+}
+TEST(auth_async_basic_retry) {
+    REQUIRE(U(InternetSetStatusCallbackA));
+    gate g = {0}; g.challenge = CH_BASIC; g.accept[0] = a_basic("as", "ap");
+    srv *s = gate_start(&g); SRV_OR_SKIP(s);
+    g_async_ev = CreateEventA(NULL, FALSE, FALSE, NULL);
+    HINTERNET hi = t_inet_open_ex("i7async", INTERNET_OPEN_TYPE_DIRECT, INTERNET_FLAG_ASYNC, 5000);
+    U(InternetSetStatusCallbackA)(hi, async_cb);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), "as", "ap", INTERNET_SERVICE_HTTP, 0, 7);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/async", NULL, NULL, NULL, T_INET_FRESH, 7);
+    SET_ERR(0);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    DWORD e = ok ? 0 : GetLastError();
+    if (!ok) { EXPECT_EQ(e, ERROR_IO_PENDING); CHECK(WaitForSingleObject(g_async_ev, 8000) == WAIT_OBJECT_0); EXPECT_EQ(g_async_res, 1); }
+    EXPECT_EQ(a_status(hr), 200);
+    EXPECT_EQ(srv_req_count(s), 2);
+    if (srv_req_count(s) >= 2) EXPECT_STR(REQ_AUTH(s, 1), a_basic("as", "ap"));
+    U(InternetSetStatusCallbackA)(hi, NULL);
+    a_close(hr); a_close(hc); a_close(hi); CloseHandle(g_async_ev); srv_stop(s);
+}
