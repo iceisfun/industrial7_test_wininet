@@ -75,8 +75,8 @@ and 500000 bytes both moved the next request to a new connection), Content-Lengt
 Content-Length query results in `bio_clv_*`, corrupt gzip streams in `bio_dec_corrupt_*`, receive-timeout probes with
 the timeout set before InternetConnect (boot 2: 400 ms and 1000 ms did not cut a 2.5 s stall either), seek past the
 end, HTTPS + decoding (`bio_d2_https_*`: HttpSendRequest failed with 12030 in some boots and not in others, varying
-between the variants - not understood, kept as notes), raw deflate read 1 byte per call (boot 3: 820 of 900 bytes,
-clean end).
+between the variants - not understood; HTTPS sends now retry once on 12030 and note it), raw deflate read in tiny
+pieces (boots 3-4: 1-byte reads end cleanly after 820 of 900 bytes, 7-byte reads after 826, prefix correct).
 
 ## Boots
 
@@ -85,3 +85,4 @@ clean end).
 | 1 | `wininet-bio-20261110-050214-b1` | 329/496 tests before the 780 s cap (srv_stop waited 3 s per test); failures triaged above |
 | 2 | `wininet-bio2-20261110-055254-b1` | 499 tests in 166 s, 13 failed (decoding labels, seek, clv, https probe); triaged |
 | 3 | `wininet-bio3-20261110-073759-b1` | 507 tests in 176 s, 1 failed (raw deflate 1-byte reads, now a note) |
+| 4 | `wininet-bio4-20261110-091404-b1` | 508 tests in 186 s, 1 failed: `bio_https_by_1` send 12030 (passed in boots 2-3) -> HTTPS sends retry once on 12030 with a note (`bio_https_get`) |

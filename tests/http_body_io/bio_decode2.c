@@ -556,10 +556,8 @@ static void https_dec_probe(int where, const void *body, size_t blen, size_t pla
     HINTERNET hi = t_inet_open(NULL);
     if (where == 1) CHECK(bio_set_dword(hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
-    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/s", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
-    if (where == 2) CHECK(bio_set_dword(hr, INTERNET_OPTION_HTTP_DECODING, TRUE));
-    t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
-    BOOL ok = U(HttpSendRequestA)(hr, AE_GD, (DWORD)-1, NULL, 0); DWORD err = ok ? 0 : GetLastError();
+    BOOL ok; DWORD err;
+    HINTERNET hr = bio_https_get(hc, "/s", where == 2, AE_GD, &ok, &err);
     size_t cap = plain_n + blen + 70000;
     unsigned char *b = malloc(cap); bio_rd r; memset(&r, 0, sizeof r); size_t n = ok ? bio_read(hr, b, cap, 7000, &r) : 0;
     t_note("%s: send ok=%d err=%lu %s; read ok=%d err=%lu n=%u", tag, ok, err, t_inet_errname(err), r.ok, r.err, (unsigned)n);

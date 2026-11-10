@@ -179,6 +179,21 @@ DWORD bio_qda(HINTERNET h, DWORD *err) {
 
 int bio_set_dword(HINTERNET h, DWORD opt, DWORD v) { return U(InternetSetOptionA)(h, opt, &v, sizeof v); }
 
+HINTERNET bio_https_get(HINTERNET hc, const char *path, int req_decoding, const char *hdrs, BOOL *ok, DWORD *err) {
+    HINTERNET hr = NULL;
+    for (int attempt = 0; attempt < 2; attempt++) {
+        hr = U(HttpOpenRequestA)(hc, "GET", path, NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
+        if (!hr) { *ok = FALSE; *err = GetLastError(); return NULL; }
+        if (req_decoding) CHECK(bio_set_dword(hr, INTERNET_OPTION_HTTP_DECODING, TRUE));
+        t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
+        *ok = U(HttpSendRequestA)(hr, hdrs, hdrs ? (DWORD)-1 : 0, NULL, 0); *err = *ok ? 0 : GetLastError();
+        if (*ok || *err != ERROR_INTERNET_CONNECTION_ABORTED || attempt) break;
+        t_note("https send %s: 12030 on the first attempt, retrying once (environment, see bio.h)", path);
+        bio_h(hr); hr = NULL;
+    }
+    return hr;
+}
+
 unsigned char *bio_pattern(size_t n) {
     unsigned char *p = malloc(n ? n : 1);
     for (size_t i = 0; i < n; i++) p[i] = srv_pattern_byte(i);

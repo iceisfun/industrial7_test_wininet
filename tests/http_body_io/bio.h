@@ -54,6 +54,10 @@ const char *bio_custom(HINTERNET h, const char *name, char *buf, DWORD cap, DWOR
 DWORD bio_qda(HINTERNET h, DWORD *err);
 int  bio_set_dword(HINTERNET h, DWORD opt, DWORD v);
 
+/* HTTPS GET on hc (IGNORE_UNKNOWN_CA, optional request-level HTTP_DECODING, optional headers). Win10 VM boots 2-4:
+ * an HTTPS send to a fresh loopback server failed now and then with 12030 (CONNECTION_ABORTED) in tests that pass in
+ * other boots, so a 12030 is noted and the request is retried once on a new request handle. */
+HINTERNET bio_https_get(HINTERNET hc, const char *path, int req_decoding, const char *hdrs, BOOL *ok, DWORD *err);
 unsigned char *bio_pattern(size_t n);             /* malloc'd srv_pattern_byte(0..n-1) */
 int  bio_sha256(const void *p, size_t n, unsigned char out[32]); /* advapi32 CryptoAPI scaffolding; 1 ok */
 #endif

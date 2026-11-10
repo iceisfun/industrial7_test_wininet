@@ -381,10 +381,9 @@ static void https_case(size_t n, unsigned flags, DWORD piece) {
     if (!s) { t_skip("https server unavailable: %s", srv_strerror(srv_last_error())); return; }
     HINTERNET hi = t_inet_open(NULL);
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
-    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/s", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
-    t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
-    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
-    CHECKF(ok, "https send err=%lu %s", GetLastError(), t_inet_errname(GetLastError()));
+    BOOL ok; DWORD err;
+    HINTERNET hr = bio_https_get(hc, "/s", 0, NULL, &ok, &err);
+    CHECKF(ok, "https send err=%lu %s", err, t_inet_errname(err));
     unsigned char *b = malloc(n + 16); bio_rd r; size_t got = ok ? bio_read(hr, b, n + 16, piece, &r) : 0;
     if (ok) { CHECKF(r.ok, "err=%lu", r.err); EXPECT_EQ(got, n); CHECK(srv_pattern_check(b, got < n ? got : n, 0)); }
     free(b); bio_h(hr); bio_h(hc); t_inet_close(hi); srv_stop(s);
