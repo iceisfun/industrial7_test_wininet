@@ -188,16 +188,6 @@ TEST(hrw_conn_max_conns_default_value) {
     CHECK(v >= 2); CHECK(v10 >= 2);
 }
 
-typedef struct { HINTERNET hc; const char *path; volatile LONG done; BOOL ok; } bg_req;
-static DWORD WINAPI bg_send(void *p) {
-    bg_req *b = (bg_req *)p;
-    HINTERNET hr = U(HttpOpenRequestA)(b->hc, "GET", b->path, NULL, NULL, NULL, HRW_F, 0);
-    b->ok = hr && U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
-    if (b->ok) { char buf[256]; t_inet_read_all(hr, buf, sizeof buf, NULL); }
-    if (hr) U(InternetCloseHandle)(hr);
-    InterlockedExchange(&b->done, 1);
-    return 0;
-}
 /* MAX_CONNS_PER_SERVER is a global option: on a session handle the set is refused with 12016. */
 TEST(hrw_conn_max_conns_session_set_refused) {
     REQUIRE(U(InternetSetOptionA));
@@ -208,38 +198,7 @@ TEST(hrw_conn_max_conns_session_set_refused) {
     EXPECT_ERR(ERROR_INTERNET_INVALID_OPERATION);
     t_inet_close(hi);
 }
-/* Default limit (2 per HTTP/1.1 server): a third concurrent request is not put on the wire while two connections are
- * busy with unread bodies; it goes out once one of them is drained and released. */
-GTEST(hrw_conn_third_request_waits_for_free_connection, 25000) {
-    HRW_REQUIRE_HTTP();
-    static const srv_step st_[] = { S_HEAD(), S_BODY(), S_REPLY_PATTERN(200, NULL, 200000, 0), S_LOOP() };
-    srv *s = hrw_srv_steps_io(st_, 4, 5000); if (!s) { t_skip("server unavailable"); return; }
-    DWORD lim = 0; hrw_get_dword_opt(NULL, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &lim);
-    if (lim != 2) { t_skip("MAX_CONNS_PER_SERVER is %lu, not the default 2", lim); srv_stop(s); return; }
-    HINTERNET hi = t_inet_open("mc/1"), hc = connect_to(hi, s);
-    HINTERNET h1 = U(HttpOpenRequestA)(hc, "GET", "/hold1", NULL, NULL, NULL, HRW_F, 0);
-    HINTERNET h2 = U(HttpOpenRequestA)(hc, "GET", "/hold2", NULL, NULL, NULL, HRW_F, 0);
-    CHECK(U(HttpSendRequestA)(h1, NULL, 0, NULL, 0));
-    CHECK(U(HttpSendRequestA)(h2, NULL, 0, NULL, 0));
-    bg_req b = { hc, "/third", 0, FALSE };
-    HANDLE th = CreateThread(NULL, 0, bg_send, &b, 0, NULL);
-    Sleep(1000);
-    int during = srv_req_count(s), conns_during = srv_conn_count(s);
-    t_note("two bodies unread: requests=%d conns=%d third_done=%ld", during, conns_during, b.done);
-    EXPECT_EQ(during, 2);
-    EXPECT_EQ(conns_during, 2);
-    EXPECT_EQ(b.done, 0);
-    char *buf = malloc(300000); t_inet_read_all(h1, buf, 300000, NULL); free(buf);
-    U(InternetCloseHandle)(h1);
-    if (th) { CHECK(WaitForSingleObject(th, 8000) == WAIT_OBJECT_0); CloseHandle(th); }
-    CHECK(b.ok);
-    CHECK(srv_wait_requests(s, 3, 3000));
-    EXPECT_STR(srv_req_line(s, 2), "GET /third HTTP/1.1");
-    t_note("after draining the first: conns=%d third on conn %d (first on %d)", srv_conn_count(s), srv_req_conn(s, 2), srv_req_conn(s, 0));
-    EXPECT_EQ(srv_req_conn(s, 2), srv_req_conn(s, 0));
-    U(InternetCloseHandle)(h2);
-    U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
-}
+/* the third-request-waits case runs in a fresh process: wire_child.c hrw_child_limit_third_request_waits */
 /* With the default limit two outstanding requests use two connections. */
 TEST(hrw_conn_default_limit_allows_two) {
     HRW_REQUIRE_HTTP();

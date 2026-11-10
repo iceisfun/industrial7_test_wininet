@@ -30,7 +30,8 @@ measured this: each sending test cost exactly about 3.0 s, while a test that nev
 appears in other areas, for example http_auth (146 tests in 458 s).
 
 This area works around it: its servers use `io_timeout_ms = 1000` (`HRW_IO_MS`, `hrw_srv_cfg`). Tests that hold
-unread 200 KB bodies keep 5000 ms. The proper fix belongs in `common/srv_core.c` `kill_conns`: close the socket
+unread 200 KB bodies keep 5000 ms. Boot C2 shows the effect: the area went from about 3 s per test to about 1 s, and
+`hrw_zz_phase_timing` measured `srv_stop=1000` with every client phase near 0 ms. The proper fix belongs in `common/srv_core.c` `kill_conns`: close the socket
 instead of calling `shutdown`, as `srv_stop` already does after its deadline. That fix is for the foundation role.
 
 ## Default request (V, boots 1, 2, C1; D for UA/Host/Content-Length)
@@ -73,6 +74,9 @@ instead of calling `shutdown`, as `srv_stop` already does after its deadline. Th
   - Bytes of 0x80 and above are sent raw, with no escaping (boot C1).
   - The W object name is UTF-8, sent raw (D `HttpOpenRequestW@0xbea10` UTF-8, V raw).
 - InternetOpenUrl keeps a URL fragment in the request-target (boot C1).
+- `HttpOpenRequestW` with a non-empty referer, ASCII or not, succeeds, but `HttpSendRequest` on that handle fails
+  with **87** and nothing reaches the wire. This was seen in boots C1 and C2, in two tests each. An empty W referer
+  works, and so does the A entry point with the same referer.
 
 ## Caller strings (V boot C1)
 - A CR/LF inside the agent (InternetOpen), the referer, or an accept type cuts the string at the CR. No header can be
@@ -116,8 +120,10 @@ instead of calling `shutdown`, as `srv_stop` already does after its deadline. Th
   with framing included.
 - `Expect: 100-continue` from the caller is sent as given. A server that never sends 100 still gets the body.
 - `HttpEndRequest` without `HttpSendRequestEx` gives 12017. `InternetWriteFile` before the send gives 12019.
-- A POST re-sent on the same handle carries the first `lpOptional` data again (boot C1). With new optional data,
-  Content-Length is 3, not 6, and the body is the first one.
+- A POST re-sent on the same handle keeps the first send's **Content-Length** (boots C1 and C2).
+  - With new optional data `"second"`, the head says `Content-Length: 3`, and a length-honouring server reads `sec`.
+  - Without optional data, `Content-Length: 5` goes out with no body. The send then fails: in C2, 12152 after the
+    server's I/O timeout.
 
 ## Connections (V)
 - Keep-alive:
@@ -140,6 +146,11 @@ instead of calling `shutdown`, as `srv_stop` already does after its deadline. Th
 ## Proxy (V)
 - The request-target is absolute: `GET http://host[:port]/p HTTP/1.1`, with IPv6 hosts bracketed. Host carries a
   port only when it is not the default.
+- The host in the request-target is lower-cased, while the Host header keeps the caller casing.
+- An IDN host given to `InternetConnectW` goes out as punycode (`xn--bcher-kva...`) in both (boot C2).
+- One proxy connection serves several origins.
+- `INTERNET_OPEN_TYPE_PROXY` with a bypass list (`127.0.0.1` or `127.0.0.*`) sends matching hosts direct, in origin
+  form. Other hosts go through the proxy (C2).
 - With RELOAD the header set is `User-Agent|Host|Pragma: no-cache`. There is no Cache-Control and no
   Proxy-Connection on GET.
 - HTTPS gives `CONNECT host:443 HTTP/1.0` with the headers
@@ -167,6 +178,8 @@ instead of calling `shutdown`, as `srv_stop` already does after its deadline. Th
 parses a caller-supplied value (gzip, deflate, br) to decide what to decode. A caller value is sent once, unchanged.
 
 ## Observations kept as notes (not hard checks)
-- The UA when the session agent is changed after the request handle exists: boot 2 showed the first agent.
-- Header names with an inner space, and the IDN host through a proxy.
+- Changing the session agent after the request handle exists is now a hard check: the agent is taken at
+  HttpOpenRequest time (V boots 2 and C2).
+- The send error after a stale Content-Length depends on the server timeout, so only `!ok` is checked.
+- The stored W referer value (`hrw_ref2_w_*`).
 - The timing probe `hrw_zz_phase_timing`.
