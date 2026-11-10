@@ -11,6 +11,8 @@
  * VM_TIMEOUT: 180 */
 #include "pc.h"
 #include <stdlib.h>
+void pc_dup_probe(const char *where);
+TEST(pc_opt2_dup_probe_after_options) { pc_dup_probe("opt2-last"); }
 
 #ifndef INTERNET_OPTION_REFRESH
 #define INTERNET_OPTION_REFRESH 37
@@ -79,17 +81,26 @@ TEST(pc_opt2_proxy_readback_normalised) {
 /* whitespace and empty list elements: recorded as observed */
 TEST(pc_opt2_proxy_readback_whitespace) {
     REQUIRE(U(InternetOpenA));
-    static const char *in[] = { " x.invalid:1", "x.invalid:1 ", "  x.invalid:1  ", "x.invalid:1;", ";x.invalid:1", "x.invalid:1;;y.invalid:2",
-                                "x.invalid:1\ty.invalid:2", "http= x.invalid:1", "http =x.invalid:1", "x.invalid :1" };
-    for (size_t i = 0; i < sizeof in / sizeof in[0]; i++) {
+    /* Win10 boot 4: the string is stored verbatim (no trimming); only ';' and ',' become ' ' on read-back.
+     * "http =x" (blank before '=') is rejected by InternetOpen with ERROR_INVALID_PARAMETER. */
+    static const struct { const char *in, *want; } t[] = {
+        { " x.invalid:1", " x.invalid:1" }, { "x.invalid:1 ", "x.invalid:1 " }, { "  x.invalid:1  ", "  x.invalid:1  " },
+        { "x.invalid:1;", "x.invalid:1 " }, { ";x.invalid:1", " x.invalid:1" }, { "x.invalid:1;;y.invalid:2", "x.invalid:1  y.invalid:2" },
+        { "x.invalid:1\ty.invalid:2", "x.invalid:1\ty.invalid:2" }, { "http= x.invalid:1", "http= x.invalid:1" },
+        { "http =x.invalid:1", NULL }, { "x.invalid :1", "x.invalid :1" } };
+    for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         SetLastError(0xdeadbeef);
-        HINTERNET h = U(InternetOpenA)("pc", INTERNET_OPEN_TYPE_PROXY, in[i], NULL, 0);
+        HINTERNET h = U(InternetOpenA)("pc", INTERNET_OPEN_TYPE_PROXY, t[i].in, NULL, 0);
         DWORD e = GetLastError();
-        if (!h) { t_note("OBS open proxy \"%s\" -> NULL err %lu", in[i], e); continue; }
+        if (!t[i].want) { CHECKF(!h && e == ERROR_INVALID_PARAMETER, "\"%s\": h %p err %lu", t[i].in, h, e); if (h) U(InternetCloseHandle)(h); continue; }
+        if (!h) { CHECKF(0, "open proxy \"%s\" -> NULL err %lu", t[i].in, e); continue; }
         char buf[1024]; INTERNET_PROXY_INFO *pi = NULL;
         DWORD l = readback(h, buf, sizeof buf, &pi);
-        t_note("OBS open proxy \"%s\" -> \"%s\" len %lu", in[i], l ? s_or(pi->lpszProxy) : "(query failed)", l);
         CHECK(l != 0);
+        if (l) {
+            CHECKF(pi->lpszProxy && !strcmp((const char *)pi->lpszProxy, t[i].want), "\"%s\": got \"%s\"", t[i].in, s_or(pi->lpszProxy));
+            EXPECT_EQ(l, 24 + 2 * (strlen(t[i].want) + 1));
+        }
         U(InternetCloseHandle)(h);
     }
 }
@@ -186,8 +197,9 @@ TEST(pc_opt2_proxy_query_partial_buffer_named) {
         /* observed: which of the caller's bytes were touched */
         int z = 0; while (z < 128 && buf[z] == 0) z++;
         int last = -1; for (int k = 0; k < 128; k++) if (buf[k] != 0xcc) last = k;
-        t_note("OBS partial len %lu: leading zero bytes %d, last touched byte %d", lens[i], z, last);
-        CHECKF(last < (int)lens[i], "len %lu: wrote byte %d past the buffer", lens[i], last);
+        /* decomp + boot 4: the first min(len, 24) bytes (the struct) are zeroed, nothing else is written */
+        int want = lens[i] < 24 ? (int)lens[i] : 24;
+        CHECKF(z == want && last == want - 1, "len %lu: zeroed %d last %d want %d", lens[i], z, last, want);
     }
     U(InternetCloseHandle)(h);
 }
@@ -203,8 +215,8 @@ TEST(pc_opt2_proxy_query_partial_buffer_direct) {
         CHECK(!U(InternetQueryOptionA)(h, INTERNET_OPTION_PROXY, buf, &l));
         EXPECT_EQ(l, 24);
         int last = -1; for (int k = 0; k < 64; k++) if (buf[k] != 0xcc) last = k;
-        t_note("OBS direct partial len %lu: last touched byte %d", lens[i], last);
-        CHECKF(last < (int)lens[i], "len %lu: wrote past the buffer", lens[i]);
+        int z = 0; while (z < 64 && buf[z] == 0) z++;
+        CHECKF(last == (int)lens[i] - 1 && z == (int)lens[i], "len %lu: zeroed %d last %d", lens[i], z, last);   /* boot 4: buffer zeroed */
     }
     /* larger than needed: len is set to 24 */
     char big[100]; DWORD l = sizeof big;
@@ -238,11 +250,11 @@ TEST(pc_opt2_proxy_query_closed_handle) {
     DWORD e = GetLastError();
     t_note("OBS query PROXY on closed session -> %d err %lu", ok, e);
     CHECK(!ok);
-    CHECK(e == ERROR_INVALID_HANDLE || e == ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
+    EXPECT_EQ(e, ERROR_INVALID_HANDLE);
     INTERNET_PROXY_INFO pi = { INTERNET_OPEN_TYPE_DIRECT, NULL, NULL };
     SetLastError(0xdeadbeef);
     CHECK(!U(InternetSetOptionA)(h, INTERNET_OPTION_PROXY, &pi, sizeof pi));
-    t_note("OBS set PROXY on closed session -> err %lu", GetLastError());
+    EXPECT_ERR(ERROR_INVALID_HANDLE);
 }
 
 TEST(pc_opt2_proxy_on_ftp_and_url_handles) {
@@ -275,7 +287,7 @@ TEST(pc_opt2_set_proxy_preconfig_on_session) {
            l ? s_or(q->lpszProxy) : "-", l);
     /* decomp: access 0 passes the argument check (only bits above 3, 2, and 3 without a proxy are rejected) */
     CHECK(ok);
-    if (ok && l && !reg_proxy_enable2()) EXPECT_EQ(q->dwAccessType, INTERNET_OPEN_TYPE_DIRECT);
+    if (ok && l && !reg_proxy_enable2()) { EXPECT_EQ(q->dwAccessType, INTERNET_OPEN_TYPE_DIRECT); EXPECT_EQ(l, 24); EXPECT_EQ(q->lpszProxy, NULL); }
     U(InternetCloseHandle)(h);
 }
 
@@ -387,6 +399,7 @@ TEST(pc_opt2_proxy_creds_empty_and_overwrite) {
     l = sizeof out; memset(out, 'x', sizeof out);
     BOOL q = U(InternetQueryOptionA)(r, INTERNET_OPTION_PROXY_PASSWORD, out, &l);
     t_note("OBS after empty set: query %d len %lu out0 %d", q, l, out[0]);
+    CHECK(ok); CHECK(q);
     if (ok && q) { EXPECT_EQ(l, 0); EXPECT_EQ(out[0], 0); }
     /* username and password are independent */
     CHECK(U(InternetSetOptionA)(r, INTERNET_OPTION_PROXY_USERNAME, "uu", 3));
@@ -407,10 +420,13 @@ TEST(pc_opt2_proxy_creds_length_arg) {
         char out[64] = { 0 }; DWORD l = sizeof out;
         BOOL q = U(InternetQueryOptionA)(r, INTERNET_OPTION_PROXY_USERNAME, out, &l);
         t_note("OBS set PROXY_USERNAME \"abcdef\" len %lu -> %d err %lu; read \"%s\" (%lu) q=%d", lens[i], ok, e, out, l, q);
+        /* boot 4: length 0 -> ERROR_INVALID_PARAMETER; any other length stores the whole NUL-terminated string */
+        if (!lens[i]) CHECKF(!ok && e == ERROR_INVALID_PARAMETER, "len 0: ok %d err %lu", ok, e);
+        else { CHECK(ok); CHECK(q); EXPECT_STR(out, "abcdef"); EXPECT_EQ(l, 6); }
     }
     SetLastError(0xdeadbeef);
     BOOL ok = U(InternetSetOptionA)(r, INTERNET_OPTION_PROXY_USERNAME, NULL, 0);
-    t_note("OBS set PROXY_USERNAME NULL/0 -> %d err %lu", ok, GetLastError());
+    CHECK(!ok); EXPECT_ERR(ERROR_INVALID_PARAMETER);
     close3(r, c, h);
 }
 
@@ -429,6 +445,7 @@ TEST(pc_opt2_proxy_creds_request_inherits_connect) {
         BOOL b = U(InternetQueryOptionA)(r, INTERNET_OPTION_PROXY_PASSWORD, p, &lp);
         t_note("OBS request after connect-level proxy creds: user %d \"%s\" (%lu) pass %d \"%s\" (%lu)", a, u, lu, b, p, lp);
         CHECK(a); CHECK(b);
+        EXPECT_STR(u, "cu"); EXPECT_STR(p, "cp");   /* boot 4: copied from the connect handle at HttpOpenRequest */
         /* request-level set does not change the connect handle */
         CHECK(U(InternetSetOptionA)(r, INTERNET_OPTION_PROXY_USERNAME, "ru", 3));
         char cu[32]; DWORD lc = sizeof cu;
@@ -544,6 +561,8 @@ TEST(pc_opt2_perconn_dwsize_variants) {
         DWORD l = sizeof lst; SetLastError(0xdeadbeef);
         BOOL ok = U(InternetQueryOptionA)(NULL, INTERNET_OPTION_PER_CONNECTION_OPTION, &lst, &l);
         t_note("OBS perconn list.dwSize 0x%lx -> %d err %lu value 0x%lx l %lu", sizes[i], ok, ok ? 0 : GetLastError(), o.Value.dwValue, l);
+        CHECKF(ok, "dwSize 0x%lx rejected", sizes[i]);      /* boot 4: dwSize is not validated */
+        if (ok) { CHECK(o.Value.dwValue & PROXY_TYPE_DIRECT); EXPECT_EQ(l, 0x20); }
     }
 }
 
@@ -556,8 +575,10 @@ TEST(pc_opt2_perconn_named_connection) {
     BOOL ok = U(InternetQueryOptionA)(NULL, INTERNET_OPTION_PER_CONNECTION_OPTION, &lst, &l);
     t_note("OBS perconn connection \"%s\" -> %d err %lu FLAGS 0x%lx server %s", conn, ok, ok ? 0 : GetLastError(),
            ok ? o[0].Value.dwValue : 0, ok && o[1].Value.pszValue ? o[1].Value.pszValue : "(null)");
+    CHECK(ok);   /* boot 4: an unknown connectoid name is accepted (FLAGS 0x1, no server) */
     if (ok) {
         CHECK(o[0].Value.dwValue & PROXY_TYPE_DIRECT);
+        if (!reg_proxy_enable2()) EXPECT_EQ(o[1].Value.pszValue, NULL);
         if (o[1].Value.pszValue) GlobalFree(o[1].Value.pszValue);
     }
 }
@@ -589,7 +610,7 @@ TEST(pc_opt2_perconn_set_bad_args_on_null_handle) {
         BOOL ok = U(InternetSetOptionA)(NULL, INTERNET_OPTION_PER_CONNECTION_OPTION, &lst, lens[i]);
         DWORD e = GetLastError();
         CHECKF(!ok, "len %lu accepted", lens[i]);
-        t_note("OBS set perconn NULL handle len %lu -> err %lu", lens[i], e);
+        if (!lens[i]) EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
         if (lens[i]) CHECKF(e == ERROR_INTERNET_BAD_OPTION_LENGTH, "len %lu err %lu", lens[i], e);
     }
 }
@@ -612,6 +633,7 @@ TEST(pc_opt2_refresh_on_null_and_session) {
         SetLastError(0xdeadbeef);
         BOOL ok = U(InternetSetOptionA)(h, INTERNET_OPTION_REFRESH, NULL, 0);
         t_note("OBS REFRESH on PROXY session -> %d err %lu", ok, GetLastError());
+        CHECK(ok);
         /* the session keeps its own proxy */
         char buf[128]; INTERNET_PROXY_INFO *q = NULL; DWORD l = readback(h, buf, sizeof buf, &q);
         if (l) EXPECT_STR((const char *)q->lpszProxy, "127.0.0.1:3128");
@@ -641,7 +663,7 @@ TEST(pc_opt2_settings_changed_options) {
     if (h) {
         SetLastError(0xdeadbeef);
         ok = U(InternetSetOptionA)(h, INTERNET_OPTION_SETTINGS_CHANGED, NULL, 0);
-        t_note("OBS SETTINGS_CHANGED on a session -> %d err %lu", ok, GetLastError());
+        CHECK(ok);
         U(InternetCloseHandle)(h);
     }
     /* these are set-only */
@@ -650,8 +672,8 @@ TEST(pc_opt2_settings_changed_options) {
         char b[16]; DWORD l = sizeof b; SetLastError(0xdeadbeef);
         BOOL q = U(InternetQueryOptionA)(NULL, so[i], b, &l);
         DWORD e = GetLastError();
-        t_note("OBS query set-only option %lu -> %d err %lu", so[i], q, e);
         CHECK(!q);
+        CHECKF(e == ERROR_INVALID_PARAMETER, "query set-only option %lu: err %lu", so[i], e);
     }
     char buf[128]; INTERNET_PROXY_INFO *q = NULL; DWORD l = readback(NULL, buf, sizeof buf, &q);
     if (l && !reg_proxy_enable2()) EXPECT_EQ(q->dwAccessType, INTERNET_OPEN_TYPE_DIRECT);
@@ -672,8 +694,9 @@ TEST(pc_opt2_settings_changed_purges_keepalive) {
     EXPECT_EQ(t_http_get(h, srv_url(s, "/3"), NULL, T_INET_FRESH, body, sizeof body, &n, &err), 200);
     CHECK(srv_wait_requests(s, 3, 3000));
     t_note("OBS after SETTINGS_CHANGED: req conns %d %d %d (connections %d)", srv_req_conn(s, 0), srv_req_conn(s, 1), srv_req_conn(s, 2), srv_conn_count(s));
-    EXPECT_NE(srv_req_conn(s, 2), srv_req_conn(s, 1));
-    EXPECT_EQ(srv_conn_count(s), 2);
+    /* boot 4: the third request still used the pooled connection (the purge does not reach this session's pool);
+     * an extra idle connection was seen once, so only the reuse is asserted */
+    EXPECT_EQ(srv_req_conn(s, 2), srv_req_conn(s, 1));
     t_inet_close(h); srv_stop(s);
 }
 
@@ -697,6 +720,22 @@ TEST(pc_opt2_connectivity_option_table) {
             t_note("OBS query %s(%lu) on %s -> %d err %lu len %lu dword 0x%lx", t[i].name, t[i].opt, on ? "session" : "NULL", ok, e, l, *(DWORD *)b);
         }
     }
+    /* boot 4 (and decomp for 54..57/70 on a session): exact outcomes per handle */
+    static const struct { DWORD opt; BOOL ok_null; DWORD v_or_err_null; BOOL ok_s; DWORD v_or_err_s; } want[] = {
+        { 50, 1, 1, 1, 1 }, { 51, 1, 0, 1, 0 }, { 52, 1, 0, 1, 0 }, { 64, 1, 0, 1, 0 }, { 70, 0, ERROR_NOT_SUPPORTED, 0, ERROR_NOT_SUPPORTED },
+        { 82, 1, 1, 1, 1 }, { 85, 0, ERROR_INTERNET_INCORRECT_HANDLE_TYPE, 0, ERROR_INVALID_PARAMETER },
+        { 103, 1, 4, 0, ERROR_INTERNET_INVALID_OPERATION }, { 54, 0, ERROR_INTERNET_INCORRECT_HANDLE_TYPE, 0, ERROR_NOT_SUPPORTED },
+        { 55, 0, ERROR_INTERNET_INCORRECT_HANDLE_TYPE, 0, ERROR_NOT_SUPPORTED }, { 56, 0, ERROR_INTERNET_INCORRECT_HANDLE_TYPE, 0, ERROR_NOT_SUPPORTED },
+        { 57, 0, ERROR_INTERNET_INCORRECT_HANDLE_TYPE, 0, ERROR_NOT_SUPPORTED } };
+    for (size_t i = 0; i < sizeof want / sizeof want[0]; i++)
+        for (int on = 0; on < 2; on++) {
+            DWORD v = 0xcccccccc, l = sizeof v; SetLastError(0xdeadbeef);
+            BOOL ok = U(InternetQueryOptionA)(on ? h : NULL, want[i].opt, &v, &l);
+            DWORD e = GetLastError();
+            BOOL wok = on ? want[i].ok_s : want[i].ok_null; DWORD wv = on ? want[i].v_or_err_s : want[i].v_or_err_null;
+            if (wok) CHECKF(ok && v == wv && l == 4, "option %lu on %s: ok %d v %lu l %lu", want[i].opt, on ? "session" : "NULL", ok, v, l);
+            else CHECKF(!ok && e == wv, "option %lu on %s: ok %d err %lu want %lu", want[i].opt, on ? "session" : "NULL", ok, e, wv);
+        }
     /* decomp: 0x36..0x39 and 0x46 report ERROR_NOT_SUPPORTED */
     static const DWORD ns[] = { 54, 55, 56, 57, 70 };
     for (size_t i = 0; i < sizeof ns / sizeof ns[0]; i++) {
@@ -723,5 +762,5 @@ TEST(pc_opt2_autodial_connection_query) {
     BOOL ok = U(InternetQueryOptionA)(NULL, 83 /* AUTODIAL_CONNECTION */, b, &l);
     t_note("OBS AUTODIAL_CONNECTION -> %d len %lu b0 %d err %lu", ok, l, b[0], ok ? 0 : GetLastError());
     CHECK(ok);
-    if (ok) EXPECT_EQ(b[0], 0);    /* decomp: the buffer's first byte is cleared, no connectoid */
+    if (ok) { EXPECT_EQ(b[0], 0); EXPECT_EQ(l, 0); EXPECT_EQ(b[1], 'x'); }   /* decomp + boot 4: first byte cleared, length 0 */
 }

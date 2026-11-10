@@ -2,7 +2,7 @@
  * close or reset before reading the request, malformed/partial responses (direct and through a proxy), handle state
  * after a failed send, recovery of a session after a refusal, timeout option values, and the message table for the
  * connection error codes. Refused connects cost ~2 s each on Windows (04 F3): only a few here.
- * VM_TIMEOUT: 300 */
+ * VM_TIMEOUT: 600 */
 #include "pc.h"
 
 static int status_of(HINTERNET hr) {

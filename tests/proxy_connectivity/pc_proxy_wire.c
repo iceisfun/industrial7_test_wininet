@@ -669,3 +669,6 @@ TEST(pc_wire_connect_bypassed_https_goes_direct) {
     EXPECT_EQ(pc_relay_heads(e.r), 0);
     tunnel_done(&e);
 }
+
+void pc_dup_probe(const char *where);
+TEST(pc_wire_dup_probe_first_overall) { pc_dup_probe("wire-first"); }

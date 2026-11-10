@@ -2,7 +2,7 @@
  * request line, HTTP/1.0 requests, cookies for proxied origins, 407 persistence and retries, per-scheme proxy
  * selection for http vs https, CONNECT variants, large and whitespace-laden bypass lists, and several sessions with
  * different proxies. Origins are *.invalid (never resolved when proxied; 12007 at once when sent direct, 04 F5).
- * VM_TIMEOUT: 300 */
+ * VM_TIMEOUT: 720 */
 #include "pc.h"
 #include <stdlib.h>
 
@@ -19,6 +19,34 @@ static char *basic(const char *up) {
     snprintf(o, 160, "Basic %s", b64); free(b64); return o;
 }
 
+
+/* ------------------------------------------------------------------ diagnostics: duplicate requests (boot 4) */
+/* Boot 4 saw every request arrive twice (each on its own connection) in the second half of this file's tests while
+ * the same pattern earlier in the run was exact. These probes record, at several points of the run, how many heads
+ * and connections one InternetOpenUrl through a proxy and one direct request produce, with timestamps. */
+void pc_dup_probe(const char *where) {
+    srv *p = srv_http(k_ok, (int)(sizeof k_ok / sizeof k_ok[0]));
+    if (!p) { t_note("dup probe %s: no server", where); return; }
+    HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
+    char body[32]; DWORD err, ms;
+    int st = pc_get(h, "http://pc-dup.invalid/probe", 0, body, sizeof body, &err, &ms);
+    Sleep(1500);
+    int nreq = srv_req_count(p), nconn = srv_conn_count(p);
+    t_note("DUP %s t=%lu proxy: status %d %lu ms heads %d conns %d", where, GetTickCount(), st, ms, nreq, nconn);
+    if (nreq != 1 || nconn != 1) srv_dump(p);
+    t_inet_close(h); srv_stop(p);
+    srv *o = srv_http(k_ok, (int)(sizeof k_ok / sizeof k_ok[0]));
+    if (!o) return;
+    h = pc_open("pc_agent", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 3000);
+    st = pc_get(h, srv_url(o, "/probe"), 0, body, sizeof body, &err, &ms);
+    Sleep(1500);
+    t_note("DUP %s direct: status %d heads %d conns %d", where, st, srv_req_count(o), srv_conn_count(o));
+    if (srv_req_count(o) != 1 || srv_conn_count(o) != 1) srv_dump(o);
+    t_inet_close(h); srv_stop(o);
+}
+
+TEST(pc_wire2_dup_probe_end_of_file_run) { pc_dup_probe("wire2-last"); }
+
 /* ------------------------------------------------------------------ URL forms in the request line */
 typedef struct { const char *url; const char *line; const char *host; int certain; } url_case;
 TEST(pc_wire2_request_line_url_forms) {
@@ -26,8 +54,9 @@ TEST(pc_wire2_request_line_url_forms) {
     PROXY2_OR_SKIP(p);
     HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
     static const url_case t[] = {
-        { "http://pc-f.invalid/a#frag", "GET http://pc-f.invalid/a HTTP/1.1", "pc-f.invalid", 1 },
-        { "http://pc-f.invalid/a?q=1#frag", "GET http://pc-f.invalid/a?q=1 HTTP/1.1", "pc-f.invalid", 1 },
+        /* Win10 boot 4: the fragment is NOT stripped from the absolute URI sent to a proxy */
+        { "http://pc-f.invalid/a#frag", "GET http://pc-f.invalid/a#frag HTTP/1.1", "pc-f.invalid", 1 },
+        { "http://pc-f.invalid/a?q=1#frag", "GET http://pc-f.invalid/a?q=1#frag HTTP/1.1", "pc-f.invalid", 1 },
         { "http://pc-f.invalid", "GET http://pc-f.invalid/ HTTP/1.1", "pc-f.invalid", 1 },
         { "http://pc-f.invalid:8080", "GET http://pc-f.invalid:8080/ HTTP/1.1", "pc-f.invalid:8080", 1 },
         { "http://pc-f.invalid/A/B/C.TXT", "GET http://pc-f.invalid/A/B/C.TXT HTTP/1.1", "pc-f.invalid", 1 },
@@ -94,7 +123,9 @@ TEST(pc_wire2_http10_request_through_proxy) {
     EXPECT_EQ(status_of(hr), 200);
     CHECK(srv_wait_requests(p, 1, 3000));
     pc_note_req(p, 0);
-    EXPECT_STR(srv_req_line(p, 0), "GET http://pc-10.invalid/ten HTTP/1.0");
+    /* Win10 boot 4: through a proxy the request goes out as HTTP/1.1 even when HttpOpenRequest asked for HTTP/1.0 */
+    t_note("OBS HttpOpenRequest(\"HTTP/1.0\") via proxy -> \"%s\"", srv_req_line(p, 0));
+    EXPECT_STR(srv_req_line(p, 0), "GET http://pc-10.invalid/ten HTTP/1.1");
     EXPECT_STR(srv_req_header(p, 0, "Host"), "pc-10.invalid");
     t_note("OBS HTTP/1.0 proxied: Proxy-Connection \"%s\" Connection \"%s\"", srv_req_header(p, 0, "Proxy-Connection") ? srv_req_header(p, 0, "Proxy-Connection") : "-",
            srv_req_header(p, 0, "Connection") ? srv_req_header(p, 0, "Connection") : "-");
@@ -429,11 +460,16 @@ TEST(pc_wire2_proxy_chunked_gzip_response) {
     BOOL dec = TRUE; U(InternetSetOptionA)(h, INTERNET_OPTION_HTTP_DECODING, &dec, sizeof dec);
     static char body[2048]; DWORD err;
     EXPECT_EQ(pc_get(h, "http://pc-gz.invalid/fox", 0, body, sizeof body, &err, NULL), 200);
-    EXPECT_STR(body, srv_fox_text());
+    /* boot 4: HTTP_DECODING set on the session did not decode the InternetOpenUrl body (raw gzip came back) */
+    int decoded = !strcmp(body, srv_fox_text()), raw = !memcmp(body, srv_fox_gzip, 3);
+    t_note("OBS gzip via proxy with session HTTP_DECODING: decoded %d raw %d", decoded, raw);
+    CHECK(decoded || raw);
     CHECK(srv_wait_requests(p, 1, 3000));
     t_note("OBS Accept-Encoding via proxy with decoding: \"%s\"", srv_req_header(p, 0, "Accept-Encoding") ? srv_req_header(p, 0, "Accept-Encoding") : "-");
     t_inet_close(h); srv_stop(p);
 }
+
+TEST(pc_wire2_dup_probe_middle) { pc_dup_probe("wire2-middle"); }
 
 /* ------------------------------------------------------------------ several sessions / proxies */
 TEST(pc_wire2_two_sessions_two_proxies) {
@@ -507,6 +543,8 @@ TEST(pc_wire2_http_only_proxy_https_goes_direct) {
     EXPECT_EQ(srv_req_count(p), 0);
     t_inet_close(h); srv_stop(p);
 }
+
+TEST(pc_wire2_dup_probe_before_sessions) { pc_dup_probe("wire2-before-sessions"); }
 
 /* ------------------------------------------------------------------ CONNECT variants */
 static const srv_step k_tls2[] = { S_HEAD(), S_REPLY(200, "Content-Type: text/plain\r\n", "tunnelled2"), S_CLOSE_IF_ASKED(), S_LOOP() };
@@ -608,6 +646,8 @@ TEST(pc_wire2_connect_https_scheme_proxy_entry_uppercase) {
     EXPECT_EQ(pc_relay_heads(e.r), 1);
     tun2_done(&e);
 }
+
+TEST(pc_wire2_dup_probe_before_connect) { pc_dup_probe("wire2-before-connect"); }
 
 /* ------------------------------------------------------------------ bypass lists: size and whitespace */
 static int via_proxy(srv *p, const char *bypass, const char *url, int *st, DWORD *err) {
@@ -742,3 +782,5 @@ TEST(pc_wire2_ftp_proxy_entry_used_for_ftp_urls) {
     EXPECT_EQ(srv_req_count(p), before);
     t_inet_close(h); srv_stop(p);
 }
+
+TEST(pc_wire2_dup_probe_first_in_file_run) { pc_dup_probe("wire2-first"); }
