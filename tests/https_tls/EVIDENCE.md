@@ -9,7 +9,7 @@ Area prefix `tls_`. All traffic stays on 127.0.0.1 or [::1] and goes to servers 
   is added to any certificate store. Plain-HTTP helper servers (shared library) serve CRLs and the issuer for AIA.
 
 Oracle: Windows 10 22H2 VM (`ver` 10.0.19045.2965, wininet 11.0.19041.2193), boots `tls-20261109-171654-b1` and
-`tls2-20261109-175539-b1` (round 1); round 2: `tls4-20261110-050205-b1`, `tls5-20261110-053042-b1` (outputs kept in
+`tls2-20261109-175539-b1` (round 1); round 2: `tls4-20261110-050205-b1`, `tls5-20261110-053042-b1`, `tls6-20261110-072756-b1`, `tls7-20261110-090738-b1` (the passing run: 187 tests, 0 failed; output in
 `results/win10/https_tls.txt`). The round-1 `tls3` boot never ran (empty serial log), so round 1 ended at boot 2. Decomp: Corpus Explorer, wininet.dll 19041.
 
 Legend:
