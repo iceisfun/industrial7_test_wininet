@@ -269,7 +269,7 @@ TEST(pc_check_connection_force_unresolvable) {
     DWORD t0 = GetTickCount(); SetLastError(0xdeadbeef);
     BOOL r = U(InternetCheckConnectionA)("http://pc-check.invalid/", FLAG_ICC_FORCE_CONNECTION, 0);
     DWORD e = GetLastError(), ms = GetTickCount() - t0;
-    t_note("check .invalid: %d err %lu (%s) %lu ms", r, e, t_inet_errname(e), ms);
+    t_note("check .invalid: %d err %lu (%s) %lu ms (forced check resolves through a slower path than HttpSendRequest)", r, e, t_inet_errname(e), ms);
     CHECK(!r);
     EXPECT_EQ(e, ERROR_INTERNET_NAME_NOT_RESOLVED);
 }
@@ -283,6 +283,7 @@ TEST(pc_check_connection_bad_url) {
         DWORD e = GetLastError();
         t_note("check \"%s\": %d err %lu (%s)", bad[i], r, e, t_inet_errname(e));
         CHECKF(!r, "\"%s\" accepted", bad[i]);
+        CHECKF(e == (i < 2 ? ERROR_INTERNET_UNRECOGNIZED_SCHEME : ERROR_INVALID_PARAMETER), "\"%s\" err %lu", bad[i], e);
     }
     SetLastError(0xdeadbeef);
     CHECK(!U(InternetCheckConnectionA)("not a url", FLAG_ICC_FORCE_CONNECTION, 0));
@@ -396,7 +397,7 @@ TEST(pc_init_autoproxy_dll_async_flags) {
         static iapd_arg a; memset(&a, 0, sizeof a); a.flags = good[i];
         if (!pc_bounded(iapd_thread, &a, 10000)) { t_skip("InternetInitializeAutoProxyDll(0x%lx) blocked > 10 s", good[i]); return; }
         t_note("InternetInitializeAutoProxyDll(0x%lx) -> %d err %lu %lu ms", good[i], a.r, a.e, a.ms);
-        if (!(good[i] & 0xc)) { CHECKF(a.r, "flags 0x%lx", good[i]); CHECKF(a.e == 0, "flags 0x%lx err %lu", good[i], a.e); }
+        CHECKF(a.r, "flags 0x%lx", good[i]); CHECKF(a.e == 0, "flags 0x%lx err %lu", good[i], a.e);
     }
 }
 
@@ -405,7 +406,7 @@ TEST(pc_init_autoproxy_dll_sync) {
     static iapd_arg a; memset(&a, 0, sizeof a); a.flags = 2;
     if (!pc_bounded(iapd_thread, &a, 15000)) { t_skip("InternetInitializeAutoProxyDll(2) blocked > 15 s"); return; }
     t_note("InternetInitializeAutoProxyDll(2) -> %d err %lu %lu ms", a.r, a.e, a.ms);
-    CHECK(a.r == TRUE || a.r == FALSE);
+    CHECK(a.r); EXPECT_EQ(a.e, 0);   /* lab: no WPAD/PAC configured, the synchronous init completes at once */
 }
 
 /* ------------------------------------------------------------------ InternetGetProxyForUrl / InternetFreeProxyInfoList */
@@ -527,6 +528,9 @@ TEST(pc_is_host_in_bypass_list_direct_config) {
         if (!pc_bounded(ihb_thread, &a, 15000)) { t_skip("IsHostInProxyBypassList blocked"); return; }
         t_note("IsHostInProxyBypassList(%d, %s) -> %d err %lu", t[i].s, t[i].h, a.r, a.e);
         CHECK(a.r == TRUE || a.r == FALSE);
+        DWORD pe = 0, n = sizeof pe;
+        RegGetValueA(HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", "ProxyEnable", RRF_RT_REG_DWORD, NULL, &pe, &n);
+        if (!pe) EXPECT_EQ(a.r, FALSE);   /* no proxy configured: nothing is "in the bypass list" */
         EXPECT_EQ(a.e, 0);
     }
 }

@@ -180,10 +180,15 @@ static void check_named(const char *proxy, const char *bypass, const char *want_
         EXPECT_EQ(pi->dwAccessType, INTERNET_OPEN_TYPE_PROXY);
         CHECKF(pi->lpszProxy && !strcmp((const char *)pi->lpszProxy, want_proxy), "proxy \"%s\": got \"%s\" want \"%s\"", proxy,
                pi->lpszProxy ? (const char *)pi->lpszProxy : "(null)", want_proxy);
-        if (want_bypass) CHECKF(pi->lpszProxyBypass && !strcmp((const char *)pi->lpszProxyBypass, want_bypass), "bypass \"%s\": got \"%s\" want \"%s\"",
-                                bypass ? bypass : "(null)", pi->lpszProxyBypass ? (const char *)pi->lpszProxyBypass : "(null)", want_bypass);
-        else CHECKF(pi->lpszProxyBypass == NULL || !*(const char *)pi->lpszProxyBypass, "bypass: got \"%s\" want none",
-                    pi->lpszProxyBypass ? (const char *)pi->lpszProxyBypass : "(null)");
+        /* Win10 quirk (LegacyGetProxySettings@0x166840): lpszProxyBypass points at a second copy of the proxy string,
+         * followed by " <bypass>" when there is one. Required size = 24 + 2*(strlen(proxy)+1) [+ strlen(bypass)+1]. */
+        char wb[512];
+        if (want_bypass) snprintf(wb, sizeof wb, "%s %s", want_proxy, want_bypass); else snprintf(wb, sizeof wb, "%s", want_proxy);
+        CHECKF(pi->lpszProxyBypass && !strcmp((const char *)pi->lpszProxyBypass, wb), "bypass \"%s\": got \"%s\" want \"%s\"",
+               bypass ? bypass : "(null)", pi->lpszProxyBypass ? (const char *)pi->lpszProxyBypass : "(null)", wb);
+        DWORD want_len = (DWORD)(24 + 2 * (strlen(want_proxy) + 1) + (want_bypass ? strlen(want_bypass) + 1 : 0));
+        CHECKF(len == want_len, "len %lu want %lu", len, want_len);
+        CHECK((const char *)pi->lpszProxy == (const char *)pi + 24);
         CHECK(len >= 24);
         CHECKF((char *)pi->lpszProxy >= (char *)pi && (char *)pi->lpszProxy < (char *)pi + len, "proxy string outside the buffer");
         t_note("proxy \"%s\" bypass \"%s\" -> len %lu proxy \"%s\" bypass \"%s\"", proxy, bypass ? bypass : "(null)", len,
@@ -214,8 +219,7 @@ TEST(pc_query_proxy_named_per_scheme) {
     EXPECT_EQ(pi->dwAccessType, INTERNET_OPEN_TYPE_PROXY);
     const char *p = pi->lpszProxy ? (const char *)pi->lpszProxy : "";
     t_note("per-scheme proxy reads back as \"%s\"", p);
-    CHECK(strstr(p, "http=127.0.0.1:1") != NULL);
-    CHECK(strstr(p, "https=127.0.0.1:2") != NULL);
+    EXPECT_STR(p, "http=127.0.0.1:1 https=127.0.0.1:2");   /* ';' and ',' become spaces */
     U(InternetCloseHandle)(h);
 }
 
@@ -229,8 +233,8 @@ TEST(pc_query_proxy_named_size_query) {
         DWORD need = 0; SetLastError(0xdeadbeef);
         CHECK(!U(InternetQueryOptionA)(h, INTERNET_OPTION_PROXY, NULL, &need));
         EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
-        size_t minimum = 24 + strlen(t[i].p) + 1 + (t[i].b ? strlen(t[i].b) + 1 : 0);
-        CHECKF(need >= minimum, "\"%s\": need %lu < %zu", t[i].p, need, minimum);
+        size_t exact = 24 + 2 * (strlen(t[i].p) + 1) + (t[i].b ? strlen(t[i].b) + 1 : 0);
+        CHECKF(need == exact, "\"%s\": need %lu want %zu", t[i].p, need, exact);
         t_note("size query \"%s\"/\"%s\": need %lu", t[i].p, t[i].b ? t[i].b : "(null)", need);
         /* exactly need bytes succeeds; need-1 fails with the same need */
         char *buf = malloc(need + 16); DWORD l = need;
@@ -256,7 +260,8 @@ TEST(pc_query_proxy_W_returns_ansi_struct) {
         EXPECT_EQ(pi->dwAccessType, INTERNET_OPEN_TYPE_PROXY);
         /* the W query is routed straight to InternetQueryOptionA: the strings are ANSI */
         CHECK(pi->lpszProxy && !strcmp((const char *)pi->lpszProxy, "127.0.0.1:3128"));
-        CHECK(pi->lpszProxyBypass && !strcmp((const char *)pi->lpszProxyBypass, "<local>"));
+        CHECK(pi->lpszProxyBypass && !strcmp((const char *)pi->lpszProxyBypass, "127.0.0.1:3128 <local>"));
+        EXPECT_EQ(l, 62);
     }
     U(InternetCloseHandle)(h);
 }
@@ -322,7 +327,7 @@ TEST(pc_set_proxy_on_session_roundtrip) {
     CHECK(qproxy(h, &pi, &len, &err));
     EXPECT_EQ(pi->dwAccessType, INTERNET_OPEN_TYPE_PROXY);
     CHECK(pi->lpszProxy && !strcmp((const char *)pi->lpszProxy, "127.0.0.1:3128"));
-    CHECK(pi->lpszProxyBypass && !strcmp((const char *)pi->lpszProxyBypass, "<local>"));
+    CHECK(pi->lpszProxyBypass && !strcmp((const char *)pi->lpszProxyBypass, "127.0.0.1:3128 <local>"));
     /* back to DIRECT */
     CHECKF(setproxy(h, INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, sizeof(INTERNET_PROXY_INFO), &err), "err %lu", err);
     CHECK(qproxy(h, &pi, &len, &err));
@@ -616,7 +621,7 @@ TEST(pc_perconn_query_W) {
     }
     l = 4; SetLastError(0xdeadbeef);
     CHECK(!U(InternetQueryOptionW)(h, INTERNET_OPTION_PER_CONNECTION_OPTION, &lst, &l));
-    t_note("W short len -> err %lu", GetLastError());
+    EXPECT_ERR(ERROR_INTERNET_BAD_OPTION_LENGTH);
     U(InternetCloseHandle)(h);
 }
 
@@ -666,34 +671,24 @@ TEST(pc_option_connected_state_on_session) {
     if (!h) { t_skip("open failed"); return; }
     DWORD v = 0xcccccccc, l = sizeof v; SetLastError(0xdeadbeef);
     BOOL ok = U(InternetQueryOptionA)(h, INTERNET_OPTION_CONNECTED_STATE, &v, &l);
-    t_note("CONNECTED_STATE on a session: ok=%d v=%lu err=%lu", ok, v, GetLastError());
+    CHECK(ok);
     if (ok) EXPECT_EQ(v, INTERNET_STATE_CONNECTED);
     U(InternetCloseHandle)(h);
 }
 
-/* Setting CONNECTED_STATE (offline mode) is reserved to the IE low-box process: from a normal process it fails
- * with ERROR_INTERNET_INTERNAL_ERROR (12004) for the correct 8-byte INTERNET_CONNECTED_INFO and 12010 for any other
- * length, so no offline state is ever entered. */
-TEST(pc_option_connected_state_set_refused) {
+/* Setting CONNECTED_STATE switches the process to offline mode: on Win10 22H2 the 8-byte INTERNET_CONNECTED_INFO set
+ * SUCCEEDED from this test process (VM run 1, contrary to the IfLowBoxIsProcessIE branch read in the decomp), so only the
+ * length checks stay here; an offline set/restore belongs in a dx_ area. */
+TEST(pc_option_connected_state_set_bad_length) {
     REQUIRE(U(InternetSetOptionA));
-    INTERNET_CONNECTED_INFO ci = { INTERNET_STATE_DISCONNECTED_BY_USER, ISO_FORCE_DISCONNECTED };
+    INTERNET_CONNECTED_INFO ci = { INTERNET_STATE_CONNECTED, 0 };
     EXPECT_EQ(sizeof ci, 8);
-    SetLastError(0xdeadbeef);
-    CHECK(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_CONNECTED_STATE, &ci, sizeof ci));
-    EXPECT_ERR(ERROR_INTERNET_INTERNAL_ERROR);
-    SetLastError(0xdeadbeef);
-    CHECK(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_CONNECTED_STATE, &ci, 4));
-    EXPECT_ERR(ERROR_INTERNET_BAD_OPTION_LENGTH);
-    SetLastError(0xdeadbeef);
-    CHECK(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_CONNECTED_STATE, &ci, 12));
-    EXPECT_ERR(ERROR_INTERNET_BAD_OPTION_LENGTH);
-    ci.dwConnectedState = INTERNET_STATE_CONNECTED; ci.dwFlags = 0;
-    SetLastError(0xdeadbeef);
-    CHECK(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_CONNECTED_STATE, &ci, sizeof ci));
-    EXPECT_ERR(ERROR_INTERNET_INTERNAL_ERROR);
-    SetLastError(0xdeadbeef);
-    CHECK(!U(InternetSetOptionW)(NULL, INTERNET_OPTION_CONNECTED_STATE, &ci, sizeof ci));
-    t_note("W set CONNECTED_STATE err %lu", GetLastError());
+    static const DWORD lens[] = { 1, 4, 7, 9, 12, 16 };
+    for (size_t i = 0; i < sizeof lens / sizeof lens[0]; i++) {
+        SetLastError(0xdeadbeef);
+        CHECKF(!U(InternetSetOptionA)(NULL, INTERNET_OPTION_CONNECTED_STATE, &ci, lens[i]), "len %lu accepted", lens[i]);
+        DWORD e = GetLastError(); CHECKF(e == ERROR_INTERNET_BAD_OPTION_LENGTH, "len %lu err %lu", lens[i], e);
+    }
     DWORD v = 0, l = sizeof v;
     CHECK(U(InternetQueryOptionA)(NULL, INTERNET_OPTION_CONNECTED_STATE, &v, &l));
     EXPECT_EQ(v, INTERNET_STATE_CONNECTED);
@@ -703,7 +698,7 @@ TEST(pc_option_offline_mode_not_implemented) {
     REQUIRE(U(InternetQueryOptionA));
     DWORD v = 0, l = sizeof v; SetLastError(0xdeadbeef);
     CHECK(!U(InternetQueryOptionA)(NULL, INTERNET_OPTION_OFFLINE_MODE, &v, &l));
-    t_note("query OFFLINE_MODE (26) NULL handle err %lu", GetLastError());
+    EXPECT_ERR(ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     HINTERNET h = U(InternetOpenA)("pc", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
     if (h) {
         l = sizeof v; SetLastError(0xdeadbeef);
@@ -717,7 +712,6 @@ TEST(pc_option_max_conns_per_proxy_read) {
     REQUIRE(U(InternetQueryOptionA));
     DWORD v = 0, l = sizeof v; SetLastError(0xdeadbeef);
     BOOL ok = U(InternetQueryOptionA)(NULL, 103 /* INTERNET_OPTION_MAX_CONNS_PER_PROXY */, &v, &l);
-    t_note("MAX_CONNS_PER_PROXY: ok=%d v=%lu err=%lu", ok, v, GetLastError());
     CHECK(ok);
-    if (ok) { EXPECT_EQ(l, 4); CHECK(v >= 1); }
+    if (ok) { EXPECT_EQ(l, 4); EXPECT_EQ(v, 4); }
 }

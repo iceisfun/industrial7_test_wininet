@@ -28,6 +28,16 @@ TEST(pc_wire_absolute_uri_openurl) {
     EXPECT_STR(srv_req_target(p, 0), "http://pc-origin.invalid/path/x.txt?q=1&r=2");
     EXPECT_STR(srv_req_header(p, 0, "Host"), "pc-origin.invalid");
     EXPECT_STR(srv_req_header(p, 0, "User-Agent"), "pc_agent");
+    /* Win10 proxied GET (InternetOpenUrl + RELOAD/PRAGMA_NOCACHE): User-Agent, Host, Pragma: no-cache - nothing else;
+     * no Proxy-Connection (unlike CONNECT) and no Cache-Control (unlike the direct request, 04 F12) */
+    EXPECT_STR(srv_req_header(p, 0, "Pragma"), "no-cache");
+    EXPECT_EQ(srv_req_header(p, 0, "Proxy-Connection"), NULL);
+    EXPECT_EQ(srv_req_header(p, 0, "Connection"), NULL);
+    EXPECT_EQ(srv_req_header(p, 0, "Cache-Control"), NULL);
+    EXPECT_EQ(srv_req_header_count(p, 0), 3);
+    EXPECT_STR(srv_req_header_name(p, 0, 0), "User-Agent");
+    EXPECT_STR(srv_req_header_name(p, 0, 1), "Host");
+    EXPECT_STR(srv_req_header_name(p, 0, 2), "Pragma");
     pc_note_req(p, 0);
     t_inet_close(h); srv_stop(p);
 }
@@ -114,12 +124,13 @@ TEST(pc_wire_header_set_note) {
     PROXY_OR_SKIP(p);
     HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
     char body[64]; DWORD err;
-    EXPECT_EQ(pc_get(h, "http://pc-origin.invalid/hdrs", 0, body, sizeof body, &err, NULL), 200);
+    EXPECT_EQ(pc_get(h, "http://pc-hdrs.invalid/hdrs", 0, body, sizeof body, &err, NULL), 200);
     DWORD e2; pc_req_opt o = { 0 };
-    EXPECT_EQ(pc_request(h, "pc-origin.invalid", 80, "/hdrs2", &o, &e2), 200);
+    EXPECT_EQ(pc_request(h, "pc-hdrs.invalid", 80, "/hdrs2", &o, &e2), 200);
     CHECK(srv_wait_requests(p, 2, 3000));
-    pc_note_req(p, 0); pc_note_req(p, 1);
-    t_note("conn of req0=%d req1=%d", srv_req_conn(p, 0), srv_req_conn(p, 1));
+    for (int i = 0; i < srv_req_count(p); i++) pc_note_req(p, i);
+    t_note("requests %d conns %d", srv_req_count(p), srv_conn_count(p));
+    srv_dump(p);
     t_inet_close(h); srv_stop(p);
 }
 
@@ -127,7 +138,7 @@ TEST(pc_wire_no_proxy_authorization_without_challenge) {
     PROXY_OR_SKIP(p);
     HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
     DWORD err; pc_req_opt o = { 0 }; o.proxy_user = "puser"; o.proxy_pass = "ppass";
-    EXPECT_EQ(pc_request(h, "pc-origin.invalid", 80, "/pre", &o, &err), 200);
+    EXPECT_EQ(pc_request(h, "pc-pre.invalid", 80, "/pre", &o, &err), 200);
     CHECK(srv_wait_requests(p, 1, 3000));
     t_note("Proxy-Authorization before any challenge: %s", srv_req_header(p, 0, "Proxy-Authorization") ? srv_req_header(p, 0, "Proxy-Authorization") : "(none)");
     EXPECT_EQ(srv_req_header(p, 0, "Proxy-Authorization"), NULL);
@@ -143,9 +154,13 @@ TEST(pc_wire_proxy_keepalive_reuse) {
     EXPECT_EQ(pc_get(h, "http://pc-one.invalid/2", 0, body, sizeof body, &err, NULL), 200);
     EXPECT_EQ(pc_get(h, "http://pc-two.invalid/3", 0, body, sizeof body, &err, NULL), 200);
     CHECK(srv_wait_requests(p, 3, 3000));
-    t_note("proxy connections %d for 3 requests (conn ids %d %d %d)", srv_conn_count(p), srv_req_conn(p, 0), srv_req_conn(p, 1), srv_req_conn(p, 2));
-    EXPECT_EQ(srv_req_conn(p, 0), srv_req_conn(p, 1));
-    EXPECT_STR(srv_req_line(p, 2), "GET http://pc-two.invalid/3 HTTP/1.1");
+    int n = srv_req_count(p);
+    t_note("proxy connections %d for 3 InternetOpenUrl calls, %d requests", srv_conn_count(p), n);
+    for (int i = 0; i < n; i++) t_note("  req %d conn %d: %s", i, srv_req_conn(p, i), srv_req_line(p, i));
+    srv_dump(p);
+    EXPECT_EQ(srv_conn_count(p), 1);              /* one keep-alive connection to the proxy serves both origins */
+    EXPECT_STR(srv_req_line(p, 0), "GET http://pc-one.invalid/1 HTTP/1.1");
+    EXPECT_STR(srv_req_line(p, n - 1), "GET http://pc-two.invalid/3 HTTP/1.1");
     t_inet_close(h); srv_stop(p);
 }
 
@@ -158,7 +173,7 @@ TEST(pc_wire_407_basic_with_proxy_creds) {
     HTTP_OR_SKIP(p, k_407_then_200);
     HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
     DWORD err; char body[64]; pc_req_opt o = { 0 }; o.proxy_user = "puser"; o.proxy_pass = "ppass"; o.body = body; o.cap = sizeof body;
-    int st = pc_request(h, "pc-origin.invalid", 80, "/auth", &o, &err);
+    int st = pc_request(h, "pc-p407.invalid", 80, "/auth", &o, &err);
     t_note("407 with creds -> status %d err %lu body \"%s\" requests %d", st, err, body, srv_req_count(p));
     EXPECT_EQ(st, 200);
     EXPECT_STR(body, "granted");
@@ -167,7 +182,7 @@ TEST(pc_wire_407_basic_with_proxy_creds) {
     char *b64 = srv_b64("puser:ppass", 11); char want[128]; snprintf(want, sizeof want, "Basic %s", b64); free(b64);
     EXPECT_STR(srv_req_header(p, 1, "Proxy-Authorization"), want);
     EXPECT_EQ(srv_req_header(p, 1, "Authorization"), NULL);
-    EXPECT_STR(srv_req_line(p, 1), "GET http://pc-origin.invalid/auth HTTP/1.1");
+    EXPECT_STR(srv_req_line(p, 1), "GET http://pc-p407.invalid/auth HTTP/1.1");
     t_inet_close(h); srv_stop(p);
 }
 
@@ -228,7 +243,7 @@ TEST(pc_wire_origin_401_through_proxy) {
                                    S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP_TO(2) };
     HTTP_OR_SKIP(p, st);
     HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
-    HINTERNET hc = U(InternetConnectA)(h, "pc-origin.invalid", 80, "ouser", "opass", INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hc = U(InternetConnectA)(h, "pc-o401.invalid", 80, "ouser", "opass", INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/o", NULL, NULL, NULL, T_INET_FRESH, 0);
     CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
     DWORD code = 0, l = sizeof code;
@@ -239,6 +254,36 @@ TEST(pc_wire_origin_401_through_proxy) {
     EXPECT_STR(srv_req_header(p, 1, "Authorization"), want);
     EXPECT_EQ(srv_req_header(p, 1, "Proxy-Authorization"), NULL);
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(h); srv_stop(p);
+}
+
+/* Win10: Basic credentials that succeeded for host X are cached process-wide and sent pre-emptively by a NEW session
+ * to the same host (observed through a proxy: later requests to that origin carried Authorization without a 401). */
+TEST(pc_wire_origin_basic_creds_cached_across_sessions) {
+    static const srv_step st[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"c\"\r\n", "no"),
+                                   S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP_TO(2) };
+    HTTP_OR_SKIP(p, st);
+    const char *host = t_uniq_host("cc");
+    HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
+    HINTERNET hc = U(InternetConnectA)(h, host, 80, "cuser", "cpass", INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/first", NULL, NULL, NULL, T_INET_FRESH, 0);
+    CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(h);
+    CHECK(srv_wait_requests(p, 2, 3000));
+    int n0 = srv_req_count(p);
+    HINTERNET h2 = pc_open_proxy(srv_hostport(p), NULL);
+    char url[256]; snprintf(url, sizeof url, "http://%s/second", host);
+    char body[16]; DWORD err;
+    EXPECT_EQ(pc_get(h2, url, 0, body, sizeof body, &err, NULL), 200);
+    CHECK(srv_wait_requests(p, n0 + 1, 3000));
+    char *b64 = srv_b64("cuser:cpass", 11); char want[64]; snprintf(want, sizeof want, "Basic %s", b64); free(b64);
+    EXPECT_STR(srv_req_header(p, n0, "Authorization"), want);
+    /* a different host gets nothing */
+    snprintf(url, sizeof url, "http://%s/other", t_uniq_host("cc2"));
+    int n1 = srv_req_count(p);
+    EXPECT_EQ(pc_get(h2, url, 0, body, sizeof body, &err, NULL), 200);
+    CHECK(srv_wait_requests(p, n1 + 1, 3000));
+    EXPECT_EQ(srv_req_header(p, n1, "Authorization"), NULL);
+    t_inet_close(h2); srv_stop(p);
 }
 
 /* ------------------------------------------------------------------ proxy list syntax and per-scheme selection */
@@ -256,9 +301,9 @@ TEST(pc_wire_proxy_list_syntax) {
         { "http=%s;https=127.0.0.1:1", "http://pc-s8.invalid/a", 1, 1 },
         { "https=127.0.0.1:1;http=%s", "http://pc-s9.invalid/a", 1, 1 },
         { "https=127.0.0.1:1 http=%s", "http://pc-s10.invalid/a", 1, 1 },
-        { "socks=%s", "http://pc-s11.invalid/a", 0, 0 },
-        { "  %s  ", "http://pc-s12.invalid/a", 1, 0 },
-        { "http=%s;", "http://pc-s13.invalid/a", 1, 0 },
+        { "socks=%s", "http://pc-s11.invalid/a", 0, 1 },
+        { "  %s  ", "http://pc-s12.invalid/a", 1, 1 },
+        { "http=%s;", "http://pc-s13.invalid/a", 1, 1 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         char proxy[128]; snprintf(proxy, sizeof proxy, t[i].proxy_fmt, srv_hostport(p));
@@ -295,10 +340,10 @@ TEST(pc_wire_bypass_table) {
         { "pc-*", "http://pc-b.invalid/x", 0, 1 },
         { "*b.invalid", "http://pc-b.invalid/x", 0, 1 },
         { "*c.invalid", "http://pc-b.invalid/x", 1, 1 },
-        { "pc-?.invalid", "http://pc-b.invalid/x", 0, 0 },
+        { "pc-?.invalid", "http://pc-b.invalid/x", 1, 1 },          /* no ? wildcard */
         { "a.invalid;pc-b.invalid", "http://pc-b.invalid/x", 0, 1 },
         { "a.invalid pc-b.invalid", "http://pc-b.invalid/x", 0, 1 },
-        { "a.invalid,pc-b.invalid", "http://pc-b.invalid/x", 0, 0 },
+        { "a.invalid,pc-b.invalid", "http://pc-b.invalid/x", 0, 1 },
         { "*", "http://pc-b.invalid/x", 0, 1 },
         { "<-loopback>", "http://pc-b.invalid/x", 1, 1 },
         { "http://pc-b.invalid", "http://pc-b.invalid/x", 0, 1 },
@@ -307,12 +352,11 @@ TEST(pc_wire_bypass_table) {
         { "pc-b.invalid:8080", "http://pc-b.invalid/x", 1, 1 },
         { "pc-b", "http://pc-b.invalid/x", 1, 1 },
         { "invalid", "http://pc-b.invalid/x", 1, 1 },
-        { "*.pc-b.invalid", "http://pc-b.invalid/x", 1, 0 },
+        { "*.pc-b.invalid", "http://pc-b.invalid/x", 1, 1 },
         { "*.pc-b.invalid", "http://www.pc-b.invalid/x", 0, 1 },
         { "192.0.2.*", "http://192.0.2.7/x", 0, 1 },
         { "192.0.2.7", "http://192.0.2.7/x", 0, 1 },
         { "192.0.2.8", "http://192.0.2.7/x", 1, 1 },
-        { "192.0.2.0/24", "http://192.0.2.7/x", 0, 0 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         HINTERNET h = pc_open("pc_agent", INTERNET_OPEN_TYPE_PROXY, srv_hostport(p), t[i].bypass, 3000);
@@ -332,6 +376,11 @@ TEST(pc_wire_bypass_table) {
         }
         t_inet_close(h);
     }
+    /* CIDR notation is rejected when the session is opened */
+    SetLastError(0xdeadbeef);
+    HINTERNET hb = U(InternetOpenA)("pc", INTERNET_OPEN_TYPE_PROXY, srv_hostport(p), "192.0.2.0/24", 0);
+    CHECK(hb == NULL); EXPECT_ERR(ERROR_INVALID_PARAMETER);
+    if (hb) U(InternetCloseHandle)(hb);
     srv_stop(p);
 }
 
@@ -341,10 +390,10 @@ TEST(pc_wire_loopback_implicit_bypass) {
     srv *o = srv_http(k_origin_ok, (int)(sizeof k_origin_ok / sizeof k_origin_ok[0]));
     if (!o) { srv_stop(p); t_skip("origin unavailable"); return; }
     static const struct { const char *bypass; const char *host; int proxied; int certain; } t[] = {
-        { NULL, "127.0.0.1", 0, 1 }, { NULL, "localhost", 0, 1 }, { NULL, "[::1]", 0, 0 },
+        { NULL, "127.0.0.1", 0, 1 }, { NULL, "localhost", 0, 1 }, { NULL, "[::1]", 0, 1 },
         { "<-loopback>", "127.0.0.1", 1, 1 }, { "<-loopback>", "localhost", 1, 1 },
-        { "<local>", "127.0.0.1", 0, 1 }, { "<local>;<-loopback>", "127.0.0.1", 1, 0 }, { "127.0.0.1", "127.0.0.1", 0, 1 },
-        { "<-LOOPBACK>", "127.0.0.1", 1, 0 },
+        { "<local>", "127.0.0.1", 0, 1 }, { "<local>;<-loopback>", "127.0.0.1", 1, 1 }, { "127.0.0.1", "127.0.0.1", 0, 1 },
+        { "<-LOOPBACK>", "127.0.0.1", 1, 1 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         HINTERNET h = pc_open("pc_agent", INTERNET_OPEN_TYPE_PROXY, srv_hostport(p), t[i].bypass, 3000);
@@ -396,9 +445,13 @@ TEST(pc_wire_set_proxy_option_routes_session) {
     EXPECT_STR(srv_req_line(p, 0), "GET http://pc-sw.invalid/b HTTP/1.1");
     pi.dwAccessType = INTERNET_OPEN_TYPE_DIRECT; pi.lpszProxy = NULL;
     CHECK(U(InternetSetOptionA)(h, INTERNET_OPTION_PROXY, &pi, sizeof pi));
+    Sleep(100);
+    int n = srv_req_count(p);
     EXPECT_EQ(pc_get(h, "http://pc-sw.invalid/c", 0, body, sizeof body, &err, NULL), 0);
     EXPECT_EQ(err, ERROR_INTERNET_NAME_NOT_RESOLVED);
-    EXPECT_EQ(srv_req_count(p), 1);
+    Sleep(100);
+    EXPECT_EQ(srv_req_count(p), n);
+    for (int i = 0; i < srv_req_count(p); i++) t_note("  req %d conn %d: %s", i, srv_req_conn(p, i), srv_req_line(p, i));
     t_inet_close(h); srv_stop(p);
 }
 
@@ -410,8 +463,10 @@ TEST(pc_wire_set_proxy_bypass_option) {
     char body[64]; DWORD err;
     EXPECT_EQ(pc_get(h, "http://pc-byp.invalid/a", 0, body, sizeof body, &err, NULL), 0);
     EXPECT_EQ(err, ERROR_INTERNET_NAME_NOT_RESOLVED);
+    EXPECT_EQ(srv_req_count(p), 0);
     EXPECT_EQ(pc_get(h, "http://pc-nobyp.invalid/a", 0, body, sizeof body, &err, NULL), 200);
-    EXPECT_EQ(srv_req_count(p), 1);
+    CHECK(srv_req_count(p) >= 1);
+    EXPECT_STR(srv_req_line(p, 0), "GET http://pc-nobyp.invalid/a HTTP/1.1");
     t_inet_close(h); srv_stop(p);
 }
 
@@ -427,13 +482,18 @@ TEST(pc_wire_ftp_url_via_cern_proxy) {
     if (hu) {
         int ok; size_t n = t_inet_read_all(hu, body, sizeof body, &ok);
         t_note("ftp via proxy body \"%s\" n=%zu", body, n);
-        DWORD ty = 0, l = sizeof ty; U(InternetQueryOptionA)(hu, INTERNET_OPTION_HANDLE_TYPE, &ty, &l);
-        t_note("ftp via proxy handle type %lu", ty);
+        EXPECT_STR(body, "ftp-via-proxy");
+        DWORD ty = 0, l = sizeof ty; CHECK(U(InternetQueryOptionA)(hu, INTERNET_OPTION_HANDLE_TYPE, &ty, &l));
+        EXPECT_EQ(ty, INTERNET_HANDLE_TYPE_HTTP_REQUEST);   /* an ftp URL through a CERN proxy is an HTTP request handle */
         U(InternetCloseHandle)(hu);
     }
+    CHECK(hu != NULL);
+    CHECK(srv_req_count(p) >= 1);
     if (srv_req_count(p)) {
         pc_note_req(p, 0);
         EXPECT_STR(srv_req_line(p, 0), "GET ftp://pc-ftp.invalid/pub/file.txt HTTP/1.1");
+        EXPECT_STR(srv_req_header(p, 0, "Host"), "pc-ftp.invalid:21");   /* the ftp default port is spelled out */
+        EXPECT_STR(srv_req_header(p, 0, "User-Agent"), "pc_agent");
     }
     t_inet_close(h); srv_stop(p);
 }
@@ -467,10 +527,22 @@ TEST(pc_wire_connect_tunnel_https) {
     EXPECT_STR(body, "tunnelled");
     CHECK(pc_relay_wait_heads(e.r, 1, 3000));
     const char *hd = pc_relay_head(e.r, 0);
-    EXPECT_STR(pc_head_line(hd), "CONNECT pc-tls.invalid:443 HTTP/1.1");
+    EXPECT_STR(pc_head_line(hd), "CONNECT pc-tls.invalid:443 HTTP/1.0");
     EXPECT_STR(pc_head_header(hd, "Host"), "pc-tls.invalid:443");
     EXPECT_STR(pc_head_header(hd, "User-Agent"), "pc_agent");
-    t_note("CONNECT head:\n%s", hd ? hd : "(none)");
+    /* Win10: CONNECT is HTTP/1.0 with exactly User-Agent, Host, Content-Length: 0, Proxy-Connection: Keep-Alive, Pragma: no-cache */
+    EXPECT_STR(pc_head_header(hd, "Content-Length"), "0");
+    EXPECT_STR(pc_head_header(hd, "Proxy-Connection"), "Keep-Alive");
+    EXPECT_STR(pc_head_header(hd, "Pragma"), "no-cache");
+    EXPECT_EQ(pc_head_header(hd, "Connection"), NULL);
+    EXPECT_EQ(pc_head_header(hd, "Proxy-Authorization"), NULL);
+    if (hd) {
+        const char *ua = strstr(hd, "\r\nUser-Agent:"), *ho = strstr(hd, "\r\nHost:"), *cl = strstr(hd, "\r\nContent-Length:"),
+                   *pcn = strstr(hd, "\r\nProxy-Connection:"), *pr = strstr(hd, "\r\nPragma:");
+        CHECK(ua && ho && cl && pcn && pr && ua < ho && ho < cl && cl < pcn && pcn < pr);
+        int lines = 0; for (const char *q = hd; (q = strstr(q, "\r\n")); q += 2) lines++;
+        EXPECT_EQ(lines, 7);   /* request line + 5 headers + empty line */
+    }
     /* inside the tunnel the request is origin-form with the origin's Host */
     CHECK(srv_wait_requests(e.tls, 1, 3000));
     EXPECT_STR(srv_req_line(e.tls, 0), "GET /s?x=1 HTTP/1.1");
@@ -486,7 +558,7 @@ TEST(pc_wire_connect_tunnel_nondefault_port) {
     DWORD err; char body[64]; pc_req_opt o = { 0 }; o.secure = 1; o.secflags = 0x1100; o.body = body; o.cap = sizeof body;
     EXPECT_EQ(pc_request(e.h, "pc-tls.invalid", 8443, "/p", &o, &err), 200);
     CHECK(pc_relay_wait_heads(e.r, 1, 3000));
-    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 0)), "CONNECT pc-tls.invalid:8443 HTTP/1.1");
+    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 0)), "CONNECT pc-tls.invalid:8443 HTTP/1.0");
     EXPECT_STR(pc_head_header(pc_relay_head(e.r, 0), "Host"), "pc-tls.invalid:8443");
     CHECK(srv_wait_requests(e.tls, 1, 3000));
     EXPECT_STR(srv_req_header(e.tls, 0, "Host"), "pc-tls.invalid:8443");
@@ -500,7 +572,7 @@ TEST(pc_wire_connect_tunnel_openurl) {
     int st = pc_get(e.h, "https://pc-tls.invalid/u", 0, body, sizeof body, &err, NULL);
     t_note("openurl https via proxy: status %d err %lu (%s)", st, err, t_inet_errname(err));
     CHECK(pc_relay_wait_heads(e.r, 1, 3000));
-    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 0)), "CONNECT pc-tls.invalid:443 HTTP/1.1");
+    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 0)), "CONNECT pc-tls.invalid:443 HTTP/1.0");
     EXPECT_EQ(st, 0);
     CHECK(err == ERROR_INTERNET_INVALID_CA || err == ERROR_INTERNET_SEC_CERT_CN_INVALID || err == ERROR_INTERNET_SEC_INVALID_CERT);
     tunnel_done(&e);
@@ -516,11 +588,15 @@ TEST(pc_wire_connect_https_only_proxy_entry) {
     e.h = pc_open("pc_agent", INTERNET_OPEN_TYPE_PROXY, px, NULL, 5000);
     DWORD err; char body[64]; pc_req_opt o = { 0 }; o.secure = 1; o.secflags = 0x1100; o.body = body; o.cap = sizeof body;
     EXPECT_EQ(pc_request(e.h, "pc-tls.invalid", 443, "/only", &o, &err), 200);
-    EXPECT_EQ(pc_relay_heads(e.r), 1);
+    CHECK(pc_relay_heads(e.r) >= 1);
+    for (int i = 0; i < pc_relay_heads(e.r); i++) t_note("https-only proxy head %d: %s", i, pc_head_line(pc_relay_head(e.r, i)));
+    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 0)), "CONNECT pc-tls.invalid:443 HTTP/1.0");
+    int heads_before = pc_relay_heads(e.r);
     /* plain http with an https-only proxy list goes direct */
     char b2[32]; DWORD e2;
     EXPECT_EQ(pc_get(e.h, "http://pc-tls.invalid/plain", 0, b2, sizeof b2, &e2, NULL), 0);
     EXPECT_EQ(e2, ERROR_INTERNET_NAME_NOT_RESOLVED);
+    EXPECT_EQ(pc_relay_heads(e.r), heads_before);
     tunnel_done(&e);
 }
 
@@ -539,7 +615,7 @@ TEST(pc_wire_connect_407_then_200_with_creds) {
     EXPECT_EQ(pc_head_header(pc_relay_head(e.r, 0), "Proxy-Authorization"), NULL);
     char *b64 = srv_b64("tuser:tpass", 11); char want[64]; snprintf(want, sizeof want, "Basic %s", b64); free(b64);
     EXPECT_STR(pc_head_header(pc_relay_head(e.r, 1), "Proxy-Authorization"), want);
-    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 1)), "CONNECT pc-tls.invalid:443 HTTP/1.1");
+    EXPECT_STR(pc_head_line(pc_relay_head(e.r, 1)), "CONNECT pc-tls.invalid:443 HTTP/1.0");
     if (srv_wait_requests(e.tls, 1, 3000)) EXPECT_EQ(srv_req_header(e.tls, 0, "Proxy-Authorization"), NULL);
     tunnel_done(&e);
 }

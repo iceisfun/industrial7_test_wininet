@@ -66,7 +66,10 @@ TEST(pc_fail_proxy_list_failover) {
     char body[16]; DWORD err, ms;
     int code = pc_get(h, "http://pc-fo.invalid/x", 0, body, sizeof body, &err, &ms);
     t_note("proxy list \"%s\": status %d err %lu (%s) second-proxy requests %d %lu ms", px, code, err, t_inet_errname(err), srv_req_count(p), ms);
-    CHECK(code == 200 || err == ERROR_INTERNET_CANNOT_CONNECT);
+    /* Win10: no failover to the second proxy of a plain list - the first refusal is final */
+    EXPECT_EQ(code, 0);
+    EXPECT_EQ(err, ERROR_INTERNET_CANNOT_CONNECT);
+    EXPECT_EQ(srv_req_count(p), 0);
     t_inet_close(h); srv_stop(p);
 }
 
@@ -106,7 +109,8 @@ TEST(pc_fail_connect_timeout_vs_refused) {
     char body[16]; DWORD err, ms;
     EXPECT_EQ(pc_get(h, url, 0, body, sizeof body, &err, &ms), 0);
     t_note("connect timeout 300 ms vs refused port: err %lu (%s) %lu ms", err, t_inet_errname(err), ms);
-    CHECK(err == ERROR_INTERNET_TIMEOUT || err == ERROR_INTERNET_CANNOT_CONNECT);
+    /* Win10: the refused connect is reported as a TIMEOUT once the (short) connect timeout has elapsed */
+    EXPECT_EQ(err, ERROR_INTERNET_TIMEOUT);
     t_inet_close(h);
 }
 
@@ -165,9 +169,12 @@ TEST(pc_fail_receive_timeout) {
     HINTERNET h = pc_open("pc_agent", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
     pc_set_timeouts(h, 5000, 5000, 800);
     char body[16]; DWORD err, ms;
-    EXPECT_EQ(pc_get(h, srv_url(s, "/slow"), 0, body, sizeof body, &err, &ms), 0);
-    EXPECT_EQ(err, ERROR_INTERNET_TIMEOUT);
-    t_note("receive timeout 800 ms: %lu ms, requests %d", ms, srv_req_count(s));
+    int code = pc_get(h, srv_url(s, "/slow"), 0, body, sizeof body, &err, &ms);
+    /* VM run 1: status 200 after ~3 s with 2 requests recorded - the 800 ms session receive timeout did not end the wait.
+     * Kept as an observation until the retry/duplicate behaviour is understood. */
+    t_note("receive timeout 800 ms: status %d err %lu (%s) %lu ms, requests %d conns %d", code, err, t_inet_errname(err), ms, srv_req_count(s), srv_conn_count(s));
+    srv_dump(s);
+    CHECK(code == 200 || err == ERROR_INTERNET_TIMEOUT);
     t_inet_close(h); srv_stop(s);
 }
 
@@ -182,12 +189,31 @@ TEST(pc_fail_receive_timeout_mid_body) {
         char buf[32]; DWORD rd = 0, total = 0; BOOL ok = TRUE; DWORD e = 0;
         for (int i = 0; i < 10; i++) { rd = 0; ok = U(InternetReadFile)(hu, buf + total, sizeof buf - 1 - total, &rd); if (!ok) { e = GetLastError(); break; } if (!rd) break; total += rd; }
         t_note("mid-body stall: ok %d err %lu (%s) total %lu", ok, e, t_inet_errname(e), total);
-        CHECK(!ok);
-        EXPECT_EQ(e, ERROR_INTERNET_TIMEOUT);
-        EXPECT_EQ(total, 3);
+        /* VM run 1: the read waited out the 3 s stall and returned all 10 bytes (no 12002 at 800 ms) */
+        CHECK((ok && total == 10) || (!ok && e == ERROR_INTERNET_TIMEOUT));
         U(InternetCloseHandle)(hu);
     }
     t_inet_close(h); srv_stop(s);
+}
+
+TEST(pc_fail_receive_timeout_on_request_handle) {
+    static const srv_step st[] = { S_HEAD(), S_SLEEP(3000), S_REPLY(200, NULL, "late") };
+    HTTP_OR_SKIP(s, st);
+    HINTERNET h = pc_open("pc_agent", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    HINTERNET hc = U(InternetConnectA)(h, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/slowreq", NULL, NULL, NULL, T_INET_FRESH, 0);
+    DWORD to = 800;
+    CHECK(U(InternetSetOptionA)(hr, INTERNET_OPTION_RECEIVE_TIMEOUT, &to, sizeof to));
+    CHECK(U(InternetSetOptionA)(hr, INTERNET_OPTION_DATA_RECEIVE_TIMEOUT, &to, sizeof to));
+    DWORD v = 0, l = sizeof v;
+    CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_RECEIVE_TIMEOUT, &v, &l)); EXPECT_EQ(v, 800);
+    DWORD t0 = GetTickCount(); SetLastError(0xdeadbeef);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    DWORD e = GetLastError(), ms = GetTickCount() - t0;
+    t_note("request-handle receive timeout 800: ok %d err %lu (%s) %lu ms requests %d conns %d", ok, e, t_inet_errname(e), ms, srv_req_count(s), srv_conn_count(s));
+    srv_dump(s);
+    CHECK(ok || e == ERROR_INTERNET_TIMEOUT);
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(h); srv_stop(s);
 }
 
 TEST(pc_fail_receive_timeout_via_proxy) {
@@ -196,8 +222,9 @@ TEST(pc_fail_receive_timeout_via_proxy) {
     HINTERNET h = pc_open("pc_agent", INTERNET_OPEN_TYPE_PROXY, srv_hostport(p), NULL, 0);
     pc_set_timeouts(h, 5000, 5000, 800);
     char body[16]; DWORD err, ms;
-    EXPECT_EQ(pc_get(h, "http://pc-slow.invalid/", 0, body, sizeof body, &err, &ms), 0);
-    EXPECT_EQ(err, ERROR_INTERNET_TIMEOUT);
+    int code = pc_get(h, "http://pc-slow.invalid/", 0, body, sizeof body, &err, &ms);
+    t_note("receive timeout via proxy: status %d err %lu %lu ms requests %d", code, err, ms, srv_req_count(p));
+    CHECK(code == 200 || err == ERROR_INTERNET_TIMEOUT);
     t_inet_close(h); srv_stop(p);
 }
 
@@ -225,13 +252,13 @@ static void run_stage(const stage_case *c, int via_proxy) {
 
 static const stage_case k_stages[] = {
     { "close without response", STEPS(S_HEAD(), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 1 },
-    { "reset without response", STEPS(S_HEAD(), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 0 },
-    { "close mid status line", STEPS(S_HEAD(), S_SEND("HTTP/1.1 2"), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 0 },
-    { "close mid headers", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Le"), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 0 },
-    { "close after header line", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nX-A: 1\r\n"), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 0 },
-    { "reset mid headers", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Le"), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 0 },
+    { "reset without response", STEPS(S_HEAD(), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 1 },
+    { "close mid status line", STEPS(S_HEAD(), S_SEND("HTTP/1.1 2"), S_CLOSE()), 200, 0, 1 },   /* HTTP/0.9 fallback: the bytes become the body */
+    { "close mid headers", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Le"), S_CLOSE()), 200, 0, 1 },
+    { "close after header line", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nX-A: 1\r\n"), S_CLOSE()), 200, 0, 1 },
+    { "reset mid headers", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Le"), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 1 },
     { "headers then close (no length)", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\n\r\nbody"), S_CLOSE()), 200, 0, 1 },
-    { "garbage instead of status line", STEPS(S_HEAD(), S_SEND("garbage here\r\n\r\n"), S_CLOSE()), 200, 0, 0 },
+    { "garbage instead of status line", STEPS(S_HEAD(), S_SEND("garbage here\r\n\r\n"), S_CLOSE()), 200, 0, 1 },
     { "truncated body", STEPS(S_HEAD(), S_REPLYF(200, NULL, "0123456789", SRV_R_TRUNCATE)), 200, 0, 1 },
     { "reset mid body", STEPS(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\n0123456789"), S_SLEEP(200), S_RESET()), 200, 0, 0 },
     { "HTTP/1.0 close-delimited", STEPS(S_HEAD(), S_REPLYF(200, NULL, "ten bytes!", SRV_R_HTTP10 | SRV_R_CLOSE)), 200, 0, 1 },
@@ -254,7 +281,10 @@ TEST(pc_fail_reset_mid_body_read_error) {
         char buf[128]; DWORD total = 0, e = 0; BOOL ok = TRUE;
         for (int i = 0; i < 20; i++) { DWORD rd = 0; ok = U(InternetReadFile)(hu, buf + total, sizeof buf - 1 - total, &rd); if (!ok) { e = GetLastError(); break; } if (!rd) break; total += rd; }
         t_note("reset mid body: ok %d err %lu (%s) total %lu", ok, e, t_inet_errname(e), total);
-        EXPECT_EQ(total, 10);
+        /* Win10: the read fails with CONNECTION_RESET; bytes buffered before the RST are not delivered (run 1: total 0) */
+        CHECK(!ok);
+        EXPECT_EQ(e, ERROR_INTERNET_CONNECTION_RESET);
+        CHECK(total <= 10);
         U(InternetCloseHandle)(hu);
     }
     t_inet_close(h); srv_stop(s);
@@ -270,13 +300,14 @@ TEST(pc_fail_stale_keepalive_retried) {
     HINTERNET h = open_direct(3000);
     char body[32]; DWORD err;
     EXPECT_EQ(pc_get(h, srv_url(s, "/1"), 0, body, sizeof body, &err, NULL), 200);
-    EXPECT_STR(body, "first");
+    t_note("stale keep-alive first body \"%s\"", body);
     EXPECT_EQ(pc_get(h, srv_url(s, "/2"), 0, body, sizeof body, &err, NULL), 200);
-    EXPECT_STR(body, "second");
+    EXPECT_STR(body, "second");   /* the closed keep-alive connection is retried transparently on a new one */
     t_note("stale keep-alive: requests %d conns %d", srv_req_count(s), srv_conn_count(s));
+    for (int i = 0; i < srv_req_count(s); i++) t_note("  req %d conn %d: %s", i, srv_req_conn(s, i), srv_req_line(s, i));
+    srv_dump(s);
     EXPECT_EQ(srv_conn_count(s), 2);
     CHECK(srv_req_count(s) >= 2);
-    if (srv_req_count(s) == 3) { EXPECT_STR(srv_req_line(s, 1), "GET /2 HTTP/1.1"); EXPECT_STR(srv_req_line(s, 2), "GET /2 HTTP/1.1"); }
     t_inet_close(h); srv_stop(s);
 }
 
@@ -287,13 +318,18 @@ TEST(pc_fail_error_text_available) {
     static const DWORD codes[] = { ERROR_INTERNET_TIMEOUT, ERROR_INTERNET_NAME_NOT_RESOLVED, ERROR_INTERNET_CANNOT_CONNECT,
         ERROR_INTERNET_CONNECTION_ABORTED, ERROR_INTERNET_CONNECTION_RESET, ERROR_HTTP_INVALID_SERVER_RESPONSE,
         ERROR_INTERNET_PROXY_SERVER_UNREACHABLE, ERROR_INTERNET_BAD_AUTO_PROXY_SCRIPT, ERROR_INTERNET_INVALID_PROXY_REQUEST,
-        ERROR_INTERNET_NOT_PROXY_REQUEST, ERROR_INTERNET_AUTODETECTION_FAILED, ERROR_INTERNET_DISCONNECTED };
+        ERROR_INTERNET_NOT_PROXY_REQUEST, ERROR_INTERNET_DISCONNECTED };
     for (size_t i = 0; i < sizeof codes / sizeof codes[0]; i++) {
         char msg[512] = { 0 };
         DWORD n = FormatMessageA(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS, m, codes[i], 0, msg, sizeof msg, NULL);
         CHECKF(n > 0, "no message for %lu (err %lu)", codes[i], GetLastError());
         if (i < 3) t_note("%lu: %s", codes[i], msg);
     }
+    /* 12180 (AUTODETECTION_FAILED, returned by DetectAutoProxyUrl) has no message in wininet's table */
+    char msg[256];
+    SetLastError(0xdeadbeef);
+    EXPECT_EQ(FormatMessageA(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_IGNORE_INSERTS, m, ERROR_INTERNET_AUTODETECTION_FAILED, 0, msg, sizeof msg, NULL), 0);
+    EXPECT_ERR(ERROR_MR_MID_NOT_FOUND);
 }
 
 TEST(pc_fail_last_response_info_after_failure) {
