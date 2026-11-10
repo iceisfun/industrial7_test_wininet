@@ -138,6 +138,16 @@ CHILD(setp) {
     return 0;
 }
 
+static DWORD run_child_io_named(const char *nm, const char *a, DWORD to) {
+    HANDLE o = GetStdHandle(STD_OUTPUT_HANDLE); SetHandleInformation(o, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+    PROCESS_INFORMATION pi; DWORD code = 0xDEAD0000;
+    HANDLE h = t_spawn_child(nm, a, 0, NULL, o, o, TRUE, NULL, &pi);
+    if (!h) return code;
+    if (WaitForSingleObject(h, to) != WAIT_OBJECT_0) { TerminateProcess(h, 1); WaitForSingleObject(h, 5000); code = 0xDEAD0001; }
+    else GetExitCodeProcess(h, &code);
+    CloseHandle(pi.hThread); CloseHandle(h);
+    return code;
+}
 static DWORD run_child_io(const char *a, DWORD to) {
     HANDLE o = GetStdHandle(STD_OUTPUT_HANDLE); SetHandleInformation(o, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
     PROCESS_INFORMATION pi; DWORD code = 0xDEAD0000;
@@ -147,6 +157,47 @@ static DWORD run_child_io(const char *a, DWORD to) {
     else GetExitCodeProcess(h, &code);
     CloseHandle(pi.hThread); CloseHandle(h);
     return code;
+}
+/* Round-trip probe (CHILD rtp <opt>): on fresh unsent handles N,S,C,R (C = HTTP connect to 127.0.0.1:1, never
+ * connected), query A (4096 buffer) then for each DWORD value set A (len 4) + query A again. Each option in its own
+ * process so globals do not leak. Line: RT opt h v sr se qr qe ql qd(first min(ql,8) bytes hex). v=-1: initial query. */
+static void rtq(int opt, char hk1, HINTERNET h, long long v) {
+    static unsigned char b[4096]; DWORD l = sizeof b; memset(b, 0xCC, sizeof b); SetLastError(0xdead);
+    BOOL r = U(InternetQueryOptionA)(h, opt, b, &l); DWORD e = GetLastError();
+    printf("RTQ %d %c %lld qr=%d qe=%lu ql=%lu qd=", opt, hk1, v, r, r ? 0 : e, l);
+    if (r) hexd(b, l < 8 ? l : 8);
+    printf("\n");
+}
+CHILD(rtp) {
+    int opt = atoi(argv[1]);
+    HINTERNET s = U(InternetOpenA)("probe-agent", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    HINTERNET c = U(InternetConnectA)(s, "127.0.0.1", 1, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET r = U(HttpOpenRequestA)(c, "GET", "/rt", NULL, NULL, NULL, T_INET_FRESH, 0);
+    HINTERNET hs[4] = { NULL, s, c, r }; const char *kn = "NSCR";
+    static const DWORD vals[] = { 0, 1, 2, 3, 4, 0x10, 0x7fffffff, 0x80000000u };
+    for (int k = 0; k < 4; k++) {
+        if (k && !hs[k]) continue;
+        rtq(opt, kn[k], hs[k], -1);
+        for (int i = 0; i < 8; i++) {
+            DWORD v = vals[i]; SetLastError(0xdead);
+            BOOL sr = U(InternetSetOptionA)(hs[k], opt, &v, 4); DWORD se = GetLastError();
+            printf("RTS %d %c %lu sr=%d se=%lu\n", opt, kn[k], (unsigned long)v, sr, sr ? 0 : se);
+            rtq(opt, kn[k], hs[k], v);
+        }
+        fflush(stdout);
+    }
+    return 0;
+}
+TEST(zz_probe_rt) {
+    REQUIRE(U(InternetSetOptionA));
+    for (int pass = 0; pass < 2; pass++)
+        for (int opt = 0; opt <= 200; opt++) {
+            if (opt == 42 || opt == 154 || opt == 39 || opt == 95 || opt == 75 || opt == 37) continue;
+            char a[16]; snprintf(a, sizeof a, "%d", opt);
+            printf("RTPASS %d %d\n", pass, opt); fflush(stdout);
+            DWORD rc = run_child_io_named("rtp", a, 15000);
+            if (rc) printf("RTCHILD %d rc=0x%lx\n", opt, rc);
+        }
 }
 TEST(zz_probe_set) {
     if (1) return;

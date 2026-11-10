@@ -11,7 +11,7 @@ V1 = ['nul0', 'nul4', 'buf0', 'len1', 'len3', 'rt']
 V2 = ['len8z', 'len5', 'd0', 'd1', 'dbig']
 # 42 END_BROWSER_SESSION and 154 (0x9a) call EndBrowserSession: never run outside dx_*.
 # 75 PER_CONNECTION_OPTION: the round-trip set reaches SetPerConnOptions (per-user registry) -> skip rt only.
-SKIP_ALL = {42, 154}
+SKIP_ALL = {39, 42, 95, 154}  # 39 SETTINGS_CHANGED, 95 PROXY_SETTINGS_CHANGED bump the shared cache-header settings version
 SKIP_RT = {75}
 rows = collections.defaultdict(dict)
 for l in open(sys.argv[1]):
