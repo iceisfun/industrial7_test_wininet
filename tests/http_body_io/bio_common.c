@@ -3,31 +3,67 @@
 #include <wincrypt.h>
 #include <stdlib.h>
 
-int bio_open_cfg(bio_env *e, const srv_config *cfg) {
+/* Copy every script with a bio_wait_next step inserted before each step that reads a request (SRV_RECV_HEAD and the
+ * area's SRV_CALL responders, which all start with srv_conn_recv_head); SRV_LOOP targets are remapped. */
+static int is_reader(const srv_step *p) { return p->op == SRV_RECV_HEAD || (p->op == SRV_CALL && p->fn != bio_wait_next); }
+static void *wrap_scripts(const srv_config *cfg, srv_config *out) {
+    *out = *cfg;
+    if (!cfg->scripts || cfg->nscripts <= 0) return NULL;
+    int ns = cfg->nscripts, total = 0;
+    int *len = calloc(ns, sizeof *len);
+    for (int k = 0; k < ns; k++) {
+        int n = cfg->scripts[k].nsteps;
+        if (n <= 0) { n = 0; while (cfg->scripts[k].steps[n].op != SRV_END) n++; n++; }
+        len[k] = n; total += 2 * n;
+    }
+    char *mem = calloc(1, ns * sizeof(srv_script) + total * sizeof(srv_step));
+    srv_script *sc = (srv_script *)mem; srv_step *pool = (srv_step *)(mem + ns * sizeof(srv_script));
+    for (int k = 0; k < ns; k++) {
+        const srv_step *in = cfg->scripts[k].steps; int n = len[k], m = 0;
+        srv_step *o = pool;
+        for (int i = 0; i < n; i++) {
+            if (is_reader(&in[i])) { srv_step w = S_CALL(bio_wait_next); o[m++] = w; }
+            o[m] = in[i];
+            if (in[i].op == SRV_LOOP) {
+                int j = in[i].arg, before = 0;
+                for (int q = 0; q < j && q < n; q++) before += is_reader(&in[q]);
+                o[m].arg = j + before;
+            }
+            m++;
+        }
+        sc[k].steps = o; sc[k].nsteps = m; pool += m;
+    }
+    free(len);
+    out->scripts = sc;
+    return mem;
+}
+
+static int open_cfg_dec(bio_env *e, const srv_config *cfg0, int dec) {
     memset(e, 0, sizeof *e);
     if (!U(InternetOpenA) || !U(InternetConnectA) || !U(HttpOpenRequestA) || !U(HttpSendRequestA) || !U(InternetReadFile)) {
         t_skip("wininet exports missing"); return 0;
     }
-    int rc = srv_start(cfg, &e->s);
-    if (rc) { e->s = NULL; t_skip("server unavailable: %s", srv_strerror(rc)); return 0; }
+    srv_config cfg; e->owned = wrap_scripts(cfg0, &cfg);
+    int rc = srv_start(&cfg, &e->s);
+    if (rc) { e->s = NULL; free(e->owned); e->owned = NULL; t_skip("server unavailable: %s", srv_strerror(rc)); return 0; }
     e->t0 = GetTickCount();
     e->hi = t_inet_open("bio-agent/1.0");
     if (!e->hi) { srv_stop(e->s); e->s = NULL; t_skip("InternetOpenA failed %lu", GetLastError()); return 0; }
+    if (dec) CHECK(bio_set_dword(e->hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
     e->hc = U(InternetConnectA)(e->hi, "127.0.0.1", srv_port(e->s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     if (!e->hc) { DWORD er = GetLastError(); t_inet_close(e->hi); srv_stop(e->s); e->s = NULL; e->hi = NULL; t_skip("InternetConnectA failed %lu", er); return 0; }
     return 1;
 }
+int bio_open_cfg(bio_env *e, const srv_config *cfg) { return open_cfg_dec(e, cfg, 0); }
 
-int bio_open(bio_env *e, const srv_step *st, int n) {
+static int open_steps(bio_env *e, const srv_step *st, int n, int dec) {
     srv_script sc = { st, n };
     srv_config cfg; memset(&cfg, 0, sizeof cfg);
-    cfg.kind = SRV_HTTP; cfg.scripts = &sc; cfg.nscripts = 1; cfg.lifetime_ms = 30000;
-    /* srv_start keeps a pointer to the script array: give it storage that outlives this frame */
-    static srv_script ring[64]; static LONG k;
-    srv_script *p = &ring[InterlockedIncrement(&k) & 63]; *p = sc; cfg.scripts = p;
-    return bio_open_cfg(e, &cfg);
+    cfg.kind = SRV_HTTP; cfg.scripts = st ? &sc : NULL; cfg.nscripts = st ? 1 : 0; cfg.lifetime_ms = 30000;
+    return open_cfg_dec(e, &cfg, dec);            /* the steps are copied: the caller's array may be on its stack */
 }
-
+int bio_open(bio_env *e, const srv_step *st, int n) { return open_steps(e, st, n, 0); }
+int bio_open_dec(bio_env *e, const srv_step *st, int n, int dec) { return open_steps(e, st, n, dec); }
 
 /* InternetCloseHandle on a worker thread with an outer bound: a close that blocks is reported, never hangs the area */
 static DWORD WINAPI close_thread(LPVOID p) { U(InternetCloseHandle)((HINTERNET)p); return 0; }
@@ -53,6 +89,7 @@ void bio_close(bio_env *e) {
     if (e->s) srv_stop(e->s);
     (void)ok;
     e->s = NULL;
+    free(e->owned); e->owned = NULL;
 }
 
 HINTERNET bio_req(bio_env *e, const char *verb, const char *path, DWORD extra, const char *hdrs, BOOL *ok, DWORD *err) {

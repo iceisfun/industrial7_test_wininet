@@ -58,8 +58,7 @@ enum { DEC_OFF = 0, DEC_SESSION = 1, DEC_REQUEST = 2, DEC_CONNECT = 3 };
 static void dec_case(const void *body, size_t blen, unsigned flags, const char *ce_hdr, const char *accept,
                      int where, const void *want, size_t wantn, DWORD piece) {
     srv_step st[] = { S_HEAD(), { SRV_REPLY, (const char *)body, blen, 200, ce_hdr, flags, flags & SRV_R_CHUNKED ? 100 : 0 }, S_LOOP() };
-    bio_env e; if (!bio_open(&e, st, 3)) return;
-    if (where == DEC_SESSION) CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, st, 3, where == DEC_SESSION)) return;   /* session option before InternetConnect */
     if (where == DEC_CONNECT) CHECK(bio_set_dword(e.hc, INTERNET_OPTION_HTTP_DECODING, TRUE));
     HINTERNET hr = U(HttpOpenRequestA)(e.hc, "GET", "/dec", NULL, NULL, NULL, T_INET_FRESH, 0);
     if (where == DEC_REQUEST) CHECK(bio_set_dword(hr, INTERNET_OPTION_HTTP_DECODING, TRUE));
@@ -122,8 +121,7 @@ TEST(bio_dec_accept_gzip_only) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_
 TEST(bio_dec_headers_after_decoding) {
     REQUIRE(U(InternetReadFile));
     srv_step st[] = { S_HEAD(), S_REPLYN(200, "Content-Encoding: gzip\r\n", srv_fox_gzip, srv_fox_gzip_len, 0), S_LOOP() };
-    bio_env e; if (!bio_open(&e, st, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, st, 3, 1)) return;
     BOOL ok; DWORD err;
     HINTERNET hr = bio_req(&e, "GET", "/h", 0, AE, &ok, &err);
     CHECK(ok);
@@ -145,8 +143,7 @@ TEST(bio_dec_headers_after_decoding) {
 /* corrupt compressed data */
 static void dec_corrupt(const char *tag, const unsigned char *p, size_t n, const char *ce) {
     srv_step st[] = { S_HEAD(), S_REPLYN(200, ce, p, n, 0), S_LOOP() };
-    bio_env e; if (!bio_open(&e, st, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, st, 3, 1)) return;
     BOOL ok; DWORD err;
     HINTERNET hr = bio_req(&e, "GET", "/bad", 0, AE, &ok, &err);
     if (!ok) { t_note("%s: send failed err=%lu %s", tag, err, t_inet_errname(err)); bio_h(hr); bio_close(&e); return; }
@@ -178,7 +175,7 @@ TEST(bio_dec_truncated_gzip) {
 }
 
 /* ------------------------------------------------------------------ receive timeouts */
-/* head arrives after the receive timeout: HttpSendRequest fails with 12002 */
+/* head arrives later than a short receive timeout set on the existing session (observed: no effect, see below) */
 TEST(bio_timeout_before_head) {
     REQUIRE(U(HttpSendRequestA));
     static const srv_step st[] = { S_HEAD(), S_SLEEP(2500), S_REPLY(200, NULL, "late") };
@@ -188,7 +185,8 @@ TEST(bio_timeout_before_head) {
     HINTERNET hr = bio_req(&e, "GET", "/late", 0, NULL, &ok, &err);
     DWORD dt = GetTickCount() - t0;
     t_note("head after 2.5 s, receive timeout 500 ms: ok=%d err=%lu (%s) after %lu ms", ok, err, t_inet_errname(err), dt);
-    CHECK(!ok); EXPECT_EQ(err, ERROR_INTERNET_TIMEOUT);
+    /* Win10 VM boot 1: a 500 ms RECEIVE_TIMEOUT set on an existing session does not cut a 2.5 s wait for the head */
+    CHECK(ok);
     bio_h(hr); bio_close(&e);
 }
 
@@ -200,11 +198,12 @@ TEST(bio_timeout_request_handle_option) {
     HINTERNET hr = U(HttpOpenRequestA)(e.hc, "GET", "/late", NULL, NULL, NULL, T_INET_FRESH, 0);
     CHECK(bio_set_dword(hr, INTERNET_OPTION_RECEIVE_TIMEOUT, 500));
     BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0); DWORD err = GetLastError();
-    CHECK(!ok); EXPECT_EQ(err, ERROR_INTERNET_TIMEOUT);
+    t_note("request RECEIVE_TIMEOUT 500, head after 2.5 s: ok=%d err=%lu", ok, err);
+    CHECK(ok);                                 /* Win10 VM boot 1: no 12002 */
     bio_h(hr); bio_close(&e);
 }
 
-/* body stalls in the middle: the received part is delivered, the next read fails with 12002 */
+/* body stalls in the middle longer than a short receive timeout set on the existing session (observed: no effect) */
 TEST(bio_timeout_mid_body) {
     REQUIRE(U(InternetReadFile));
     static const srv_step st[] = { S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nabcde"), S_SLEEP(2500), S_SEND("fghij"), S_CLOSE() };
@@ -214,8 +213,8 @@ TEST(bio_timeout_mid_body) {
     char b[16]; bio_rd r; DWORD t0 = GetTickCount();
     size_t n = bio_read(hr, b, sizeof b, 0, &r);
     t_note("mid-body stall: ok=%d err=%lu (%s) n=%u after %lu ms", r.ok, r.err, t_inet_errname(r.err), (unsigned)n, GetTickCount() - t0);
-    EXPECT_EQ(n, 5); CHECK(!memcmp(b, "abcde", 5));
-    CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_INTERNET_TIMEOUT);
+    CHECK(n <= 10 && !memcmp(b, "abcdefghij", n));
+    CHECK(r.ok); EXPECT_EQ(n, 10);             /* Win10 VM boot 1: the read waited out the stall, no 12002 */
     bio_h(hr); bio_close(&e);
 }
 
@@ -228,7 +227,7 @@ TEST(bio_timeout_mid_chunked) {
     HINTERNET hr = bio_get(&e, "/stallc");
     char b[16]; bio_rd r; size_t n = bio_read(hr, b, sizeof b, 0, &r);
     t_note("chunked stall: ok=%d err=%lu (%s) n=%u", r.ok, r.err, t_inet_errname(r.err), (unsigned)n);
-    EXPECT_EQ(n, 3); CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_INTERNET_TIMEOUT);
+    CHECK(r.ok); EXPECT_EQ(n, 3); CHECK(!memcmp(b, "abc", 3));   /* Win10 VM boot 1: no 12002 */
     bio_h(hr); bio_close(&e);
 }
 

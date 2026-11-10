@@ -38,9 +38,8 @@ static void d2_run(const d2_in *in, d2_out *o) {
     memset(o, 0, sizeof *o);
     srv_step st[] = { S_HEAD(), { SRV_REPLY, (const char *)in->body, in->blen, 200, in->rhdrs, in->rflags, in->csz }, S_LOOP() };
     if (in->blen == 0) { st[1].data = ""; }
-    bio_env e; if (!bio_open(&e, st, (in->rflags & (SRV_R_CLOSE | SRV_R_TRUNCATE)) ? 2 : 3)) return;
+    bio_env e; if (!bio_open_dec(&e, st, (in->rflags & (SRV_R_CLOSE | SRV_R_TRUNCATE)) ? 2 : 3, in->decode)) return;
     o->ran = 1;
-    if (in->decode) CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
     HINTERNET hr = U(HttpOpenRequestA)(e.hc, in->verb ? in->verb : "GET", "/d2", NULL, NULL, NULL, T_INET_FRESH, 0);
     CHECK(hr != NULL);
     if (in->addhdrs) CHECK(U(HttpAddRequestHeadersA)(hr, in->addhdrs, (DWORD)-1, HTTP_ADDREQ_FLAG_ADD));
@@ -241,8 +240,7 @@ TEST(bio_d2_vary_kept_when_not_decoding) {
 TEST(bio_d2_content_length_after_decoding) {
     REQUIRE(U(HttpQueryInfoA));
     srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, srv_fox_gzip, srv_fox_gzip_len, 0), S_LOOP() };
-    bio_env e; if (!bio_open(&e, st, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, st, 3, 1)) return;
     BOOL ok; DWORD err;
     HINTERNET hr = bio_req(&e, "GET", "/cl", 0, AE_GD, &ok, &err);
     CHECK(ok);
@@ -380,8 +378,7 @@ TEST(bio_d2_qda_loop_decoded) {
     REQUIRE(U(InternetQueryDataAvailable));
     static const srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, bio_gz_pat300k, 0, 0), S_LOOP() };
     srv_step s2[3]; memcpy(s2, st, sizeof s2); s2[1].n = bio_gz_pat300k_len;
-    bio_env e; if (!bio_open(&e, s2, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, s2, 3, 1)) return;
     BOOL ok; DWORD err;
     HINTERNET hr = bio_req(&e, "GET", "/q", 0, AE_GD, &ok, &err);
     CHECK(ok);
@@ -405,8 +402,7 @@ TEST(bio_d2_qda_loop_decoded) {
 TEST(bio_d2_readfileex_decoded) {
     REQUIRE(U(InternetReadFileExA));
     srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_BR, bio_br_pat100k, bio_br_pat100k_len, 0), S_LOOP() };
-    bio_env e; if (!bio_open(&e, st, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, st, 3, 1)) return;
     BOOL ok; DWORD err;
     HINTERNET hr = bio_req(&e, "GET", "/x", 0, AE_GDB, &ok, &err);
     CHECK(ok);
@@ -419,8 +415,7 @@ TEST(bio_d2_keepalive_two_decoded) {
     REQUIRE(U(InternetReadFile));
     static const srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, srv_fox_gzip, 0, 0), S_LOOP() };
     srv_step s2[3]; memcpy(s2, st, sizeof s2); s2[1].n = srv_fox_gzip_len;
-    bio_env e; if (!bio_open(&e, s2, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, s2, 3, 1)) return;
     for (int i = 0; i < 3; i++) {
         BOOL ok; DWORD err;
         HINTERNET hr = bio_req(&e, "GET", "/k", 0, AE_GD, &ok, &err);
@@ -438,8 +433,7 @@ TEST(bio_d2_partial_decoded_then_next) {
     REQUIRE(U(InternetReadFile));
     static const srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, srv_fox_gzip, 0, 0), S_LOOP() };
     srv_step s2[3]; memcpy(s2, st, sizeof s2); s2[1].n = srv_fox_gzip_len;
-    bio_env e; if (!bio_open(&e, s2, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, s2, 3, 1)) return;
     BOOL ok; DWORD err;
     HINTERNET hr = bio_req(&e, "GET", "/p1", 0, AE_GD, &ok, &err);
     char b[2048]; DWORD rd = 0;
@@ -465,12 +459,12 @@ TEST(bio_d2_request_option_off_overrides_session) {
     REQUIRE(U(InternetReadFile));
     static const srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, srv_fox_gzip, 0, 0), S_LOOP() };
     srv_step s2[3]; memcpy(s2, st, sizeof s2); s2[1].n = srv_fox_gzip_len;
-    bio_env e; if (!bio_open(&e, s2, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, s2, 3, 1)) return;
     HINTERNET hr = U(HttpOpenRequestA)(e.hc, "GET", "/o", NULL, NULL, NULL, T_INET_FRESH, 0);
     DWORD v = 0xDEAD, l = sizeof v;
     BOOL qok = U(InternetQueryOptionA)(hr, INTERNET_OPTION_HTTP_DECODING, &v, &l);
     t_note("request HTTP_DECODING inherited from the session: ok=%d v=%lu", qok, v);
+    CHECK(qok); EXPECT_EQ(v, 1);
     CHECK(bio_set_dword(hr, INTERNET_OPTION_HTTP_DECODING, FALSE));
     CHECK(U(HttpSendRequestA)(hr, AE_GD, (DWORD)-1, NULL, 0));
     char *b = malloc(4096); bio_rd r; size_t n = bio_read(hr, b, 4096, 0, &r);
@@ -478,6 +472,39 @@ TEST(bio_d2_request_option_off_overrides_session) {
     t_note("session TRUE, request FALSE: %s", dec ? "decoded" : raw ? "left encoded" : "other");
     CHECK(r.ok); CHECK(raw);
     free(b); bio_h(hr); bio_close(&e);
+}
+/* Win10 VM boot 1: the connect handle copies HTTP_DECODING from the session when it is created; setting the session
+ * option later reaches neither the connect handle nor its requests */
+TEST(bio_d2_session_option_after_connect_not_inherited) {
+    REQUIRE(U(InternetQueryOptionA));
+    static const srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, srv_fox_gzip, 0, 0), S_LOOP() };
+    srv_step s2[3]; memcpy(s2, st, sizeof s2); s2[1].n = srv_fox_gzip_len;
+    bio_env e; if (!bio_open(&e, s2, 3)) return;
+    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    DWORD v = 0xDEAD, l = sizeof v;
+    CHECK(U(InternetQueryOptionA)(e.hc, INTERNET_OPTION_HTTP_DECODING, &v, &l)); EXPECT_EQ(v, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(e.hc, "GET", "/o", NULL, NULL, NULL, T_INET_FRESH, 0);
+    v = 0xDEAD; l = sizeof v;
+    CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_HTTP_DECODING, &v, &l)); EXPECT_EQ(v, 0);
+    CHECK(U(HttpSendRequestA)(hr, AE_GD, (DWORD)-1, NULL, 0));
+    char *b = malloc(4096); bio_rd r; size_t n = bio_read(hr, b, 4096, 0, &r);
+    CHECK(r.ok); CHECK(n == srv_fox_gzip_len && !memcmp(b, srv_fox_gzip, n));
+    free(b); bio_h(hr); bio_close(&e);
+}
+TEST(bio_d2_session_before_connect_inherited) {
+    REQUIRE(U(InternetQueryOptionA));
+    bio_env e; if (!bio_open_dec(&e, NULL, 0, 1)) return;
+    DWORD v = 0xDEAD, l = sizeof v;
+    CHECK(U(InternetQueryOptionA)(e.hc, INTERNET_OPTION_HTTP_DECODING, &v, &l)); EXPECT_EQ(v, 1);
+    HINTERNET hr = U(HttpOpenRequestA)(e.hc, "GET", "/o", NULL, NULL, NULL, T_INET_FRESH, 0);
+    v = 0xDEAD; l = sizeof v;
+    CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_HTTP_DECODING, &v, &l)); EXPECT_EQ(v, 1);
+    /* turning it off on the connect handle does not change an existing request */
+    CHECK(bio_set_dword(e.hc, INTERNET_OPTION_HTTP_DECODING, FALSE));
+    v = 0xDEAD; l = sizeof v;
+    CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_HTTP_DECODING, &v, &l));
+    t_note("request option after the connect handle was set FALSE: %lu", v);
+    bio_h(hr); bio_close(&e);
 }
 TEST(bio_d2_session_option_after_open_request) {
     REQUIRE(U(InternetReadFile));
@@ -490,14 +517,13 @@ TEST(bio_d2_session_option_after_open_request) {
     char *b = malloc(4096); bio_rd r; size_t n = bio_read(hr, b, 4096, 0, &r);
     int dec = n == SRV_FOX_LEN && !memcmp(b, srv_fox_text(), n), raw = n == srv_fox_gzip_len && !memcmp(b, srv_fox_gzip, n);
     t_note("session option set after HttpOpenRequest: %s", dec ? "decoded" : raw ? "left encoded" : "other");
-    CHECK(r.ok); CHECK(dec || raw);
+    CHECK(r.ok); CHECK(raw);                   /* Win10 VM boot 1: left encoded */
     free(b); bio_h(hr); bio_close(&e);
 }
 TEST(bio_d2_openurl_br) {
     REQUIRE(U(InternetOpenUrlA));
     srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_BR, bio_br_fox, bio_br_fox_len, 0), S_LOOP() };
-    bio_env e; if (!bio_open(&e, st, 3)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    bio_env e; if (!bio_open_dec(&e, st, 3, 1)) return;
     HINTERNET hu = U(InternetOpenUrlA)(e.hi, srv_url(e.s, "/br"), AE_GDB, (DWORD)-1, T_INET_FRESH, 0);
     CHECK(hu != NULL);
     char *b = malloc(2048); bio_rd r; size_t n = hu ? bio_read(hu, b, 2048, 64, &r) : 0;

@@ -14,7 +14,13 @@
 #define ERROR_INTERNET_DECODING_FAILED 12175
 #endif
 
-typedef struct { srv *s; HINTERNET hi, hc; DWORD t0; } bio_env;
+typedef struct { srv *s; HINTERNET hi, hc; DWORD t0; void *owned; } bio_env;
+
+/* HTTP_DECODING TRUE on the session before InternetConnect (the connect handle copies it when it is created;
+ * Win10 VM: setting it on the session afterwards does not reach existing connect/request handles) */
+int  bio_open_dec(bio_env *e, const srv_step *st, int n, int session_decoding);
+/* bio_wait.c: SRV_CALL step inserted before every request-reading step (see there) */
+int  bio_wait_next(srv_conn *c, const srv_step *st, void *user);
 
 /* Start a server running steps (connection i runs the same script) and open a DIRECT session + connect handle.
  * Returns 0 after t_skip() when the server or wininet is unavailable. */

@@ -165,37 +165,35 @@ static void seek_read_check(HINTERNET hr, LONG to, DWORD method, DWORD want_pos,
     CHECKF(rd == exp, "read after seek to %lu: %lu want %lu", want_pos, rd, exp);
     CHECK(srv_pattern_check(b, rd, want_pos));
 }
+/* Win10 VM boot 1: a cache-backed response is seekable while it is being read (backwards and forwards, also past
+ * what has been downloaded), and no longer once the body has been read to its end (12016, like a non-cached one). */
 TEST(bio_m2_seek_cached_large_body) {
     REQUIRE(U(InternetSetFilePointer)); REQUIRE(U(DeleteUrlCacheEntryA));
     static const srv_step st[] = { S_HEAD(), S_REPLY_PATTERN(200, CACHEABLE, 100000, 0), S_LOOP() };
     bio_env e; if (!bio_open(&e, st, 3)) return;
     char url[128]; HINTERNET hr = cached_get(&e, "/seek.bin", 0, url, sizeof url);
-    unsigned char *b = malloc(100100); bio_rd r; size_t n = bio_read(hr, b, 100100, 0, &r);
-    CHECK(r.ok); EXPECT_EQ(n, 100000);
+    unsigned char *b = malloc(100100); DWORD rd = 0;
+    CHECK(U(InternetReadFile)(hr, b, 1000, &rd)); CHECK(rd >= 1 && rd <= 1000 && srv_pattern_check(b, rd, 0));
+    seek_read_check(hr, 0, FILE_BEGIN, 0, 100, 100000);
+    seek_read_check(hr, 50000, FILE_BEGIN, 50000, 100, 100000);
+    seek_read_check(hr, 1, FILE_BEGIN, 1, 4096, 100000);
+    seek_read_check(hr, 65536, FILE_BEGIN, 65536, 4096, 100000);
+    DWORD p = U(InternetSetFilePointer)(hr, 1000, NULL, FILE_BEGIN, 0); EXPECT_EQ(p, 1000);
+    seek_read_check(hr, 500, FILE_CURRENT, 1500, 10, 100000);
+    seek_read_check(hr, -1510, FILE_CURRENT, 0, 10, 100000);
     SetLastError(0);
-    DWORD p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0);
-    if (p == INVALID_SET_FILE_POINTER) {
-        t_note("cached body not seekable here: err %lu", GetLastError());
-        CHECK(0);
-    } else {
-        EXPECT_EQ(p, 0);
-        seek_read_check(hr, 50000, FILE_BEGIN, 50000, 100, 100000);
-        seek_read_check(hr, 99990, FILE_BEGIN, 99990, 100, 100000);
-        seek_read_check(hr, 1, FILE_BEGIN, 1, 4096, 100000);
-        seek_read_check(hr, -10, FILE_END, 99990, 4096, 100000);
-        seek_read_check(hr, 0, FILE_END, 100000, 100, 100000);
-        seek_read_check(hr, 65536, FILE_BEGIN, 65536, 4096, 100000);
-        p = U(InternetSetFilePointer)(hr, 1000, NULL, FILE_BEGIN, 0); EXPECT_EQ(p, 1000);
-        seek_read_check(hr, 500, FILE_CURRENT, 1500, 10, 100000);
-        seek_read_check(hr, -1510, FILE_CURRENT, 0, 10, 100000);
-        SetLastError(0);
-        p = U(InternetSetFilePointer)(hr, 200000, NULL, FILE_BEGIN, 0); DWORD err = GetLastError();
-        t_note("seek past the end of a 100000-byte cached body: r=%lu err=%lu", p, err);
-        /* whole body again from 0 */
-        p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0); EXPECT_EQ(p, 0);
-        n = bio_read(hr, b, 100100, 3333, &r);
-        CHECK(r.ok); EXPECT_EQ(n, 100000); CHECK(srv_pattern_check(b, n, 0));
-    }
+    p = U(InternetSetFilePointer)(hr, -10, NULL, FILE_END, 0); DWORD err = GetLastError();
+    t_note("FILE_END -10 on a 100000-byte cached body being read: r=%lu err=%lu", p, err);
+    SetLastError(0);
+    p = U(InternetSetFilePointer)(hr, 200000, NULL, FILE_BEGIN, 0); err = GetLastError();
+    t_note("seek past the end of a 100000-byte cached body: r=%lu err=%lu", p, err);
+    /* whole body from 0 to EOF */
+    p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0); EXPECT_EQ(p, 0);
+    bio_rd r; size_t n = bio_read(hr, b, 100100, 3333, &r);
+    CHECK(r.ok); EXPECT_EQ(n, 100000); CHECK(srv_pattern_check(b, n, 0));
+    SetLastError(0);
+    p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0);
+    EXPECT_EQ(p, INVALID_SET_FILE_POINTER); EXPECT_ERR(ERROR_INTERNET_INVALID_OPERATION);
     free(b); bio_h(hr); bio_close(&e);
     U(DeleteUrlCacheEntryA)(url);
 }
@@ -210,12 +208,14 @@ TEST(bio_m2_seek_cached_before_full_read) {
     SetLastError(0);
     DWORD p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0); DWORD err = GetLastError();
     t_note("seek back to 0 after 1000 of 100000 bytes: r=%lu err=%lu", p, err);
+    EXPECT_EQ(p, 0);
     if (p == 0) {
         CHECK(U(InternetReadFile)(hr, b, 500, &rd)); CHECK(rd <= 500 && srv_pattern_check(b, rd, 0));
     }
     SetLastError(0);
     p = U(InternetSetFilePointer)(hr, 90000, NULL, FILE_BEGIN, 0); err = GetLastError();
     t_note("seek forward to 90000 (not downloaded yet): r=%lu err=%lu", p, err);
+    EXPECT_EQ(p, 90000);
     if (p == 90000) { CHECK(U(InternetReadFile)(hr, b, 100, &rd)); CHECK(srv_pattern_check(b, rd, 90000)); }
     bio_h(hr); bio_close(&e);
     U(DeleteUrlCacheEntryA)(url);
@@ -445,7 +445,10 @@ TEST(bio_m2_stale_bytes_before_next_response) {
     hr = bio_req(&e, "GET", "/2", 0, NULL, &ok, &err);
     n = ok ? bio_read(hr, b, sizeof b, 0, &r) : 0;
     t_note("next response after stale bytes: send ok=%d err=%lu body '%.*s' (connections %d)", ok, err, (int)n, b, srv_conn_count(e.s));
-    CHECK(!ok || (n == 5 && (!memcmp(b, "stale", 5) || !memcmp(b, "fresh", 5))));
+    /* VM boot 1: the connection with unread extra bytes is not reused; the new connection runs the script from its
+     * first step, so its answer is "hello" */
+    CHECK(ok); EXPECT_EQ(srv_conn_count(e.s), 2);
+    CHECK(n == 5 && !memcmp(b, "hello", 5));
     bio_h(hr); bio_close(&e);
 }
 
@@ -467,23 +470,30 @@ TEST(bio_m2_read_buffer_size_option) {
     free(b); bio_h(hr); bio_close(&e);
 }
 
-TEST(bio_m2_timeout_then_read_again) {
-    REQUIRE(U(InternetReadFile));
-    static const srv_step st[] = { S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nabcde"), S_SLEEP(2000), S_SEND("fghij"), S_SLEEP(500), S_CLOSE() };
-    bio_env e; if (!bio_open(&e, st, 6)) return;
-    CHECK(bio_set_dword(e.hi, INTERNET_OPTION_RECEIVE_TIMEOUT, 400));
-    HINTERNET hr = bio_get(&e, "/t");
-    char b[16]; bio_rd r; size_t n = bio_read(hr, b, sizeof b, 0, &r);
-    EXPECT_EQ(n, 5); CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_INTERNET_TIMEOUT);
-    Sleep(2000);                               /* the rest has arrived by now */
-    DWORD rd = 77; SetLastError(0);
-    BOOL ok = U(InternetReadFile)(hr, b, sizeof b, &rd); DWORD err = GetLastError();
-    t_note("read again after a 12002: ok=%d err=%lu %s rd=%lu", ok, err, ok ? "" : t_inet_errname(err), rd);
-    CHECK(!ok || rd == 0 || (rd <= 5 && !memcmp(b, "fghij", rd)));
-    bio_h(hr);
-    /* the connect handle is still usable: the next request gets a new connection */
-    bio_close(&e);
+/* Receive timeout set on the session BEFORE InternetConnect (so the connect and request handles inherit it), with a
+ * 2.5 s stall in the middle of the body. Observed only: Win10 VM boot 1 showed that a 400-500 ms RECEIVE_TIMEOUT set
+ * on an existing session or on the request did not cut such stalls short. Invariants: no byte invented, and a
+ * failure is 12002. */
+static void stall_probe(DWORD tmo, const char *tag) {
+    static const srv_step st[] = { S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 10\r\n\r\nabcde"), S_SLEEP(2500), S_SEND("fghij"), S_SLEEP(300), S_CLOSE() };
+    srv_step cp[6]; memcpy(cp, st, sizeof cp);
+    srv_script sc = { cp, 6 };
+    srv_config cfg; memset(&cfg, 0, sizeof cfg); cfg.kind = SRV_HTTP; cfg.scripts = &sc; cfg.nscripts = 1; cfg.lifetime_ms = 20000;
+    srv *s = NULL; if (srv_start(&cfg, &s)) { t_skip("server unavailable"); return; }
+    HINTERNET hi = t_inet_open_ex("bio-tmo", INTERNET_OPEN_TYPE_DIRECT, 0, tmo);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/st", NULL, NULL, NULL, T_INET_FRESH, 0);
+    DWORD v = 0, l = sizeof v; U(InternetQueryOptionA)(hr, INTERNET_OPTION_RECEIVE_TIMEOUT, &v, &l);
+    CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
+    char b[16]; bio_rd r; DWORD t0 = GetTickCount(); size_t n = bio_read(hr, b, sizeof b, 0, &r);
+    t_note("%s: request RECEIVE_TIMEOUT %lu, 2.5 s stall mid-body: ok=%d err=%lu %s n=%u after %lu ms", tag, v, r.ok, r.err,
+           r.ok ? "" : t_inet_errname(r.err), (unsigned)n, GetTickCount() - t0);
+    CHECK(n <= 10 && !memcmp(b, "abcdefghij", n));
+    if (!r.ok) EXPECT_EQ(r.err, ERROR_INTERNET_TIMEOUT); else EXPECT_EQ(n, 10);
+    bio_h(hr); bio_h(hc); t_inet_close(hi); srv_stop(s);
 }
+TEST(bio_m2_stall_session_timeout_400) { REQUIRE(U(InternetReadFile)); stall_probe(400, "session timeouts 400"); }
+TEST(bio_m2_stall_session_timeout_1000) { REQUIRE(U(InternetReadFile)); stall_probe(1000, "session timeouts 1000"); }
 
 TEST(bio_m2_data_receive_timeout_option) {
     REQUIRE(U(InternetReadFile));
@@ -496,8 +506,8 @@ TEST(bio_m2_data_receive_timeout_option) {
     CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
     char b[16]; bio_rd r; DWORD t0 = GetTickCount(); size_t n = bio_read(hr, b, sizeof b, 0, &r);
     t_note("mid-body stall with DATA_RECEIVE_TIMEOUT 400: ok=%d err=%lu %s n=%u after %lu ms", r.ok, r.err, r.ok ? "" : t_inet_errname(r.err), (unsigned)n, GetTickCount() - t0);
-    CHECK(n == 5 || n == 10);
     CHECK(!memcmp(b, "abcdefghij", n));
+    CHECK(r.ok); EXPECT_EQ(n, 10);             /* VM boot 1: no 12002, the read waited out the stall */
     bio_h(hr); bio_close(&e);
 }
 
@@ -507,10 +517,12 @@ TEST(bio_m2_resend_after_chunked_partial) {
     static const srv_step st[] = { S_HEAD(), S_REPLY_CHUNKED(200, NULL, "0123456789abcdefghijklmnopqrstuvwxyz", 5), S_LOOP() };
     bio_env e; if (!bio_open(&e, st, 3)) return;
     HINTERNET hr = bio_get(&e, "/rc");
-    char b[64]; DWORD rd = 0;
-    CHECK(U(InternetReadFile)(hr, b, 7, &rd)); EXPECT_EQ(rd, 7);
+    char b[64]; DWORD rd = 0; size_t got = 0;
+    while (got < 7) { rd = 0; if (!U(InternetReadFile)(hr, b + got, (DWORD)(7 - got), &rd) || !rd) break; got += rd; }
+    EXPECT_EQ(got, 7); CHECK(!memcmp(b, "0123456", 7));     /* VM boot 1: a 7-byte read of 5-byte chunks returned 4 */
     BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0); DWORD err = GetLastError();
     t_note("resend after 7 of 36 chunked bytes: ok=%d err=%lu", ok, err);
+    CHECK(ok);
     if (ok) {
         bio_rd r; size_t n = bio_read(hr, b, sizeof b, 0, &r);
         CHECK(r.ok); EXPECT_EQ(n, 36); CHECK(n == 36 && !memcmp(b, "0123456789abcdefghijklmnopqrstuvwxyz", 36));
