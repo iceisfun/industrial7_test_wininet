@@ -49,8 +49,9 @@ TEST(auth_cache_other_directory) {
     q.path = "/other/x"; a_send(hc, &q, &r, 0);
     a_dump(s);
     EXPECT_EQ(r.status, 200);
-    t_note("other directory after /dir/ auth: %d more requests, first auth=%s", srv_req_count(s) - before,
-           REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
+    /* Win10 VM: pre-authentication is scoped to the directory; /other/ is challenged again and answered from the PWC */
+    EXPECT_EQ(srv_req_count(s) - before, 2); CHECK(REQ_AUTH(s, before) == NULL);
+    EXPECT_STR(REQ_AUTH(s, before + 1), "Basic dXNlcjpwYXNz");
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -64,8 +65,8 @@ TEST(auth_cache_parent_directory) {
     q.path = "/p/b"; a_send(hc, &q, &r, 0);
     a_dump(s);
     EXPECT_EQ(r.status, 200);
-    t_note("parent directory after /p/q/ auth: %d more requests, first auth=%s", srv_req_count(s) - before,
-           REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
+    EXPECT_EQ(srv_req_count(s) - before, 2); CHECK(REQ_AUTH(s, before) == NULL);   /* Win10 VM */
+    EXPECT_STR(REQ_AUTH(s, before + 1), "Basic dXNlcjpwYXNz");
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -81,8 +82,8 @@ TEST(auth_cache_new_connect_handle_no_creds) {
     HINTERNET hc2 = a_connect(hi, s, NULL, NULL);
     a_send(hc2, &q, &r, 0);
     a_dump(s);
-    t_note("same session, new connect handle without creds: status=%lu, %d more requests, first auth=%s", r.status,
-           srv_req_count(s) - before, REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
+    /* Win10 VM: the password cache is not tied to the connect handle */
+    EXPECT_EQ(r.status, 200); EXPECT_EQ(srv_req_count(s) - before, 1); EXPECT_STR(REQ_AUTH(s, before), "Basic dXNlcjpwYXNz");
     a_close(hc2); t_inet_close(hi); srv_stop(s);
 }
 
@@ -95,8 +96,8 @@ TEST(auth_cache_new_session_no_creds) {
     int before = srv_req_count(s);
     q.cuser = q.cpass = NULL; a_once(s, &q, &r);
     a_dump(s);
-    t_note("new InternetOpen session without creds: status=%lu, %d more requests, first auth=%s", r.status,
-           srv_req_count(s) - before, REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
+    /* Win10 VM: process-wide, survives closing the session */
+    EXPECT_EQ(r.status, 200); EXPECT_EQ(srv_req_count(s) - before, 1); EXPECT_STR(REQ_AUTH(s, before), "Basic dXNlcjpwYXNz");
     srv_stop(s);
 }
 
@@ -113,8 +114,8 @@ TEST(auth_cache_different_creds_on_new_connect) {
     a_dump(s);
     EXPECT_EQ(r.status, 200);
     const char *last = REQ_AUTH(s, srv_req_count(s) - 1);
-    t_note("second connect with other creds: %d more requests, auth seq first=%s last=%s", srv_req_count(s) - before,
-           REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)", last ? last : "(none)");
+    /* Win10 VM: the new connect handle's credentials are sent pre-emptively */
+    EXPECT_EQ(srv_req_count(s) - before, 1); EXPECT_STR(REQ_AUTH(s, before), a_basic("user2", "pass2"));
     a_close(hc2); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -130,8 +131,9 @@ TEST(auth_cache_not_populated_by_failed_creds) {
     a_send(hc2, &q, &r, 0);
     a_dump(s);
     EXPECT_EQ(r.status, 401);
-    t_note("after failed creds, credential-less request: %d more requests, first auth=%s", srv_req_count(s) - before,
-           REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
+    /* Win10 VM: no pre-emptive send, but the challenge is answered with the remembered (failed) pair */
+    EXPECT_EQ(srv_req_count(s) - before, 2); CHECK(REQ_AUTH(s, before) == NULL);
+    EXPECT_STR(REQ_AUTH(s, before + 1), a_basic("user", "wrong"));
     a_close(hc2); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -146,7 +148,7 @@ TEST(auth_cache_preemptive_with_no_auth_flag) {
     q.flags = T_INET_FRESH | INTERNET_FLAG_NO_AUTH; a_send(hc, &q, &r, 0);
     a_dump(s);
     EXPECT_EQ(srv_req_count(s) - before, 1);
-    t_note("NO_AUTH after cached creds: status=%lu auth=%s", r.status, REQ_AUTH(s, before) ? REQ_AUTH(s, before) : "(none)");
+    EXPECT_EQ(r.status, 401); CHECK(REQ_AUTH(s, before) == NULL);   /* Win10 VM: NO_AUTH also disables pre-authentication */
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 

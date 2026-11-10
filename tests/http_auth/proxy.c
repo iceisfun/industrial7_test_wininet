@@ -209,20 +209,44 @@ TEST(auth_proxy_connect_creds_answer_proxy_in_chain) {
     srv_stop(s);
 }
 
-TEST(auth_proxy_then_origin_auth) {
+TEST(auth_proxy_request_server_creds_shadow_proxy_creds) {
     REQUIRE(U(HttpSendRequestA));
     static const srv_step st[] = { S_CALL(chain_fn) }; static const srv_script sc[] = { SRV_SCRIPT(st) };
     srv_config cfg = { SRV_HTTP, sc, 1 }; srv *s; START_OR_SKIP(&cfg, &s);
     areq q = {0}; q.path = "/chain"; q.puser = "puser"; q.ppass = "ppass"; q.ruser = "ouser"; q.rpass = "opass"; ares r; proxy_once(s, NULL, NULL, &q, &r);
     a_dump(s);
-    EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "both");
+    /* Win10 VM: request USERNAME/PASSWORD (server creds) are used for the proxy leg in preference to PROXY_* */
+    CHECK(r.ok); EXPECT_EQ(r.status, 407); EXPECT_EQ(srv_req_count(s), 2);
+    if (srv_req_count(s) >= 2) EXPECT_STR(REQ_PAUTH(s, 1), a_basic("ouser", "opass"));
+    srv_stop(s);
+}
+
+/* one credential pair valid at both the proxy and the origin */
+static int chain_same_fn(srv_conn *c, const srv_step *st, void *user) {
+    srv *s = srv_conn_server(c); char want[128]; snprintf(want, sizeof want, "%s", a_basic("both", "pw"));
+    for (int it = 0; it < 16; it++) {
+        int ri = srv_conn_recv_head(c); if (ri < 0) return -1;
+        const char *p = srv_req_header(s, ri, "Proxy-Authorization"), *o = srv_req_header(s, ri, "Authorization");
+        if (!p || strcmp(p, want)) srv_conn_sendf(c, "HTTP/1.1 407 Proxy Authentication Required\r\n" CH_PBASIC "Content-Length: 1\r\n\r\nP");
+        else if (!o || strcmp(o, want)) srv_conn_sendf(c, "HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"origin\"\r\nContent-Length: 1\r\n\r\nO");
+        else srv_conn_sendf(c, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nboth");
+    }
+    return -1;
+}
+TEST(auth_proxy_then_origin_auth) {
+    REQUIRE(U(HttpSendRequestA));
+    static const srv_step st[] = { S_CALL(chain_same_fn) }; static const srv_script sc[] = { SRV_SCRIPT(st) };
+    srv_config cfg = { SRV_HTTP, sc, 1 }; srv *s; START_OR_SKIP(&cfg, &s);
+    areq q = {0}; q.path = "/chain2"; ares r; proxy_once(s, "both", "pw", &q, &r);
+    a_dump(s);
     int n = srv_req_count(s);
-    t_note("proxy+origin chain: %d requests", n);
+    t_note("proxy then origin with one pair: status=%lu requests=%d", r.status, n);
+    EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "both");
     EXPECT_EQ(n, 3);
     if (n >= 3) {
         CHECK(REQ_PAUTH(s, 0) == NULL); CHECK(REQ_AUTH(s, 0) == NULL);
-        EXPECT_STR(REQ_PAUTH(s, 1), a_basic("puser", "ppass")); CHECK(REQ_AUTH(s, 1) == NULL);
-        EXPECT_STR(REQ_PAUTH(s, 2), a_basic("puser", "ppass")); EXPECT_STR(REQ_AUTH(s, 2), a_basic("ouser", "opass"));
+        EXPECT_STR(REQ_PAUTH(s, 1), a_basic("both", "pw")); CHECK(REQ_AUTH(s, 1) == NULL);
+        EXPECT_STR(REQ_PAUTH(s, 2), a_basic("both", "pw")); EXPECT_STR(REQ_AUTH(s, 2), a_basic("both", "pw"));
     }
     srv_stop(s);
 }

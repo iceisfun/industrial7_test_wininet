@@ -31,7 +31,7 @@ TEST(auth_edge_large_401_body_drained) {
     EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "fine");
     EXPECT_EQ(srv_req_count(s), 2);
     EXPECT_STR(REQ_AUTH(s, 1), B64UP);
-    t_note("64 KB 401 body: conns %d -> %d", srv_req_conn(s, 0), srv_req_conn(s, 1));
+    EXPECT_EQ(srv_req_conn(s, 0), srv_req_conn(s, 1));   /* Win10 VM: drained, connection reused */
     srv_stop(s);
 }
 
@@ -96,7 +96,7 @@ TEST(auth_edge_401_then_redirect_keeps_auth_same_host) {
     if (srv_req_count(s) >= 3) {
         EXPECT_STR(REQ_AUTH(s, 1), B64UP);
         EXPECT_STR(srv_req_target(s, 2), "/moved/x");
-        t_note("redirect after auth, same host, other dir: auth=%s", REQ_AUTH(s, 2) ? REQ_AUTH(s, 2) : "(none)");
+        CHECK(REQ_AUTH(s, 2) == NULL);   /* Win10 VM: other directory, no pre-authentication */
     }
     srv_stop(s);
 }
@@ -104,13 +104,18 @@ TEST(auth_edge_401_then_redirect_keeps_auth_same_host) {
 TEST(auth_edge_redirect_cross_host_after_auth) {
     REQUIRE(U(HttpSendRequestA));
     /* same server reached as "localhost" after authenticating to 127.0.0.1: record whether Basic follows */
-    static const srv_step st[] = { S_HEAD(), S_REPLY(401, CH, "no"), S_HEAD(), S_REPLY(302, "Location: http://localhost:%P/elsewhere\r\n", ""), S_HEAD(), S_REPLY(200, NULL, "fine"), S_LOOP_TO(4) };
-    ares r; srv *s; run_script(st, 7, "/x", T_INET_FRESH, &r, &s); SRV_OR_SKIP(s);
+    static const srv_step st0[] = { S_HEAD(), S_REPLY(401, CH, "no"), S_HEAD(), S_REPLY(302, "Location: http://localhost:%P/elsewhere\r\n", ""), S_LOOP() };
+    static const srv_step st1[] = { S_HEAD(), S_REPLY(200, NULL, "fine"), S_LOOP() };
+    static const srv_script sc[] = { SRV_SCRIPT(st0), SRV_SCRIPT(st1) };
+    srv_config cfg = { SRV_HTTP, sc, 2 }; srv *s; START_OR_SKIP(&cfg, &s);
+    areq q = {0}; q.path = "/x"; q.cuser = "user"; q.cpass = "pass"; ares r; a_once(s, &q, &r);
     a_dump(s);
     EXPECT_EQ(r.status, 200);
+    EXPECT_EQ(srv_req_count(s), 3);
     if (srv_req_count(s) >= 3) {
         CHECK(srv_req_header(s, 2, "Host") && !strncmp(srv_req_header(s, 2, "Host"), "localhost:", 10));
-        t_note("cross-host redirect after Basic: Authorization=%s", REQ_AUTH(s, 2) ? REQ_AUTH(s, 2) : "(none)");
+        CHECK(REQ_AUTH(s, 2) == NULL);   /* Win10 VM: credentials do not follow a redirect to another host name */
+        CHECK(srv_req_conn(s, 2) != srv_req_conn(s, 1));
     }
     srv_stop(s);
 }
@@ -140,8 +145,9 @@ TEST(auth_edge_server_revokes_after_success) {
     EXPECT_EQ(r.status, 200);
     a_send(hc, &q, &r, 0);
     a_dump(s);
-    t_note("revoked creds: status=%lu body=%s total requests=%d", r.status, r.body, srv_req_count(s));
-    EXPECT_EQ(r.status, 401);
+    /* Win10 VM: a 401 to a pre-authenticated request is returned without another retry */
+    EXPECT_EQ(r.status, 401); EXPECT_STR(r.body, "revoked"); EXPECT_EQ(srv_req_count(s), 3);
+    if (srv_req_count(s) >= 3) EXPECT_STR(REQ_AUTH(s, 2), B64UP);
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -166,11 +172,11 @@ TEST(auth_edge_authorization_header_position) {
     if (srv_req_count(s) >= 2) {
         char line[512] = ""; size_t o = 0;
         for (int h = 0; h < srv_req_header_count(s, 1) && o + 40 < sizeof line; h++) o += snprintf(line + o, sizeof line - o, "%s|", srv_req_header_name(s, 1, h));
-        t_note("retry header order: %s", line);
-        EXPECT_STR(srv_req_header_name(s, 1, srv_req_header_index(s, 1, "Authorization")), "Authorization");
+        char line0[512] = ""; o = 0;
+        for (int h = 0; h < srv_req_header_count(s, 0) && o + 40 < sizeof line0; h++) o += snprintf(line0 + o, sizeof line0 - o, "%s|", srv_req_header_name(s, 0, h));
+        t_note("first header order: %s retry: %s", line0, line);
+        EXPECT_STR(line, "User-Agent|Host|Cache-Control|Connection|Authorization|");   /* Win10 VM */
         EXPECT_EQ(srv_req_header_occurrences(s, 1, "Authorization"), 1);
-        /* same header set on both legs except Authorization */
-        EXPECT_EQ(srv_req_header_count(s, 1), srv_req_header_count(s, 0) + 1);
     }
     srv_stop(s);
 }

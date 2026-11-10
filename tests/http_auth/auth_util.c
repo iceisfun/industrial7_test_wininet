@@ -229,7 +229,9 @@ void a_send(HINTERNET hc, const areq *q, ares *r, int keep) {
     setstr(hr, INTERNET_OPTION_USERNAME, q->ruser); setstr(hr, INTERNET_OPTION_PASSWORD, q->rpass);
     setstr(hr, INTERNET_OPTION_PROXY_USERNAME, q->puser); setstr(hr, INTERNET_OPTION_PROXY_PASSWORD, q->ppass);
     SetLastError(0xdeadbeef);
+    DWORD t0 = GetTickCount();
     r->ok = U(HttpSendRequestA)(hr, q->hdrs, q->hdrs ? (DWORD)-1 : 0, (void *)q->body, q->body_len);
+    DWORD dt = GetTickCount() - t0; if (dt > 700) t_note("slow HttpSendRequest: %lu ms", dt);
     r->err = r->ok ? 0 : GetLastError();
     r->status = a_status(hr);
     if (r->ok) r->n = t_inet_read_all(hr, r->body, sizeof r->body, NULL);
@@ -242,6 +244,8 @@ void a_once(srv *s, const areq *q, ares *r) {
     a_send(hc, q, r, 0);
     a_close(hc); t_inet_close(hi);
 }
+#undef srv_stop
+void a_srv_stop(srv *s) { DWORD t0 = GetTickCount(); srv_stop(s); DWORD dt = GetTickCount() - t0; if (dt > 700) t_note("slow srv_stop: %lu ms", dt); }
 void a_dump(srv *s) {
     int n = srv_req_count(s);
     for (int i = 0; i < n; i++) {

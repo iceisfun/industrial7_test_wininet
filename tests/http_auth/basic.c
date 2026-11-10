@@ -2,7 +2,7 @@
  * The gate answers 200 only to an exact expected Authorization value, else 401 + challenge, so a 200 proves the
  * client computed base64(user:pass) exactly; the recorder shows what was sent on every leg. */
 #include "auth.h"
-/* VM_TIMEOUT: 480 */
+/* VM_TIMEOUT: 720 */
 
 #define CH_BASIC "WWW-Authenticate: Basic realm=\"i7\"\r\n"
 
@@ -137,15 +137,16 @@ TEST(auth_basic_request_option_creds) {
     srv_stop(s);
 }
 
-TEST(auth_basic_request_option_overrides_connect_creds) {
+TEST(auth_basic_connect_creds_win_over_request_option) {
     REQUIRE(U(HttpSendRequestA));
     gate g = {0}; g.challenge = CH_BASIC; g.accept[0] = a_basic("ruser", "rpass");
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
     areq q = {0}; q.cuser = "cuser"; q.cpass = "cpass"; q.ruser = "ruser"; q.rpass = "rpass"; ares r; a_once(s, &q, &r);
     a_dump(s);
-    EXPECT_EQ(r.status, 200);
+    /* Win10 VM: the InternetConnect credentials win over INTERNET_OPTION_USERNAME/PASSWORD set on the request */
+    EXPECT_EQ(r.status, 401);
     EXPECT_EQ(srv_req_count(s), 2);
-    EXPECT_STR(REQ_AUTH(s, 1), a_basic("ruser", "rpass"));
+    EXPECT_STR(REQ_AUTH(s, 1), a_basic("cuser", "cpass"));
     srv_stop(s);
 }
 
@@ -157,8 +158,8 @@ TEST(auth_basic_request_username_with_connect_password) {
     a_dump(s);
     const char *a = REQ_AUTH(s, 1);
     t_note("request USERNAME only over connect cuser/cpass: status=%lu auth=%s", r.status, a ? a : "(none)");
-    EXPECT_EQ(r.status, 200);
-    EXPECT_STR(a, a_basic("ruser", "cpass"));
+    EXPECT_EQ(r.status, 401);                       /* Win10 VM: connect pair used as a whole */
+    EXPECT_STR(a, a_basic("cuser", "cpass"));
     srv_stop(s);
 }
 
@@ -196,7 +197,7 @@ TEST(auth_basic_open_url_userinfo) {
     CHECK(srv_req_count(s) >= 1);
     EXPECT_STR(REQ_AUTH(s, srv_req_count(s) - 1), a_basic("urlu", "urlp"));
     EXPECT_STR(srv_req_line(s, 0), "GET /ui HTTP/1.1");
-    t_note("userinfo URL: %d request(s), first auth=%s", srv_req_count(s), REQ_AUTH(s, 0) ? REQ_AUTH(s, 0) : "(none)");
+    EXPECT_EQ(srv_req_count(s), 2); CHECK(REQ_AUTH(s, 0) == NULL);   /* no pre-emptive Basic from userinfo (Win10 VM) */
     t_inet_close(hi); srv_stop(s);
 }
 
@@ -211,8 +212,9 @@ TEST(auth_basic_open_url_userinfo_percent_encoded) {
     int code = t_http_get(hi, url, NULL, T_INET_FRESH, body, sizeof body, &n, &err);
     a_dump(s);
     int last = srv_req_count(s) - 1; const char *a = last >= 0 ? REQ_AUTH(s, last) : NULL;
-    t_note("percent-encoded userinfo: code=%d err=%lu auth=%s (decoded form %s)", code, err, a ? a : "(none)", a_basic("u@x", "p:q"));
     EXPECT_EQ(code, 200);
+    EXPECT_STR(a, a_basic("u@x", "p:q"));   /* userinfo is percent-decoded (Win10 VM) */
+    EXPECT_EQ(srv_req_count(s), 2);
     t_inet_close(hi); srv_stop(s);
 }
 
@@ -271,9 +273,9 @@ TEST(auth_basic_user_without_password) {
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
     areq q = {0}; q.cuser = "solo"; ares r; a_once(s, &q, &r);
     a_dump(s);
-    t_note("user without password: status=%lu requests=%d", r.status, srv_req_count(s));
-    EXPECT_EQ(r.status, 200);
-    EXPECT_STR(REQ_AUTH(s, srv_req_count(s) - 1), "Basic c29sbzo=");
+    /* decomp ProcessResponseHeaders: credentials are applied only when user AND password are present; Win10 VM */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s), 1);
     srv_stop(s);
 }
 
@@ -283,8 +285,8 @@ TEST(auth_basic_empty_password_string) {
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
     areq q = {0}; q.cuser = "solo"; q.cpass = ""; ares r; a_once(s, &q, &r);
     a_dump(s);
-    t_note("user + empty password: status=%lu requests=%d", r.status, srv_req_count(s));
-    EXPECT_EQ(r.status, 200);
+    EXPECT_EQ(r.status, 401);   /* "" is treated as NULL -> no credentials -> no retry (Win10 VM) */
+    EXPECT_EQ(srv_req_count(s), 1);
     srv_stop(s);
 }
 
@@ -294,7 +296,6 @@ TEST(auth_basic_password_without_user) {
     srv *s = gate_start(&g); SRV_OR_SKIP(s);
     areq q = {0}; q.cpass = "lonely"; ares r; a_once(s, &q, &r);
     a_dump(s);
-    t_note("password without user: status=%lu requests=%d", r.status, srv_req_count(s));
     EXPECT_EQ(r.status, 401);
     EXPECT_EQ(srv_req_count(s), 1);
     srv_stop(s);
@@ -316,6 +317,8 @@ TEST(auth_basic_wide_connect_non_ascii) {
     char hx[256] = ""; if (d) a_hex(d, dn < 100 ? dn : 100, hx);
     t_note("non-ASCII Basic creds: status=%lu decoded=%s acp=%u", r.status, hx, GetACP());
     EXPECT_EQ(r.status, 200);
+    /* Win10 VM (ACP 1252): the wide credentials are converted to the ANSI code page, not UTF-8 */
+    if (GetACP() == 1252) EXPECT_STR(hx, "fc7365723a70e47373");
     free(d); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -392,7 +395,7 @@ TEST(auth_basic_wrong_creds_send_again_on_same_handle) {
     EXPECT_EQ(a_status(r.hr), 200);
     a_dump(s);
     int n = srv_req_count(s);
-    t_note("wrong then right: %d requests before, %d after", before, n);
+    EXPECT_EQ(before, 2); EXPECT_EQ(n, 3);   /* Win10 VM: the resend goes straight out with the new password */
     EXPECT_STR(REQ_AUTH(s, n - 1), a_basic("user", "right"));
     a_close(r.hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
@@ -439,8 +442,10 @@ TEST(auth_basic_caller_header_wrong_then_creds) {
     areq q = {0}; q.cuser = "user"; q.cpass = "pass"; q.hdrs = "Authorization: Basic Ym9ndXM6Ym9ndXM=\r\n"; ares r; a_once(s, &q, &r);
     a_dump(s);
     int n = srv_req_count(s);
-    t_note("caller Authorization header + connect creds: status=%lu requests=%d", r.status, n);
     EXPECT_STR(REQ_AUTH(s, 0), "Basic Ym9ndXM6Ym9ndXM=");
+    /* Win10 VM: the caller header is replaced by the computed one on the retry */
+    EXPECT_EQ(r.status, 200); EXPECT_EQ(n, 2);
+    if (n >= 2) { EXPECT_STR(REQ_AUTH(s, 1), "Basic dXNlcjpwYXNz"); EXPECT_EQ(srv_req_header_occurrences(s, 1, "Authorization"), 1); }
     srv_stop(s);
 }
 
@@ -503,11 +508,13 @@ TEST(auth_basic_query_request_authorization_header) {
     EXPECT_EQ(r.status, 200);
     char b[256]; DWORD idx = 0;
     int ok = a_query(r.hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, &idx, b, sizeof b);
-    t_note("request Authorization via HttpQueryInfo: ok=%d err=%lu val=%s", ok, ok ? 0 : GetLastError(), b);
+    DWORD qe = ok ? 0 : GetLastError();
+    /* Win10 VM: the request-header view is the caller's request; the auth header added on the retry is not in it */
+    CHECK(!ok); EXPECT_EQ(qe, ERROR_HTTP_HEADER_NOT_FOUND);
     char raw[2048]; DWORD l = sizeof raw;
     if (U(HttpQueryInfoA)(r.hr, HTTP_QUERY_RAW_HEADERS_CRLF | HTTP_QUERY_FLAG_REQUEST_HEADERS, raw, &l, NULL)) {
-        t_note("request raw headers: %.300s", raw);
         CHECK(strstr(raw, "GET / HTTP/1.1\r\n") == raw);
+        CHECK(strstr(raw, "Authorization") == NULL);
     } else CHECKF(0, "raw request headers err=%lu", GetLastError());
     a_close(r.hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }

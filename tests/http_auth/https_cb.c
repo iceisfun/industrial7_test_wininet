@@ -68,7 +68,8 @@ TEST(auth_https_ntlm_custom_gate) {
     srv *s = gate_start_kind(&g, SRV_HTTPS); SRV_OR_SKIP(s);
     ares r; tls_send(s, "i7tlsuser", "tlsntlm", "/tlsntlm", &r);
     a_dump(s);
-    t_note("https ntlm: status=%lu v2ok=%d user=[%s]", r.status, g.ntlm_v2_ok, g.ntlm_user);
+    t_note("https ntlm: ok=%d err=%lu %s status=%lu v2ok=%d user=[%s] conns=%d", r.ok, r.err, t_inet_errname(r.err), r.status, g.ntlm_v2_ok, g.ntlm_user, srv_conn_count(s));
+    srv_dump(s);
     EXPECT_EQ(r.status, 200);
     EXPECT_EQ(g.ntlm_v2_ok, 1);
     srv_stop(s);
@@ -96,6 +97,7 @@ TEST(auth_callback_sequence_basic_retry) {
     char line[512] = ""; size_t o = 0;
     for (LONG i = 0; i < g_ncb && i < MAXCB && o + 8 < sizeof line; i++) o += snprintf(line + o, sizeof line - o, "%lu ", g_cb[i]);
     t_note("callbacks: %s", line);
+    EXPECT_STR(line, "60 80 20 21 30 31 40 41 80 30 31 40 41 ");   /* Win10 VM: one connect, two send/receive rounds */
     EXPECT_EQ(count_cb(INTERNET_STATUS_SENDING_REQUEST), 2);
     EXPECT_EQ(count_cb(INTERNET_STATUS_REQUEST_SENT), 2);
     EXPECT_EQ(count_cb(INTERNET_STATUS_RESPONSE_RECEIVED), 2);

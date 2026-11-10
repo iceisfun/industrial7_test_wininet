@@ -94,5 +94,8 @@ void a_close(HINTERNET h);
 /* Authorization header of request i (NULL if none), and Proxy-Authorization */
 #define REQ_AUTH(s, i)  srv_req_header((s), (i), "Authorization")
 #define REQ_PAUTH(s, i) srv_req_header((s), (i), "Proxy-Authorization")
-void a_dump(srv *s);   /* t_note request lines + auth headers */
+void a_dump(srv *s);
+/* srv_stop with a NOTE when stopping takes long (keeps the area inside its VM time budget) */
+void a_srv_stop(srv *s);
+#define srv_stop(s) a_srv_stop(s)   /* t_note request lines + auth headers */
 #endif
