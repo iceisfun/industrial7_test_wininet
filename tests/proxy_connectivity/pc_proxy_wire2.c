@@ -34,15 +34,16 @@ TEST(pc_wire2_request_line_url_forms) {
         { "http://pc-f.invalid", "GET http://pc-f.invalid/ HTTP/1.1", "pc-f.invalid", 1 },
         { "http://pc-f.invalid:8080", "GET http://pc-f.invalid:8080/ HTTP/1.1", "pc-f.invalid:8080", 1 },
         { "http://pc-f.invalid/A/B/C.TXT", "GET http://pc-f.invalid/A/B/C.TXT HTTP/1.1", "pc-f.invalid", 1 },
-        { "http://PC-UPPER.INVALID/Up", NULL, NULL, 0 },
-        { "http://[2001:db8::1]:8080/v6", "GET http://[2001:db8::1]:8080/v6 HTTP/1.1", "[2001:db8::1]:8080", 0 },
-        { "http://[2001:db8::2]/v6", NULL, NULL, 0 },
+        /* boots 4-6: the host is lower-cased in the request line but sent verbatim in Host */
+        { "http://PC-UPPER.INVALID/Up", "GET http://pc-upper.invalid/Up HTTP/1.1", "PC-UPPER.INVALID", 1 },
+        { "http://[2001:db8::1]:8080/v6", "GET http://[2001:db8::1]:8080/v6 HTTP/1.1", "[2001:db8::1]:8080", 1 },
+        { "http://[2001:db8::2]/v6", "GET http://[2001:db8::2]/v6 HTTP/1.1", "[2001:db8::2]", 1 },
         { "http://pc-f.invalid/a%20b", "GET http://pc-f.invalid/a%20b HTTP/1.1", "pc-f.invalid", 1 },
-        { "http://pc-f.invalid/a b", NULL, NULL, 0 },
-        { "http://pc-f.invalid/dir/../x", NULL, NULL, 0 },
+        { "http://pc-f.invalid/a b", "GET http://pc-f.invalid/a%20b HTTP/1.1", "pc-f.invalid", 1 },
+        { "http://pc-f.invalid/dir/../x", "GET http://pc-f.invalid/x HTTP/1.1", "pc-f.invalid", 1 },
         { "http://pc-f.invalid/x?a=b&c=d%26e", "GET http://pc-f.invalid/x?a=b&c=d%26e HTTP/1.1", "pc-f.invalid", 1 },
-        { "http://user:pw@pc-f.invalid/cred", NULL, "pc-f.invalid", 0 },
-        { "http://pc-f.invalid:80/eighty", "GET http://pc-f.invalid/eighty HTTP/1.1", "pc-f.invalid", 0 },
+        { "http://user:pw@pc-f.invalid/cred", "GET http://pc-f.invalid/cred HTTP/1.1", "pc-f.invalid", 1 },   /* userinfo dropped */
+        { "http://pc-f.invalid:80/eighty", "GET http://pc-f.invalid/eighty HTTP/1.1", "pc-f.invalid", 1 },
         { "http://192.0.2.9/ip", "GET http://192.0.2.9/ip HTTP/1.1", "192.0.2.9", 1 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
@@ -55,6 +56,7 @@ TEST(pc_wire2_request_line_url_forms) {
                got && srv_req_header(p, before, "Authorization") ? srv_req_header(p, before, "Authorization") : "-");
         if (t[i].certain) {
             CHECKF(st == 200, "%s: status %d err %lu", t[i].url, st, err);
+            if (got) CHECKF(srv_req_header(p, before, "Authorization") == NULL, "%s: Authorization sent", t[i].url);
             if (t[i].line) CHECKF(ln && !strcmp(ln, t[i].line), "%s: line \"%s\" want \"%s\"", t[i].url, ln ? ln : "(none)", t[i].line);
             if (t[i].host) CHECKF(ho && !strcmp(ho, t[i].host), "%s: Host \"%s\" want \"%s\"", t[i].url, ho ? ho : "(none)", t[i].host);
         }
@@ -415,6 +417,8 @@ TEST(pc_wire2_proxy_connection_close_via_proxy_connection_header) {
     EXPECT_EQ(pc_get(h, "http://pc-pcc.invalid/2", 0, body, sizeof body, &err, NULL), 200);
     CHECK(srv_wait_requests(p, 2, 3000));
     t_note("OBS Proxy-Connection: close -> conns %d (req conns %d, %d)", srv_conn_count(p), srv_req_conn(p, 0), srv_req_conn(p, 1));
+    EXPECT_EQ(srv_conn_count(p), 2);   /* boot 6: Proxy-Connection: close from the proxy ends the keep-alive */
+    EXPECT_NE(srv_req_conn(p, 0), srv_req_conn(p, 1));
     t_inet_close(h); srv_stop(p);
 }
 
@@ -562,7 +566,8 @@ TEST(pc_wire2_connect_second_request_new_tunnel_or_reuse) {
     EXPECT_EQ(pc_request(e.h, "pc-reuse.invalid", 443, "/2", &o, &err), 200);
     t_note("OBS two https requests via proxy: CONNECT heads %d relay conns %d, origin reqs %d conns %d", pc_relay_heads(e.r), pc_relay_conns(e.r),
            srv_req_count(e.tls), srv_conn_count(e.tls));
-    CHECK(pc_relay_heads(e.r) >= 1 && pc_relay_heads(e.r) <= 2);
+    EXPECT_EQ(pc_relay_heads(e.r), 2);   /* boot 6: no tunnel reuse for requests with ignore-certificate flags: a new CONNECT each */
+    EXPECT_EQ(pc_relay_conns(e.r), 2);
     EXPECT_EQ(srv_req_count(e.tls), 2);
     for (int i = 0; i < pc_relay_heads(e.r); i++) EXPECT_STR(pc_head_line(pc_relay_head(e.r, i)), "CONNECT pc-reuse.invalid:443 HTTP/1.0");
     tun2_done(&e);

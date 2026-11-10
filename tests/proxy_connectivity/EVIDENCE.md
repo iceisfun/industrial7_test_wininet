@@ -90,7 +90,13 @@ Oracle: Windows 10 22H2 VM (`tools/vm_run.sh proxy_connectivity`), wininet 11.0.
 # Pass 2 (files `pc_dial.c`, `pc_options2.c`, `pc_proxy_wire2.c`, `pc_failures2.c`)
 
 Win10 boots: 3 (baseline of pass 1, 122/123; the failing creds-cache test depended on the script position, fixed with
-per-connection scripts), 4 (pass-2 probes; area hit the 300 s limit, so `VM_TIMEOUT` is now 720), 5+ (see below).
+per-connection scripts), 4 (pass-2 probes; the area hit the 300 s limit, so `VM_TIMEOUT` is now 720), 5 (246 tests, 13
+failing), 6 (239/239 PASS, 2831 checks, 402 s), 7 (confirmation after promoting boot-6 notes).
+
+**Harness finding (boot 5).** `EXPECT_EQ`/`EXPECT_NE` in `common/t.h` evaluate their first argument twice (once in the
+comparison and once for the "got" value). Every `EXPECT_EQ(pc_get(...), 200)` therefore sent its request twice, and Wine
+showed the same doubling. `pc.h` now redefines single-evaluation versions for this area. Pass-1 wire facts that counted
+requests were re-observed in boot 6. Other areas that pass side-effecting calls to `EXPECT_EQ` have the same problem.
 Decomp references are wininet 10.0.19041 RVAs from the corpus API.
 
 ## Option read-back and set details (`pc_options2.c`)
@@ -112,5 +118,49 @@ Decomp references are wininet 10.0.19041 RVAs from the corpus API.
 | set PER_CONNECTION_OPTION on the NULL handle: NULL buffer or len 0 -> 87; len 1..0x1f -> 12010 (never reaches the registry) | V |
 | REFRESH (37) on NULL, PRECONFIG and PROXY sessions -> TRUE (the PROXY session keeps its proxy); on a connect handle -> 12018 | D case 0x25 + V |
 | SETTINGS_CHANGED (39) and PROXY_SETTINGS_CHANGED (95) -> TRUE; querying 37/39/95 -> 87 | D + V |
-| SETTINGS_CHANGED did not make the next request of an existing session open a new connection | V (note) |
+| SETTINGS_CHANGED purges pooled keep-alive connections: the next request of an existing session opens a new one | D case 0x27 (PurgeKeepAlivesAndDuos) + V |
 | query table (NULL / session): 50=1/1, 51=0/0, 52=0/0, 64=0/0, 70 -> 50/50, 82=1/1, 83 ok len 0 (first byte cleared) both, 85 -> 12018/87, 103 = 4 / 12016, 54..57 -> 12018/50 | D cases 0x32..0x39, 0x46, 0x53 + V |
+
+## Dial / RAS stubs, connectivity (`pc_dial.c`)
+| fact | tag |
+|---|---|
+| InternetAutodial: flags & ~0xF -> FALSE/87; else TRUE/0 when RAS is present (Win10: yes, INTERNET_RAS_INSTALLED); never dials, HWND only traced | D @0x13c520 + V |
+| InternetAutodialHangup(0) TRUE/0, nonzero -> FALSE/87 | D @0x13c5e0 + V |
+| InternetDial(A/W) return a DWORD: *lpdwConnection zeroed first; reserved != 0 or NULL lpdwConnection -> 87; flags unchecked; else 0; InternetDial == InternetDialA | D @0x13c690/0x13c760 + V |
+| InternetHangUp returns 0 (reserved 0) or 87, never touches GetLastError | D @0x13c9b0 + V |
+| InternetSetDialState(A/W) always FALSE/120 | D @0x13ca50/0x13cab0 + V |
+| InternetAutodialCallback is a no-op | D @0x133af0 + V |
+| GetProxyDllInfo returns pointers into wininet's image (aProxyFileList, CLSID_PSFactoryBuffer), stable across calls | D @0x132630 + V |
+| InternetGetConnectedStateExW: name = LoadStringW(cch) -> truncated to cch-1 chars ("LAN Connection" in the lab); ExA: short buffer gets b[len-1]=0, returns TRUE with GetLastError 122 from WideCharToMultiByte; reserved != 0 -> 87 with flags and name zeroed | D @0xd8340/0x286e0 + V |
+| InternetCheckConnection FORCE: http/https URL forms (with path, query, fragment, userinfo, localhost) = bare TCP connect, no request; ftp:// waits for an FTP banner (12111 after ~5 s against an HTTP peer); gopher -> 87; closed port -> 12029 for every scheme; only bit 0 of dwFlags is FORCE | D @0x137a50 + V |
+| InternetCheckConnection URL table: "", "http://", "not a url", "http//x" -> 12006; "http:///path", port 99999 -> 12005; "mailto:", "javascript:" -> 87; "file:///", "about:blank" -> TRUE; port 0 -> 12029; host over 256 chars -> TRUE without connecting | D + V |
+| InternetGetProxyForUrl(NULL, url): http, https, ftp, ws, wss, gopher, mailto, [::1], 127.0.0.1 -> 0 with 1 entry (lab: fProxy/fBypass FALSE, port 0); file:///, "http://" -> 12005; "not a url", bare host -> 12006; a second InternetFreeProxyInfoList is a no-op | V |
+| DetectAutoProxyUrl: flags other than DHCP/DNS_A bits (0, 4, 8, 0x80000000) -> 87; buffer[0] cleared, nothing written past it; lab -> 12180 | D @0x165bb0 + V |
+| IsHostInProxyBypassList (lab, no proxy): FALSE for every host and length, GetLastError 0; "<local>" -> FALSE/12005 | V |
+
+## Forward proxy wire, part 2 (`pc_proxy_wire2.c`)
+| fact | tag |
+|---|---|
+| request line lower-cases the host but `Host:` keeps the caller's casing; `a b` -> `a%20b`, `/dir/../x` -> `/x`, userinfo dropped (no Authorization), explicit :80 dropped | V |
+| absolute-URI request line keeps the **fragment** (`GET http://h/a#frag HTTP/1.1`); `%20`, `%26` kept; IPv6 literal `[2001:db8::1]:8080` and IP literals as given; ftp URLs with userinfo keep it in the line (`GET ftp://u:pw@h/f`) | V |
+| HttpOpenRequest(version "HTTP/1.0") through a proxy still sends HTTP/1.1 | V |
+| INTERNET_OPTION_URL on a proxied request = origin URL; request headers first line is origin-form | V |
+| User-Agent is the InternetOpen agent verbatim; an empty agent sends no User-Agent | V |
+| redirects through the proxy: absolute and relative Location re-requested through the proxy in absolute form; to a loopback origin -> direct (implicit bypass); to a bypassed name -> direct (12007); NO_AUTO_REDIRECT returns the 302 | V |
+| 407: proxy credentials are cached per proxy and sent pre-emptively on later requests (other origins too); always-407 -> exactly one retry, 407 returned; 407 + Connection: close -> retry on a new connection; connect-handle PROXY_USERNAME/PASSWORD used; POST body re-sent | V |
+| `http=` only list: https goes direct (12007); `http=A;https=B`: http to A, CONNECT to B; `HTTPS=` upper-case accepted; `ftp=` entry used for ftp:// as a CERN GET | V |
+| two https requests with ignore-certificate flags: a new CONNECT (and connection) each, no tunnel reuse; `Proxy-Connection: close` from a proxy ends the keep-alive | V |
+| CONNECT to IP literals: `CONNECT 192.0.2.10:443`, `CONNECT [2001:db8::5]:443`, Host the same; 200 reply variants (HTTP/1.0, extra headers, Content-Length: 0) all accepted; custom and Authorization headers stay inside the tunnel | V |
+| bypass list: blanks around entries, empty entries, case ignored; `;` or ` ` alone bypass nothing; trailing-dot entry does not match; `*.*`, `pc-ws.*`, `*ws*`, `**` match; `http://*.invalid` matches http, `ftp://*.invalid` does not; `*.invalid:80` matches an implicit :80; a 7 KB list works; `<local>` = dotless names (any case, any port) | V |
+| session HTTP_DECODING did not decode a gzip InternetOpenUrl body through the proxy (raw bytes returned) | V (note) |
+
+## Failures, part 2 (`pc_failures2.c`)
+| fact | tag |
+|---|---|
+| CONNECT failures: close -> 12152, RST -> 12031, garbage / partial status / 200-then-close -> 12029, 200-then-RST -> 12031, 200-then-plaintext -> 12157, 301/100-then-close -> 12152; 407 without challenge and HTTP/1.0 403 are returned as the status | V |
+| server misbehaviour (identical direct and via proxy): close at accept / 100-then-close -> 12152, RST at accept -> 12031; response sent before the request is read -> 200 with it; status line only -> 200 empty; one byte "H" -> 200 body "H" (0.9); LF-only head, no reason phrase, `HTTP/2 200`, lowercase `http/1.1` -> 200; 999 -> 999; truncated chunk -> 200 with the partial bytes; bad chunk size -> 12004; negative or garbage Content-Length -> 200 empty body | V |
+| after a refused HttpSendRequest the handle still answers status queries and InternetReadFile (0 bytes), and the request headers stay queryable; a second send fails 12029 again; the session keeps working | V |
+| `.invalid` names: the first lookup in the process took ~12 s in the lab, the following ones 0 ms (all 12007) | V + N |
+| URL ports: 0 and empty -> tried (12029); 65536, 99999, -1, abc -> 12005 | V |
+| timeouts on a PROXY session: connect 60000, send/receive/data 30000, retries 5; CONNECT_TIMEOUT 0 reads back 0xFFFFFFFF; values copied to children at creation | V |
+| message texts (en-US): 12002, 12007, 12029, 12030, 12031, 12152, 12005, 12006, 12018 "The supplied handle is the wrong type for the requested operation", 12010 "The length is incorrect for the option type", 12009 "The option is invalid" | V |

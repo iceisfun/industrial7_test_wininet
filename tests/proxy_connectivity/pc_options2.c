@@ -692,8 +692,10 @@ TEST(pc_opt2_settings_changed_purges_keepalive) {
     EXPECT_EQ(t_http_get(h, srv_url(s, "/3"), NULL, T_INET_FRESH, body, sizeof body, &n, &err), 200);
     CHECK(srv_wait_requests(s, 3, 3000));
     t_note("OBS after SETTINGS_CHANGED: req conns %d %d %d (connections %d)", srv_req_conn(s, 0), srv_req_conn(s, 1), srv_req_conn(s, 2), srv_conn_count(s));
-    /* boots 4/5 ran with a double-evaluating EXPECT_EQ (6 requests): re-observed with single evaluation */
+    /* boot 6 (single evaluation): the pooled connection is dropped, the third request opens a new one */
     EXPECT_EQ(srv_req_count(s), 3);
+    EXPECT_NE(srv_req_conn(s, 2), srv_req_conn(s, 1));
+    EXPECT_EQ(srv_conn_count(s), 2);
     t_inet_close(h); srv_stop(s);
 }
 
