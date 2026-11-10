@@ -403,12 +403,14 @@ TEST(rsp_hdr_content_encoding_gzip_decoded) {
     rh_t c; if (!rh_start(&c, st, 2)) return;
     if (!rh_open(&c, "GET", "/gz", 0)) { rh_close(&c); return; }
     BOOL on = TRUE; CHECK(U(InternetSetOptionA)(c.hr, INTERNET_OPTION_HTTP_DECODING, &on, sizeof on));
-    CHECK(rh_send(&c, NULL, NULL, 0));
+    /* decoding happens only when the request itself lists the coding [D _CheckDecompressionRequestHeaders, see
+     * http_body_io EVIDENCE]; after decoding Content-Encoding is removed [D CheckDecompression] */
+    CHECK(rh_send(&c, "Accept-Encoding: gzip, deflate\r\n", NULL, 0));
     const char *ce = rh_qa(c.hr, HTTP_QUERY_CONTENT_ENCODING, NULL);
     const char *cl = rh_qa(c.hr, HTTP_QUERY_CONTENT_LENGTH, NULL);
     const char *ae = rh_qa(c.hr, HTTP_QUERY_ACCEPT_ENCODING | HTTP_QUERY_FLAG_REQUEST_HEADERS, NULL);
     t_note("decoding on: Content-Encoding=%s Content-Length=%s req Accept-Encoding=%s", ce ? ce : "(gone)", cl ? cl : "(gone)", ae ? ae : "(none)");
-    CHECK(!ae);   /* [W10] enabling decoding on the request handle does not add Accept-Encoding to this request */
+    CHECK(ae && !strcmp(ae, "gzip, deflate"));
     static char b[4096]; size_t bn = rh_body(&c, b, sizeof b);
     EXPECT_EQ(bn, SRV_FOX_LEN);
     CHECK(!memcmp(b, srv_fox_text(), SRV_FOX_LEN));

@@ -58,6 +58,12 @@ static void seg_stop(seg_srv *g) {
 }
 /* open + send "/s/a/b"; returns the request handle or NULL (CHECK done) */
 static HINTERNET seg_get(seg_srv *g, const char *verb, size_t a, size_t b, const char *file, int line) {
+    /* the server accepts at most SRV_MAXCONN (64) connections: start a fresh one well before that */
+    if (srv_conn_count(g->s) >= 56) {
+        const char *r = g_resp; size_t rn = g_resp_n;
+        seg_stop(g);
+        if (!seg_start(g, r, rn)) return NULL;
+    }
     char path[64]; snprintf(path, sizeof path, "/s/%u/%u", (unsigned)a, (unsigned)b);
     HINTERNET hr = U(HttpOpenRequestA)(g->hc, verb, path, NULL, NULL, NULL, RH_FLAGS, 0);
     if (!hr) { t_check(0, file, line, "HttpOpenRequestA", "err=%lu", GetLastError()); return NULL; }

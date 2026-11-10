@@ -38,7 +38,7 @@ TEST(rsp_val_control_bytes_inside_value) {
     rh_close(&c);
 }
 
-/* control bytes at the start and end of a value: which ones count as whitespace? (VT, FF and others) */
+/* control bytes at the start and end of a value are kept: only SP and HT are trimmed [D ParseHeaders, W10] */
 TEST(rsp_val_control_bytes_at_value_ends) {
     REQUIRE(U(HttpQueryInfoA));
     static char resp[4096]; size_t k = (size_t)sprintf(resp, "HTTP/1.1 200 OK\r\n");
@@ -50,10 +50,10 @@ TEST(rsp_val_control_bytes_at_value_ends) {
         char nm[16];
         snprintf(nm, sizeof nm, "X-S%02X", bytes[i]); const char *v = rh_qac(c.hr, nm, 0, NULL);
         t_note("leading 0x%02x: %s len %lu", bytes[i], v ? rh_esc(v, rh_len) : "(fail)", rh_len);
-        CHECKF(v && (rh_len == 1 || rh_len == 2), "leading 0x%02x: stored (trimmed or not) len=%lu err=%lu", bytes[i], rh_len, rh_err);
+        CHECKF(v && rh_len == 2, "leading 0x%02x: stored (trimmed or not) len=%lu err=%lu", bytes[i], rh_len, rh_err);
         snprintf(nm, sizeof nm, "X-E%02X", bytes[i]); v = rh_qac(c.hr, nm, 0, NULL);
         t_note("trailing 0x%02x: %s len %lu", bytes[i], v ? rh_esc(v, rh_len) : "(fail)", rh_len);
-        CHECKF(v && (rh_len == 1 || rh_len == 2) && v[0] == 'v', "trailing 0x%02x: len=%lu err=%lu", bytes[i], rh_len, rh_err);
+        CHECKF(v && rh_len == 2 && v[0] == 'v', "trailing 0x%02x: len=%lu err=%lu", bytes[i], rh_len, rh_err);
     }
     rh_close(&c);
 }

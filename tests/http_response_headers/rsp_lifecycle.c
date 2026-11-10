@@ -103,8 +103,9 @@ TEST(rsp_life_send_request_ex_end_request) {
     INTERNET_BUFFERSA ib; memset(&ib, 0, sizeof ib); ib.dwStructSize = sizeof ib; ib.dwBufferTotal = 5;
     CHECK(U(HttpSendRequestExA)(c.hr, &ib, NULL, 0, 0));
     /* between the upload and HttpEndRequest there is no response yet [K]; record what the query says */
-    q_note(c.hr, HTTP_QUERY_STATUS_CODE, NULL, "STATUS_CODE before HttpEndRequest");
-    q_note(c.hr, 0, "X-Ex", "X-Ex before HttpEndRequest");
+    /* [W10] until HttpEndRequest the handle has no response: every query gives 12019 INCORRECT_HANDLE_STATE */
+    EXPECT_QERR2(c.hr, HTTP_QUERY_STATUS_CODE, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+    EXPECT_QCERR(c.hr, "X-Ex", 0, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     DWORD w = 0; CHECK(U(InternetWriteFile)(c.hr, "12345", 5, &w)); EXPECT_EQ(w, 5);
     CHECK(U(HttpEndRequestA)(c.hr, NULL, 0, 0));
     DWORD code = 0; CHECK(rh_qnum(c.hr, HTTP_QUERY_STATUS_CODE, &code)); EXPECT_EQ(code, 201);
@@ -168,11 +169,12 @@ TEST(rsp_life_after_invalid_response) {
     REQUIRE(U(HttpQueryInfoA));
     rh_t c; if (!rh_raw(&c, "GET", "", 0)) return;
     CHECK(!c.sent); EXPECT_EQ(c.err, ERROR_HTTP_INVALID_SERVER_RESPONSE);
-    q_note(c.hr, HTTP_QUERY_STATUS_CODE, NULL, "STATUS_CODE after 12152");
-    q_note(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL, "RAW_HEADERS_CRLF after 12152");
-    q_note(c.hr, HTTP_QUERY_VERSION, NULL, "VERSION after 12152");
-    EXPECT_QA(c.hr, HTTP_QUERY_REQUEST_METHOD, "GET");
-    EXPECT_QC(c.hr, "X-Anything", NULL);
+    /* [W10] after a 12152 the handle is in a state where every query, request side included, gives 12019 */
+    EXPECT_QERR2(c.hr, HTTP_QUERY_STATUS_CODE, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+    EXPECT_QERR2(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+    EXPECT_QERR2(c.hr, HTTP_QUERY_VERSION, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+    EXPECT_QERR2(c.hr, HTTP_QUERY_REQUEST_METHOD, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+    EXPECT_QCERR(c.hr, "X-Anything", 0, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     rh_close(&c);
 }
 
@@ -189,8 +191,9 @@ TEST(rsp_life_after_connection_refused) {
     rh_send(&c, NULL, NULL, 0);
     CHECK(!c.sent);
     CHECKF(c.err == ERROR_INTERNET_CANNOT_CONNECT, "err=%lu %s", c.err, t_inet_errname(c.err));
-    q_note(c.hr, HTTP_QUERY_STATUS_CODE, NULL, "STATUS_CODE after 12029");
-    q_note(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL, "RAW_HEADERS_CRLF after 12029");
+    /* [W10] a connect failure leaves the handle as before the send (hqi_args_before_send): "0" and the empty block */
+    EXPECT_Q(c.hr, HTTP_QUERY_STATUS_CODE, "0");
+    EXPECT_Q(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "\r\n\r\n");
     EXPECT_QC(c.hr, "Server", NULL);
     EXPECT_QA(c.hr, HTTP_QUERY_REQUEST_METHOD, "GET");
     rh_close(&c);
@@ -210,9 +213,11 @@ TEST(rsp_life_resend_failure_clears_old_headers) {
     EXPECT_QC(c.hr, "X-Good", "1");
     rh_send(&c, NULL, NULL, 0);
     t_note("resend to a server that closes: sent=%d err=%lu %s (conns %d)", c.sent, c.err, t_inet_errname(c.err), srv_conn_count(c.s));
+    /* [W10] the resend fails with 12152 and the old response is gone: queries give 12019 */
+    CHECKF(!c.sent && c.err == ERROR_HTTP_INVALID_SERVER_RESPONSE, "sent=%d err=%lu", c.sent, c.err);
     if (!c.sent) {
-        EXPECT_QC(c.hr, "X-Good", NULL);
-        q_note(c.hr, HTTP_QUERY_STATUS_CODE, NULL, "STATUS_CODE after failed resend");
+        EXPECT_QCERR(c.hr, "X-Good", 0, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+        EXPECT_QERR2(c.hr, HTTP_QUERY_STATUS_CODE, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     }
     rh_close(&c);
 }
@@ -342,12 +347,11 @@ TEST(rsp_life_query_after_parent_closed) {
     RH_SENT_OR_FAIL(&c);
     EXPECT_QC(c.hr, "X-P", "p");
     U(InternetCloseHandle)(c.hc); c.hc = NULL;
-    const char *v = rh_qac(c.hr, "X-P", 0, NULL);
-    t_note("query after the connect handle was closed: %s err=%lu", v ? v : "(fail)", rh_err);
+    /* [W10] closing the parent closes the child: the request handle is invalid afterwards (6) */
+    EXPECT_QCERR(c.hr, "X-P", 0, ERROR_INVALID_HANDLE);
     U(InternetCloseHandle)(c.hi); c.hi = NULL;
-    v = rh_qac(c.hr, "X-P", 0, NULL);
-    t_note("query after the session handle was closed: %s err=%lu", v ? v : "(fail)", rh_err);
-    U(InternetCloseHandle)(c.hr); c.hr = NULL;
+    EXPECT_QCERR(c.hr, "X-P", 0, ERROR_INVALID_HANDLE);
+    c.hr = NULL;
     rh_close(&c);
 }
 

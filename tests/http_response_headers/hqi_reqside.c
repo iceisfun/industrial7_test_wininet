@@ -46,12 +46,11 @@ TEST(hqi_req_added_header_visible_before_send) {
     EXPECT_RQ(c.hr, "x-q", "1");
     EXPECT_QC(c.hr, "X-Q", NULL);   /* not in the response store */
     const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF | REQF, NULL);
-    CHECKF(raw && !strncmp(raw, "GET /r HTTP/1.1\r\n", 17) && strstr(raw, "\r\nX-Q: 1\r\n"), "request raw before send: %s", raw ? rh_esc(raw, strlen(raw)) : "(fail)");
-    t_note("request RAW_HEADERS_CRLF before send: %s", raw ? rh_esc(raw, strlen(raw)) : "(fail)");
-    const char *host = rh_qa(c.hr, HTTP_QUERY_HOST | REQF, NULL);
-    t_note("request Host before send: %s err=%lu", host ? host : "(fail)", rh_err);
-    const char *ua = rh_qa(c.hr, HTTP_QUERY_USER_AGENT | REQF, NULL);
-    t_note("request User-Agent before send: %s err=%lu", ua ? ua : "(fail)", rh_err);
+    /* [W10] before the send the request store holds only the request line and what the caller added:
+     * Host and User-Agent are added when the request is sent */
+    CHECKF(raw && !strcmp(raw, "GET /r HTTP/1.1\r\nX-Q: 1\r\n\r\n"), "request raw before send: %s", raw ? rh_esc(raw, strlen(raw)) : "(fail)");
+    EXPECT_QERR(c.hr, HTTP_QUERY_HOST | REQF, ERROR_HTTP_HEADER_NOT_FOUND);
+    EXPECT_QERR(c.hr, HTTP_QUERY_USER_AGENT | REQF, ERROR_HTTP_HEADER_NOT_FOUND);
     CHECK(rh_send(&c, NULL, NULL, 0));
     EXPECT_RQ(c.hr, "X-Q", "1");
     EXPECT_QC(c.hr, "X-Resp", "r");
@@ -74,14 +73,16 @@ TEST(hqi_req_add_flag_matrix) {
     /* REPLACE: first occurrence */
     ok = add(c.hr, "X-Q: 9\r\n", HTTP_ADDREQ_FLAG_REPLACE, &e);
     CHECKF(ok, "REPLACE err=%lu", e);
-    { DWORD idx = 0; const char *v = rq(c.hr, "X-Q", &idx); const char *v2 = rq(c.hr, "X-Q", &idx);
-      t_note("after REPLACE X-Q: 9 -> [%s] [%s] idx %lu", v ? v : "-", v2 ? v2 : "-", idx); }
+    /* [W10] REPLACE removes the first occurrence and appends the new value at the end */
+    WALKR(c.hr, "X-Q", "2", "9");
     /* REPLACE with an empty value removes [K] */
     CHECK(add(c.hr, "X-New:\r\n", HTTP_ADDREQ_FLAG_REPLACE, &e));
     EXPECT_RQ(c.hr, "X-New", NULL);
     /* REPLACE of an absent name */
+    /* [W10] REPLACE of an absent name adds it */
     ok = add(c.hr, "X-Absent: a\r\n", HTTP_ADDREQ_FLAG_REPLACE, &e);
-    t_note("REPLACE absent: ok=%d err=%lu; query %s", ok, e, rq(c.hr, "X-Absent", NULL) ? "found" : "absent");
+    CHECKF(ok, "REPLACE absent err=%lu", e);
+    EXPECT_RQ(c.hr, "X-Absent", "a");
     ok = add(c.hr, "X-Absent2: a\r\n", HTTP_ADDREQ_FLAG_REPLACE | HTTP_ADDREQ_FLAG_ADD, &e);
     CHECKF(ok, "REPLACE|ADD absent err=%lu", e);
     EXPECT_RQ(c.hr, "X-Absent2", "a");
@@ -204,9 +205,16 @@ TEST(hqi_req_buffer_protocol) {
     lstrcpyA(b, "X-Buf"); CHECK(rh_callA(c.hr, HTTP_QUERY_CUSTOM | REQF, b, 3, &idx)); EXPECT_STR(b, "ab"); EXPECT_EQ(idx, 2);
     lstrcpyA(b, "X-Buf"); CHECK(!rh_callA(c.hr, HTTP_QUERY_CUSTOM | REQF, b, sizeof b, &idx)); EXPECT_EQ(rh_err, ERROR_HTTP_HEADER_NOT_FOUND); EXPECT_EQ(idx, 2);
     WCHAR w[64]; idx = 0;
-    lstrcpyW(w, L"X-Buf"); CHECK(!rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 20, &idx)); EXPECT_EQ(rh_err, ERROR_INSUFFICIENT_BUFFER); EXPECT_EQ(rh_len, 22);
-    lstrcpyW(w, L"X-Buf"); CHECK(rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 22, &idx)); CHECK(!lstrcmpW(w, L"0123456789")); EXPECT_EQ(rh_len, 20);
+    /* W: 20 bytes holds the 11-byte A copy but not 22 bytes of W: 122, and the index has already advanced (the
+     * quirk of hqi_buf_w_partial_buffer_advances_index, here on the request side) */
+    lstrcpyW(w, L"X-Buf"); CHECK(!rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 20, &idx)); EXPECT_EQ(rh_err, ERROR_INSUFFICIENT_BUFFER); EXPECT_EQ(rh_len, 22); EXPECT_EQ(idx, 1);
+    lstrcpyW(w, L"X-Buf"); CHECK(rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 22, &idx)); CHECK(!lstrcmpW(w, L"ab")); EXPECT_EQ(rh_len, 4); EXPECT_EQ(idx, 2);
+    idx = 0;
+    lstrcpyW(w, L"X-Buf"); CHECK(rh_callW(c.hr, HTTP_QUERY_CUSTOM | REQF, w, 22, &idx)); CHECK(!lstrcmpW(w, L"0123456789")); EXPECT_EQ(rh_len, 20); EXPECT_EQ(idx, 1);
+    /* [W10] CUSTOM with a zero length: 87, *len 0 */
     { DWORD l = 0; lstrcpyA(b, "X-Buf"); SetLastError(0);
+      CHECK(!U(HttpQueryInfoA)(c.hr, HTTP_QUERY_CUSTOM | REQF | HTTP_QUERY_FLAG_COALESCE_WITH_COMMA, b, &l, NULL)); EXPECT_ERR(ERROR_INVALID_PARAMETER); EXPECT_EQ(l, 0); }
+    { DWORD l = 6; lstrcpyA(b, "X-Buf"); SetLastError(0);
       CHECK(!U(HttpQueryInfoA)(c.hr, HTTP_QUERY_CUSTOM | REQF | HTTP_QUERY_FLAG_COALESCE_WITH_COMMA, b, &l, NULL)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER); EXPECT_EQ(l, 15); }
     rh_close(&c);
 }
@@ -224,6 +232,7 @@ TEST(hqi_req_send_headers_and_resend) {
         int n2 = srv_req_header_occurrences(c.s, 1, "X-Send");
         const char *v = rq(c.hr, "X-Send", NULL);
         t_note("resend without headers: X-Send on the wire %d time(s); request store says %s", n2, v ? v : "(absent)");
+        EXPECT_EQ(n2, 1);   /* [W10] headers given to HttpSendRequest stay in the request (once) */
         CHECKF((n2 > 0) == (v != NULL), "query agrees with wire: wire %d, query %s", n2, v ? v : "(absent)");
     } else CHECK(0);
     rh_close(&c);

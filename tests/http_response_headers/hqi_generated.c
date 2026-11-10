@@ -76,28 +76,31 @@ static const struct { int code; const char *reason; } CODES[] = {
     { 404, "Not Found" }, { 410, "Gone" }, { 418, "I'm a teapot" }, { 500, "Internal Server Error" }, { 503, "Service Unavailable" },
 };
 
+static int g_variant;   /* 0: HTTP/1.1 + CRLF; 1: HTTP/1.0 + LF-only line ends on the wire */
 static void gen_build(gen_resp *g, unsigned seed) {
+    const char *ver = g_variant ? "HTTP/1.0" : "HTTP/1.1", *eol = g_variant ? "\n" : "\r\n";
     memset(g, 0, sizeof *g);
     g_seed = seed * 2654435761u + 7;
     int ci = (int)rn(sizeof CODES / sizeof CODES[0]);
     g->code = CODES[ci].code; lstrcpyA(g->reason, CODES[ci].reason);
     g->n = 3 + (int)rn(GMAX - 3);
     int favs[4]; for (int i = 0; i < 4; i++) favs[i] = (int)rn(NPOOL);   /* a few names repeat often */
-    size_t k = (size_t)sprintf(g->resp, "HTTP/1.1 %d %s\r\n", g->code, g->reason);
-    size_t r = (size_t)sprintf(g->raw_crlf, "HTTP/1.1 %d %s\r\n", g->code, g->reason);
-    size_t z = (size_t)sprintf(g->raw_nul, "HTTP/1.1 %d %s", g->code, g->reason) + 1;
+    size_t k = (size_t)sprintf(g->resp, "%s %d %s%s", ver, g->code, g->reason, eol);
+    size_t r = (size_t)sprintf(g->raw_crlf, "%s %d %s\r\n", ver, g->code, g->reason);
+    size_t z = (size_t)sprintf(g->raw_nul, "%s %d %s", ver, g->code, g->reason) + 1;
     for (int i = 0; i < g->n; i++) {
         gen_hdr *h = &g->h[i];
         h->pool = rn(3) == 0 ? favs[rn(4)] : (int)rn(NPOOL);
         casing(h->wire_name, POOL[h->pool].name, (int)rn(4));
         gen_value(h->value, sizeof h->value);
         const char *p1 = PAD[rn(6)], *p2 = h->value[0] ? PAD[rn(6)] : "";
-        k += (size_t)sprintf(g->resp + k, "%s:%s%s%s\r\n", h->wire_name, p1, h->value, p2);
+        k += (size_t)sprintf(g->resp + k, "%s:%s%s%s%s", h->wire_name, p1, h->value, p2, eol);
         r += (size_t)sprintf(g->raw_crlf + r, "%s: %s\r\n", h->wire_name, h->value);
         z += (size_t)sprintf(g->raw_nul + z, "%s: %s", h->wire_name, h->value) + 1;
     }
     static const char TAIL[] = "Content-Length: 0\r\nConnection: close\r\n";
-    k += (size_t)sprintf(g->resp + k, "%s\r\n", TAIL);
+    if (g_variant) k += (size_t)sprintf(g->resp + k, "Content-Length: 0\nConnection: close\n\n");
+    else k += (size_t)sprintf(g->resp + k, "%s\r\n", TAIL);
     r += (size_t)sprintf(g->raw_crlf + r, "%s\r\n", TAIL);
     z += (size_t)sprintf(g->raw_nul + z, "Content-Length: 0") + 1;
     z += (size_t)sprintf(g->raw_nul + z, "Connection: close") + 1;
@@ -209,6 +212,9 @@ TEST(hqi_gen_seeds_040_080_a) { run_range(40, 80, 0); }
 TEST(hqi_gen_seeds_080_120_a) { run_range(80, 120, 0); }
 TEST(hqi_gen_seeds_000_040_w) { run_range(0, 40, 1); }
 TEST(hqi_gen_seeds_040_080_w) { run_range(40, 80, 1); }
+/* HTTP/1.0 status line, LF-only line ends: the raw block is still rebuilt with CRLF [W10 rsp_hdr_lf_only_line_endings] */
+TEST(hqi_gen_seeds_http10_lf_a) { g_variant = 1; run_range(200, 230, 0); g_variant = 0; }
+TEST(hqi_gen_seeds_http10_lf_w) { g_variant = 1; run_range(230, 250, 1); g_variant = 0; }
 
 /* the same generated header sets, all in one response, with the same name repeated up to 40 times */
 TEST(hqi_gen_single_name_repeated) {
