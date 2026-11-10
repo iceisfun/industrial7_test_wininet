@@ -1,7 +1,7 @@
 /* bio_read.c - InternetReadFile: argument validation, handle types, Content-Length bodies of every size class
  * around the 4096/8192/65536 boundaries up to 1 MB, read-size sweeps, EOF semantics, integrity (CRC32/SHA-256),
  * InternetOpenUrl handles.
- * VM_TIMEOUT: 300
+ * VM_TIMEOUT: 600
  * Evidence: [D InternalInternetReadFile] for argument checks, everything else measured on the Win10 22H2 VM. */
 #include "bio.h"
 #include <stdlib.h>

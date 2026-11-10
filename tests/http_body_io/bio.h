@@ -14,7 +14,7 @@
 #define ERROR_INTERNET_DECODING_FAILED 12175
 #endif
 
-typedef struct { srv *s; HINTERNET hi, hc; } bio_env;
+typedef struct { srv *s; HINTERNET hi, hc; DWORD t0; } bio_env;
 
 /* Start a server running steps (connection i runs the same script) and open a DIRECT session + connect handle.
  * Returns 0 after t_skip() when the server or wininet is unavailable. */
@@ -34,8 +34,8 @@ typedef struct {
     int over;        /* calls that reported more bytes than requested (must stay 0) */
     DWORD maxrd;     /* largest single read */
 } bio_rd;
-/* Read until a 0-byte read or a failure, piece bytes per call (0 = 65536). cap must exceed the body: bytes beyond
- * cap are counted in n but dropped. */
+/* Read until a 0-byte read or a failure, piece bytes per call (0 = 65536). reads are clamped to the space left in buf;
+ * once buf is full, further bytes go to a sink and are counted in n but dropped. */
 size_t bio_read(HINTERNET h, void *buf, size_t cap, DWORD piece, bio_rd *r);
 /* Same with InternetReadFileExA (INTERNET_BUFFERSA, flags) */
 size_t bio_read_ex(HINTERNET h, void *buf, size_t cap, DWORD piece, DWORD flags, bio_rd *r);

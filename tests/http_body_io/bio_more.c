@@ -26,7 +26,7 @@ TEST(bio_post_large_both) { REQUIRE(U(HttpSendRequestA)); post_case("POST", 1000
 TEST(bio_put_response) { REQUIRE(U(HttpSendRequestA)); post_case("PUT", 4097, 4097); }
 TEST(bio_post_empty_response) { REQUIRE(U(HttpSendRequestA)); post_case("POST", 5, 0); }
 
-/* ------------------------------------------------------------------ HTTP/1.0 requests */
+/* ------------------------------------------------------------------ HttpOpenRequest("HTTP/1.0") and HTTP/1.0 replies */
 static void http10_req_case(unsigned flags, size_t n) {
     srv_step st[] = { S_HEAD(), S_REPLY_PATTERN(200, NULL, n, flags), S_CLOSE_IF_ASKED(), S_LOOP() };
     bio_env e; if (!bio_open(&e, st, 4)) return;
@@ -35,7 +35,9 @@ static void http10_req_case(unsigned flags, size_t n) {
     unsigned char *b = malloc(n + 16); bio_rd r; size_t got = bio_read(hr, b, n + 16, 1000, &r);
     CHECK(r.ok); EXPECT_EQ(got, n); CHECK(srv_pattern_check(b, got < n ? got : n, 0));
     CHECK(srv_wait_requests(e.s, 1, 2000));
-    EXPECT_STR(srv_req_line(e.s, 0), "GET /v10 HTTP/1.0");
+    /* Win10 VM (boot wininet-bio-20261109-172245): the lpszVersion "HTTP/1.0" of HttpOpenRequestA does not change the
+     * request line; the session's HTTP version (INTERNET_OPTION_HTTP_VERSION, default 1.1) is what goes on the wire */
+    EXPECT_STR(srv_req_line(e.s, 0), "GET /v10 HTTP/1.1");
     const char *c = srv_req_header(e.s, 0, "Connection");
     t_note("HTTP/1.0 request Connection header: %s", c ? c : "(none)");
     free(b); bio_h(hr); bio_close(&e);
@@ -151,4 +153,27 @@ TEST(bio_split_sweep_content_length) {
 TEST(bio_split_sweep_chunked) {
     REQUIRE(U(InternetReadFile));
     split_sweep("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5;e=1\r\nhello\r\n7\r\n world!\r\n0\r\nT: x\r\n\r\n", "hello world!", 12, "chunked");
+}
+
+/* INTERNET_OPTION_HTTP_VERSION (process-wide, restored afterwards) is what selects an HTTP/1.0 request line */
+TEST(bio_http_version_option_10) {
+    REQUIRE(U(InternetSetOptionA)); REQUIRE(U(InternetQueryOptionA));
+    HTTP_VERSION_INFO old = { 0, 0 }, v10 = { 1, 0 }; DWORD l = sizeof old;
+    if (!U(InternetQueryOptionA)(NULL, INTERNET_OPTION_HTTP_VERSION, &old, &l)) { t_skip("query HTTP_VERSION err=%lu", GetLastError()); return; }
+    t_note("process HTTP version %lu.%lu", old.dwMajorVersion, old.dwMinorVersion);
+    srv_step st[] = { S_HEAD(), S_REPLY_PATTERN(200, NULL, 3000, SRV_R_HTTP10), S_CLOSE_IF_ASKED(), S_LOOP() };
+    bio_env e; if (!bio_open(&e, st, 4)) return;
+    CHECK(U(InternetSetOptionA)(NULL, INTERNET_OPTION_HTTP_VERSION, &v10, sizeof v10));
+    HINTERNET hr = U(HttpOpenRequestA)(e.hc, "GET", "/opt10", NULL, NULL, NULL, T_INET_FRESH, 0);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    U(InternetSetOptionA)(NULL, INTERNET_OPTION_HTTP_VERSION, &old, sizeof old);
+    CHECK(ok);
+    unsigned char b[3100]; bio_rd r; size_t n = bio_read(hr, b, sizeof b, 1000, &r);
+    CHECK(r.ok); EXPECT_EQ(n, 3000); CHECK(srv_pattern_check(b, n, 0));
+    CHECK(srv_wait_requests(e.s, 1, 2000));
+    const char *line = srv_req_line(e.s, 0);
+    t_note("request line with HTTP_VERSION 1.0: %s", line ? line : "(none)");
+    const char *c = srv_req_header(e.s, 0, "Connection");
+    t_note("HTTP/1.0 request Connection header: %s", c ? c : "(none)");
+    bio_h(hr); bio_close(&e);
 }

@@ -10,6 +10,7 @@ int bio_open_cfg(bio_env *e, const srv_config *cfg) {
     }
     int rc = srv_start(cfg, &e->s);
     if (rc) { e->s = NULL; t_skip("server unavailable: %s", srv_strerror(rc)); return 0; }
+    e->t0 = GetTickCount();
     e->hi = t_inet_open("bio-agent/1.0");
     if (!e->hi) { srv_stop(e->s); e->s = NULL; t_skip("InternetOpenA failed %lu", GetLastError()); return 0; }
     e->hc = U(InternetConnectA)(e->hi, "127.0.0.1", srv_port(e->s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
@@ -27,11 +28,30 @@ int bio_open(bio_env *e, const srv_step *st, int n) {
     return bio_open_cfg(e, &cfg);
 }
 
-void bio_h(HINTERNET h) { if (h) U(InternetCloseHandle)(h); }
+
+/* InternetCloseHandle on a worker thread with an outer bound: a close that blocks is reported, never hangs the area */
+static DWORD WINAPI close_thread(LPVOID p) { U(InternetCloseHandle)((HINTERNET)p); return 0; }
+static int close_bounded(HINTERNET h, const char *what) {
+    if (!h) return 1;
+    DWORD t0 = GetTickCount();
+    HANDLE th = CreateThread(NULL, 0, close_thread, h, 0, NULL);
+    if (!th) { U(InternetCloseHandle)(h); return 1; }
+    DWORD w = WaitForSingleObject(th, 10000);
+    CloseHandle(th);
+    DWORD dt = GetTickCount() - t0;
+    if (w != WAIT_OBJECT_0) { CHECKF(0, "InternetCloseHandle(%s) still blocked after %lu ms", what, dt); return 0; }
+    if (dt > 1000) t_note("InternetCloseHandle(%s) took %lu ms", what, dt);
+    return 1;
+}
+void bio_h(HINTERNET h) { close_bounded(h, "request"); }
 
 void bio_close(bio_env *e) {
-    bio_h(e->hc); bio_h(e->hi); e->hc = e->hi = NULL;
+    int ok = close_bounded(e->hc, "connect") & close_bounded(e->hi, "session");
+    e->hc = e->hi = NULL;
+    DWORD dt = GetTickCount() - e->t0;
+    if (dt > 3000) t_note("test body took %lu ms", dt);
     if (e->s) srv_stop(e->s);
+    (void)ok;
     e->s = NULL;
 }
 
@@ -60,7 +80,8 @@ size_t bio_read(HINTERNET h, void *buf, size_t cap, DWORD piece, bio_rd *r) {
     unsigned char *b = buf; static unsigned char sink[65536];
     for (int guard = 0; guard < 4000000; guard++) {
         DWORD rd = 0xDEADBEEF; unsigned char *dst; DWORD want = piece;
-        if (r->n + want <= cap) dst = b + r->n; else { dst = sink; if (want > sizeof sink) want = sizeof sink; }
+        if (r->n < cap) { dst = b + r->n; if (want > cap - r->n) want = (DWORD)(cap - r->n); }
+        else { dst = sink; if (want > sizeof sink) want = sizeof sink; }
         SetLastError(0xBEEF);
         if (!U(InternetReadFile)(h, dst, want, &rd)) { r->ok = 0; r->err = GetLastError(); return r->n; }
         if (rd == 0xDEADBEEF) { r->ok = 0; r->err = 0xDEADBEEF; return r->n; }
@@ -79,7 +100,8 @@ size_t bio_read_ex(HINTERNET h, void *buf, size_t cap, DWORD piece, DWORD flags,
     for (int guard = 0; guard < 4000000; guard++) {
         INTERNET_BUFFERSA ib; memset(&ib, 0, sizeof ib); ib.dwStructSize = sizeof ib;
         DWORD want = piece;
-        if (r->n + want <= cap) ib.lpvBuffer = b + r->n; else { ib.lpvBuffer = sink; if (want > sizeof sink) want = sizeof sink; }
+        if (r->n < cap) { ib.lpvBuffer = b + r->n; if (want > cap - r->n) want = (DWORD)(cap - r->n); }
+        else { ib.lpvBuffer = sink; if (want > sizeof sink) want = sizeof sink; }
         ib.dwBufferLength = want;
         if (!U(InternetReadFileExA)(h, &ib, flags, 0)) { r->ok = 0; r->err = GetLastError(); return r->n; }
         if (ib.dwBufferLength > want) r->over++;
