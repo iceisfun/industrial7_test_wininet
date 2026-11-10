@@ -33,6 +33,7 @@ static int send_reply(srv_conn *c, const hci_reply *r, int is_head, unsigned sho
 static int plan_fn(srv_conn *c, const srv_step *stp, void *user) {
     hci_plan *p = user; srv *s = srv_conn_server(c);
     for (int guard = 0; guard < 64; guard++) {
+        if (!hci_wait_request(c)) return -1;
         int ri = srv_conn_recv_head(c);
         if (ri < 0) return -1;
         const char *m = srv_req_method(s, ri);

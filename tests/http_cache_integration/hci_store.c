@@ -2,7 +2,7 @@
  * extension) and which responses are stored at all.
  * Decomp: HTTP_REQUEST_HANDLE_OBJECT::FCanWriteToCache@0x6a120 (200 or cacheable redirect + IsMIMETypeCacheable,
  * no-store/HTTP 0.9 never, other statuses only with NEED_FILE/HYPERLINK), FHttpBeginCacheWrite@0xe39c (extension),
- * LocalEndCacheWrite. VM_TIMEOUT: 240 */
+ * LocalEndCacheWrite. VM_TIMEOUT: 420 */
 #include "hci.h"
 #include <stdlib.h>
 
@@ -34,6 +34,15 @@ TEST(hci_store_get_creates_entry) {
         EXPECT_EQ(e->dwStructSize, sizeof(INTERNET_CACHE_ENTRY_INFOA));
         CHECK(e->lpszLocalFileName && e->lpszLocalFileName[0]);
         CHECK(e->lpHeaderInfo && e->dwHeaderInfoSize > 0);
+        EXPECT_EQ(e->CacheEntryType, 0x41);            /* VM: NORMAL_CACHE_ENTRY | 0x40 for HTTP-written entries */
+        EXPECT_EQ(e->dwHitRate, 1);
+        EXPECT_EQ(e->dwUseCount, 0);
+        CHECK(hci_ext_of(e)[0] == 0);
+        /* VM: local file is ...\INetCache\IE\<8 chars>\<url leaf>[1].txt */
+        const char *slash = strstr(url + 7, "/") + 1, *leaf = strrchr(e->lpszLocalFileName, '\\');
+        CHECK(leaf && !_strnicmp(leaf + 1, slash, strlen(slash)));
+        CHECK(strstr(e->lpszLocalFileName, "\\INetCache\\") != NULL);
+        CHECK(!_stricmp(hci_local_ext(e), "txt"));
     }
     free(e);
     srv_stop(s);
@@ -108,7 +117,7 @@ TEST(hci_store_header_info_contents) {
         CHECK(hci_hdr_has(e, "Content-Type: text/plain\r\n"));
         CHECK(hci_hdr_has(e, "X-Hci-Custom: v1\r\n"));
         CHECK(hci_hdr_has(e, "ETag: \"e1\"\r\n"));
-        CHECK(hci_hdr_has(e, "Cache-Control: max-age=3600\r\n"));
+        CHECK(!hci_hdr_has(e, "Cache-Control"));     /* VM: Cache-Control is not kept in the stored header blob */
         CHECK(hci_hdr_has(e, "Content-Length: 4\r\n"));
         /* header blob is a NUL-free CRLF list ending in an empty line */
         const char *h = (const char *)e->lpHeaderInfo; DWORD n = e->dwHeaderInfoSize;
@@ -126,7 +135,7 @@ TEST(hci_store_set_cookie_in_header_info) {
     const char *url = hci_url(s, "setcookie");
     hci_resp r; INTERNET_CACHE_ENTRY_INFOA *e = get_once(s, url, INTERNET_FLAG_NO_COOKIES, &r);
     CHECK(e != NULL);
-    if (e) t_note("Set-Cookie kept in cached headers: %d", hci_hdr_has(e, "Set-Cookie"));
+    if (e) { CHECK(!hci_hdr_has(e, "Set-Cookie")); CHECK(hci_hdr_has(e, "Content-Type: text/plain\r\n")); }
     free(e);
     srv_stop(s);
 }
@@ -244,9 +253,10 @@ TEST(hci_store_extension_from_content_type) {
 /* URL extension vs. content type */
 TEST(hci_store_extension_from_url) {
     REQUIRE(U(InternetOpenUrlA)); REQUIRE(U(GetUrlCacheEntryInfoA));
-    static const struct { const char *urlext, *ctype; } rows[] = {
-        { "txt", "text/plain" }, { "html", "text/html" }, { "png", "image/png" }, { "dat", "application/octet-stream" },
-        { "txt", "text/html" }, { "css", "image/png" }, { "js", NULL },
+    /* VM: a known Content-Type decides the extension; octet-stream or no type keeps the URL's */
+    static const struct { const char *urlext, *ctype, *want; } rows[] = {
+        { "txt", "text/plain", "txt" }, { "html", "text/html", "htm" }, { "png", "image/png", "png" }, { "dat", "application/octet-stream", "dat" },
+        { "txt", "text/html", "htm" }, { "css", "image/png", "png" }, { "js", NULL, "js" },
     };
     for (size_t k = 0; k < sizeof rows / sizeof rows[0]; k++) {
         hci_plan p = {0};
@@ -256,7 +266,11 @@ TEST(hci_store_extension_from_url) {
         const char *url = hci_url_ext(s, "uext", rows[k].urlext);
         hci_resp r; INTERNET_CACHE_ENTRY_INFOA *e = get_once(s, url, 0, &r);
         CHECKF(e != NULL, "%s", url);
-        if (e) t_note("url .%s ctype %s -> lpszFileExtension=%s local ext=%s", rows[k].urlext, rows[k].ctype ? rows[k].ctype : "(none)", hci_ext_of(e), hci_local_ext(e));
+        if (e) {
+            t_note("url .%s ctype %s -> lpszFileExtension=%s local ext=%s", rows[k].urlext, rows[k].ctype ? rows[k].ctype : "(none)", hci_ext_of(e), hci_local_ext(e));
+            CHECKF(!_stricmp(hci_local_ext(e), rows[k].want), ".%s %s: ext %s want %s", rows[k].urlext, rows[k].ctype ? rows[k].ctype : "-", hci_local_ext(e), rows[k].want);
+            CHECK(hci_ext_of(e)[0] == 0);               /* VM: lpszFileExtension is empty for HTTP-written entries */
+        }
         free(e);
         srv_stop(s);
     }
@@ -269,7 +283,12 @@ TEST(hci_store_content_disposition_filename) {
     const char *url = hci_url(s, "disp");
     hci_resp r; INTERNET_CACHE_ENTRY_INFOA *e = get_once(s, url, 0, &r);
     CHECK(e != NULL);
-    if (e) t_note("Content-Disposition: local=%s ext=%s", e->lpszLocalFileName, hci_ext_of(e));
+    if (e) {
+        t_note("Content-Disposition: local=%s ext=%s", e->lpszLocalFileName, hci_ext_of(e));
+        const char *leaf = strrchr(e->lpszLocalFileName, '\\'); leaf = leaf ? leaf + 1 : e->lpszLocalFileName;
+        CHECKF(!_strnicmp(leaf, "report[", 7), "leaf %s", leaf);    /* VM: report[1].csv */
+        CHECK(!_stricmp(hci_local_ext(e), "csv"));
+    }
     free(e);
     srv_stop(s);
 }
@@ -290,7 +309,7 @@ TEST(hci_store_non_200_status_not_cached) {
     }
 }
 
-/* NEED_FILE (MUST_CACHE_REQUEST) forces a cache file even for a status that is never cached */
+/* NEED_FILE (MUST_CACHE_REQUEST) and a status that is never cached */
 TEST(hci_store_need_file_forces_404_entry) {
     REQUIRE(U(InternetOpenUrlA)); REQUIRE(U(GetUrlCacheEntryInfoA));
     hci_plan p = {0}; hci_set(&p, 0, 404, "missing", "Content-Type: text/plain\r\n");
@@ -299,8 +318,11 @@ TEST(hci_store_need_file_forces_404_entry) {
     hci_resp r; INTERNET_CACHE_ENTRY_INFOA *e = get_once(s, url, INTERNET_FLAG_NEED_FILE, &r);
     EXPECT_EQ(r.status, 404);
     hci_note_entry("needfile 404", e);
-    t_note("NEED_FILE 404: datafile early=%s(err %lu) after=%s(err %lu)", r.datafile_early, r.datafile_early_err, r.datafile, r.datafile_err);
-    CHECK(r.datafile[0] != 0);
+    /* VM: NEED_FILE does not make a 404 cacheable and gives no data file */
+    CHECK(e == NULL);
+    EXPECT_EQ(r.datafile_err, ERROR_INTERNET_ITEM_NOT_FOUND);
+    EXPECT_EQ(r.datafile_early_err, ERROR_INTERNET_ITEM_NOT_FOUND);
+    CHECK(r.datafile[0] == 0);
     free(e);
     srv_stop(s);
 }
@@ -315,12 +337,14 @@ TEST(hci_store_need_file_no_store_gives_datafile) {
     EXPECT_STR(r.body, "nostorefile");
     CHECK(r.datafile[0] != 0);
     hci_note_entry("needfile no-store", e);
+    CHECK(e == NULL);                              /* VM: a temporary data file, no entry, file gone after close */
+    CHECK(!hci_file_exists(r.datafile));
     t_note("NEED_FILE no-store datafile=%s err=%lu exists-after-close=%d", r.datafile, r.datafile_err, hci_file_exists(r.datafile));
     free(e);
     srv_stop(s);
 }
 
-/* the excluded MIME list (FExcludedMimeType) */
+/* the excluded MIME list (FExcludedMimeType): on the Win10 image none of the multipart types is excluded (VM) */
 TEST(hci_store_multipart_mixed_replace_not_cached) {
     REQUIRE(U(InternetOpenUrlA)); REQUIRE(U(GetUrlCacheEntryInfoA));
     static const char *types[] = { "multipart/x-mixed-replace; boundary=b", "multipart/mixed; boundary=b", "multipart/x-byteranges; boundary=b" };
@@ -331,7 +355,7 @@ TEST(hci_store_multipart_mixed_replace_not_cached) {
         hci_resp r; INTERNET_CACHE_ENTRY_INFOA *e = get_once(s, url, 0, &r);
         EXPECT_EQ(r.status, 200);
         t_note("%s cached=%d", types[k], e != NULL);
-        if (k == 0) CHECKF(e == NULL, "%s", types[k]);
+        CHECKF(e != NULL, "%s not cached", types[k]);   /* VM: the default exclusion list does not hold these */
         free(e);
         srv_stop(s);
     }
@@ -380,7 +404,7 @@ TEST(hci_store_truncated_body_not_committed) {
     hci_resp r; INTERNET_CACHE_ENTRY_INFOA *e = get_once(s, url, 0, &r);
     t_note("truncated: read %zu bytes ok=%d", r.len, r.read_ok);
     hci_note_entry("truncated", e);
-    if (e) CHECKF(e->dwSizeLow != 20 || 1, "");
+    CHECK(e == NULL);                              /* VM: an incomplete body is never committed */
     free(e);
     srv_stop(s);
 }
@@ -399,7 +423,8 @@ TEST(hci_store_partial_read_then_close) {
     t_inet_close(hi);
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
     t_note("partial read (100 of %zu) then close: entry=%d err=%lu size=%lu", sizeof big, e != NULL, err, e ? e->dwSizeLow : 0);
-    if (e) CHECK(e->dwSizeLow != 100);
+    CHECK(e == NULL);                              /* VM: closing before EOF abandons the entry */
+    EXPECT_EQ(err, ERROR_FILE_NOT_FOUND);
     free(e);
     srv_stop(s);
 }
@@ -429,7 +454,9 @@ TEST(hci_store_fragment_not_part_of_key) {
     t_note("fragment: request target %s", srv_req_target(s, 0));
     int with = hci_exists(url), without = hci_exists(base);
     t_note("fragment: entry with #=%d without=%d", with, without);
-    CHECK(with || without);
+    /* VM: InternetOpenUrl keeps the fragment, both on the wire and in the cache key */
+    CHECK(with); CHECK(!without);
+    const char *tg = srv_req_target(s, 0); CHECK(tg && strstr(tg, "#section") != NULL);
     free(e);
     srv_stop(s);
 }

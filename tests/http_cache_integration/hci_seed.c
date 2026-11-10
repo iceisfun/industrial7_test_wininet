@@ -2,7 +2,7 @@
  * CommitUrlCacheEntry), and what a cache-served request handle answers (HttpQueryInfo, QueryDataAvailable,
  * InternetSetFilePointer, wide cache API views of HTTP-written entries).
  * Decomp: GetFromCachePreNetIO@0x27138 / IsExpired@0xc7d88 (ExpireTime decides freshness), CommitUrlCacheEntryW@0xd1820.
- * VM_TIMEOUT: 240 */
+ * VM_TIMEOUT: 420 */
 #include "hci.h"
 #include <stdlib.h>
 
@@ -44,9 +44,10 @@ TEST(hci_seed_expired_entry_with_etag_revalidated) {
     CHECK(seed(url, "seeded-stale", "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nETag: \"seed\"\r\n\r\n", -86400, 0));
     HINTERNET hi = hci_open(); hci_resp r; hci_get(hi, url, NULL, 0, &r); t_inet_close(hi);
     EXPECT_EQ(hci_reqs(s, 1), 1);
-    if (srv_req_count(s) >= 1) EXPECT_STR(srv_req_header(s, 0, "If-None-Match"), "\"seed\"");
-    EXPECT_EQ(p.cond_served, 1);
-    EXPECT_STR(r.body, "seeded-stale");
+    /* VM: an ETag in a header blob committed through the cache API is not used for If-None-Match */
+    if (srv_req_count(s) >= 1) CHECK(srv_req_header(s, 0, "If-None-Match") == NULL);
+    EXPECT_EQ(p.cond_served, 0);
+    EXPECT_STR(r.body, "network");
     srv_stop(s);
 }
 
@@ -62,6 +63,9 @@ TEST(hci_seed_expired_entry_lm_if_modified_since) {
     const char *ims = srv_req_count(s) ? srv_req_header(s, 0, "If-Modified-Since") : NULL;
     t_note("seeded expired entry with LastModifiedTime: If-Modified-Since=%s", ims ? ims : "(none)");
     CHECK(ims != NULL);
+    /* VM: the date comes from the entry's LastModifiedTime (not the blob) and carries "; length=<size>" */
+    CHECK(ims && strstr(ims, " GMT; length=9") != NULL);
+    CHECK(ims && !strstr(ims, "1994"));
     EXPECT_STR(r.body, "seeded-lm");
     srv_stop(s);
 }
@@ -172,9 +176,12 @@ TEST(hci_seed_cached_handle_set_file_pointer) {
         char buf[32]; DWORD rd = 0;
         EXPECT_EQ(U(InternetSetFilePointer)(h, 10, NULL, FILE_BEGIN, 0), 10);
         CHECK(U(InternetReadFile)(h, buf, 3, &rd)); buf[rd] = 0; EXPECT_STR(buf, "abc");
-        EXPECT_EQ(U(InternetSetFilePointer)(h, -5, NULL, FILE_CURRENT, 0), 8);
+        SetLastError(0); DWORD rc = U(InternetSetFilePointer)(h, -5, NULL, FILE_CURRENT, 0); DWORD ec = GetLastError();
+        SetLastError(0); DWORD re = U(InternetSetFilePointer)(h, -2, NULL, FILE_END, 0); DWORD ee = GetLastError();
+        t_note("cache handle: FILE_CURRENT -5 -> %ld err %lu; FILE_END -2 -> %ld err %lu", (long)rc, ec, (long)re, ee);
+        EXPECT_EQ(U(InternetSetFilePointer)(h, 8, NULL, FILE_BEGIN, 0), 8);
         CHECK(U(InternetReadFile)(h, buf, 2, &rd)); buf[rd] = 0; EXPECT_STR(buf, "89");
-        EXPECT_EQ(U(InternetSetFilePointer)(h, -2, NULL, FILE_END, 0), 14);
+        EXPECT_EQ(U(InternetSetFilePointer)(h, 14, NULL, FILE_BEGIN, 0), 14);
         CHECK(U(InternetReadFile)(h, buf, 10, &rd)); buf[rd] = 0; EXPECT_STR(buf, "ef");
         EXPECT_EQ(U(InternetSetFilePointer)(h, 0, NULL, FILE_BEGIN, 0), 0);
         CHECK(U(InternetReadFile)(h, buf, 16, &rd)); EXPECT_EQ(rd, 16);

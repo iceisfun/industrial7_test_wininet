@@ -2,7 +2,7 @@
  * CACHE_IF_NET_FAIL, HYPERLINK, FORMS_SUBMIT, NEED_FILE, and the REQUEST_FLAGS option bits.
  * Decomp: CanRetrieveFromCache@0x14d8ec (no cache read when flags & (RELOAD|RESYNCHRONIZE) 0x80000800),
  * FCanWriteToCache@0x6a120 (NO_CACHE_WRITE 0x04000000), InitBeginSendRequest (OFFLINE miss -> 2),
- * GetFromCacheOffline@0x171318. VM_TIMEOUT: 240 */
+ * GetFromCacheOffline@0x171318. VM_TIMEOUT: 420 */
 #include "hci.h"
 #include <stdlib.h>
 

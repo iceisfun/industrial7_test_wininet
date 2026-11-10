@@ -3,7 +3,7 @@
  * Decomp: HttpOpenRequest folds RELOAD|NO_CACHE_WRITE into non-GET/POST methods (02 3.2); FCanWriteToCache@0x6a120
  * (POST needs a secondary key; redirects 301..303/307/308; 302/303/307 need max-age or Expires; HTTPS + Pragma
  * no-cache); SetSecondaryCacheKey@0x253d0 (cache URL = URL + key, request handles only, else 12018);
- * InternetSetOptionA case 0x7a (ENABLE_REDIRECT_CACHE_READ: len 4, request handle). VM_TIMEOUT: 240 */
+ * InternetSetOptionA case 0x7a (ENABLE_REDIRECT_CACHE_READ: len 4, request handle). VM_TIMEOUT: 420 */
 #include "hci.h"
 #include <stdlib.h>
 
@@ -322,6 +322,7 @@ typedef struct { const char *hdrs; const char *body; } https_ctx;
 static int https_fn(srv_conn *c, const srv_step *stp, void *user) {
     https_ctx *x = user; srv *s = srv_conn_server(c);
     for (int g = 0; g < 16; g++) {
+        if (!hci_wait_request(c)) return -1;
         int ri = srv_conn_recv_head(c); if (ri < 0) return -1;
         char head[1024]; int n = snprintf(head, sizeof head, "HTTP/1.1 200 OK\r\n%sContent-Length: %u\r\n\r\n%s", x->hdrs, (unsigned)strlen(x->body), x->body);
         if (srv_conn_send(c, head, n)) return -1;

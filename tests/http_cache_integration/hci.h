@@ -37,6 +37,7 @@ typedef struct {
     volatile LONG cond_served;
 } hci_plan;
 
+int  hci_wait_request(srv_conn *c);               /* 0: server stopping (hci_wait.c) */
 srv *hci_plan_start(hci_plan *p);                  /* NULL -> t_skip already called by the caller (check) */
 #define HCI_START(p, s) do { (s) = hci_plan_start(p); if (!(s)) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; } } while (0)
 /* set reply i: hdrs printf-style */

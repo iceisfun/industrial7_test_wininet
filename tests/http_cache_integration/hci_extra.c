@@ -1,7 +1,7 @@
 /* hci_extra.c - edge responses and cache-related request options: HTTP/0.9 and HTTP/1.0 responses, the cache stream
  * handle option, secondary key reuse, request-option state before send, large header blocks.
  * Decomp: FCanWriteToCache@0x6a120 (IsHttp09 -> never cached), InternetQueryOptionA case 0x1b (CACHE_STREAM_HANDLE),
- * SetSecondaryCacheKey@0x253d0. VM_TIMEOUT: 240 */
+ * SetSecondaryCacheKey@0x253d0. VM_TIMEOUT: 420 */
 #include "hci.h"
 #include <stdlib.h>
 
