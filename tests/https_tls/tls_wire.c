@@ -30,7 +30,7 @@ static DWORD client_secure_protocols(void) {
 static DWORD hello_request(th_srv *t, const char *host, DWORD http_proto, int set_proto) {
     treq r; DWORD e;
     if (!treq_open(&r, host, th_port(t), "GET", "/h", T_INET_FRESH | INTERNET_FLAG_SECURE)) { e = GetLastError(); treq_close(&r); return e ? e : 1; }
-    if (set_proto) U(InternetSetOptionA)(r.hi, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, &http_proto, sizeof http_proto);
+    if (set_proto) U(InternetSetOptionA)(r.hr, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, &http_proto, sizeof http_proto);
     t_https_secflags(r.hr, SECURITY_SET_MASK);
     e = treq_send(&r);
     treq_close(&r);
@@ -183,13 +183,29 @@ TEST(tls_enable_http_protocol_option_rules) {
 }
 
 /* HTTP/2 enabled against an HTTP/1.1-only TLS server: ALPN is offered but not selected -> HTTP/1.1, protocol used 0 */
+/* the option on the session handle, set before the connect/request handles exist: probe inheritance */
+TEST(tls_hello_alpn_session_level_probe) {
+    TH_START_OR_SKIP(t, TH_CLOSE);
+    HINTERNET hi = t_inet_open(NULL);
+    DWORD v = HTTP_PROTOCOL_FLAG_HTTP2;
+    CHECK(U(InternetSetOptionA)(hi, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, &v, sizeof v));
+    HINTERNET hc = U(InternetConnectA)(hi, "localhost", th_port(t), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
+    t_https_secflags(hr, SECURITY_SET_MASK);
+    U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    th_wait(t, 1, 3000);
+    const th_hello *h = th_get(t, 0); note_hello("session-level http2", h);
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi);
+    th_stop(t);
+}
+
 TEST(tls_alpn_offered_server_ignores) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/alpn", T_INET_FRESH | INTERNET_FLAG_SECURE));
     DWORD v = HTTP_PROTOCOL_FLAG_HTTP2;
     CHECK(U(InternetSetOptionA)(t.hr, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, &v, sizeof v));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     EXPECT_EQ(treq_status(&t), 200);
     DWORD used = 0xDEAD, l = sizeof used;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_HTTP_PROTOCOL_USED, &used, &l));
@@ -211,13 +227,20 @@ static void broken_case(int reaction, const char *name, DWORD want) {
     CHECKF(e == want, "%s: err=%lu %s want %lu %s", name, e, t_inet_errname(e), want, t_inet_errname(want));
     th_stop(t);
 }
-TEST(tls_broken_server_close_after_hello) { broken_case(TH_CLOSE, "close", ERROR_INTERNET_SECURITY_CHANNEL_ERROR); }
+TEST(tls_broken_server_close_after_hello) { broken_case(TH_CLOSE, "close", ERROR_INTERNET_CANNOT_CONNECT); }
 TEST(tls_broken_server_reset_after_hello) { broken_case(TH_RESET, "reset", ERROR_INTERNET_CONNECTION_RESET); }
 TEST(tls_broken_server_fatal_alert) { broken_case(TH_ALERT, "alert", ERROR_INTERNET_SECURITY_CHANNEL_ERROR); }
 TEST(tls_broken_server_plaintext_http) { broken_case(TH_PLAINTEXT_HTTP, "plaintext", ERROR_INTERNET_SECURITY_CHANNEL_ERROR); }
 TEST(tls_broken_server_garbage) { broken_case(TH_GARBAGE, "garbage", ERROR_INTERNET_SECURITY_CHANNEL_ERROR); }
-TEST(tls_broken_server_truncated_serverhello) { broken_case(TH_HANGUP_AFTER_SH, "truncated-sh", ERROR_INTERNET_SECURITY_CHANNEL_ERROR); }
-TEST(tls_broken_server_close_without_reading) { broken_case(TH_SILENT_CLOSE_NOREAD, "close-noread", ERROR_INTERNET_SECURITY_CHANNEL_ERROR); }
+TEST(tls_broken_server_truncated_serverhello) { broken_case(TH_HANGUP_AFTER_SH, "truncated-sh", ERROR_INTERNET_CANNOT_CONNECT); }
+/* closing with the ClientHello unread: FIN vs RST depends on timing (12030 observed); accept the connection-level set */
+TEST(tls_broken_server_close_without_reading) {
+    th_srv *t = th_start(TH_SILENT_CLOSE_NOREAD); if (!t) { t_skip("winsock unavailable"); return; }
+    DWORD e = hello_request(t, "127.0.0.1", 0, 0);
+    t_note("close-noread: err=%lu %s", e, t_inet_errname(e));
+    CHECKF(e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET || e == ERROR_INTERNET_CANNOT_CONNECT, "err=%lu", e);
+    th_stop(t);
+}
 
 /* HTTPS request to a plain HTTP server (the shared library) */
 TEST(tls_broken_https_to_http_server) {
@@ -227,7 +250,7 @@ TEST(tls_broken_https_to_http_server) {
     t_https_secflags(t.hr, SECURITY_SET_MASK);
     DWORD e = treq_send(&t);
     t_note("https->http server: err=%lu %s, server requests=%d", e, t_inet_errname(e), srv_req_count(s));
-    EXPECT_EQ(e, ERROR_INTERNET_SECURITY_CHANNEL_ERROR);
+    EXPECT_EQ(e, ERROR_INTERNET_CANNOT_CONNECT);          /* Win10 VM: the HTTP server answers the hello with nothing useful and closes */
     treq_close(&t); srv_stop(s);
 }
 
@@ -239,7 +262,7 @@ TEST(tls_broken_http_to_https_server) {
     DWORD st = e ? 0 : treq_status(&t);
     t_note("http->https server: err=%lu %s status=%lu", e, t_inet_errname(e), st);
     tls_dump_tls_events(s);
-    CHECK(e != 0 || st != 200);
+    EXPECT_EQ(e, ERROR_HTTP_INVALID_SERVER_RESPONSE);     /* Win10 VM: 12152 */
     CHECK(srv_wait_events(s, SRV_EV_TLS_ABORT, 1, 2000));
     treq_close(&t); srv_stop(s);
 }
@@ -283,7 +306,7 @@ TEST(tls_proto_both_ends_agree) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/v", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     tls_sec_conn_info sci; memset(&sci, 0, sizeof sci); DWORD l = sizeof sci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CONNECTION_INFO, &sci, &l));
     const char *d = tls_done_data(s, 0);

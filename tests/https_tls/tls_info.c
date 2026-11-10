@@ -61,7 +61,7 @@ TEST(tls_info_certstruct_cn_other) {
     srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/i", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x1100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     INTERNET_CERTIFICATE_INFO ci; memset(&ci, 0, sizeof ci); DWORD l = sizeof ci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l));
     EXPECT_STR(ci.lpszSubjectInfo, "i7-other.invalid");
@@ -77,7 +77,7 @@ TEST(tls_info_certstruct_expired_dates) {
     PCCERT_CONTEXT sc = srv_cert_get(SRV_CERT_EXPIRED);
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/i", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x2100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     INTERNET_CERTIFICATE_INFO ci; memset(&ci, 0, sizeof ci); DWORD l = sizeof ci;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l));
     CHECK(sc && ft_eq(ci.ftExpiry, sc->pCertInfo->NotAfter));
@@ -94,7 +94,7 @@ TEST(tls_info_certstruct_expired_dates) {
 TEST(tls_info_certstruct_after_ca_failure) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/i", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_INVALID_CA);
+    SEND_EQ(&t, ERROR_INTERNET_INVALID_CA);
     INTERNET_CERTIFICATE_INFO ci; memset(&ci, 0, sizeof ci); DWORD l = sizeof ci;
     SET_ERR(0);
     BOOL ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, &ci, &l);
@@ -117,7 +117,7 @@ TEST(tls_info_certstruct_buffer_sizes) {
     BOOL ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, NULL, &l);
     DWORD e = ok ? 0 : GetLastError();
     t_note("certstruct NULL/0: ok=%d err=%lu len=%lu", ok, e, l);
-    CHECK(!ok); EXPECT_EQ(e, ERROR_INSUFFICIENT_BUFFER); EXPECT_EQ(l, 64);
+    CHECK(ok); EXPECT_EQ(l, 64);        /* decomp ConvertSecurityInfoIntoCertInfoStruct: NULL/0 -> size only, success */
     /* short */
     static const DWORD lens[] = { 1, 8, 32, 63 };
     for (size_t i = 0; i < 4; i++) {
@@ -126,7 +126,8 @@ TEST(tls_info_certstruct_buffer_sizes) {
         e = ok ? 0 : GetLastError();
         t_note("certstruct len %lu: ok=%d err=%lu len=%lu", lens[i], ok, e, l);
         CHECK(!ok);
-        CHECKF(e == ERROR_INSUFFICIENT_BUFFER || e == ERROR_INTERNET_INTERNAL_ERROR, "len %lu err %lu", lens[i], e);
+        CHECKF(e == ERROR_INTERNET_INTERNAL_ERROR, "len %lu err %lu", lens[i], e);   /* decomp: short -> 12004 */
+        EXPECT_EQ(l, 64);
     }
     /* larger than needed */
     char big[128]; memset(big, 0x5A, sizeof big); l = sizeof big;
@@ -149,7 +150,7 @@ TEST(tls_info_plain_http_request_invalid_operation) {
     srv *s = srv_http(st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/p", T_INET_FRESH));
     for (int sent = 0; sent < 2; sent++) {
-        if (sent) { EXPECT_EQ(treq_send(&t), 0); char b[16]; treq_body(&t, b, sizeof b); }
+        if (sent) { SEND_EQ(&t, 0); char b[16]; treq_body(&t, b, sizeof b); }
         for (size_t i = 0; i < sizeof k_secopts / sizeof k_secopts[0]; i++) {
             char buf[512]; DWORD l = k_secopts[i].len; SET_ERR(0);
             BOOL ok = U(InternetQueryOptionA)(t.hr, k_secopts[i].opt, buf, &l);
@@ -177,8 +178,13 @@ TEST(tls_info_https_request_before_send) {
         char buf[512]; DWORD l = k_secopts[i].len; SET_ERR(0);
         BOOL ok = U(InternetQueryOptionA)(t.hr, k_secopts[i].opt, buf, &l);
         DWORD e = ok ? 0 : GetLastError();
-        t_note("unsent https opt %lu: ok=%d err=%lu", k_secopts[i].opt, ok, e);
-        CHECKF(!ok, "opt %lu succeeded before send", k_secopts[i].opt);
+        t_note("unsent https opt %lu: ok=%d err=%lu first dword=0x%lx", k_secopts[i].opt, ok, e, *(DWORD *)buf);
+        CHECKF(ok, "opt %lu before send: err=%lu (Win10 VM: the security entry exists from HttpOpenRequest)", k_secopts[i].opt, e);
+        if (ok && k_secopts[i].opt == INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT) {
+            INTERNET_CERTIFICATE_INFO *ci = (void *)buf;
+            t_note("unsent certstruct: subject=%p issuer=%p key=%lu", ci->lpszSubjectInfo, ci->lpszIssuerInfo, ci->dwKeySize);
+            CHECK(ci->lpszSubjectInfo == NULL && ci->lpszIssuerInfo == NULL);
+        }
     }
     tls_sec_conn_info sci; memset(&sci, 0xCC, sizeof sci); DWORD l = sizeof sci;
     BOOL ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CONNECTION_INFO, &sci, &l);
@@ -221,22 +227,25 @@ TEST(tls_info_certificate_string) {
     t_note("certificate string (%lu chars): %.300s", l, buf);
     CHECK(strstr(buf, "localhost") != NULL);
     EXPECT_EQ(l, strlen(buf));
-    /* sizing: too small -> 122 with the needed size (including the NUL) */
+    /* sizing quirk (decomp case 0x23 + Win10 VM): any buffer shorter than strlen+1 -> 122 and *len = 1, not the needed size */
     DWORD need = l + 1, l2 = 4; char tiny[4]; SET_ERR(0);
     EXPECT_FAIL(!U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE, tiny, &l2), ERROR_INSUFFICIENT_BUFFER);
     t_note("short query asked for %lu (string %lu)", l2, l);
-    EXPECT_EQ(l2, need);
+    EXPECT_EQ(l2, 1);
     l2 = l; SET_ERR(0);   /* exactly strlen: no room for the NUL */
     EXPECT_FAIL(!U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE, buf, &l2), ERROR_INSUFFICIENT_BUFFER);
+    EXPECT_EQ(l2, 1);
     l2 = need;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE, buf, &l2));
     EXPECT_EQ(l2, need - 1);
-    /* W: the same text in UTF-16 */
+    /* W: InternetQueryOptionW has no conversion branch for 35: the ANSI bytes come back unchanged */
     WCHAR wb[2048]; DWORD wl = sizeof wb; memset(wb, 0, sizeof wb);
     ok = U(InternetQueryOptionW)(t.hr, INTERNET_OPTION_SECURITY_CERTIFICATE, wb, &wl);
     CHECKF(ok, "W err=%lu", GetLastError());
     t_note("W certificate string length field %lu", wl);
-    CHECK(wcsstr(wb, L"localhost") != NULL);
+    CHECK(strstr((char *)wb, "localhost") != NULL);
+    EXPECT_EQ(wl, l);
+    CHECK(!memcmp(wb, buf, l));
     treq_close(&t); srv_stop(s);
 }
 
@@ -312,7 +321,7 @@ TEST(tls_info_connection_info_after_success) {
 TEST(tls_info_connection_info_after_failure) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/f", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_INVALID_CA);
+    SEND_EQ(&t, ERROR_INTERNET_INVALID_CA);
     tls_sec_conn_info sci; memset(&sci, 0xCC, sizeof sci); DWORD l = sizeof sci;
     BOOL ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SECURITY_CONNECTION_INFO, &sci, &l);
     t_note("after 12045: ok=%d dwSize=%lu fSecure=%d proto=0x%lx suite=0x%lx", ok, sci.dwSize, sci.fSecure, sci.connectionInfo.dwProtocol, sci.cipherInfo.dwCipherSuite);
@@ -341,7 +350,8 @@ TEST(tls_info_server_chain_after_success) {
         CHECK(sc && leaf && leaf->cbCertEncoded == sc->cbCertEncoded && !memcmp(leaf->pbCertEncoded, sc->pbCertEncoded, sc->cbCertEncoded));
         t_note("chain trust error=0x%lx info=0x%lx", ch->TrustStatus.dwErrorStatus, ch->TrustStatus.dwInfoStatus);
         CHECK(ch->TrustStatus.dwErrorStatus & CERT_TRUST_IS_UNTRUSTED_ROOT);
-        CHECK(ch->TrustStatus.dwInfoStatus & CERT_TRUST_IS_SELF_SIGNED);
+        t_note("element[0] trust error=0x%lx info=0x%lx", sch->rgpElement[0]->TrustStatus.dwErrorStatus, sch->rgpElement[0]->TrustStatus.dwInfoStatus);
+        CHECK(sch->rgpElement[0]->TrustStatus.dwInfoStatus & CERT_TRUST_IS_SELF_SIGNED);
         p_free_chain()(ch);
     }
     /* each query hands out a new reference */
@@ -373,7 +383,7 @@ TEST(tls_info_server_chain_after_failure) {
     srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); if (!s) TLS_SKIP_SRV();
     PCCERT_CONTEXT sc = srv_cert_get(SRV_CERT_CN_OTHER);
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/f", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_INVALID_CA);
+    SEND_EQ(&t, ERROR_INTERNET_INVALID_CA);
     PCCERT_CHAIN_CONTEXT ch = NULL; DWORD l = sizeof ch; SET_ERR(0);
     BOOL ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT, &ch, &l);
     t_note("chain after 12045: ok=%d err=%lu ch=%p", ok, ok ? 0 : GetLastError(), ch);
@@ -396,7 +406,7 @@ TEST(tls_info_http_protocol_used) {
     l = 3; SET_ERR(0);
     EXPECT_FAIL(!U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_HTTP_PROTOCOL_USED, &v, &l), ERROR_INTERNET_BAD_OPTION_LENGTH);
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     l = sizeof v; v = 0xDEAD;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_HTTP_PROTOCOL_USED, &v, &l));
     EXPECT_EQ(v, 0);                                   /* HTTP/1.1, not HTTP_PROTOCOL_FLAG_HTTP2 */
@@ -440,7 +450,7 @@ TEST(tls_info_url_option_scheme) {
     l = sizeof url;
     CHECK(U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_URL, url, &l));
     t_note("port 0 + SECURE url=%s", url);
-    EXPECT_STR(url, "https://127.0.0.1/p");
+    EXPECT_STR(url, "https://127.0.0.1:80/p");             /* Win10 VM: port 0 resolved at InternetConnect (no SECURE there) -> 80 */
     treq_close(&t);
 }
 

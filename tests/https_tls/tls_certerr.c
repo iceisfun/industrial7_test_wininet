@@ -50,7 +50,8 @@ TEST(tls_cert_localhost_matrix) {
         { SRV_CERT_LOCALHOST, "127.0.0.1", 0x2000, 0, E_CA },
         { SRV_CERT_LOCALHOST, "127.0.0.1", 0x80, 0, E_CA },
         { SRV_CERT_LOCALHOST, "127.0.0.1", 0x200, 0, E_CA },
-        { SRV_CERT_LOCALHOST, "127.0.0.1", 0x3380, 0, E_CA },
+        { SRV_CERT_LOCALHOST, "127.0.0.1", 0x3280, 0, E_CA },
+        { SRV_CERT_LOCALHOST, "127.0.0.1", 0x3380, 0, 0 },
         { SRV_CERT_LOCALHOST, "127.0.0.1", 0x13380, 0, 0 },
         { SRV_CERT_LOCALHOST, "127.0.0.1", 0x100 | 0x80, 0, 0 },
         { SRV_CERT_LOCALHOST, "127.0.0.1", 0, INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, E_CA },
@@ -110,7 +111,7 @@ TEST(tls_cert_wrong_usage_matrix) {
     REQUIRE(U(HttpSendRequestA));
     static const cert_row rows[] = {
         { SRV_CERT_CLIENT, "127.0.0.1", 0, 0, E_CA },
-        { SRV_CERT_CLIENT, "127.0.0.1", 0x100, 0, E_CN },
+        { SRV_CERT_CLIENT, "127.0.0.1", 0x100, 0, E_INV },             /* Win10 VM: wrong usage reported before CN */
         { SRV_CERT_CLIENT, "127.0.0.1", 0x1100, 0, E_INV },
         { SRV_CERT_CLIENT, "127.0.0.1", 0x1300, 0, 0 },
         { SRV_CERT_CLIENT, "127.0.0.1", 0x0300, 0, E_CN },
@@ -123,11 +124,11 @@ TEST(tls_cert_wrong_usage_matrix) {
 TEST(tls_retry_unknown_ca_same_handle) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/r", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), E_CA);
+    SEND_EQ(&t, E_CA);
     EXPECT_EQ(treq_status(&t), 0);
-    EXPECT_EQ(treq_send(&t), E_CA);                       /* resend without change: same error */
+    SEND_EQ(&t, E_CA);                       /* resend without change: same error */
     CHECK(t_https_secflags(t.hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     EXPECT_EQ(treq_status(&t), 200);
     char b[32] = ""; treq_body(&t, b, sizeof b); EXPECT_STR(b, "hello");
     CHECK(srv_wait_requests(s, 1, 2000));
@@ -141,11 +142,11 @@ TEST(tls_retry_unknown_ca_same_handle) {
 TEST(tls_retry_cn_then_ca_chain) {
     srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/r", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), E_CA);
+    SEND_EQ(&t, E_CA);
     CHECK(t_https_secflags(t.hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    EXPECT_EQ(treq_send(&t), E_CN);
+    SEND_EQ(&t, E_CN);
     CHECK(t_https_secflags(t.hr, SECURITY_FLAG_IGNORE_CERT_CN_INVALID));
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     EXPECT_EQ(treq_status(&t), 200);
     EXPECT_EQ(tls_secflags(t.hr), 0x20001101);            /* 04 F8 */
     treq_close(&t); srv_stop(s);
@@ -154,11 +155,11 @@ TEST(tls_retry_cn_then_ca_chain) {
 TEST(tls_retry_expired_chain) {
     srv *s = tls_srv(SRV_CERT_EXPIRED, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/r", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), E_CA);
+    SEND_EQ(&t, E_CA);
     CHECK(t_https_secflags(t.hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    EXPECT_EQ(treq_send(&t), E_DATE);
+    SEND_EQ(&t, E_DATE);
     CHECK(t_https_secflags(t.hr, SECURITY_FLAG_IGNORE_CERT_DATE_INVALID));
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     EXPECT_EQ(treq_status(&t), 200);
     EXPECT_EQ(tls_secflags(t.hr), 0x20002101);
     treq_close(&t); srv_stop(s);
@@ -171,7 +172,7 @@ TEST(tls_retry_wrong_usage_chain) {
     seq[0] = treq_send(&t);
     for (int i = 0; i < 3; i++) { t_https_secflags(t.hr, add[i]); seq[i + 1] = treq_send(&t); }
     t_note("wrong-usage chain: %lu -> +0x100 %lu -> +0x1000 %lu -> +0x200 %lu", seq[0], seq[1], seq[2], seq[3]);
-    EXPECT_EQ(seq[0], E_CA); EXPECT_EQ(seq[1], E_CN); EXPECT_EQ(seq[2], E_INV); EXPECT_EQ(seq[3], 0);
+    EXPECT_EQ(seq[0], E_CA); EXPECT_EQ(seq[1], E_INV); EXPECT_EQ(seq[2], E_INV); EXPECT_EQ(seq[3], 0);
     EXPECT_EQ(tls_secflags(t.hr), 0x20001301);
     treq_close(&t); srv_stop(s);
 }
@@ -225,7 +226,7 @@ TEST(tls_pooled_connection_flags_per_request) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/a", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char b[16]; treq_body(&t, b, sizeof b);
     HINTERNET h2 = U(HttpOpenRequestA)(t.hc, "GET", "/b", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
     t_https_secflags(h2, 0x100);
@@ -260,14 +261,17 @@ TEST(tls_errordlg_no_ui_probe) {
     REQUIRE(U(InternetErrorDlg));
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/d", T_INET_FRESH | INTERNET_FLAG_SECURE));
-    EXPECT_EQ(treq_send(&t), E_CA);
+    SEND_EQ(&t, E_CA);
     static dlg_arg a; a.hr = t.hr; a.r = 0xFFFFFFFF;
     HANDLE th = CreateThread(NULL, 0, dlg_thread, &a, 0, NULL);
     DWORD w = WaitForSingleObject(th, 3000);
     if (w != WAIT_OBJECT_0) { t_note("InternetErrorDlg(NO_UI) did not return within 3 s (thread leaked, handles leaked)"); CHECK(0); return; }
     CloseHandle(th);
     t_note("InternetErrorDlg(NO_UI|CHANGE_OPTIONS|GENERATE_DATA, 12045) -> %lu, flags now 0x%lx", a.r, tls_secflags(t.hr));
+    EXPECT_EQ(a.r, ERROR_CANCELLED);                      /* Win10 VM: 1223, no flags changed */
+    EXPECT_EQ(tls_secflags(t.hr), 0);
     DWORD e = treq_send(&t);
     t_note("resend after the NO_UI dialog call: err=%lu", e);
+    EXPECT_EQ(e, ERROR_INTERNET_INVALID_CA);
     treq_close(&t); srv_stop(s);
 }

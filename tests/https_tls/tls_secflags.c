@@ -119,14 +119,15 @@ TEST(tls_secflags_initial_https_request) {
     treq_close(&t);
 }
 
-/* request flags INTERNET_FLAG_IGNORE_CERT_* (HttpOpenRequest) show up as the same security flag bits (04 F8) */
+/* request flags INTERNET_FLAG_IGNORE_CERT_* (HttpOpenRequest) are NOT visible in the security flags before the send
+ * (Win10 VM: 0); they are applied at send time and then read back (see tls_secflags_request_flag_after_success). */
 TEST(tls_secflags_from_request_flags) {
     REQUIRE(U(HttpOpenRequestA));
     static const struct { DWORD open, want; } tab[] = {
         { 0, 0 },
-        { INTERNET_FLAG_IGNORE_CERT_CN_INVALID, SECURITY_FLAG_IGNORE_CERT_CN_INVALID },
-        { INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, SECURITY_FLAG_IGNORE_CERT_DATE_INVALID },
-        { INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, 0x3000 },
+        { INTERNET_FLAG_IGNORE_CERT_CN_INVALID, 0 },
+        { INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, 0 },
+        { INTERNET_FLAG_IGNORE_CERT_CN_INVALID | INTERNET_FLAG_IGNORE_CERT_DATE_INVALID, 0 },
         { INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP, 0 },
         { INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS, 0 },
         { INTERNET_FLAG_KEEP_CONNECTION, 0 },
@@ -198,11 +199,11 @@ TEST(tls_secflags_set_combinations) {
 /* OR with the request-flag bits */
 TEST(tls_secflags_set_on_top_of_request_flags) {
     treq t; HINTERNET hr = open_https_req(&t, 0, INTERNET_FLAG_IGNORE_CERT_CN_INVALID);
-    EXPECT_EQ(tls_secflags(hr), 0x1000);
+    EXPECT_EQ(tls_secflags(hr), 0);                       /* request flag not visible before send */
     CHECK(tls_set_secflags(hr, 0x100));
-    EXPECT_EQ(tls_secflags(hr), 0x1100);
+    EXPECT_EQ(tls_secflags(hr), 0x100);
     CHECK(tls_set_secflags(hr, 0x2000 | 0x80));
-    EXPECT_EQ(tls_secflags(hr), 0x3180);
+    EXPECT_EQ(tls_secflags(hr), 0x2180);
     treq_close(&t);
 }
 
@@ -212,10 +213,10 @@ TEST(tls_secflags_wide_entry_points) {
     treq t; HINTERNET hr = open_https_req(&t, 0, INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
     DWORD f = 0, l = sizeof f;
     CHECK(U(InternetQueryOptionW)(hr, INTERNET_OPTION_SECURITY_FLAGS, &f, &l));
-    EXPECT_EQ(l, 4); EXPECT_EQ(f, 0x2000);
+    EXPECT_EQ(l, 4); EXPECT_EQ(f, 0);
     DWORD v = 0x100 | 0x200;
     CHECK(U(InternetSetOptionW)(hr, INTERNET_OPTION_SECURITY_FLAGS, &v, sizeof v));
-    EXPECT_EQ(tls_secflags(hr), 0x2300);
+    EXPECT_EQ(tls_secflags(hr), 0x300);
     l = 2; SET_ERR(0);
     EXPECT_FAIL(!U(InternetQueryOptionW)(hr, INTERNET_OPTION_SECURITY_FLAGS, &f, &l), ERROR_INSUFFICIENT_BUFFER);
     EXPECT_EQ(l, 4);
@@ -261,7 +262,7 @@ TEST(tls_secflags_after_success_all_ignores) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), 0);
     CHECK(tls_set_secflags(hr, SECURITY_SET_MASK));
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     DWORD f = tls_secflags(hr);
     t_note("after success with SECURITY_SET_MASK: 0x%lx", f);
     EXPECT_EQ(f, SECURITY_FLAG_STRENGTH_STRONG | SECURITY_SET_MASK | SECURITY_FLAG_SECURE);
@@ -272,10 +273,10 @@ TEST(tls_secflags_after_success_all_ignores) {
 TEST(tls_secflags_after_invalid_ca_failure) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), 0);
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_INVALID_CA);
+    SEND_EQ(&t, ERROR_INTERNET_INVALID_CA);
     DWORD f = tls_secflags(hr);
     t_note("after 12045: flags=0x%lx", f);
-    EXPECT_EQ(f, SECURITY_FLAG_STRENGTH_STRONG | SECURITY_FLAG_SECURE);
+    EXPECT_EQ(f, 0);                                         /* Win10 VM: no SECURE/STRENGTH bits after 12045 */
     treq_close(&t); srv_stop(s);
 }
 
@@ -283,10 +284,30 @@ TEST(tls_secflags_after_cn_failure) {
     srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), 0);
     CHECK(tls_set_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_SEC_CERT_CN_INVALID);
+    SEND_EQ(&t, ERROR_INTERNET_SEC_CERT_CN_INVALID);
     DWORD f = tls_secflags(hr);
     t_note("after 12038: flags=0x%lx", f);
-    EXPECT_EQ(f, SECURITY_FLAG_STRENGTH_STRONG | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_SECURE);
+    EXPECT_EQ(f, SECURITY_FLAG_IGNORE_UNKNOWN_CA);            /* Win10 VM: only what was set */
+    treq_close(&t); srv_stop(s);
+}
+
+/* the request flag is applied at send time and then reads back (04 F8: 0x20001101) */
+TEST(tls_secflags_request_flag_after_success) {
+    srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); if (!s) TLS_SKIP_SRV();
+    treq t; HINTERNET hr = open_https_req(&t, srv_port(s), INTERNET_FLAG_IGNORE_CERT_CN_INVALID);
+    EXPECT_EQ(tls_secflags(hr), 0);
+    CHECK(tls_set_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
+    SEND_EQ(&t, 0);
+    EXPECT_EQ(tls_secflags(hr), SECURITY_FLAG_STRENGTH_STRONG | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_SECURE);
+    treq_close(&t); srv_stop(s);
+}
+
+TEST(tls_secflags_request_date_flag_after_success) {
+    srv *s = tls_srv(SRV_CERT_EXPIRED, NULL, 0); if (!s) TLS_SKIP_SRV();
+    treq t; HINTERNET hr = open_https_req(&t, srv_port(s), INTERNET_FLAG_IGNORE_CERT_DATE_INVALID);
+    CHECK(tls_set_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
+    SEND_EQ(&t, 0);
+    EXPECT_EQ(tls_secflags(hr), SECURITY_FLAG_STRENGTH_STRONG | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID | SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_SECURE);
     treq_close(&t); srv_stop(s);
 }
 
@@ -319,7 +340,7 @@ TEST(tls_secflags_not_inherited_by_next_request) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, NULL, 0); if (!s) TLS_SKIP_SRV();
     treq t; HINTERNET hr = open_https_req(&t, srv_port(s), 0);
     CHECK(tls_set_secflags(hr, 0x100));
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char b[32]; treq_body(&t, b, sizeof b);
     HINTERNET hr2 = U(HttpOpenRequestA)(t.hc, "GET", "/second", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
     DWORD f2 = tls_secflags(hr2);

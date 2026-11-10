@@ -8,7 +8,7 @@ TEST(tls_flow_large_body_many_records) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/big", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char *buf = malloc(210000); size_t n = 0; DWORD r;
     for (int guard = 0; guard < 10000; guard++) {
         if (!U(InternetReadFile)(t.hr, buf + n, 7777, &r) || r == 0) break;
@@ -26,7 +26,7 @@ TEST(tls_flow_chunked_body) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/c", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char b[128] = ""; treq_body(&t, b, sizeof b);
     EXPECT_STR(b, "chunked over tls: 0123456789");
     treq_close(&t); srv_stop(s);
@@ -37,7 +37,7 @@ TEST(tls_flow_close_delimited_body_with_close_notify) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 2); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/cd", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char b[64] = ""; int ok = 0; t_inet_read_all(t.hr, b, sizeof b, &ok);
     EXPECT_STR(b, "until close");
     CHECK(ok);
@@ -50,11 +50,27 @@ TEST(tls_flow_gzip_body) {
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/gz", T_INET_FRESH | INTERNET_FLAG_SECURE));
     BOOL dec = TRUE; CHECK(U(InternetSetOptionA)(t.hr, INTERNET_OPTION_HTTP_DECODING, &dec, sizeof dec));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char b[1024] = ""; size_t n = treq_body(&t, b, sizeof b);
+    srv_wait_requests(s, 1, 2000);
+    const char *ae = srv_req_header(s, 0, "Accept-Encoding");
+    t_note("request-level HTTP_DECODING: body %u bytes, Accept-Encoding=%s", (unsigned)n, ae ? ae : "(none)");
+    treq_close(&t);
+    /* session-level decoding */
+    HINTERNET hi = t_inet_open(NULL);
+    CHECK(U(InternetSetOptionA)(hi, INTERNET_OPTION_HTTP_DECODING, &dec, sizeof dec));
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/gz2", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
+    t_https_secflags(hr, 0x100);
+    CHECKF(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0), "err=%lu", GetLastError());
+    memset(b, 0, sizeof b); n = t_inet_read_all(hr, b, sizeof b, NULL);
+    srv_wait_requests(s, 2, 2000);
+    ae = srv_req_header(s, 1, "Accept-Encoding");
+    t_note("session-level HTTP_DECODING: body %u bytes, Accept-Encoding=%s", (unsigned)n, ae ? ae : "(none)");
     EXPECT_EQ(n, SRV_FOX_LEN);
     CHECK(!strcmp(b, srv_fox_text()));
-    treq_close(&t); srv_stop(s);
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi);
+    srv_stop(s);
 }
 
 TEST(tls_flow_post_body_and_wire) {
@@ -87,7 +103,7 @@ TEST(tls_flow_head_same_as_plain_http) {
     CHECK(treq_open(&a, "127.0.0.1", srv_port(s1), "GET", "/same", T_INET_FRESH | INTERNET_FLAG_SECURE));
     CHECK(treq_open(&b, "127.0.0.1", srv_port(s2), "GET", "/same", T_INET_FRESH));
     t_https_secflags(a.hr, 0x100);
-    EXPECT_EQ(treq_send(&a), 0); EXPECT_EQ(treq_send(&b), 0);
+    SEND_EQ(&a, 0); SEND_EQ(&b, 0);
     CHECK(srv_wait_requests(s1, 1, 2000)); CHECK(srv_wait_requests(s2, 1, 2000));
     int n1 = srv_req_header_count(s1, 0), n2 = srv_req_header_count(s2, 0);
     t_note("https headers=%d http headers=%d", n1, n2);
@@ -153,12 +169,12 @@ TEST(tls_clientcert_needed_even_with_all_ignore_flags) {
     srv_stop(s);
 }
 
-/* the CA check precedes the client-certificate request */
+/* the client-certificate request is reported before the CA check (Win10 VM) */
 TEST(tls_clientcert_ca_error_first) {
     int rc; srv *s = tls_srv_cfg(SRV_CERT_LOCALHOST, 0, 1, NULL, 0, &rc); if (!s) { t_skip("server: %s", srv_strerror(rc)); return; }
     DWORD st, e = tls_try(s, NULL, 0, 0, &st);
     t_note("client cert requested, no ignore flags: err=%lu %s", e, t_inet_errname(e));
-    EXPECT_EQ(e, ERROR_INTERNET_INVALID_CA);
+    EXPECT_EQ(e, ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED);
     srv_stop(s);
 }
 
@@ -216,7 +232,7 @@ TEST(tls_clientcert_retry_with_context) {
     int rc; srv *s = tls_srv_cfg(SRV_CERT_LOCALHOST, 0, 1, NULL, 0, &rc); if (!s) { t_skip("server: %s", srv_strerror(rc)); return; }
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/mtls", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED);
+    SEND_EQ(&t, ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED);
     SET_ERR(0);
     CHECKF(U(InternetSetOptionA)(t.hr, INTERNET_OPTION_CLIENT_CERT_CONTEXT, (void *)cc, sizeof(CERT_CONTEXT)), "err=%lu", GetLastError());
     DWORD e = treq_send(&t);
@@ -236,7 +252,7 @@ TEST(tls_clientcert_continue_without_probe) {
     int rc; srv *s = tls_srv_cfg(SRV_CERT_LOCALHOST, 0, 1, NULL, 0, &rc); if (!s) { t_skip("server: %s", srv_strerror(rc)); return; }
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/nocert", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED);
+    SEND_EQ(&t, ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED);
     BOOL ok = U(InternetSetOptionA)(t.hr, INTERNET_OPTION_CLIENT_CERT_CONTEXT, NULL, 0);
     DWORD e1 = ok ? 0 : GetLastError();
     DWORD idx = (DWORD)-1;
@@ -246,6 +262,11 @@ TEST(tls_clientcert_continue_without_probe) {
     t_note("continue without cert: CERT_CONTEXT(NULL) ok=%d err=%lu; SELECT(-1) ok=%d err=%lu; resend err=%lu %s",
            ok, e1, ok2, e2, e3, t_inet_errname(e3));
     tls_dump_tls_events(s);
+    CHECK(!ok); EXPECT_EQ(e1, ERROR_INVALID_PARAMETER);
+    CHECK(ok2);                                          /* decomp case 0x2f: index -1 accepted once the list exists */
+    EXPECT_EQ(e3, 0);
+    const char *d = tls_done_data(s, 0);
+    CHECK(d && tls_ev_field(d, "client_cert") == 0);
     treq_close(&t); srv_stop(s);
 }
 
@@ -282,9 +303,8 @@ TEST(tls_proxy_connect_tunnel_success) {
     CHECK(tp_wait(p, 1, 2000));
     const char *h = tp_head(p, 0);
     t_note("CONNECT head: %s", h ? h : "(none)");
-    CHECK(h && !strncmp(h, "CONNECT i7tls.invalid:8443 HTTP/1.1\r\n", 37));
-    CHECK(h && strstr(h, "\r\nHost: i7tls.invalid:8443\r\n") != NULL);
-    CHECK(h && strstr(h, "\r\nUser-Agent: tls-test\r\n") != NULL);
+    CHECK(h && !strncmp(h, "CONNECT i7tls.invalid:8443 HTTP/1.0\r\n", 37));   /* Win10 VM: CONNECT is HTTP/1.0 */
+    if (h) { char tmp[2048]; snprintf(tmp, sizeof tmp, "%s", h); for (char *q = strtok(tmp, "\r\n"); q; q = strtok(NULL, "\r\n")) t_note("connect line: %s", q); }
     CHECK(srv_wait_requests(s, 1, 2000));
     EXPECT_STR(srv_req_line(s, 0), "GET /via HTTP/1.1");          /* origin-form inside the tunnel */
     EXPECT_STR(srv_req_header(s, 0, "Host"), "i7tls.invalid:8443");
@@ -303,7 +323,7 @@ TEST(tls_proxy_connect_cert_checked_against_target) {
     EXPECT_EQ(e, ERROR_INTERNET_SEC_CERT_CN_INVALID);
     CHECK(tp_wait(p, 1, 2000));
     const char *h = tp_head(p, 0);
-    CHECK(h && !strncmp(h, "CONNECT i7tls.invalid:443 HTTP/1.1\r\n", 36));
+    CHECK(h && !strncmp(h, "CONNECT i7tls.invalid:443 HTTP/1.0\r\n", 36));
     treq_close(&t); tp_stop(p); srv_stop(s);
 }
 
@@ -415,7 +435,7 @@ TEST(tls_redirect_https_same_server) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 5); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/orig", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     EXPECT_EQ(treq_status(&t), 200);
     char b[32] = ""; treq_body(&t, b, sizeof b); EXPECT_STR(b, "moved-here");
     CHECK(srv_wait_requests(s, 2, 2000));
@@ -435,10 +455,11 @@ TEST(tls_redirect_https_to_https_other_cert) {
     t_https_secflags(t.hr, 0x100);
     DWORD e = treq_send(&t);
     t_note("https->https(CN_OTHER) with 0x100: err=%lu %s", e, t_inet_errname(e));
-    EXPECT_EQ(e, ERROR_INTERNET_SEC_CERT_CN_INVALID);
-    t_https_secflags(t.hr, 0x1000);
+    EXPECT_EQ(e, ERROR_INTERNET_INVALID_CA);              /* Win10 VM: the new origin starts with fresh flags */
+    t_note("flags after redirect failure: 0x%lx", tls_secflags(t.hr));
+    t_https_secflags(t.hr, 0x1100);
     e = treq_send(&t);
-    t_note("+0x1000 resend: err=%lu status=%lu", e, e ? 0 : treq_status(&t));
+    t_note("+0x1100 resend: err=%lu status=%lu", e, e ? 0 : treq_status(&t));
     EXPECT_EQ(e, 0);
     treq_close(&t); srv_stop(s1); srv_stop(s2);
 }
@@ -462,7 +483,7 @@ TEST(tls_flow_split_records_slow) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 3); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/split", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     DWORD avail = 0;
     CHECK(U(InternetQueryDataAvailable)(t.hr, &avail, 0, 0));
     CHECK(avail > 0 && avail <= 20);
@@ -477,7 +498,7 @@ TEST(tls_flow_truncated_body) {
     srv *s = tls_srv(SRV_CERT_LOCALHOST, st, 2); if (!s) TLS_SKIP_SRV();
     treq t; CHECK(treq_open(&t, "127.0.0.1", srv_port(s), "GET", "/tr", T_INET_FRESH | INTERNET_FLAG_SECURE));
     t_https_secflags(t.hr, 0x100);
-    EXPECT_EQ(treq_send(&t), 0);
+    SEND_EQ(&t, 0);
     char b[64] = ""; int ok = 0; size_t n = t_inet_read_all(t.hr, b, sizeof b, &ok);
     t_note("truncated over TLS: read %u bytes ok=%d err=%lu", (unsigned)n, ok, ok ? 0 : GetLastError());
     EXPECT_EQ(n, 8);
