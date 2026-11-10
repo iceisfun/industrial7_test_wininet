@@ -1,0 +1,254 @@
+[
+{
+"name": "SpLsaModeInitialize",
+"ordinal": 1,
+"rva": 157808,
+"forwarder": null,
+"ref": "schannel.dll!0x26870"
+},
+{
+"name": "AcceptSecurityContext",
+"ordinal": 2,
+"rva": 566471,
+"forwarder": "SSPICLI.AcceptSecurityContext",
+"ref": null
+},
+{
+"name": "AcquireCredentialsHandleA",
+"ordinal": 3,
+"rva": 566527,
+"forwarder": "SSPICLI.AcquireCredentialsHandleA",
+"ref": null
+},
+{
+"name": "AcquireCredentialsHandleW",
+"ordinal": 4,
+"rva": 566587,
+"forwarder": "SSPICLI.AcquireCredentialsHandleW",
+"ref": null
+},
+{
+"name": "ApplyControlToken",
+"ordinal": 5,
+"rva": 566639,
+"forwarder": "SSPICLI.ApplyControlToken",
+"ref": null
+},
+{
+"name": "CompleteAuthToken",
+"ordinal": 6,
+"rva": 566683,
+"forwarder": "SSPICLI.CompleteAuthToken",
+"ref": null
+},
+{
+"name": "DeleteSecurityContext",
+"ordinal": 7,
+"rva": 566731,
+"forwarder": "SSPICLI.DeleteSecurityContext",
+"ref": null
+},
+{
+"name": "EnumerateSecurityPackagesA",
+"ordinal": 8,
+"rva": 566788,
+"forwarder": "SSPICLI.EnumerateSecurityPackagesA",
+"ref": null
+},
+{
+"name": "EnumerateSecurityPackagesW",
+"ordinal": 9,
+"rva": 566850,
+"forwarder": "SSPICLI.EnumerateSecurityPackagesW",
+"ref": null
+},
+{
+"name": "FreeContextBuffer",
+"ordinal": 10,
+"rva": 566903,
+"forwarder": "SSPICLI.FreeContextBuffer",
+"ref": null
+},
+{
+"name": "FreeCredentialsHandle",
+"ordinal": 11,
+"rva": 566951,
+"forwarder": "SSPICLI.FreeCredentialsHandle",
+"ref": null
+},
+{
+"name": "ImpersonateSecurityContext",
+"ordinal": 12,
+"rva": 567008,
+"forwarder": "SSPICLI.ImpersonateSecurityContext",
+"ref": null
+},
+{
+"name": "InitSecurityInterfaceA",
+"ordinal": 13,
+"rva": 567066,
+"forwarder": "SSPICLI.InitSecurityInterfaceA",
+"ref": null
+},
+{
+"name": "InitSecurityInterfaceW",
+"ordinal": 14,
+"rva": 567120,
+"forwarder": "SSPICLI.InitSecurityInterfaceW",
+"ref": null
+},
+{
+"name": "InitializeSecurityContextA",
+"ordinal": 15,
+"rva": 567178,
+"forwarder": "SSPICLI.InitializeSecurityContextA",
+"ref": null
+},
+{
+"name": "InitializeSecurityContextW",
+"ordinal": 16,
+"rva": 567240,
+"forwarder": "SSPICLI.InitializeSecurityContextW",
+"ref": null
+},
+{
+"name": "MakeSignature",
+"ordinal": 17,
+"rva": 567289,
+"forwarder": "SSPICLI.MakeSignature",
+"ref": null
+},
+{
+"name": "QueryContextAttributesA",
+"ordinal": 18,
+"rva": 567335,
+"forwarder": "SSPICLI.QueryContextAttributesA",
+"ref": null
+},
+{
+"name": "QueryContextAttributesW",
+"ordinal": 19,
+"rva": 567391,
+"forwarder": "SSPICLI.QueryContextAttributesW",
+"ref": null
+},
+{
+"name": "QuerySecurityPackageInfoA",
+"ordinal": 20,
+"rva": 567449,
+"forwarder": "SSPICLI.QuerySecurityPackageInfoA",
+"ref": null
+},
+{
+"name": "QuerySecurityPackageInfoW",
+"ordinal": 21,
+"rva": 567509,
+"forwarder": "SSPICLI.QuerySecurityPackageInfoW",
+"ref": null
+},
+{
+"name": "RevertSecurityContext",
+"ordinal": 22,
+"rva": 567565,
+"forwarder": "SSPICLI.RevertSecurityContext",
+"ref": null
+},
+{
+"name": "SealMessage",
+"ordinal": 23,
+"rva": 567607,
+"forwarder": "SSPICLI.SealMessage",
+"ref": null
+},
+{
+"name": "SpUserModeInitialize",
+"ordinal": 24,
+"rva": 81680,
+"forwarder": null,
+"ref": "schannel.dll!0x13f10"
+},
+{
+"name": "SslCrackCertificate",
+"ordinal": 25,
+"rva": 287776,
+"forwarder": null,
+"ref": "schannel.dll!0x46420"
+},
+{
+"name": "SslEmptyCacheA",
+"ordinal": 26,
+"rva": 311184,
+"forwarder": null,
+"ref": "schannel.dll!0x4bf90"
+},
+{
+"name": "SslEmptyCacheW",
+"ordinal": 27,
+"rva": 311344,
+"forwarder": null,
+"ref": "schannel.dll!0x4c030"
+},
+{
+"name": "SslFreeCertificate",
+"ordinal": 28,
+"rva": 288512,
+"forwarder": null,
+"ref": "schannel.dll!0x46700"
+},
+{
+"name": "SslFreeCustomBuffer",
+"ordinal": 29,
+"rva": 283696,
+"forwarder": null,
+"ref": "schannel.dll!0x45430"
+},
+{
+"name": "SslGenerateRandomBits",
+"ordinal": 30,
+"rva": 288560,
+"forwarder": null,
+"ref": "schannel.dll!0x46730"
+},
+{
+"name": "SslGetExtensions",
+"ordinal": 31,
+"rva": 317536,
+"forwarder": null,
+"ref": "schannel.dll!0x4d860"
+},
+{
+"name": "SslGetMaximumKeySize",
+"ordinal": 32,
+"rva": 288576,
+"forwarder": null,
+"ref": "schannel.dll!0x46740"
+},
+{
+"name": "SslGetServerIdentity",
+"ordinal": 33,
+"rva": 318800,
+"forwarder": null,
+"ref": "schannel.dll!0x4dd50"
+},
+{
+"name": "SslLoadCertificate",
+"ordinal": 34,
+"rva": 97792,
+"forwarder": null,
+"ref": "schannel.dll!0x17e00"
+},
+{
+"name": "UnsealMessage",
+"ordinal": 35,
+"rva": 567851,
+"forwarder": "SSPICLI.UnsealMessage",
+"ref": null
+},
+{
+"name": "VerifySignature",
+"ordinal": 36,
+"rva": 567889,
+"forwarder": "SSPICLI.VerifySignature",
+"ref": null
+}
+]

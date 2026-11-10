@@ -1,0 +1,492 @@
+[
+{
+"name": "WinHttpPacJsWorkerMain",
+"ordinal": 1,
+"rva": 520400,
+"forwarder": null,
+"ref": "winhttp.dll!0x7f0d0"
+},
+{
+"name": "WinHttpSetSecureLegacyServersAppCompat",
+"ordinal": 2,
+"rva": 348704,
+"forwarder": null,
+"ref": "winhttp.dll!0x55220"
+},
+{
+"name": "DllCanUnloadNow",
+"ordinal": 3,
+"rva": 496864,
+"forwarder": null,
+"ref": "winhttp.dll!0x794e0"
+},
+{
+"name": "DllGetClassObject",
+"ordinal": 4,
+"rva": 496880,
+"forwarder": null,
+"ref": "winhttp.dll!0x794f0"
+},
+{
+"name": "Private1",
+"ordinal": 5,
+"rva": 498400,
+"forwarder": null,
+"ref": "winhttp.dll!0x79ae0"
+},
+{
+"name": "SvchostPushServiceGlobals",
+"ordinal": 6,
+"rva": 545856,
+"forwarder": null,
+"ref": "winhttp.dll!0x85440"
+},
+{
+"name": "WinHttpAddRequestHeaders",
+"ordinal": 7,
+"rva": 231760,
+"forwarder": null,
+"ref": "winhttp.dll!0x38950"
+},
+{
+"name": "WinHttpAddRequestHeadersEx",
+"ordinal": 8,
+"rva": 499520,
+"forwarder": null,
+"ref": "winhttp.dll!0x79f40"
+},
+{
+"name": "WinHttpAutoProxySvcMain",
+"ordinal": 9,
+"rva": 545872,
+"forwarder": null,
+"ref": "winhttp.dll!0x85450"
+},
+{
+"name": "WinHttpCheckPlatform",
+"ordinal": 10,
+"rva": 496864,
+"forwarder": null,
+"ref": "winhttp.dll!0x794e0"
+},
+{
+"name": "WinHttpCloseHandle",
+"ordinal": 11,
+"rva": 222208,
+"forwarder": null,
+"ref": "winhttp.dll!0x36400"
+},
+{
+"name": "WinHttpConnect",
+"ordinal": 12,
+"rva": 129728,
+"forwarder": null,
+"ref": "winhttp.dll!0x1fac0"
+},
+{
+"name": "WinHttpConnectionDeletePolicyEntries",
+"ordinal": 13,
+"rva": 520720,
+"forwarder": null,
+"ref": "winhttp.dll!0x7f210"
+},
+{
+"name": "WinHttpConnectionDeleteProxyInfo",
+"ordinal": 14,
+"rva": 529168,
+"forwarder": null,
+"ref": "winhttp.dll!0x81310"
+},
+{
+"name": "WinHttpConnectionFreeNameList",
+"ordinal": 15,
+"rva": 529360,
+"forwarder": null,
+"ref": "winhttp.dll!0x813d0"
+},
+{
+"name": "WinHttpConnectionFreeProxyInfo",
+"ordinal": 16,
+"rva": 529488,
+"forwarder": null,
+"ref": "winhttp.dll!0x81450"
+},
+{
+"name": "WinHttpConnectionFreeProxyList",
+"ordinal": 17,
+"rva": 529616,
+"forwarder": null,
+"ref": "winhttp.dll!0x814d0"
+},
+{
+"name": "WinHttpConnectionGetNameList",
+"ordinal": 18,
+"rva": 529744,
+"forwarder": null,
+"ref": "winhttp.dll!0x81550"
+},
+{
+"name": "WinHttpConnectionGetProxyInfo",
+"ordinal": 19,
+"rva": 529888,
+"forwarder": null,
+"ref": "winhttp.dll!0x815e0"
+},
+{
+"name": "WinHttpConnectionGetProxyList",
+"ordinal": 20,
+"rva": 530032,
+"forwarder": null,
+"ref": "winhttp.dll!0x81670"
+},
+{
+"name": "WinHttpConnectionSetPolicyEntries",
+"ordinal": 21,
+"rva": 521520,
+"forwarder": null,
+"ref": "winhttp.dll!0x7f530"
+},
+{
+"name": "WinHttpConnectionSetProxyInfo",
+"ordinal": 22,
+"rva": 530176,
+"forwarder": null,
+"ref": "winhttp.dll!0x81700"
+},
+{
+"name": "WinHttpConnectionUpdateIfIndexTable",
+"ordinal": 23,
+"rva": 311392,
+"forwarder": null,
+"ref": "winhttp.dll!0x4c060"
+},
+{
+"name": "WinHttpCrackUrl",
+"ordinal": 24,
+"rva": 170192,
+"forwarder": null,
+"ref": "winhttp.dll!0x298d0"
+},
+{
+"name": "WinHttpCreateProxyResolver",
+"ordinal": 25,
+"rva": 239744,
+"forwarder": null,
+"ref": "winhttp.dll!0x3a880"
+},
+{
+"name": "WinHttpCreateUrl",
+"ordinal": 26,
+"rva": 174400,
+"forwarder": null,
+"ref": "winhttp.dll!0x2a940"
+},
+{
+"name": "WinHttpDetectAutoProxyConfigUrl",
+"ordinal": 27,
+"rva": 522320,
+"forwarder": null,
+"ref": "winhttp.dll!0x7f850"
+},
+{
+"name": "WinHttpFreeProxyResult",
+"ordinal": 28,
+"rva": 522944,
+"forwarder": null,
+"ref": "winhttp.dll!0x7fac0"
+},
+{
+"name": "WinHttpFreeProxyResultEx",
+"ordinal": 29,
+"rva": 37920,
+"forwarder": null,
+"ref": "winhttp.dll!0x9420"
+},
+{
+"name": "WinHttpFreeProxySettings",
+"ordinal": 30,
+"rva": 523056,
+"forwarder": null,
+"ref": "winhttp.dll!0x7fb30"
+},
+{
+"name": "WinHttpGetDefaultProxyConfiguration",
+"ordinal": 31,
+"rva": 19296,
+"forwarder": null,
+"ref": "winhttp.dll!0x4b60"
+},
+{
+"name": "WinHttpGetIEProxyConfigForCurrentUser",
+"ordinal": 32,
+"rva": 20432,
+"forwarder": null,
+"ref": "winhttp.dll!0x4fd0"
+},
+{
+"name": "WinHttpGetProxyForUrl",
+"ordinal": 33,
+"rva": 265008,
+"forwarder": null,
+"ref": "winhttp.dll!0x40b30"
+},
+{
+"name": "WinHttpGetProxyForUrlEx",
+"ordinal": 34,
+"rva": 523232,
+"forwarder": null,
+"ref": "winhttp.dll!0x7fbe0"
+},
+{
+"name": "WinHttpGetProxyForUrlEx2",
+"ordinal": 35,
+"rva": 149040,
+"forwarder": null,
+"ref": "winhttp.dll!0x24630"
+},
+{
+"name": "WinHttpGetProxyForUrlHvsi",
+"ordinal": 36,
+"rva": 523504,
+"forwarder": null,
+"ref": "winhttp.dll!0x7fcf0"
+},
+{
+"name": "WinHttpGetProxyResult",
+"ordinal": 37,
+"rva": 523712,
+"forwarder": null,
+"ref": "winhttp.dll!0x7fdc0"
+},
+{
+"name": "WinHttpGetProxyResultEx",
+"ordinal": 38,
+"rva": 12688,
+"forwarder": null,
+"ref": "winhttp.dll!0x3190"
+},
+{
+"name": "WinHttpGetProxySettingsVersion",
+"ordinal": 39,
+"rva": 127008,
+"forwarder": null,
+"ref": "winhttp.dll!0x1f020"
+},
+{
+"name": "WinHttpGetTunnelSocket",
+"ordinal": 40,
+"rva": 530704,
+"forwarder": null,
+"ref": "winhttp.dll!0x81910"
+},
+{
+"name": "WinHttpOpen",
+"ordinal": 41,
+"rva": 204320,
+"forwarder": null,
+"ref": "winhttp.dll!0x31e20"
+},
+{
+"name": "WinHttpOpenRequest",
+"ordinal": 42,
+"rva": 238288,
+"forwarder": null,
+"ref": "winhttp.dll!0x3a2d0"
+},
+{
+"name": "WinHttpProbeConnectivity",
+"ordinal": 43,
+"rva": 506368,
+"forwarder": null,
+"ref": "winhttp.dll!0x7ba00"
+},
+{
+"name": "WinHttpQueryAuthSchemes",
+"ordinal": 44,
+"rva": 532304,
+"forwarder": null,
+"ref": "winhttp.dll!0x81f50"
+},
+{
+"name": "WinHttpQueryDataAvailable",
+"ordinal": 45,
+"rva": 267728,
+"forwarder": null,
+"ref": "winhttp.dll!0x415d0"
+},
+{
+"name": "WinHttpQueryHeaders",
+"ordinal": 46,
+"rva": 212192,
+"forwarder": null,
+"ref": "winhttp.dll!0x33ce0"
+},
+{
+"name": "WinHttpQueryOption",
+"ordinal": 47,
+"rva": 268640,
+"forwarder": null,
+"ref": "winhttp.dll!0x41960"
+},
+{
+"name": "WinHttpReadData",
+"ordinal": 48,
+"rva": 210192,
+"forwarder": null,
+"ref": "winhttp.dll!0x33510"
+},
+{
+"name": "WinHttpReadProxySettings",
+"ordinal": 49,
+"rva": 94480,
+"forwarder": null,
+"ref": "winhttp.dll!0x17110"
+},
+{
+"name": "WinHttpReadProxySettingsHvsi",
+"ordinal": 50,
+"rva": 523744,
+"forwarder": null,
+"ref": "winhttp.dll!0x7fde0"
+},
+{
+"name": "WinHttpReceiveResponse",
+"ordinal": 51,
+"rva": 235824,
+"forwarder": null,
+"ref": "winhttp.dll!0x39930"
+},
+{
+"name": "WinHttpResetAutoProxy",
+"ordinal": 52,
+"rva": 312176,
+"forwarder": null,
+"ref": "winhttp.dll!0x4c370"
+},
+{
+"name": "WinHttpSaveProxyCredentials",
+"ordinal": 53,
+"rva": 506544,
+"forwarder": null,
+"ref": "winhttp.dll!0x7bab0"
+},
+{
+"name": "WinHttpSendRequest",
+"ordinal": 54,
+"rva": 233536,
+"forwarder": null,
+"ref": "winhttp.dll!0x39040"
+},
+{
+"name": "WinHttpSetCredentials",
+"ordinal": 55,
+"rva": 532800,
+"forwarder": null,
+"ref": "winhttp.dll!0x82140"
+},
+{
+"name": "WinHttpSetDefaultProxyConfiguration",
+"ordinal": 56,
+"rva": 527680,
+"forwarder": null,
+"ref": "winhttp.dll!0x80d40"
+},
+{
+"name": "WinHttpSetOption",
+"ordinal": 57,
+"rva": 228576,
+"forwarder": null,
+"ref": "winhttp.dll!0x37ce0"
+},
+{
+"name": "WinHttpSetProxySettingsPerUser",
+"ordinal": 58,
+"rva": 524064,
+"forwarder": null,
+"ref": "winhttp.dll!0x7ff20"
+},
+{
+"name": "WinHttpSetStatusCallback",
+"ordinal": 59,
+"rva": 208768,
+"forwarder": null,
+"ref": "winhttp.dll!0x32f80"
+},
+{
+"name": "WinHttpSetTimeouts",
+"ordinal": 60,
+"rva": 230432,
+"forwarder": null,
+"ref": "winhttp.dll!0x38420"
+},
+{
+"name": "WinHttpTimeFromSystemTime",
+"ordinal": 61,
+"rva": 30720,
+"forwarder": null,
+"ref": "winhttp.dll!0x7800"
+},
+{
+"name": "WinHttpTimeToSystemTime",
+"ordinal": 62,
+"rva": 30176,
+"forwarder": null,
+"ref": "winhttp.dll!0x75e0"
+},
+{
+"name": "WinHttpWebSocketClose",
+"ordinal": 63,
+"rva": 571136,
+"forwarder": null,
+"ref": "winhttp.dll!0x8b700"
+},
+{
+"name": "WinHttpWebSocketCompleteUpgrade",
+"ordinal": 64,
+"rva": 572208,
+"forwarder": null,
+"ref": "winhttp.dll!0x8bb30"
+},
+{
+"name": "WinHttpWebSocketQueryCloseStatus",
+"ordinal": 65,
+"rva": 571392,
+"forwarder": null,
+"ref": "winhttp.dll!0x8b800"
+},
+{
+"name": "WinHttpWebSocketReceive",
+"ordinal": 66,
+"rva": 575024,
+"forwarder": null,
+"ref": "winhttp.dll!0x8c630"
+},
+{
+"name": "WinHttpWebSocketSend",
+"ordinal": 67,
+"rva": 577040,
+"forwarder": null,
+"ref": "winhttp.dll!0x8ce10"
+},
+{
+"name": "WinHttpWebSocketShutdown",
+"ordinal": 68,
+"rva": 578208,
+"forwarder": null,
+"ref": "winhttp.dll!0x8d2a0"
+},
+{
+"name": "WinHttpWriteData",
+"ordinal": 69,
+"rva": 6016,
+"forwarder": null,
+"ref": "winhttp.dll!0x1780"
+},
+{
+"name": "WinHttpWriteProxySettings",
+"ordinal": 70,
+"rva": 524720,
+"forwarder": null,
+"ref": "winhttp.dll!0x801b0"
+}
+]

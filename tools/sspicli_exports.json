@@ -1,0 +1,737 @@
+[
+{
+"name": "SecDeleteUserModeContext",
+"ordinal": 1,
+"rva": 116496,
+"forwarder": null,
+"ref": "sspicli.dll!0x1c710"
+},
+{
+"name": "SecInitUserModeContext",
+"ordinal": 2,
+"rva": 116624,
+"forwarder": null,
+"ref": "sspicli.dll!0x1c790"
+},
+{
+"name": "SspiUnmarshalAuthIdentityInternal",
+"ordinal": 3,
+"rva": 97696,
+"forwarder": null,
+"ref": "sspicli.dll!0x17da0"
+},
+{
+"name": "AcceptSecurityContext",
+"ordinal": 4,
+"rva": 6416,
+"forwarder": null,
+"ref": "sspicli.dll!0x1910"
+},
+{
+"name": "AcquireCredentialsHandleA",
+"ordinal": 5,
+"rva": 47584,
+"forwarder": null,
+"ref": "sspicli.dll!0xb9e0"
+},
+{
+"name": "AcquireCredentialsHandleW",
+"ordinal": 6,
+"rva": 47680,
+"forwarder": null,
+"ref": "sspicli.dll!0xba40"
+},
+{
+"name": "AddCredentialsA",
+"ordinal": 7,
+"rva": 117376,
+"forwarder": null,
+"ref": "sspicli.dll!0x1ca80"
+},
+{
+"name": "AddCredentialsW",
+"ordinal": 8,
+"rva": 117680,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cbb0"
+},
+{
+"name": "AddSecurityPackageA",
+"ordinal": 9,
+"rva": 102896,
+"forwarder": null,
+"ref": "sspicli.dll!0x191f0"
+},
+{
+"name": "AddSecurityPackageW",
+"ordinal": 10,
+"rva": 103024,
+"forwarder": null,
+"ref": "sspicli.dll!0x19270"
+},
+{
+"name": "ApplyControlToken",
+"ordinal": 11,
+"rva": 117984,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cce0"
+},
+{
+"name": "ChangeAccountPasswordA",
+"ordinal": 12,
+"rva": 118128,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cd70"
+},
+{
+"name": "ChangeAccountPasswordW",
+"ordinal": 13,
+"rva": 118208,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cdc0"
+},
+{
+"name": "CompleteAuthToken",
+"ordinal": 14,
+"rva": 118288,
+"forwarder": null,
+"ref": "sspicli.dll!0x1ce10"
+},
+{
+"name": "CredMarshalTargetInfo",
+"ordinal": 15,
+"rva": 45904,
+"forwarder": null,
+"ref": "sspicli.dll!0xb350"
+},
+{
+"name": "CredUnmarshalTargetInfo",
+"ordinal": 16,
+"rva": 44048,
+"forwarder": null,
+"ref": "sspicli.dll!0xac10"
+},
+{
+"name": "DecryptMessage",
+"ordinal": 17,
+"rva": 7296,
+"forwarder": null,
+"ref": "sspicli.dll!0x1c80"
+},
+{
+"name": "DeleteSecurityContext",
+"ordinal": 18,
+"rva": 5264,
+"forwarder": null,
+"ref": "sspicli.dll!0x1490"
+},
+{
+"name": "DeleteSecurityPackageA",
+"ordinal": 19,
+"rva": 49872,
+"forwarder": null,
+"ref": "sspicli.dll!0xc2d0"
+},
+{
+"name": "DeleteSecurityPackageW",
+"ordinal": 20,
+"rva": 49872,
+"forwarder": null,
+"ref": "sspicli.dll!0xc2d0"
+},
+{
+"name": "EncryptMessage",
+"ordinal": 21,
+"rva": 7136,
+"forwarder": null,
+"ref": "sspicli.dll!0x1be0"
+},
+{
+"name": "EnumerateSecurityPackagesA",
+"ordinal": 22,
+"rva": 118432,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cea0"
+},
+{
+"name": "EnumerateSecurityPackagesW",
+"ordinal": 23,
+"rva": 12464,
+"forwarder": null,
+"ref": "sspicli.dll!0x30b0"
+},
+{
+"name": "ExportSecurityContext",
+"ordinal": 24,
+"rva": 118592,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cf40"
+},
+{
+"name": "FreeContextBuffer",
+"ordinal": 25,
+"rva": 18464,
+"forwarder": null,
+"ref": "sspicli.dll!0x4820"
+},
+{
+"name": "FreeCredentialsHandle",
+"ordinal": 26,
+"rva": 4816,
+"forwarder": null,
+"ref": "sspicli.dll!0x12d0"
+},
+{
+"name": "GetSecurityUserInfo",
+"ordinal": 27,
+"rva": 102880,
+"forwarder": null,
+"ref": "sspicli.dll!0x191e0"
+},
+{
+"name": "GetUserNameExA",
+"ordinal": 28,
+"rva": 13552,
+"forwarder": null,
+"ref": "sspicli.dll!0x34f0"
+},
+{
+"name": "GetUserNameExW",
+"ordinal": 29,
+"rva": 29904,
+"forwarder": null,
+"ref": "sspicli.dll!0x74d0"
+},
+{
+"name": "ImpersonateSecurityContext",
+"ordinal": 30,
+"rva": 51920,
+"forwarder": null,
+"ref": "sspicli.dll!0xcad0"
+},
+{
+"name": "ImportSecurityContextA",
+"ordinal": 31,
+"rva": 118768,
+"forwarder": null,
+"ref": "sspicli.dll!0x1cff0"
+},
+{
+"name": "ImportSecurityContextW",
+"ordinal": 32,
+"rva": 118992,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d0d0"
+},
+{
+"name": "InitSecurityInterfaceA",
+"ordinal": 33,
+"rva": 119216,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d1b0"
+},
+{
+"name": "InitSecurityInterfaceW",
+"ordinal": 34,
+"rva": 49712,
+"forwarder": null,
+"ref": "sspicli.dll!0xc230"
+},
+{
+"name": "InitializeSecurityContextA",
+"ordinal": 35,
+"rva": 4688,
+"forwarder": null,
+"ref": "sspicli.dll!0x1250"
+},
+{
+"name": "InitializeSecurityContextW",
+"ordinal": 36,
+"rva": 4944,
+"forwarder": null,
+"ref": "sspicli.dll!0x1350"
+},
+{
+"name": "LogonUserExExW",
+"ordinal": 37,
+"rva": 15888,
+"forwarder": null,
+"ref": "sspicli.dll!0x3e10"
+},
+{
+"name": "LsaCallAuthenticationPackage",
+"ordinal": 38,
+"rva": 11904,
+"forwarder": null,
+"ref": "sspicli.dll!0x2e80"
+},
+{
+"name": "LsaConnectUntrusted",
+"ordinal": 39,
+"rva": 39760,
+"forwarder": null,
+"ref": "sspicli.dll!0x9b50"
+},
+{
+"name": "LsaDeregisterLogonProcess",
+"ordinal": 40,
+"rva": 39744,
+"forwarder": null,
+"ref": "sspicli.dll!0x9b40"
+},
+{
+"name": "LsaEnumerateLogonSessions",
+"ordinal": 41,
+"rva": 116800,
+"forwarder": null,
+"ref": "sspicli.dll!0x1c840"
+},
+{
+"name": "LsaFreeReturnBuffer",
+"ordinal": 42,
+"rva": 31392,
+"forwarder": null,
+"ref": "sspicli.dll!0x7aa0"
+},
+{
+"name": "LsaGetLogonSessionData",
+"ordinal": 43,
+"rva": 10688,
+"forwarder": null,
+"ref": "sspicli.dll!0x29c0"
+},
+{
+"name": "LsaLogonUser",
+"ordinal": 44,
+"rva": 8816,
+"forwarder": null,
+"ref": "sspicli.dll!0x2270"
+},
+{
+"name": "LsaLookupAuthenticationPackage",
+"ordinal": 45,
+"rva": 12256,
+"forwarder": null,
+"ref": "sspicli.dll!0x2fe0"
+},
+{
+"name": "LsaRegisterLogonProcess",
+"ordinal": 46,
+"rva": 40256,
+"forwarder": null,
+"ref": "sspicli.dll!0x9d40"
+},
+{
+"name": "LsaRegisterPolicyChangeNotification",
+"ordinal": 47,
+"rva": 116864,
+"forwarder": null,
+"ref": "sspicli.dll!0x1c880"
+},
+{
+"name": "LsaUnregisterPolicyChangeNotification",
+"ordinal": 48,
+"rva": 56096,
+"forwarder": null,
+"ref": "sspicli.dll!0xdb20"
+},
+{
+"name": "MakeSignature",
+"ordinal": 49,
+"rva": 55552,
+"forwarder": null,
+"ref": "sspicli.dll!0xd900"
+},
+{
+"name": "QueryContextAttributesA",
+"ordinal": 50,
+"rva": 51648,
+"forwarder": null,
+"ref": "sspicli.dll!0xc9c0"
+},
+{
+"name": "QueryContextAttributesExA",
+"ordinal": 51,
+"rva": 5072,
+"forwarder": null,
+"ref": "sspicli.dll!0x13d0"
+},
+{
+"name": "QueryContextAttributesExW",
+"ordinal": 52,
+"rva": 4496,
+"forwarder": null,
+"ref": "sspicli.dll!0x1190"
+},
+{
+"name": "QueryContextAttributesW",
+"ordinal": 53,
+"rva": 6992,
+"forwarder": null,
+"ref": "sspicli.dll!0x1b50"
+},
+{
+"name": "QueryCredentialsAttributesA",
+"ordinal": 54,
+"rva": 119280,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d1f0"
+},
+{
+"name": "QueryCredentialsAttributesExA",
+"ordinal": 55,
+"rva": 119440,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d290"
+},
+{
+"name": "QueryCredentialsAttributesExW",
+"ordinal": 56,
+"rva": 49888,
+"forwarder": null,
+"ref": "sspicli.dll!0xc2e0"
+},
+{
+"name": "QueryCredentialsAttributesW",
+"ordinal": 57,
+"rva": 4144,
+"forwarder": null,
+"ref": "sspicli.dll!0x1030"
+},
+{
+"name": "QuerySecurityContextToken",
+"ordinal": 58,
+"rva": 53280,
+"forwarder": null,
+"ref": "sspicli.dll!0xd020"
+},
+{
+"name": "QuerySecurityPackageInfoA",
+"ordinal": 59,
+"rva": 119616,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d340"
+},
+{
+"name": "QuerySecurityPackageInfoW",
+"ordinal": 60,
+"rva": 47088,
+"forwarder": null,
+"ref": "sspicli.dll!0xb7f0"
+},
+{
+"name": "RevertSecurityContext",
+"ordinal": 61,
+"rva": 51792,
+"forwarder": null,
+"ref": "sspicli.dll!0xca50"
+},
+{
+"name": "SaslAcceptSecurityContext",
+"ordinal": 62,
+"rva": 122976,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e060"
+},
+{
+"name": "SaslEnumerateProfilesA",
+"ordinal": 63,
+"rva": 123488,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e260"
+},
+{
+"name": "SaslEnumerateProfilesW",
+"ordinal": 64,
+"rva": 123504,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e270"
+},
+{
+"name": "SaslGetContextOption",
+"ordinal": 65,
+"rva": 123520,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e280"
+},
+{
+"name": "SaslGetProfilePackageA",
+"ordinal": 66,
+"rva": 123840,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e3c0"
+},
+{
+"name": "SaslGetProfilePackageW",
+"ordinal": 67,
+"rva": 123968,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e440"
+},
+{
+"name": "SaslIdentifyPackageA",
+"ordinal": 68,
+"rva": 124048,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e490"
+},
+{
+"name": "SaslIdentifyPackageW",
+"ordinal": 69,
+"rva": 124112,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e4d0"
+},
+{
+"name": "SaslInitializeSecurityContextA",
+"ordinal": 70,
+"rva": 124176,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e510"
+},
+{
+"name": "SaslInitializeSecurityContextW",
+"ordinal": 71,
+"rva": 124624,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e6d0"
+},
+{
+"name": "SaslSetContextOption",
+"ordinal": 72,
+"rva": 125072,
+"forwarder": null,
+"ref": "sspicli.dll!0x1e890"
+},
+{
+"name": "SealMessage",
+"ordinal": 73,
+"rva": 7136,
+"forwarder": null,
+"ref": "sspicli.dll!0x1be0"
+},
+{
+"name": "SecCacheSspiPackages",
+"ordinal": 74,
+"rva": 108848,
+"forwarder": null,
+"ref": "sspicli.dll!0x1a930"
+},
+{
+"name": "SeciAllocateAndSetCallFlags",
+"ordinal": 75,
+"rva": 48768,
+"forwarder": null,
+"ref": "sspicli.dll!0xbe80"
+},
+{
+"name": "SeciAllocateAndSetCallTarget",
+"ordinal": 76,
+"rva": 53008,
+"forwarder": null,
+"ref": "sspicli.dll!0xcf10"
+},
+{
+"name": "SeciAllocateAndSetIPAddress",
+"ordinal": 77,
+"rva": 47344,
+"forwarder": null,
+"ref": "sspicli.dll!0xb8f0"
+},
+{
+"name": "SeciFreeCallContext",
+"ordinal": 78,
+"rva": 48224,
+"forwarder": null,
+"ref": "sspicli.dll!0xbc60"
+},
+{
+"name": "SeciIsProtectedUser",
+"ordinal": 79,
+"rva": 49136,
+"forwarder": null,
+"ref": "sspicli.dll!0xbff0"
+},
+{
+"name": "SetContextAttributesA",
+"ordinal": 80,
+"rva": 119680,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d380"
+},
+{
+"name": "SetContextAttributesW",
+"ordinal": 81,
+"rva": 4304,
+"forwarder": null,
+"ref": "sspicli.dll!0x10d0"
+},
+{
+"name": "SetCredentialsAttributesA",
+"ordinal": 82,
+"rva": 119872,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d440"
+},
+{
+"name": "SetCredentialsAttributesW",
+"ordinal": 83,
+"rva": 120048,
+"forwarder": null,
+"ref": "sspicli.dll!0x1d4f0"
+},
+{
+"name": "SspiCompareAuthIdentities",
+"ordinal": 84,
+"rva": 98720,
+"forwarder": null,
+"ref": "sspicli.dll!0x181a0"
+},
+{
+"name": "SspiCopyAuthIdentity",
+"ordinal": 85,
+"rva": 54240,
+"forwarder": null,
+"ref": "sspicli.dll!0xd3e0"
+},
+{
+"name": "SspiDecryptAuthIdentity",
+"ordinal": 86,
+"rva": 104496,
+"forwarder": null,
+"ref": "sspicli.dll!0x19830"
+},
+{
+"name": "SspiDecryptAuthIdentityEx",
+"ordinal": 87,
+"rva": 104528,
+"forwarder": null,
+"ref": "sspicli.dll!0x19850"
+},
+{
+"name": "SspiEncodeAuthIdentityAsStrings",
+"ordinal": 88,
+"rva": 42064,
+"forwarder": null,
+"ref": "sspicli.dll!0xa450"
+},
+{
+"name": "SspiEncodeStringsAsAuthIdentity",
+"ordinal": 89,
+"rva": 99456,
+"forwarder": null,
+"ref": "sspicli.dll!0x18480"
+},
+{
+"name": "SspiEncryptAuthIdentity",
+"ordinal": 90,
+"rva": 53456,
+"forwarder": null,
+"ref": "sspicli.dll!0xd0d0"
+},
+{
+"name": "SspiEncryptAuthIdentityEx",
+"ordinal": 91,
+"rva": 53488,
+"forwarder": null,
+"ref": "sspicli.dll!0xd0f0"
+},
+{
+"name": "SspiExcludePackage",
+"ordinal": 92,
+"rva": 101152,
+"forwarder": null,
+"ref": "sspicli.dll!0x18b20"
+},
+{
+"name": "SspiFreeAuthIdentity",
+"ordinal": 93,
+"rva": 54912,
+"forwarder": null,
+"ref": "sspicli.dll!0xd680"
+},
+{
+"name": "SspiGetComputerNameForSPN",
+"ordinal": 94,
+"rva": 105600,
+"forwarder": null,
+"ref": "sspicli.dll!0x19c80"
+},
+{
+"name": "SspiGetTargetHostName",
+"ordinal": 95,
+"rva": 41232,
+"forwarder": null,
+"ref": "sspicli.dll!0xa110"
+},
+{
+"name": "SspiIsAuthIdentityEncrypted",
+"ordinal": 96,
+"rva": 105008,
+"forwarder": null,
+"ref": "sspicli.dll!0x19a30"
+},
+{
+"name": "SspiLocalFree",
+"ordinal": 97,
+"rva": 49760,
+"forwarder": null,
+"ref": "sspicli.dll!0xc260"
+},
+{
+"name": "SspiMarshalAuthIdentity",
+"ordinal": 98,
+"rva": 102080,
+"forwarder": null,
+"ref": "sspicli.dll!0x18ec0"
+},
+{
+"name": "SspiPrepareForCredRead",
+"ordinal": 99,
+"rva": 43408,
+"forwarder": null,
+"ref": "sspicli.dll!0xa990"
+},
+{
+"name": "SspiPrepareForCredWrite",
+"ordinal": 100,
+"rva": 42400,
+"forwarder": null,
+"ref": "sspicli.dll!0xa5a0"
+},
+{
+"name": "SspiUnmarshalAuthIdentity",
+"ordinal": 101,
+"rva": 102864,
+"forwarder": null,
+"ref": "sspicli.dll!0x191d0"
+},
+{
+"name": "SspiValidateAuthIdentity",
+"ordinal": 102,
+"rva": 54832,
+"forwarder": null,
+"ref": "sspicli.dll!0xd630"
+},
+{
+"name": "SspiZeroAuthIdentity",
+"ordinal": 103,
+"rva": 55088,
+"forwarder": null,
+"ref": "sspicli.dll!0xd730"
+},
+{
+"name": "UnsealMessage",
+"ordinal": 104,
+"rva": 7296,
+"forwarder": null,
+"ref": "sspicli.dll!0x1c80"
+},
+{
+"name": "VerifySignature",
+"ordinal": 105,
+"rva": 55712,
+"forwarder": null,
+"ref": "sspicli.dll!0xd9a0"
+}
+]

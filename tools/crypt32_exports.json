@@ -1,0 +1,2151 @@
+[
+{
+"name": null,
+"ordinal": 1001,
+"rva": 314576,
+"forwarder": null,
+"ref": "crypt32.dll!0x4ccd0"
+},
+{
+"name": null,
+"ordinal": 1002,
+"rva": 452336,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e6f0"
+},
+{
+"name": null,
+"ordinal": 1003,
+"rva": 451056,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e1f0"
+},
+{
+"name": null,
+"ordinal": 1004,
+"rva": 451024,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e1d0"
+},
+{
+"name": null,
+"ordinal": 1005,
+"rva": 451232,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e2a0"
+},
+{
+"name": null,
+"ordinal": 1006,
+"rva": 451200,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e280"
+},
+{
+"name": null,
+"ordinal": 1007,
+"rva": 450928,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e170"
+},
+{
+"name": null,
+"ordinal": 1008,
+"rva": 450992,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e1b0"
+},
+{
+"name": null,
+"ordinal": 1009,
+"rva": 451120,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e230"
+},
+{
+"name": null,
+"ordinal": 1010,
+"rva": 451168,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e260"
+},
+{
+"name": null,
+"ordinal": 1011,
+"rva": 450896,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e150"
+},
+{
+"name": "CryptObjectLocatorFree",
+"ordinal": 1012,
+"rva": 879024,
+"forwarder": null,
+"ref": "crypt32.dll!0xd69b0"
+},
+{
+"name": "CryptObjectLocatorGet",
+"ordinal": 1013,
+"rva": 879104,
+"forwarder": null,
+"ref": "crypt32.dll!0xd6a00"
+},
+{
+"name": "CryptObjectLocatorGetContent",
+"ordinal": 1014,
+"rva": 879168,
+"forwarder": null,
+"ref": "crypt32.dll!0xd6a40"
+},
+{
+"name": "CryptObjectLocatorGetUpdated",
+"ordinal": 1015,
+"rva": 879360,
+"forwarder": null,
+"ref": "crypt32.dll!0xd6b00"
+},
+{
+"name": "CryptObjectLocatorInitialize",
+"ordinal": 1016,
+"rva": 879440,
+"forwarder": null,
+"ref": "crypt32.dll!0xd6b50"
+},
+{
+"name": "CryptObjectLocatorIsChanged",
+"ordinal": 1017,
+"rva": 880336,
+"forwarder": null,
+"ref": "crypt32.dll!0xd6ed0"
+},
+{
+"name": "CryptObjectLocatorRelease",
+"ordinal": 1018,
+"rva": 880384,
+"forwarder": null,
+"ref": "crypt32.dll!0xd6f00"
+},
+{
+"name": "I_PFXImportCertStoreEx",
+"ordinal": 1019,
+"rva": 885408,
+"forwarder": null,
+"ref": "crypt32.dll!0xd82a0"
+},
+{
+"name": "CertAddCRLContextToStore",
+"ordinal": 1020,
+"rva": 519664,
+"forwarder": null,
+"ref": "crypt32.dll!0x7edf0"
+},
+{
+"name": "CertAddCRLLinkToStore",
+"ordinal": 1021,
+"rva": 519792,
+"forwarder": null,
+"ref": "crypt32.dll!0x7ee70"
+},
+{
+"name": "CertAddCTLContextToStore",
+"ordinal": 1022,
+"rva": 519664,
+"forwarder": null,
+"ref": "crypt32.dll!0x7edf0"
+},
+{
+"name": "CertAddCTLLinkToStore",
+"ordinal": 1023,
+"rva": 519792,
+"forwarder": null,
+"ref": "crypt32.dll!0x7ee70"
+},
+{
+"name": "CertAddCertificateContextToStore",
+"ordinal": 1024,
+"rva": 203680,
+"forwarder": null,
+"ref": "crypt32.dll!0x31ba0"
+},
+{
+"name": "CertAddCertificateLinkToStore",
+"ordinal": 1025,
+"rva": 519792,
+"forwarder": null,
+"ref": "crypt32.dll!0x7ee70"
+},
+{
+"name": "CertAddEncodedCRLToStore",
+"ordinal": 1026,
+"rva": 302336,
+"forwarder": null,
+"ref": "crypt32.dll!0x49d00"
+},
+{
+"name": "CertAddEncodedCTLToStore",
+"ordinal": 1027,
+"rva": 36224,
+"forwarder": null,
+"ref": "crypt32.dll!0x8d80"
+},
+{
+"name": "CertAddEncodedCertificateToStore",
+"ordinal": 1028,
+"rva": 107248,
+"forwarder": null,
+"ref": "crypt32.dll!0x1a2f0"
+},
+{
+"name": "CertAddEncodedCertificateToSystemStoreA",
+"ordinal": 1029,
+"rva": 524000,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fee0"
+},
+{
+"name": "CertAddEncodedCertificateToSystemStoreW",
+"ordinal": 1030,
+"rva": 524128,
+"forwarder": null,
+"ref": "crypt32.dll!0x7ff60"
+},
+{
+"name": "CertAddEnhancedKeyUsageIdentifier",
+"ordinal": 1031,
+"rva": 525952,
+"forwarder": null,
+"ref": "crypt32.dll!0x80680"
+},
+{
+"name": "CertAddRefServerOcspResponse",
+"ordinal": 1032,
+"rva": 532576,
+"forwarder": null,
+"ref": "crypt32.dll!0x82060"
+},
+{
+"name": "CertAddRefServerOcspResponseContext",
+"ordinal": 1033,
+"rva": 532608,
+"forwarder": null,
+"ref": "crypt32.dll!0x82080"
+},
+{
+"name": "CertAddSerializedElementToStore",
+"ordinal": 1034,
+"rva": 68032,
+"forwarder": null,
+"ref": "crypt32.dll!0x109c0"
+},
+{
+"name": "CertAddStoreToCollection",
+"ordinal": 1035,
+"rva": 200128,
+"forwarder": null,
+"ref": "crypt32.dll!0x30dc0"
+},
+{
+"name": "CertAlgIdToOID",
+"ordinal": 1036,
+"rva": 534672,
+"forwarder": null,
+"ref": "crypt32.dll!0x82890"
+},
+{
+"name": "CertCloseServerOcspResponse",
+"ordinal": 1037,
+"rva": 532640,
+"forwarder": null,
+"ref": "crypt32.dll!0x820a0"
+},
+{
+"name": "CertCloseStore",
+"ordinal": 1038,
+"rva": 114480,
+"forwarder": null,
+"ref": "crypt32.dll!0x1bf30"
+},
+{
+"name": "CertCompareCertificate",
+"ordinal": 1039,
+"rva": 293136,
+"forwarder": null,
+"ref": "crypt32.dll!0x47910"
+},
+{
+"name": "CertCompareCertificateName",
+"ordinal": 1040,
+"rva": 205008,
+"forwarder": null,
+"ref": "crypt32.dll!0x320d0"
+},
+{
+"name": "CertCompareIntegerBlob",
+"ordinal": 1041,
+"rva": 534736,
+"forwarder": null,
+"ref": "crypt32.dll!0x828d0"
+},
+{
+"name": "CertComparePublicKeyInfo",
+"ordinal": 1042,
+"rva": 134992,
+"forwarder": null,
+"ref": "crypt32.dll!0x20f50"
+},
+{
+"name": "CertControlStore",
+"ordinal": 1043,
+"rva": 52272,
+"forwarder": null,
+"ref": "crypt32.dll!0xcc30"
+},
+{
+"name": "CertCreateCRLContext",
+"ordinal": 1044,
+"rva": 302272,
+"forwarder": null,
+"ref": "crypt32.dll!0x49cc0"
+},
+{
+"name": "CertCreateCTLContext",
+"ordinal": 1045,
+"rva": 36160,
+"forwarder": null,
+"ref": "crypt32.dll!0x8d40"
+},
+{
+"name": "CertCreateCTLEntryFromCertificateContextProperties",
+"ordinal": 1046,
+"rva": 519888,
+"forwarder": null,
+"ref": "crypt32.dll!0x7eed0"
+},
+{
+"name": "CertCreateCertificateChainEngine",
+"ordinal": 1047,
+"rva": 848544,
+"forwarder": null,
+"ref": "crypt32.dll!0xcf2a0"
+},
+{
+"name": "CertCreateCertificateContext",
+"ordinal": 1048,
+"rva": 287248,
+"forwarder": null,
+"ref": "crypt32.dll!0x46210"
+},
+{
+"name": "CertCreateContext",
+"ordinal": 1049,
+"rva": 58112,
+"forwarder": null,
+"ref": "crypt32.dll!0xe300"
+},
+{
+"name": "CertCreateSelfSignCertificate",
+"ordinal": 1050,
+"rva": 536224,
+"forwarder": null,
+"ref": "crypt32.dll!0x82ea0"
+},
+{
+"name": "CertDeleteCRLFromStore",
+"ordinal": 1051,
+"rva": 521232,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f410"
+},
+{
+"name": "CertDeleteCTLFromStore",
+"ordinal": 1052,
+"rva": 521232,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f410"
+},
+{
+"name": "CertDeleteCertificateFromStore",
+"ordinal": 1053,
+"rva": 521232,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f410"
+},
+{
+"name": "CertDuplicateCRLContext",
+"ordinal": 1054,
+"rva": 234624,
+"forwarder": null,
+"ref": "crypt32.dll!0x39480"
+},
+{
+"name": "CertDuplicateCTLContext",
+"ordinal": 1055,
+"rva": 234624,
+"forwarder": null,
+"ref": "crypt32.dll!0x39480"
+},
+{
+"name": "CertDuplicateCertificateChain",
+"ordinal": 1056,
+"rva": 304784,
+"forwarder": null,
+"ref": "crypt32.dll!0x4a690"
+},
+{
+"name": "CertDuplicateCertificateContext",
+"ordinal": 1057,
+"rva": 74016,
+"forwarder": null,
+"ref": "crypt32.dll!0x12120"
+},
+{
+"name": "CertDuplicateStore",
+"ordinal": 1058,
+"rva": 304560,
+"forwarder": null,
+"ref": "crypt32.dll!0x4a5b0"
+},
+{
+"name": "CertEnumCRLContextProperties",
+"ordinal": 1059,
+"rva": 521264,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f430"
+},
+{
+"name": "CertEnumCRLsInStore",
+"ordinal": 1060,
+"rva": 23440,
+"forwarder": null,
+"ref": "crypt32.dll!0x5b90"
+},
+{
+"name": "CertEnumCTLContextProperties",
+"ordinal": 1061,
+"rva": 521264,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f430"
+},
+{
+"name": "CertEnumCTLsInStore",
+"ordinal": 1062,
+"rva": 211216,
+"forwarder": null,
+"ref": "crypt32.dll!0x33910"
+},
+{
+"name": "CertEnumCertificateContextProperties",
+"ordinal": 1063,
+"rva": 521264,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f430"
+},
+{
+"name": "CertEnumCertificatesInStore",
+"ordinal": 1064,
+"rva": 55136,
+"forwarder": null,
+"ref": "crypt32.dll!0xd760"
+},
+{
+"name": "CertEnumPhysicalStore",
+"ordinal": 1065,
+"rva": 555984,
+"forwarder": null,
+"ref": "crypt32.dll!0x87bd0"
+},
+{
+"name": "CertEnumSubjectInSortedCTL",
+"ordinal": 1066,
+"rva": 521296,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f450"
+},
+{
+"name": "CertEnumSystemStore",
+"ordinal": 1067,
+"rva": 556016,
+"forwarder": null,
+"ref": "crypt32.dll!0x87bf0"
+},
+{
+"name": "CertEnumSystemStoreLocation",
+"ordinal": 1068,
+"rva": 556928,
+"forwarder": null,
+"ref": "crypt32.dll!0x87f80"
+},
+{
+"name": "CertFindAttribute",
+"ordinal": 1069,
+"rva": 229568,
+"forwarder": null,
+"ref": "crypt32.dll!0x380c0"
+},
+{
+"name": "CertFindCRLInStore",
+"ordinal": 1070,
+"rva": 287472,
+"forwarder": null,
+"ref": "crypt32.dll!0x462f0"
+},
+{
+"name": "CertFindCTLInStore",
+"ordinal": 1071,
+"rva": 521664,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f5c0"
+},
+{
+"name": "CertFindCertificateInCRL",
+"ordinal": 1072,
+"rva": 308224,
+"forwarder": null,
+"ref": "crypt32.dll!0x4b400"
+},
+{
+"name": "CertFindCertificateInStore",
+"ordinal": 1073,
+"rva": 59200,
+"forwarder": null,
+"ref": "crypt32.dll!0xe740"
+},
+{
+"name": "CertFindChainInStore",
+"ordinal": 1074,
+"rva": 560384,
+"forwarder": null,
+"ref": "crypt32.dll!0x88d00"
+},
+{
+"name": "CertFindExtension",
+"ordinal": 1075,
+"rva": 208736,
+"forwarder": null,
+"ref": "crypt32.dll!0x32f60"
+},
+{
+"name": "CertFindRDNAttr",
+"ordinal": 1076,
+"rva": 534768,
+"forwarder": null,
+"ref": "crypt32.dll!0x828f0"
+},
+{
+"name": "CertFindSubjectInCTL",
+"ordinal": 1077,
+"rva": 232480,
+"forwarder": null,
+"ref": "crypt32.dll!0x38c20"
+},
+{
+"name": "CertFindSubjectInSortedCTL",
+"ordinal": 1078,
+"rva": 180304,
+"forwarder": null,
+"ref": "crypt32.dll!0x2c050"
+},
+{
+"name": "CertFreeCRLContext",
+"ordinal": 1079,
+"rva": 306304,
+"forwarder": null,
+"ref": "crypt32.dll!0x4ac80"
+},
+{
+"name": "CertFreeCTLContext",
+"ordinal": 1080,
+"rva": 306304,
+"forwarder": null,
+"ref": "crypt32.dll!0x4ac80"
+},
+{
+"name": "CertFreeCertificateChain",
+"ordinal": 1081,
+"rva": 230592,
+"forwarder": null,
+"ref": "crypt32.dll!0x384c0"
+},
+{
+"name": "CertFreeCertificateChainEngine",
+"ordinal": 1082,
+"rva": 848560,
+"forwarder": null,
+"ref": "crypt32.dll!0xcf2b0"
+},
+{
+"name": "CertFreeCertificateChainList",
+"ordinal": 1083,
+"rva": 561360,
+"forwarder": null,
+"ref": "crypt32.dll!0x890d0"
+},
+{
+"name": "CertFreeCertificateContext",
+"ordinal": 1084,
+"rva": 100336,
+"forwarder": null,
+"ref": "crypt32.dll!0x187f0"
+},
+{
+"name": "CertFreeServerOcspResponseContext",
+"ordinal": 1085,
+"rva": 532752,
+"forwarder": null,
+"ref": "crypt32.dll!0x82110"
+},
+{
+"name": "CertGetCRLContextProperty",
+"ordinal": 1086,
+"rva": 130864,
+"forwarder": null,
+"ref": "crypt32.dll!0x1ff30"
+},
+{
+"name": "CertGetCRLFromStore",
+"ordinal": 1087,
+"rva": 521760,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f620"
+},
+{
+"name": "CertGetCTLContextProperty",
+"ordinal": 1088,
+"rva": 130864,
+"forwarder": null,
+"ref": "crypt32.dll!0x1ff30"
+},
+{
+"name": "CertGetCertificateChain",
+"ordinal": 1089,
+"rva": 82448,
+"forwarder": null,
+"ref": "crypt32.dll!0x14210"
+},
+{
+"name": "CertGetCertificateContextProperty",
+"ordinal": 1090,
+"rva": 130864,
+"forwarder": null,
+"ref": "crypt32.dll!0x1ff30"
+},
+{
+"name": "CertGetEnhancedKeyUsage",
+"ordinal": 1091,
+"rva": 209616,
+"forwarder": null,
+"ref": "crypt32.dll!0x332d0"
+},
+{
+"name": "CertGetIntendedKeyUsage",
+"ordinal": 1092,
+"rva": 211376,
+"forwarder": null,
+"ref": "crypt32.dll!0x339b0"
+},
+{
+"name": "CertGetIssuerCertificateFromStore",
+"ordinal": 1093,
+"rva": 522000,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f710"
+},
+{
+"name": "CertGetNameStringA",
+"ordinal": 1094,
+"rva": 564352,
+"forwarder": null,
+"ref": "crypt32.dll!0x89c80"
+},
+{
+"name": "CertGetNameStringW",
+"ordinal": 1095,
+"rva": 205536,
+"forwarder": null,
+"ref": "crypt32.dll!0x322e0"
+},
+{
+"name": "CertGetPublicKeyLength",
+"ordinal": 1096,
+"rva": 213536,
+"forwarder": null,
+"ref": "crypt32.dll!0x34220"
+},
+{
+"name": "CertGetServerOcspResponseContext",
+"ordinal": 1097,
+"rva": 532832,
+"forwarder": null,
+"ref": "crypt32.dll!0x82160"
+},
+{
+"name": "CertGetStoreProperty",
+"ordinal": 1098,
+"rva": 522256,
+"forwarder": null,
+"ref": "crypt32.dll!0x7f810"
+},
+{
+"name": "CertGetSubjectCertificateFromStore",
+"ordinal": 1099,
+"rva": 303216,
+"forwarder": null,
+"ref": "crypt32.dll!0x4a070"
+},
+{
+"name": "CertGetValidUsages",
+"ordinal": 1100,
+"rva": 207232,
+"forwarder": null,
+"ref": "crypt32.dll!0x32980"
+},
+{
+"name": "CertIsRDNAttrsInCertificateName",
+"ordinal": 1101,
+"rva": 534880,
+"forwarder": null,
+"ref": "crypt32.dll!0x82960"
+},
+{
+"name": "CertIsStrongHashToSign",
+"ordinal": 1102,
+"rva": 572768,
+"forwarder": null,
+"ref": "crypt32.dll!0x8bd60"
+},
+{
+"name": "CertIsValidCRLForCertificate",
+"ordinal": 1103,
+"rva": 28816,
+"forwarder": null,
+"ref": "crypt32.dll!0x7090"
+},
+{
+"name": "CertIsWeakHash",
+"ordinal": 1104,
+"rva": 90544,
+"forwarder": null,
+"ref": "crypt32.dll!0x161b0"
+},
+{
+"name": "CertNameToStrA",
+"ordinal": 1105,
+"rva": 315584,
+"forwarder": null,
+"ref": "crypt32.dll!0x4d0c0"
+},
+{
+"name": "CertNameToStrW",
+"ordinal": 1106,
+"rva": 296832,
+"forwarder": null,
+"ref": "crypt32.dll!0x48780"
+},
+{
+"name": "CertOIDToAlgId",
+"ordinal": 1107,
+"rva": 232960,
+"forwarder": null,
+"ref": "crypt32.dll!0x38e00"
+},
+{
+"name": "CertOpenServerOcspResponse",
+"ordinal": 1108,
+"rva": 533056,
+"forwarder": null,
+"ref": "crypt32.dll!0x82240"
+},
+{
+"name": "CertOpenStore",
+"ordinal": 1109,
+"rva": 162768,
+"forwarder": null,
+"ref": "crypt32.dll!0x27bd0"
+},
+{
+"name": "CertOpenSystemStoreA",
+"ordinal": 1110,
+"rva": 524256,
+"forwarder": null,
+"ref": "crypt32.dll!0x7ffe0"
+},
+{
+"name": "CertOpenSystemStoreW",
+"ordinal": 1111,
+"rva": 524384,
+"forwarder": null,
+"ref": "crypt32.dll!0x80060"
+},
+{
+"name": "CertRDNValueToStrA",
+"ordinal": 1112,
+"rva": 564544,
+"forwarder": null,
+"ref": "crypt32.dll!0x89d40"
+},
+{
+"name": "CertRDNValueToStrW",
+"ordinal": 1113,
+"rva": 564752,
+"forwarder": null,
+"ref": "crypt32.dll!0x89e10"
+},
+{
+"name": "CertRegisterPhysicalStore",
+"ordinal": 1114,
+"rva": 557184,
+"forwarder": null,
+"ref": "crypt32.dll!0x88080"
+},
+{
+"name": "CertRegisterSystemStore",
+"ordinal": 1115,
+"rva": 557888,
+"forwarder": null,
+"ref": "crypt32.dll!0x88340"
+},
+{
+"name": "CertRemoveEnhancedKeyUsageIdentifier",
+"ordinal": 1116,
+"rva": 526416,
+"forwarder": null,
+"ref": "crypt32.dll!0x80850"
+},
+{
+"name": "CertRemoveStoreFromCollection",
+"ordinal": 1117,
+"rva": 301376,
+"forwarder": null,
+"ref": "crypt32.dll!0x49940"
+},
+{
+"name": "CertResyncCertificateChainEngine",
+"ordinal": 1118,
+"rva": 848624,
+"forwarder": null,
+"ref": "crypt32.dll!0xcf2f0"
+},
+{
+"name": "CertRetrieveLogoOrBiometricInfo",
+"ordinal": 1119,
+"rva": 573632,
+"forwarder": null,
+"ref": "crypt32.dll!0x8c0c0"
+},
+{
+"name": "CertSaveStore",
+"ordinal": 1120,
+"rva": 294944,
+"forwarder": null,
+"ref": "crypt32.dll!0x48020"
+},
+{
+"name": "CertSelectCertificateChains",
+"ordinal": 1121,
+"rva": 561392,
+"forwarder": null,
+"ref": "crypt32.dll!0x890f0"
+},
+{
+"name": "CertSerializeCRLStoreElement",
+"ordinal": 1122,
+"rva": 289920,
+"forwarder": null,
+"ref": "crypt32.dll!0x46c80"
+},
+{
+"name": "CertSerializeCTLStoreElement",
+"ordinal": 1123,
+"rva": 289920,
+"forwarder": null,
+"ref": "crypt32.dll!0x46c80"
+},
+{
+"name": "CertSerializeCertificateStoreElement",
+"ordinal": 1124,
+"rva": 289920,
+"forwarder": null,
+"ref": "crypt32.dll!0x46c80"
+},
+{
+"name": "CertSetCRLContextProperty",
+"ordinal": 1125,
+"rva": 302224,
+"forwarder": null,
+"ref": "crypt32.dll!0x49c90"
+},
+{
+"name": "CertSetCTLContextProperty",
+"ordinal": 1126,
+"rva": 302224,
+"forwarder": null,
+"ref": "crypt32.dll!0x49c90"
+},
+{
+"name": "CertSetCertificateContextPropertiesFromCTLEntry",
+"ordinal": 1127,
+"rva": 30160,
+"forwarder": null,
+"ref": "crypt32.dll!0x75d0"
+},
+{
+"name": "CertSetCertificateContextProperty",
+"ordinal": 1128,
+"rva": 302224,
+"forwarder": null,
+"ref": "crypt32.dll!0x49c90"
+},
+{
+"name": "CertSetEnhancedKeyUsage",
+"ordinal": 1129,
+"rva": 526672,
+"forwarder": null,
+"ref": "crypt32.dll!0x80950"
+},
+{
+"name": "CertSetStoreProperty",
+"ordinal": 1130,
+"rva": 522768,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fa10"
+},
+{
+"name": "CertStrToNameA",
+"ordinal": 1131,
+"rva": 565184,
+"forwarder": null,
+"ref": "crypt32.dll!0x89fc0"
+},
+{
+"name": "CertStrToNameW",
+"ordinal": 1132,
+"rva": 23568,
+"forwarder": null,
+"ref": "crypt32.dll!0x5c10"
+},
+{
+"name": "CertUnregisterPhysicalStore",
+"ordinal": 1133,
+"rva": 558160,
+"forwarder": null,
+"ref": "crypt32.dll!0x88450"
+},
+{
+"name": "CertUnregisterSystemStore",
+"ordinal": 1134,
+"rva": 558448,
+"forwarder": null,
+"ref": "crypt32.dll!0x88570"
+},
+{
+"name": "CertVerifyCRLRevocation",
+"ordinal": 1135,
+"rva": 535424,
+"forwarder": null,
+"ref": "crypt32.dll!0x82b80"
+},
+{
+"name": "CertVerifyCRLTimeValidity",
+"ordinal": 1136,
+"rva": 535568,
+"forwarder": null,
+"ref": "crypt32.dll!0x82c10"
+},
+{
+"name": "CertVerifyCTLUsage",
+"ordinal": 1137,
+"rva": 575712,
+"forwarder": null,
+"ref": "crypt32.dll!0x8c8e0"
+},
+{
+"name": "CertVerifyCertificateChainPolicy",
+"ordinal": 1138,
+"rva": 147392,
+"forwarder": null,
+"ref": "crypt32.dll!0x23fc0"
+},
+{
+"name": "CertVerifyRevocation",
+"ordinal": 1139,
+"rva": 212320,
+"forwarder": null,
+"ref": "crypt32.dll!0x33d60"
+},
+{
+"name": "CertVerifySubjectCertificateContext",
+"ordinal": 1140,
+"rva": 522896,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fa90"
+},
+{
+"name": "CertVerifyTimeValidity",
+"ordinal": 1141,
+"rva": 197072,
+"forwarder": null,
+"ref": "crypt32.dll!0x301d0"
+},
+{
+"name": "CertVerifyValidityNesting",
+"ordinal": 1142,
+"rva": 535760,
+"forwarder": null,
+"ref": "crypt32.dll!0x82cd0"
+},
+{
+"name": "CryptAcquireCertificatePrivateKey",
+"ordinal": 1143,
+"rva": 318048,
+"forwarder": null,
+"ref": "crypt32.dll!0x4da60"
+},
+{
+"name": "CryptBinaryToStringA",
+"ordinal": 1144,
+"rva": 65808,
+"forwarder": null,
+"ref": "crypt32.dll!0x10110"
+},
+{
+"name": "CryptBinaryToStringW",
+"ordinal": 1145,
+"rva": 65488,
+"forwarder": null,
+"ref": "crypt32.dll!0xffd0"
+},
+{
+"name": "CryptCloseAsyncHandle",
+"ordinal": 1146,
+"rva": 580320,
+"forwarder": null,
+"ref": "crypt32.dll!0x8dae0"
+},
+{
+"name": "CryptCreateAsyncHandle",
+"ordinal": 1147,
+"rva": 580368,
+"forwarder": null,
+"ref": "crypt32.dll!0x8db10"
+},
+{
+"name": "CryptCreateKeyIdentifierFromCSP",
+"ordinal": 1148,
+"rva": 569952,
+"forwarder": null,
+"ref": "crypt32.dll!0x8b260"
+},
+{
+"name": "CryptDecodeMessage",
+"ordinal": 1149,
+"rva": 587024,
+"forwarder": null,
+"ref": "crypt32.dll!0x8f510"
+},
+{
+"name": "CryptDecodeObject",
+"ordinal": 1150,
+"rva": 135936,
+"forwarder": null,
+"ref": "crypt32.dll!0x21300"
+},
+{
+"name": "CryptDecodeObjectEx",
+"ordinal": 1151,
+"rva": 136000,
+"forwarder": null,
+"ref": "crypt32.dll!0x21340"
+},
+{
+"name": "CryptDecryptAndVerifyMessageSignature",
+"ordinal": 1152,
+"rva": 587184,
+"forwarder": null,
+"ref": "crypt32.dll!0x8f5b0"
+},
+{
+"name": "CryptDecryptMessage",
+"ordinal": 1153,
+"rva": 587744,
+"forwarder": null,
+"ref": "crypt32.dll!0x8f7e0"
+},
+{
+"name": "CryptEncodeObject",
+"ordinal": 1154,
+"rva": 305760,
+"forwarder": null,
+"ref": "crypt32.dll!0x4aa60"
+},
+{
+"name": "CryptEncodeObjectEx",
+"ordinal": 1155,
+"rva": 145536,
+"forwarder": null,
+"ref": "crypt32.dll!0x23880"
+},
+{
+"name": "CryptEncryptMessage",
+"ordinal": 1156,
+"rva": 587856,
+"forwarder": null,
+"ref": "crypt32.dll!0x8f850"
+},
+{
+"name": "CryptEnumKeyIdentifierProperties",
+"ordinal": 1157,
+"rva": 522976,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fae0"
+},
+{
+"name": "CryptEnumOIDFunction",
+"ordinal": 1158,
+"rva": 189680,
+"forwarder": null,
+"ref": "crypt32.dll!0x2e4f0"
+},
+{
+"name": "CryptEnumOIDInfo",
+"ordinal": 1159,
+"rva": 649312,
+"forwarder": null,
+"ref": "crypt32.dll!0x9e860"
+},
+{
+"name": "CryptExportPKCS8",
+"ordinal": 1160,
+"rva": 893456,
+"forwarder": null,
+"ref": "crypt32.dll!0xda210"
+},
+{
+"name": "CryptExportPublicKeyInfo",
+"ordinal": 1161,
+"rva": 570096,
+"forwarder": null,
+"ref": "crypt32.dll!0x8b2f0"
+},
+{
+"name": "CryptExportPublicKeyInfoEx",
+"ordinal": 1162,
+"rva": 318976,
+"forwarder": null,
+"ref": "crypt32.dll!0x4de00"
+},
+{
+"name": "CryptExportPublicKeyInfoFromBCryptKeyHandle",
+"ordinal": 1163,
+"rva": 570160,
+"forwarder": null,
+"ref": "crypt32.dll!0x8b330"
+},
+{
+"name": "CryptFindCertificateKeyProvInfo",
+"ordinal": 1164,
+"rva": 535856,
+"forwarder": null,
+"ref": "crypt32.dll!0x82d30"
+},
+{
+"name": "CryptFindLocalizedName",
+"ordinal": 1165,
+"rva": 649568,
+"forwarder": null,
+"ref": "crypt32.dll!0x9e960"
+},
+{
+"name": "CryptFindOIDInfo",
+"ordinal": 1166,
+"rva": 140160,
+"forwarder": null,
+"ref": "crypt32.dll!0x22380"
+},
+{
+"name": "CryptFormatObject",
+"ordinal": 1167,
+"rva": 696640,
+"forwarder": null,
+"ref": "crypt32.dll!0xaa140"
+},
+{
+"name": "CryptFreeOIDFunctionAddress",
+"ordinal": 1168,
+"rva": 214208,
+"forwarder": null,
+"ref": "crypt32.dll!0x344c0"
+},
+{
+"name": "CryptGetAsyncParam",
+"ordinal": 1169,
+"rva": 580416,
+"forwarder": null,
+"ref": "crypt32.dll!0x8db40"
+},
+{
+"name": "CryptGetDefaultOIDDllList",
+"ordinal": 1170,
+"rva": 215104,
+"forwarder": null,
+"ref": "crypt32.dll!0x34840"
+},
+{
+"name": "CryptGetDefaultOIDFunctionAddress",
+"ordinal": 1171,
+"rva": 215280,
+"forwarder": null,
+"ref": "crypt32.dll!0x348f0"
+},
+{
+"name": "CryptGetKeyIdentifierProperty",
+"ordinal": 1172,
+"rva": 523232,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fbe0"
+},
+{
+"name": "CryptGetMessageCertificates",
+"ordinal": 1173,
+"rva": 588080,
+"forwarder": null,
+"ref": "crypt32.dll!0x8f930"
+},
+{
+"name": "CryptGetMessageSignerCount",
+"ordinal": 1174,
+"rva": 588144,
+"forwarder": null,
+"ref": "crypt32.dll!0x8f970"
+},
+{
+"name": "CryptGetOIDFunctionAddress",
+"ordinal": 1175,
+"rva": 146608,
+"forwarder": null,
+"ref": "crypt32.dll!0x23cb0"
+},
+{
+"name": "CryptGetOIDFunctionValue",
+"ordinal": 1176,
+"rva": 642048,
+"forwarder": null,
+"ref": "crypt32.dll!0x9cc00"
+},
+{
+"name": "CryptHashCertificate",
+"ordinal": 1177,
+"rva": 70064,
+"forwarder": null,
+"ref": "crypt32.dll!0x111b0"
+},
+{
+"name": "CryptHashCertificate2",
+"ordinal": 1178,
+"rva": 108032,
+"forwarder": null,
+"ref": "crypt32.dll!0x1a600"
+},
+{
+"name": "CryptHashMessage",
+"ordinal": 1179,
+"rva": 588320,
+"forwarder": null,
+"ref": "crypt32.dll!0x8fa20"
+},
+{
+"name": "CryptHashPublicKeyInfo",
+"ordinal": 1180,
+"rva": 12976,
+"forwarder": null,
+"ref": "crypt32.dll!0x32b0"
+},
+{
+"name": "CryptHashToBeSigned",
+"ordinal": 1181,
+"rva": 138464,
+"forwarder": null,
+"ref": "crypt32.dll!0x21ce0"
+},
+{
+"name": "CryptImportPKCS8",
+"ordinal": 1182,
+"rva": 894480,
+"forwarder": null,
+"ref": "crypt32.dll!0xda610"
+},
+{
+"name": "CryptImportPublicKeyInfo",
+"ordinal": 1183,
+"rva": 23040,
+"forwarder": null,
+"ref": "crypt32.dll!0x5a00"
+},
+{
+"name": "CryptImportPublicKeyInfoEx",
+"ordinal": 1184,
+"rva": 213808,
+"forwarder": null,
+"ref": "crypt32.dll!0x34330"
+},
+{
+"name": "CryptImportPublicKeyInfoEx2",
+"ordinal": 1185,
+"rva": 141600,
+"forwarder": null,
+"ref": "crypt32.dll!0x22920"
+},
+{
+"name": "CryptInitOIDFunctionSet",
+"ordinal": 1186,
+"rva": 262992,
+"forwarder": null,
+"ref": "crypt32.dll!0x40350"
+},
+{
+"name": "CryptInstallDefaultContext",
+"ordinal": 1187,
+"rva": 742816,
+"forwarder": null,
+"ref": "crypt32.dll!0xb55a0"
+},
+{
+"name": "CryptInstallOIDFunctionAddress",
+"ordinal": 1188,
+"rva": 262880,
+"forwarder": null,
+"ref": "crypt32.dll!0x402e0"
+},
+{
+"name": "CryptLoadSip",
+"ordinal": 1189,
+"rva": 977712,
+"forwarder": null,
+"ref": "crypt32.dll!0xeeb30"
+},
+{
+"name": "CryptMemAlloc",
+"ordinal": 1190,
+"rva": 285632,
+"forwarder": null,
+"ref": "crypt32.dll!0x45bc0"
+},
+{
+"name": "CryptMemFree",
+"ordinal": 1191,
+"rva": 137728,
+"forwarder": null,
+"ref": "crypt32.dll!0x21a00"
+},
+{
+"name": "CryptMemRealloc",
+"ordinal": 1192,
+"rva": 743984,
+"forwarder": null,
+"ref": "crypt32.dll!0xb5a30"
+},
+{
+"name": "CryptMsgCalculateEncodedLength",
+"ordinal": 1193,
+"rva": 985840,
+"forwarder": null,
+"ref": "crypt32.dll!0xf0af0"
+},
+{
+"name": "CryptMsgClose",
+"ordinal": 1194,
+"rva": 136816,
+"forwarder": null,
+"ref": "crypt32.dll!0x21670"
+},
+{
+"name": "CryptMsgControl",
+"ordinal": 1195,
+"rva": 269072,
+"forwarder": null,
+"ref": "crypt32.dll!0x41b10"
+},
+{
+"name": "CryptMsgCountersign",
+"ordinal": 1196,
+"rva": 1030272,
+"forwarder": null,
+"ref": "crypt32.dll!0xfb880"
+},
+{
+"name": "CryptMsgCountersignEncoded",
+"ordinal": 1197,
+"rva": 1030688,
+"forwarder": null,
+"ref": "crypt32.dll!0xfba20"
+},
+{
+"name": "CryptMsgDuplicate",
+"ordinal": 1198,
+"rva": 311456,
+"forwarder": null,
+"ref": "crypt32.dll!0x4c0a0"
+},
+{
+"name": "CryptMsgEncodeAndSignCTL",
+"ordinal": 1199,
+"rva": 1032704,
+"forwarder": null,
+"ref": "crypt32.dll!0xfc200"
+},
+{
+"name": "CryptMsgGetAndVerifySigner",
+"ordinal": 1200,
+"rva": 34816,
+"forwarder": null,
+"ref": "crypt32.dll!0x8800"
+},
+{
+"name": "CryptMsgGetParam",
+"ordinal": 1201,
+"rva": 83968,
+"forwarder": null,
+"ref": "crypt32.dll!0x14800"
+},
+{
+"name": "CryptMsgOpenToDecode",
+"ordinal": 1202,
+"rva": 214576,
+"forwarder": null,
+"ref": "crypt32.dll!0x34630"
+},
+{
+"name": "CryptMsgOpenToEncode",
+"ordinal": 1203,
+"rva": 1031616,
+"forwarder": null,
+"ref": "crypt32.dll!0xfbdc0"
+},
+{
+"name": "CryptMsgSignCTL",
+"ordinal": 1204,
+"rva": 1032960,
+"forwarder": null,
+"ref": "crypt32.dll!0xfc300"
+},
+{
+"name": "CryptMsgUpdate",
+"ordinal": 1205,
+"rva": 164144,
+"forwarder": null,
+"ref": "crypt32.dll!0x28130"
+},
+{
+"name": "CryptMsgVerifyCountersignatureEncoded",
+"ordinal": 1206,
+"rva": 1031888,
+"forwarder": null,
+"ref": "crypt32.dll!0xfbed0"
+},
+{
+"name": "CryptMsgVerifyCountersignatureEncodedEx",
+"ordinal": 1207,
+"rva": 1031984,
+"forwarder": null,
+"ref": "crypt32.dll!0xfbf30"
+},
+{
+"name": "CryptProtectData",
+"ordinal": 1208,
+"rva": 310064,
+"forwarder": null,
+"ref": "crypt32.dll!0x4bb30"
+},
+{
+"name": "CryptProtectMemory",
+"ordinal": 1209,
+"rva": 1321016,
+"forwarder": "DPAPI.CryptProtectMemory",
+"ref": null
+},
+{
+"name": "CryptQueryObject",
+"ordinal": 1210,
+"rva": 5008,
+"forwarder": null,
+"ref": "crypt32.dll!0x1390"
+},
+{
+"name": "CryptRegisterDefaultOIDFunction",
+"ordinal": 1211,
+"rva": 642304,
+"forwarder": null,
+"ref": "crypt32.dll!0x9cd00"
+},
+{
+"name": "CryptRegisterOIDFunction",
+"ordinal": 1212,
+"rva": 643104,
+"forwarder": null,
+"ref": "crypt32.dll!0x9d020"
+},
+{
+"name": "CryptRegisterOIDInfo",
+"ordinal": 1213,
+"rva": 649744,
+"forwarder": null,
+"ref": "crypt32.dll!0x9ea10"
+},
+{
+"name": "CryptRetrieveTimeStamp",
+"ordinal": 1214,
+"rva": 979488,
+"forwarder": null,
+"ref": "crypt32.dll!0xef220"
+},
+{
+"name": "CryptSIPAddProvider",
+"ordinal": 1215,
+"rva": 977888,
+"forwarder": null,
+"ref": "crypt32.dll!0xeebe0"
+},
+{
+"name": "CryptSIPCreateIndirectData",
+"ordinal": 1216,
+"rva": 216320,
+"forwarder": null,
+"ref": "crypt32.dll!0x34d00"
+},
+{
+"name": "CryptSIPGetCaps",
+"ordinal": 1217,
+"rva": 219664,
+"forwarder": null,
+"ref": "crypt32.dll!0x35a10"
+},
+{
+"name": "CryptSIPGetSealedDigest",
+"ordinal": 1218,
+"rva": 978800,
+"forwarder": null,
+"ref": "crypt32.dll!0xeef70"
+},
+{
+"name": "CryptSIPGetSignedDataMsg",
+"ordinal": 1219,
+"rva": 308928,
+"forwarder": null,
+"ref": "crypt32.dll!0x4b6c0"
+},
+{
+"name": "CryptSIPLoad",
+"ordinal": 1220,
+"rva": 212096,
+"forwarder": null,
+"ref": "crypt32.dll!0x33c80"
+},
+{
+"name": "CryptSIPPutSignedDataMsg",
+"ordinal": 1221,
+"rva": 979040,
+"forwarder": null,
+"ref": "crypt32.dll!0xef060"
+},
+{
+"name": "CryptSIPRemoveProvider",
+"ordinal": 1222,
+"rva": 978368,
+"forwarder": null,
+"ref": "crypt32.dll!0xeedc0"
+},
+{
+"name": "CryptSIPRemoveSignedDataMsg",
+"ordinal": 1223,
+"rva": 979280,
+"forwarder": null,
+"ref": "crypt32.dll!0xef150"
+},
+{
+"name": "CryptSIPRetrieveSubjectGuid",
+"ordinal": 1224,
+"rva": 288160,
+"forwarder": null,
+"ref": "crypt32.dll!0x465a0"
+},
+{
+"name": "CryptSIPRetrieveSubjectGuidForCatalogFile",
+"ordinal": 1225,
+"rva": 289040,
+"forwarder": null,
+"ref": "crypt32.dll!0x46910"
+},
+{
+"name": "CryptSIPVerifyIndirectData",
+"ordinal": 1226,
+"rva": 317072,
+"forwarder": null,
+"ref": "crypt32.dll!0x4d690"
+},
+{
+"name": "CryptSetAsyncParam",
+"ordinal": 1227,
+"rva": 580320,
+"forwarder": null,
+"ref": "crypt32.dll!0x8dae0"
+},
+{
+"name": "CryptSetKeyIdentifierProperty",
+"ordinal": 1228,
+"rva": 523520,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fd00"
+},
+{
+"name": "CryptSetOIDFunctionValue",
+"ordinal": 1229,
+"rva": 643360,
+"forwarder": null,
+"ref": "crypt32.dll!0x9d120"
+},
+{
+"name": "CryptSignAndEncodeCertificate",
+"ordinal": 1230,
+"rva": 69376,
+"forwarder": null,
+"ref": "crypt32.dll!0x10f00"
+},
+{
+"name": "CryptSignAndEncryptMessage",
+"ordinal": 1231,
+"rva": 588944,
+"forwarder": null,
+"ref": "crypt32.dll!0x8fc90"
+},
+{
+"name": "CryptSignCertificate",
+"ordinal": 1232,
+"rva": 69792,
+"forwarder": null,
+"ref": "crypt32.dll!0x110a0"
+},
+{
+"name": "CryptSignMessage",
+"ordinal": 1233,
+"rva": 589296,
+"forwarder": null,
+"ref": "crypt32.dll!0x8fdf0"
+},
+{
+"name": "CryptSignMessageWithKey",
+"ordinal": 1234,
+"rva": 589568,
+"forwarder": null,
+"ref": "crypt32.dll!0x8ff00"
+},
+{
+"name": "CryptStringToBinaryA",
+"ordinal": 1235,
+"rva": 240608,
+"forwarder": null,
+"ref": "crypt32.dll!0x3abe0"
+},
+{
+"name": "CryptStringToBinaryW",
+"ordinal": 1236,
+"rva": 240192,
+"forwarder": null,
+"ref": "crypt32.dll!0x3aa40"
+},
+{
+"name": "CryptUninstallDefaultContext",
+"ordinal": 1237,
+"rva": 743280,
+"forwarder": null,
+"ref": "crypt32.dll!0xb5770"
+},
+{
+"name": "CryptUnprotectData",
+"ordinal": 1238,
+"rva": 281104,
+"forwarder": null,
+"ref": "crypt32.dll!0x44a10"
+},
+{
+"name": "CryptUnprotectMemory",
+"ordinal": 1239,
+"rva": 1321761,
+"forwarder": "DPAPI.CryptUnprotectMemory",
+"ref": null
+},
+{
+"name": "CryptUnregisterDefaultOIDFunction",
+"ordinal": 1240,
+"rva": 643632,
+"forwarder": null,
+"ref": "crypt32.dll!0x9d230"
+},
+{
+"name": "CryptUnregisterOIDFunction",
+"ordinal": 1241,
+"rva": 644336,
+"forwarder": null,
+"ref": "crypt32.dll!0x9d4f0"
+},
+{
+"name": "CryptUnregisterOIDInfo",
+"ordinal": 1242,
+"rva": 650256,
+"forwarder": null,
+"ref": "crypt32.dll!0x9ec10"
+},
+{
+"name": "CryptUpdateProtectedState",
+"ordinal": 1243,
+"rva": 1321898,
+"forwarder": "DPAPI.CryptUpdateProtectedState",
+"ref": null
+},
+{
+"name": "CryptVerifyCertificateSignature",
+"ordinal": 1244,
+"rva": 536144,
+"forwarder": null,
+"ref": "crypt32.dll!0x82e50"
+},
+{
+"name": "CryptVerifyCertificateSignatureEx",
+"ordinal": 1245,
+"rva": 96192,
+"forwarder": null,
+"ref": "crypt32.dll!0x177c0"
+},
+{
+"name": "CryptVerifyDetachedMessageHash",
+"ordinal": 1246,
+"rva": 590224,
+"forwarder": null,
+"ref": "crypt32.dll!0x90190"
+},
+{
+"name": "CryptVerifyDetachedMessageSignature",
+"ordinal": 1247,
+"rva": 590320,
+"forwarder": null,
+"ref": "crypt32.dll!0x901f0"
+},
+{
+"name": "CryptVerifyMessageHash",
+"ordinal": 1248,
+"rva": 590448,
+"forwarder": null,
+"ref": "crypt32.dll!0x90270"
+},
+{
+"name": "CryptVerifyMessageSignature",
+"ordinal": 1249,
+"rva": 590528,
+"forwarder": null,
+"ref": "crypt32.dll!0x902c0"
+},
+{
+"name": "CryptVerifyMessageSignatureWithKey",
+"ordinal": 1250,
+"rva": 590656,
+"forwarder": null,
+"ref": "crypt32.dll!0x90340"
+},
+{
+"name": "CryptVerifyTimeStampSignature",
+"ordinal": 1251,
+"rva": 15584,
+"forwarder": null,
+"ref": "crypt32.dll!0x3ce0"
+},
+{
+"name": "I_CertChainEngineIsDisallowedCertificate",
+"ordinal": 1252,
+"rva": 233712,
+"forwarder": null,
+"ref": "crypt32.dll!0x390f0"
+},
+{
+"name": "I_CertDiagControl",
+"ordinal": 1253,
+"rva": 46128,
+"forwarder": null,
+"ref": "crypt32.dll!0xb430"
+},
+{
+"name": "I_CertFinishSslHandshake",
+"ordinal": 1254,
+"rva": 225344,
+"forwarder": null,
+"ref": "crypt32.dll!0x37040"
+},
+{
+"name": "I_CertProcessSslHandshake",
+"ordinal": 1255,
+"rva": 225776,
+"forwarder": null,
+"ref": "crypt32.dll!0x371f0"
+},
+{
+"name": "I_CertProtectFunction",
+"ordinal": 1256,
+"rva": 53552,
+"forwarder": null,
+"ref": "crypt32.dll!0xd130"
+},
+{
+"name": "I_CertSrvProtectFunction",
+"ordinal": 1257,
+"rva": 238608,
+"forwarder": null,
+"ref": "crypt32.dll!0x3a410"
+},
+{
+"name": "I_CertSyncStore",
+"ordinal": 1258,
+"rva": 523968,
+"forwarder": null,
+"ref": "crypt32.dll!0x7fec0"
+},
+{
+"name": "I_CertUpdateStore",
+"ordinal": 1259,
+"rva": 22832,
+"forwarder": null,
+"ref": "crypt32.dll!0x5930"
+},
+{
+"name": "I_CertWnfEnableFlushCache",
+"ordinal": 1260,
+"rva": 325552,
+"forwarder": null,
+"ref": "crypt32.dll!0x4f7b0"
+},
+{
+"name": "I_CryptAddRefLruEntry",
+"ordinal": 1261,
+"rva": 303200,
+"forwarder": null,
+"ref": "crypt32.dll!0x4a060"
+},
+{
+"name": "I_CryptAddSmartCardCertToStore",
+"ordinal": 1262,
+"rva": 759088,
+"forwarder": null,
+"ref": "crypt32.dll!0xb9530"
+},
+{
+"name": "I_CryptAllocTls",
+"ordinal": 1263,
+"rva": 234928,
+"forwarder": null,
+"ref": "crypt32.dll!0x395b0"
+},
+{
+"name": "I_CryptAllocTlsEx",
+"ordinal": 1264,
+"rva": 236720,
+"forwarder": null,
+"ref": "crypt32.dll!0x39cb0"
+},
+{
+"name": "I_CryptCreateLruCache",
+"ordinal": 1265,
+"rva": 95680,
+"forwarder": null,
+"ref": "crypt32.dll!0x175c0"
+},
+{
+"name": "I_CryptCreateLruEntry",
+"ordinal": 1266,
+"rva": 102064,
+"forwarder": null,
+"ref": "crypt32.dll!0x18eb0"
+},
+{
+"name": "I_CryptDetachTls",
+"ordinal": 1267,
+"rva": 286272,
+"forwarder": null,
+"ref": "crypt32.dll!0x45e40"
+},
+{
+"name": "I_CryptDisableLruOfEntries",
+"ordinal": 1268,
+"rva": 853280,
+"forwarder": null,
+"ref": "crypt32.dll!0xd0520"
+},
+{
+"name": "I_CryptEnableLruOfEntries",
+"ordinal": 1269,
+"rva": 853360,
+"forwarder": null,
+"ref": "crypt32.dll!0xd0570"
+},
+{
+"name": "I_CryptEnumMatchingLruEntries",
+"ordinal": 1270,
+"rva": 10240,
+"forwarder": null,
+"ref": "crypt32.dll!0x2800"
+},
+{
+"name": "I_CryptFindLruEntry",
+"ordinal": 1271,
+"rva": 103984,
+"forwarder": null,
+"ref": "crypt32.dll!0x19630"
+},
+{
+"name": "I_CryptFindLruEntryData",
+"ordinal": 1272,
+"rva": 853472,
+"forwarder": null,
+"ref": "crypt32.dll!0xd05e0"
+},
+{
+"name": "I_CryptFindSmartCardCertInStore",
+"ordinal": 1273,
+"rva": 759376,
+"forwarder": null,
+"ref": "crypt32.dll!0xb9650"
+},
+{
+"name": "I_CryptFlushLruCache",
+"ordinal": 1274,
+"rva": 71680,
+"forwarder": null,
+"ref": "crypt32.dll!0x11800"
+},
+{
+"name": "I_CryptFreeLruCache",
+"ordinal": 1275,
+"rva": 311968,
+"forwarder": null,
+"ref": "crypt32.dll!0x4c2a0"
+},
+{
+"name": "I_CryptFreeTls",
+"ordinal": 1276,
+"rva": 236928,
+"forwarder": null,
+"ref": "crypt32.dll!0x39d80"
+},
+{
+"name": "I_CryptGetAsn1Decoder",
+"ordinal": 1277,
+"rva": 158064,
+"forwarder": null,
+"ref": "crypt32.dll!0x26970"
+},
+{
+"name": "I_CryptGetAsn1Encoder",
+"ordinal": 1278,
+"rva": 178608,
+"forwarder": null,
+"ref": "crypt32.dll!0x2b9b0"
+},
+{
+"name": "I_CryptGetDefaultCryptProv",
+"ordinal": 1279,
+"rva": 214864,
+"forwarder": null,
+"ref": "crypt32.dll!0x34750"
+},
+{
+"name": "I_CryptGetDefaultCryptProvForEncrypt",
+"ordinal": 1280,
+"rva": 743664,
+"forwarder": null,
+"ref": "crypt32.dll!0xb58f0"
+},
+{
+"name": "I_CryptGetFileVersion",
+"ordinal": 1281,
+"rva": 451536,
+"forwarder": null,
+"ref": "crypt32.dll!0x6e3d0"
+},
+{
+"name": "I_CryptGetLruEntryData",
+"ordinal": 1282,
+"rva": 91872,
+"forwarder": null,
+"ref": "crypt32.dll!0x166e0"
+},
+{
+"name": "I_CryptGetLruEntryIdentifier",
+"ordinal": 1283,
+"rva": 853520,
+"forwarder": null,
+"ref": "crypt32.dll!0xd0610"
+},
+{
+"name": "I_CryptGetOssGlobal",
+"ordinal": 1284,
+"rva": 760000,
+"forwarder": null,
+"ref": "crypt32.dll!0xb98c0"
+},
+{
+"name": "I_CryptGetTls",
+"ordinal": 1285,
+"rva": 162688,
+"forwarder": null,
+"ref": "crypt32.dll!0x27b80"
+},
+{
+"name": "I_CryptInsertLruEntry",
+"ordinal": 1286,
+"rva": 101744,
+"forwarder": null,
+"ref": "crypt32.dll!0x18d70"
+},
+{
+"name": "I_CryptInstallAsn1Module",
+"ordinal": 1287,
+"rva": 234944,
+"forwarder": null,
+"ref": "crypt32.dll!0x395c0"
+},
+{
+"name": "I_CryptInstallOssGlobal",
+"ordinal": 1288,
+"rva": 760000,
+"forwarder": null,
+"ref": "crypt32.dll!0xb98c0"
+},
+{
+"name": "I_CryptReadTrustedPublisherDWORDValueFromRegistry",
+"ordinal": 1289,
+"rva": 193312,
+"forwarder": null,
+"ref": "crypt32.dll!0x2f320"
+},
+{
+"name": "I_CryptRegisterSmartCardStore",
+"ordinal": 1290,
+"rva": 580320,
+"forwarder": null,
+"ref": "crypt32.dll!0x8dae0"
+},
+{
+"name": "I_CryptReleaseLruEntry",
+"ordinal": 1291,
+"rva": 101616,
+"forwarder": null,
+"ref": "crypt32.dll!0x18cf0"
+},
+{
+"name": "I_CryptRemoveLruEntry",
+"ordinal": 1292,
+"rva": 22704,
+"forwarder": null,
+"ref": "crypt32.dll!0x58b0"
+},
+{
+"name": "I_CryptSetTls",
+"ordinal": 1293,
+"rva": 180000,
+"forwarder": null,
+"ref": "crypt32.dll!0x2bf20"
+},
+{
+"name": "I_CryptTouchLruEntry",
+"ordinal": 1294,
+"rva": 21984,
+"forwarder": null,
+"ref": "crypt32.dll!0x55e0"
+},
+{
+"name": "I_CryptUninstallAsn1Module",
+"ordinal": 1295,
+"rva": 238928,
+"forwarder": null,
+"ref": "crypt32.dll!0x3a550"
+},
+{
+"name": "I_CryptUninstallOssGlobal",
+"ordinal": 1296,
+"rva": 760000,
+"forwarder": null,
+"ref": "crypt32.dll!0xb98c0"
+},
+{
+"name": "I_CryptUnregisterSmartCardStore",
+"ordinal": 1297,
+"rva": 580320,
+"forwarder": null,
+"ref": "crypt32.dll!0x8dae0"
+},
+{
+"name": "I_CryptWalkAllLruCacheEntries",
+"ordinal": 1298,
+"rva": 287328,
+"forwarder": null,
+"ref": "crypt32.dll!0x46260"
+},
+{
+"name": "I_PFXDecrypt",
+"ordinal": 1299,
+"rva": 902016,
+"forwarder": null,
+"ref": "crypt32.dll!0xdc380"
+},
+{
+"name": "I_PFXHMAC",
+"ordinal": 1300,
+"rva": 903072,
+"forwarder": null,
+"ref": "crypt32.dll!0xdc7a0"
+},
+{
+"name": "PFXExportCertStore",
+"ordinal": 1301,
+"rva": 888160,
+"forwarder": null,
+"ref": "crypt32.dll!0xd8d60"
+},
+{
+"name": "PFXExportCertStore2",
+"ordinal": 1302,
+"rva": 888512,
+"forwarder": null,
+"ref": "crypt32.dll!0xd8ec0"
+},
+{
+"name": "PFXExportCertStoreEx",
+"ordinal": 1303,
+"rva": 888544,
+"forwarder": null,
+"ref": "crypt32.dll!0xd8ee0"
+},
+{
+"name": "PFXImportCertStore",
+"ordinal": 1304,
+"rva": 889200,
+"forwarder": null,
+"ref": "crypt32.dll!0xd9170"
+},
+{
+"name": "PFXIsPFXBlob",
+"ordinal": 1305,
+"rva": 889248,
+"forwarder": null,
+"ref": "crypt32.dll!0xd91a0"
+},
+{
+"name": "PFXVerifyPassword",
+"ordinal": 1306,
+"rva": 889392,
+"forwarder": null,
+"ref": "crypt32.dll!0xd9230"
+},
+{
+"name": null,
+"ordinal": 2000,
+"rva": 911648,
+"forwarder": null,
+"ref": "crypt32.dll!0xde920"
+}
+]

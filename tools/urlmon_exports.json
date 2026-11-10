@@ -1,0 +1,2214 @@
+[
+{
+"name": null,
+"ordinal": 100,
+"rva": 1178528,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fba0"
+},
+{
+"name": null,
+"ordinal": 101,
+"rva": 439952,
+"forwarder": null,
+"ref": "urlmon.dll!0x6b690"
+},
+{
+"name": null,
+"ordinal": 102,
+"rva": 1102656,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d340"
+},
+{
+"name": null,
+"ordinal": 103,
+"rva": 1101648,
+"forwarder": null,
+"ref": "urlmon.dll!0x10cf50"
+},
+{
+"name": null,
+"ordinal": 104,
+"rva": 1101104,
+"forwarder": null,
+"ref": "urlmon.dll!0x10cd30"
+},
+{
+"name": null,
+"ordinal": 105,
+"rva": 1101680,
+"forwarder": null,
+"ref": "urlmon.dll!0x10cf70"
+},
+{
+"name": null,
+"ordinal": 106,
+"rva": 1102512,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d2b0"
+},
+{
+"name": null,
+"ordinal": 107,
+"rva": 1100976,
+"forwarder": null,
+"ref": "urlmon.dll!0x10ccb0"
+},
+{
+"name": null,
+"ordinal": 108,
+"rva": 403200,
+"forwarder": null,
+"ref": "urlmon.dll!0x62700"
+},
+{
+"name": "FileBearsMarkOfTheWeb",
+"ordinal": 109,
+"rva": 417888,
+"forwarder": null,
+"ref": "urlmon.dll!0x66060"
+},
+{
+"name": "GetPortFromUrlScheme",
+"ordinal": 110,
+"rva": 745392,
+"forwarder": null,
+"ref": "urlmon.dll!0xb5fb0"
+},
+{
+"name": null,
+"ordinal": 111,
+"rva": 1102992,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d490"
+},
+{
+"name": null,
+"ordinal": 112,
+"rva": 376752,
+"forwarder": null,
+"ref": "urlmon.dll!0x5bfb0"
+},
+{
+"name": null,
+"ordinal": 113,
+"rva": 1146448,
+"forwarder": null,
+"ref": "urlmon.dll!0x117e50"
+},
+{
+"name": null,
+"ordinal": 114,
+"rva": 377232,
+"forwarder": null,
+"ref": "urlmon.dll!0x5c190"
+},
+{
+"name": null,
+"ordinal": 115,
+"rva": 1102784,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d3c0"
+},
+{
+"name": null,
+"ordinal": 116,
+"rva": 1101472,
+"forwarder": null,
+"ref": "urlmon.dll!0x10cea0"
+},
+{
+"name": "GetPropertyFromName",
+"ordinal": 117,
+"rva": 745424,
+"forwarder": null,
+"ref": "urlmon.dll!0xb5fd0"
+},
+{
+"name": "GetPropertyName",
+"ordinal": 118,
+"rva": 745456,
+"forwarder": null,
+"ref": "urlmon.dll!0xb5ff0"
+},
+{
+"name": "IsDWORDProperty",
+"ordinal": 119,
+"rva": 745488,
+"forwarder": null,
+"ref": "urlmon.dll!0xb6010"
+},
+{
+"name": "IsStringProperty",
+"ordinal": 120,
+"rva": 745520,
+"forwarder": null,
+"ref": "urlmon.dll!0xb6030"
+},
+{
+"name": "AsyncGetClassBits",
+"ordinal": 121,
+"rva": 530656,
+"forwarder": null,
+"ref": "urlmon.dll!0x818e0"
+},
+{
+"name": "AsyncInstallDistributionUnit",
+"ordinal": 122,
+"rva": 824272,
+"forwarder": null,
+"ref": "urlmon.dll!0xc93d0"
+},
+{
+"name": "BindAsyncMoniker",
+"ordinal": 123,
+"rva": 762576,
+"forwarder": null,
+"ref": "urlmon.dll!0xba2d0"
+},
+{
+"name": "CAuthenticateHostUI_CreateInstance",
+"ordinal": 124,
+"rva": 965136,
+"forwarder": null,
+"ref": "urlmon.dll!0xeba10"
+},
+{
+"name": "CDLGetLongPathNameA",
+"ordinal": 125,
+"rva": 826672,
+"forwarder": null,
+"ref": "urlmon.dll!0xc9d30"
+},
+{
+"name": "CDLGetLongPathNameW",
+"ordinal": 126,
+"rva": 826704,
+"forwarder": null,
+"ref": "urlmon.dll!0xc9d50"
+},
+{
+"name": "CORPolicyProvider",
+"ordinal": 127,
+"rva": 1207840,
+"forwarder": null,
+"ref": "urlmon.dll!0x126e20"
+},
+{
+"name": "CoGetClassObjectFromURL",
+"ordinal": 128,
+"rva": 824416,
+"forwarder": null,
+"ref": "urlmon.dll!0xc9460"
+},
+{
+"name": "CoInstall",
+"ordinal": 129,
+"rva": 825712,
+"forwarder": null,
+"ref": "urlmon.dll!0xc9970"
+},
+{
+"name": "CoInternetCanonicalizeIUri",
+"ordinal": 130,
+"rva": 389680,
+"forwarder": null,
+"ref": "urlmon.dll!0x5f230"
+},
+{
+"name": "CoInternetCombineIUri",
+"ordinal": 131,
+"rva": 136464,
+"forwarder": null,
+"ref": "urlmon.dll!0x21510"
+},
+{
+"name": "CoInternetCombineUrl",
+"ordinal": 132,
+"rva": 123728,
+"forwarder": null,
+"ref": "urlmon.dll!0x1e350"
+},
+{
+"name": "CoInternetCombineUrlEx",
+"ordinal": 133,
+"rva": 181696,
+"forwarder": null,
+"ref": "urlmon.dll!0x2c5c0"
+},
+{
+"name": "CoInternetCompareUrl",
+"ordinal": 134,
+"rva": 1046336,
+"forwarder": null,
+"ref": "urlmon.dll!0xff740"
+},
+{
+"name": "CoInternetCreateSecurityManager",
+"ordinal": 135,
+"rva": 188736,
+"forwarder": null,
+"ref": "urlmon.dll!0x2e140"
+},
+{
+"name": "CoInternetCreateZoneManager",
+"ordinal": 136,
+"rva": 377456,
+"forwarder": null,
+"ref": "urlmon.dll!0x5c270"
+},
+{
+"name": "CoInternetFeatureSettingsChanged",
+"ordinal": 137,
+"rva": 1176624,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f430"
+},
+{
+"name": "CoInternetGetMobileBrowserAppCompatMode",
+"ordinal": 138,
+"rva": 771760,
+"forwarder": null,
+"ref": "urlmon.dll!0xbc6b0"
+},
+{
+"name": "CoInternetGetMobileBrowserForceDesktopMode",
+"ordinal": 139,
+"rva": 771872,
+"forwarder": null,
+"ref": "urlmon.dll!0xbc720"
+},
+{
+"name": "CoInternetGetProtocolFlags",
+"ordinal": 140,
+"rva": 504304,
+"forwarder": null,
+"ref": "urlmon.dll!0x7b1f0"
+},
+{
+"name": "CoInternetGetSecurityUrl",
+"ordinal": 141,
+"rva": 1046528,
+"forwarder": null,
+"ref": "urlmon.dll!0xff800"
+},
+{
+"name": "CoInternetGetSecurityUrlEx",
+"ordinal": 142,
+"rva": 153472,
+"forwarder": null,
+"ref": "urlmon.dll!0x25780"
+},
+{
+"name": "CoInternetGetSession",
+"ordinal": 143,
+"rva": 385072,
+"forwarder": null,
+"ref": "urlmon.dll!0x5e030"
+},
+{
+"name": "CoInternetIsFeatureEnabled",
+"ordinal": 144,
+"rva": 248160,
+"forwarder": null,
+"ref": "urlmon.dll!0x3c960"
+},
+{
+"name": "CoInternetIsFeatureEnabledForIUri",
+"ordinal": 145,
+"rva": 247712,
+"forwarder": null,
+"ref": "urlmon.dll!0x3c7a0"
+},
+{
+"name": "CoInternetIsFeatureEnabledForUrl",
+"ordinal": 146,
+"rva": 247376,
+"forwarder": null,
+"ref": "urlmon.dll!0x3c650"
+},
+{
+"name": "CoInternetIsFeatureZoneElevationEnabled",
+"ordinal": 147,
+"rva": 1047648,
+"forwarder": null,
+"ref": "urlmon.dll!0xffc60"
+},
+{
+"name": "CoInternetParseIUri",
+"ordinal": 148,
+"rva": 507280,
+"forwarder": null,
+"ref": "urlmon.dll!0x7bd90"
+},
+{
+"name": "CoInternetParseUrl",
+"ordinal": 149,
+"rva": 147360,
+"forwarder": null,
+"ref": "urlmon.dll!0x23fa0"
+},
+{
+"name": "CoInternetQueryInfo",
+"ordinal": 150,
+"rva": 146016,
+"forwarder": null,
+"ref": "urlmon.dll!0x23a60"
+},
+{
+"name": "CoInternetSetFeatureEnabled",
+"ordinal": 151,
+"rva": 1048336,
+"forwarder": null,
+"ref": "urlmon.dll!0xfff10"
+},
+{
+"name": "CoInternetSetMobileBrowserAppCompatMode",
+"ordinal": 152,
+"rva": 772048,
+"forwarder": null,
+"ref": "urlmon.dll!0xbc7d0"
+},
+{
+"name": "CoInternetSetMobileBrowserForceDesktopMode",
+"ordinal": 153,
+"rva": 772128,
+"forwarder": null,
+"ref": "urlmon.dll!0xbc820"
+},
+{
+"name": "CompareSecurityIds",
+"ordinal": 154,
+"rva": 363744,
+"forwarder": null,
+"ref": "urlmon.dll!0x58ce0"
+},
+{
+"name": "CompatFlagsFromClsid",
+"ordinal": 155,
+"rva": 378736,
+"forwarder": null,
+"ref": "urlmon.dll!0x5c770"
+},
+{
+"name": "CopyBindInfo",
+"ordinal": 156,
+"rva": 373792,
+"forwarder": null,
+"ref": "urlmon.dll!0x5b420"
+},
+{
+"name": "CopyStgMedium",
+"ordinal": 157,
+"rva": 374048,
+"forwarder": null,
+"ref": "urlmon.dll!0x5b520"
+},
+{
+"name": "CreateAsyncBindCtx",
+"ordinal": 158,
+"rva": 762752,
+"forwarder": null,
+"ref": "urlmon.dll!0xba380"
+},
+{
+"name": "CreateAsyncBindCtxEx",
+"ordinal": 159,
+"rva": 450144,
+"forwarder": null,
+"ref": "urlmon.dll!0x6de60"
+},
+{
+"name": "CreateFormatEnumerator",
+"ordinal": 160,
+"rva": 494768,
+"forwarder": null,
+"ref": "urlmon.dll!0x78cb0"
+},
+{
+"name": "CreateIUriBuilder",
+"ordinal": 161,
+"rva": 423808,
+"forwarder": null,
+"ref": "urlmon.dll!0x67780"
+},
+{
+"name": "CreateURLMoniker",
+"ordinal": 162,
+"rva": 762992,
+"forwarder": null,
+"ref": "urlmon.dll!0xba470"
+},
+{
+"name": "CreateURLMonikerEx",
+"ordinal": 163,
+"rva": 447520,
+"forwarder": null,
+"ref": "urlmon.dll!0x6d420"
+},
+{
+"name": "CreateURLMonikerEx2",
+"ordinal": 164,
+"rva": 35744,
+"forwarder": null,
+"ref": "urlmon.dll!0x8ba0"
+},
+{
+"name": "CreateUri",
+"ordinal": 165,
+"rva": 400128,
+"forwarder": null,
+"ref": "urlmon.dll!0x61b00"
+},
+{
+"name": "CreateUriFromMultiByteString",
+"ordinal": 166,
+"rva": 745552,
+"forwarder": null,
+"ref": "urlmon.dll!0xb6050"
+},
+{
+"name": "CreateUriPriv",
+"ordinal": 167,
+"rva": 745584,
+"forwarder": null,
+"ref": "urlmon.dll!0xb6070"
+},
+{
+"name": "CreateUriWithFragment",
+"ordinal": 168,
+"rva": 745664,
+"forwarder": null,
+"ref": "urlmon.dll!0xb60c0"
+},
+{
+"name": "DllCanUnloadNow",
+"ordinal": 169,
+"rva": 431488,
+"forwarder": null,
+"ref": "urlmon.dll!0x69580"
+},
+{
+"name": "DllGetClassObject",
+"ordinal": 170,
+"rva": 424384,
+"forwarder": null,
+"ref": "urlmon.dll!0x679c0"
+},
+{
+"name": "DllInstall",
+"ordinal": 171,
+"rva": 764112,
+"forwarder": null,
+"ref": "urlmon.dll!0xba8d0"
+},
+{
+"name": "DllRegisterServer",
+"ordinal": 172,
+"rva": 764128,
+"forwarder": null,
+"ref": "urlmon.dll!0xba8e0"
+},
+{
+"name": "DllRegisterServerEx",
+"ordinal": 173,
+"rva": 504304,
+"forwarder": null,
+"ref": "urlmon.dll!0x7b1f0"
+},
+{
+"name": "DllUnregisterServer",
+"ordinal": 174,
+"rva": 764144,
+"forwarder": null,
+"ref": "urlmon.dll!0xba8f0"
+},
+{
+"name": "Extract",
+"ordinal": 175,
+"rva": 828656,
+"forwarder": null,
+"ref": "urlmon.dll!0xca4f0"
+},
+{
+"name": "FaultInIEFeature",
+"ordinal": 176,
+"rva": 520000,
+"forwarder": null,
+"ref": "urlmon.dll!0x7ef40"
+},
+{
+"name": "FindMediaType",
+"ordinal": 177,
+"rva": 765696,
+"forwarder": null,
+"ref": "urlmon.dll!0xbaf00"
+},
+{
+"name": "FindMediaTypeClass",
+"ordinal": 178,
+"rva": 489552,
+"forwarder": null,
+"ref": "urlmon.dll!0x77850"
+},
+{
+"name": "FindMimeFromData",
+"ordinal": 179,
+"rva": 469728,
+"forwarder": null,
+"ref": "urlmon.dll!0x72ae0"
+},
+{
+"name": "GetAddSitesFileUrl",
+"ordinal": 180,
+"rva": 1176672,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f460"
+},
+{
+"name": "GetClassFileOrMime",
+"ordinal": 181,
+"rva": 42400,
+"forwarder": null,
+"ref": "urlmon.dll!0xa5a0"
+},
+{
+"name": "GetClassURL",
+"ordinal": 182,
+"rva": 504304,
+"forwarder": null,
+"ref": "urlmon.dll!0x7b1f0"
+},
+{
+"name": "GetComponentIDFromCLSSPEC",
+"ordinal": 183,
+"rva": 831936,
+"forwarder": null,
+"ref": "urlmon.dll!0xcb1c0"
+},
+{
+"name": "GetIDNFlagsForUri",
+"ordinal": 184,
+"rva": 247216,
+"forwarder": null,
+"ref": "urlmon.dll!0x3c5b0"
+},
+{
+"name": "GetIUriPriv",
+"ordinal": 185,
+"rva": 441440,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc60"
+},
+{
+"name": "GetIUriPriv2",
+"ordinal": 186,
+"rva": 745696,
+"forwarder": null,
+"ref": "urlmon.dll!0xb60e0"
+},
+{
+"name": "GetLabelsFromNamedHost",
+"ordinal": 187,
+"rva": 1234544,
+"forwarder": null,
+"ref": "urlmon.dll!0x12d670"
+},
+{
+"name": "GetMarkOfTheWeb",
+"ordinal": 188,
+"rva": 1146208,
+"forwarder": null,
+"ref": "urlmon.dll!0x117d60"
+},
+{
+"name": "GetSoftwareUpdateInfo",
+"ordinal": 189,
+"rva": 504304,
+"forwarder": null,
+"ref": "urlmon.dll!0x7b1f0"
+},
+{
+"name": "GetUrlmonThreadNotificationHwnd",
+"ordinal": 190,
+"rva": 1051504,
+"forwarder": null,
+"ref": "urlmon.dll!0x100b70"
+},
+{
+"name": "GetZoneFromAlternateDataStreamEx",
+"ordinal": 191,
+"rva": 164944,
+"forwarder": null,
+"ref": "urlmon.dll!0x28450"
+},
+{
+"name": "HlinkGoBack",
+"ordinal": 192,
+"rva": 1085616,
+"forwarder": null,
+"ref": "urlmon.dll!0x1090b0"
+},
+{
+"name": "HlinkGoForward",
+"ordinal": 193,
+"rva": 1085824,
+"forwarder": null,
+"ref": "urlmon.dll!0x109180"
+},
+{
+"name": "HlinkNavigateMoniker",
+"ordinal": 194,
+"rva": 1086032,
+"forwarder": null,
+"ref": "urlmon.dll!0x109250"
+},
+{
+"name": "HlinkNavigateString",
+"ordinal": 195,
+"rva": 1086176,
+"forwarder": null,
+"ref": "urlmon.dll!0x1092e0"
+},
+{
+"name": "HlinkSimpleNavigateToMoniker",
+"ordinal": 196,
+"rva": 1086320,
+"forwarder": null,
+"ref": "urlmon.dll!0x109370"
+},
+{
+"name": "HlinkSimpleNavigateToString",
+"ordinal": 197,
+"rva": 1087968,
+"forwarder": null,
+"ref": "urlmon.dll!0x1099e0"
+},
+{
+"name": "IEGetUserPrivateNamespaceName",
+"ordinal": 198,
+"rva": 1103488,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d680"
+},
+{
+"name": "IEInstallScope",
+"ordinal": 199,
+"rva": 825872,
+"forwarder": null,
+"ref": "urlmon.dll!0xc9a10"
+},
+{
+"name": "IntlPercentEncodeNormalize",
+"ordinal": 200,
+"rva": 745728,
+"forwarder": null,
+"ref": "urlmon.dll!0xb6100"
+},
+{
+"name": "IsAsyncMoniker",
+"ordinal": 201,
+"rva": 400784,
+"forwarder": null,
+"ref": "urlmon.dll!0x61d90"
+},
+{
+"name": "IsIntranetAvailable",
+"ordinal": 202,
+"rva": 1177616,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f810"
+},
+{
+"name": "IsJITInProgress",
+"ordinal": 203,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": "IsLoggingEnabledA",
+"ordinal": 204,
+"rva": 1092272,
+"forwarder": null,
+"ref": "urlmon.dll!0x10aab0"
+},
+{
+"name": "IsLoggingEnabledW",
+"ordinal": 205,
+"rva": 1092608,
+"forwarder": null,
+"ref": "urlmon.dll!0x10ac00"
+},
+{
+"name": "IsValidURL",
+"ordinal": 206,
+"rva": 35776,
+"forwarder": null,
+"ref": "urlmon.dll!0x8bc0"
+},
+{
+"name": "MkParseDisplayNameEx",
+"ordinal": 207,
+"rva": 763024,
+"forwarder": null,
+"ref": "urlmon.dll!0xba490"
+},
+{
+"name": "ObtainUserAgentString",
+"ordinal": 208,
+"rva": 965584,
+"forwarder": null,
+"ref": "urlmon.dll!0xebbd0"
+},
+{
+"name": "PrivateCoInstall",
+"ordinal": 209,
+"rva": 825888,
+"forwarder": null,
+"ref": "urlmon.dll!0xc9a20"
+},
+{
+"name": "QueryAssociations",
+"ordinal": 210,
+"rva": 512208,
+"forwarder": null,
+"ref": "urlmon.dll!0x7d0d0"
+},
+{
+"name": "QueryClsidAssociation",
+"ordinal": 211,
+"rva": 1040304,
+"forwarder": null,
+"ref": "urlmon.dll!0xfdfb0"
+},
+{
+"name": "RegisterBindStatusCallback",
+"ordinal": 212,
+"rva": 140800,
+"forwarder": null,
+"ref": "urlmon.dll!0x22600"
+},
+{
+"name": "RegisterFormatEnumerator",
+"ordinal": 213,
+"rva": 493920,
+"forwarder": null,
+"ref": "urlmon.dll!0x78960"
+},
+{
+"name": "RegisterMediaTypeClass",
+"ordinal": 214,
+"rva": 763744,
+"forwarder": null,
+"ref": "urlmon.dll!0xba760"
+},
+{
+"name": "RegisterMediaTypes",
+"ordinal": 215,
+"rva": 524768,
+"forwarder": null,
+"ref": "urlmon.dll!0x801e0"
+},
+{
+"name": "RegisterWebPlatformPermanentSecurityManager",
+"ordinal": 216,
+"rva": 1271392,
+"forwarder": null,
+"ref": "urlmon.dll!0x136660"
+},
+{
+"name": "ReleaseBindInfo",
+"ordinal": 217,
+"rva": 270896,
+"forwarder": null,
+"ref": "urlmon.dll!0x42230"
+},
+{
+"name": "RestrictHTTP2",
+"ordinal": 218,
+"rva": 436448,
+"forwarder": null,
+"ref": "urlmon.dll!0x6a8e0"
+},
+{
+"name": "RevokeBindStatusCallback",
+"ordinal": 219,
+"rva": 140144,
+"forwarder": null,
+"ref": "urlmon.dll!0x22370"
+},
+{
+"name": "RevokeFormatEnumerator",
+"ordinal": 220,
+"rva": 764032,
+"forwarder": null,
+"ref": "urlmon.dll!0xba880"
+},
+{
+"name": "SetAccessForIEAppContainer",
+"ordinal": 221,
+"rva": 1103520,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d6a0"
+},
+{
+"name": "SetSoftwareUpdateAdvertisementState",
+"ordinal": 222,
+"rva": 504304,
+"forwarder": null,
+"ref": "urlmon.dll!0x7b1f0"
+},
+{
+"name": "ShouldDisplayPunycodeForUri",
+"ordinal": 223,
+"rva": 965904,
+"forwarder": null,
+"ref": "urlmon.dll!0xebd10"
+},
+{
+"name": "ShouldShowIntranetWarningSecband",
+"ordinal": 224,
+"rva": 426912,
+"forwarder": null,
+"ref": "urlmon.dll!0x683a0"
+},
+{
+"name": "ShowTrustAlertDialog",
+"ordinal": 225,
+"rva": 1178112,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fa00"
+},
+{
+"name": "URLDownloadA",
+"ordinal": 226,
+"rva": 1048720,
+"forwarder": null,
+"ref": "urlmon.dll!0x100090"
+},
+{
+"name": "URLDownloadToCacheFileA",
+"ordinal": 227,
+"rva": 1090224,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a2b0"
+},
+{
+"name": "URLDownloadToCacheFileW",
+"ordinal": 228,
+"rva": 512672,
+"forwarder": null,
+"ref": "urlmon.dll!0x7d2a0"
+},
+{
+"name": "URLDownloadToFileA",
+"ordinal": 229,
+"rva": 1090624,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a440"
+},
+{
+"name": "URLDownloadToFileW",
+"ordinal": 230,
+"rva": 446784,
+"forwarder": null,
+"ref": "urlmon.dll!0x6d140"
+},
+{
+"name": "URLDownloadW",
+"ordinal": 231,
+"rva": 1048832,
+"forwarder": null,
+"ref": "urlmon.dll!0x100100"
+},
+{
+"name": "URLOpenBlockingStreamA",
+"ordinal": 232,
+"rva": 1090976,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a5a0"
+},
+{
+"name": "URLOpenBlockingStreamW",
+"ordinal": 233,
+"rva": 1091216,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a690"
+},
+{
+"name": "URLOpenPullStreamA",
+"ordinal": 234,
+"rva": 1091488,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a7a0"
+},
+{
+"name": "URLOpenPullStreamW",
+"ordinal": 235,
+"rva": 1091696,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a870"
+},
+{
+"name": "URLOpenStreamA",
+"ordinal": 236,
+"rva": 1091904,
+"forwarder": null,
+"ref": "urlmon.dll!0x10a940"
+},
+{
+"name": "URLOpenStreamW",
+"ordinal": 237,
+"rva": 1092112,
+"forwarder": null,
+"ref": "urlmon.dll!0x10aa10"
+},
+{
+"name": "UnregisterWebPlatformPermanentSecurityManager",
+"ordinal": 238,
+"rva": 38576,
+"forwarder": null,
+"ref": "urlmon.dll!0x96b0"
+},
+{
+"name": "UrlMkBuildVersion",
+"ordinal": 239,
+"rva": 764496,
+"forwarder": null,
+"ref": "urlmon.dll!0xbaa50"
+},
+{
+"name": "UrlMkGetSessionOption",
+"ordinal": 240,
+"rva": 430448,
+"forwarder": null,
+"ref": "urlmon.dll!0x69170"
+},
+{
+"name": "UrlMkSetSessionOption",
+"ordinal": 241,
+"rva": 398608,
+"forwarder": null,
+"ref": "urlmon.dll!0x61510"
+},
+{
+"name": "UrlmonCleanupCurrentThread",
+"ordinal": 242,
+"rva": 387360,
+"forwarder": null,
+"ref": "urlmon.dll!0x5e920"
+},
+{
+"name": "WriteHitLogging",
+"ordinal": 243,
+"rva": 1092400,
+"forwarder": null,
+"ref": "urlmon.dll!0x10ab30"
+},
+{
+"name": "ZonesReInit",
+"ordinal": 244,
+"rva": 1147504,
+"forwarder": null,
+"ref": "urlmon.dll!0x118270"
+},
+{
+"name": null,
+"ordinal": 304,
+"rva": 1103312,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d5d0"
+},
+{
+"name": null,
+"ordinal": 305,
+"rva": 1099728,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c7d0"
+},
+{
+"name": null,
+"ordinal": 306,
+"rva": 1097504,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bf20"
+},
+{
+"name": null,
+"ordinal": 307,
+"rva": 1097104,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bd90"
+},
+{
+"name": null,
+"ordinal": 308,
+"rva": 1230240,
+"forwarder": null,
+"ref": "urlmon.dll!0x12c5a0"
+},
+{
+"name": null,
+"ordinal": 309,
+"rva": 1097776,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c030"
+},
+{
+"name": null,
+"ordinal": 310,
+"rva": 1099936,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c8a0"
+},
+{
+"name": null,
+"ordinal": 311,
+"rva": 1096176,
+"forwarder": null,
+"ref": "urlmon.dll!0x10b9f0"
+},
+{
+"name": null,
+"ordinal": 312,
+"rva": 1096768,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bc40"
+},
+{
+"name": null,
+"ordinal": 313,
+"rva": 1098416,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c2b0"
+},
+{
+"name": null,
+"ordinal": 314,
+"rva": 1098352,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c270"
+},
+{
+"name": null,
+"ordinal": 315,
+"rva": 1098608,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c370"
+},
+{
+"name": null,
+"ordinal": 316,
+"rva": 1096000,
+"forwarder": null,
+"ref": "urlmon.dll!0x10b940"
+},
+{
+"name": null,
+"ordinal": 318,
+"rva": 1099232,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c5e0"
+},
+{
+"name": null,
+"ordinal": 319,
+"rva": 1099424,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c6a0"
+},
+{
+"name": null,
+"ordinal": 320,
+"rva": 1098704,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c3d0"
+},
+{
+"name": null,
+"ordinal": 321,
+"rva": 1096672,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bbe0"
+},
+{
+"name": "IECompatLogCSSFix",
+"ordinal": 322,
+"rva": 1096448,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bb00"
+},
+{
+"name": null,
+"ordinal": 323,
+"rva": 1098832,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c450"
+},
+{
+"name": null,
+"ordinal": 324,
+"rva": 1054384,
+"forwarder": null,
+"ref": "urlmon.dll!0x1016b0"
+},
+{
+"name": null,
+"ordinal": 395,
+"rva": 1104144,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d910"
+},
+{
+"name": null,
+"ordinal": 403,
+"rva": 441360,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc10"
+},
+{
+"name": null,
+"ordinal": 404,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 406,
+"rva": 441360,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc10"
+},
+{
+"name": null,
+"ordinal": 408,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 409,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 410,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 411,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 412,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 413,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 414,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 415,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 416,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 417,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 421,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 422,
+"rva": 441360,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc10"
+},
+{
+"name": null,
+"ordinal": 434,
+"rva": 1099552,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c720"
+},
+{
+"name": null,
+"ordinal": 435,
+"rva": 1097568,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bf60"
+},
+{
+"name": null,
+"ordinal": 436,
+"rva": 1097408,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bec0"
+},
+{
+"name": null,
+"ordinal": 437,
+"rva": 1097296,
+"forwarder": null,
+"ref": "urlmon.dll!0x10be50"
+},
+{
+"name": null,
+"ordinal": 438,
+"rva": 1097840,
+"forwarder": null,
+"ref": "urlmon.dll!0x10c070"
+},
+{
+"name": null,
+"ordinal": 439,
+"rva": 1097712,
+"forwarder": null,
+"ref": "urlmon.dll!0x10bff0"
+},
+{
+"name": null,
+"ordinal": 441,
+"rva": 14320,
+"forwarder": null,
+"ref": "urlmon.dll!0x37f0"
+},
+{
+"name": null,
+"ordinal": 442,
+"rva": 401424,
+"forwarder": null,
+"ref": "urlmon.dll!0x62010"
+},
+{
+"name": null,
+"ordinal": 443,
+"rva": 237520,
+"forwarder": null,
+"ref": "urlmon.dll!0x39fd0"
+},
+{
+"name": null,
+"ordinal": 444,
+"rva": 310672,
+"forwarder": null,
+"ref": "urlmon.dll!0x4bd90"
+},
+{
+"name": null,
+"ordinal": 445,
+"rva": 298688,
+"forwarder": null,
+"ref": "urlmon.dll!0x48ec0"
+},
+{
+"name": null,
+"ordinal": 446,
+"rva": 394256,
+"forwarder": null,
+"ref": "urlmon.dll!0x60410"
+},
+{
+"name": null,
+"ordinal": 447,
+"rva": 771920,
+"forwarder": null,
+"ref": "urlmon.dll!0xbc750"
+},
+{
+"name": null,
+"ordinal": 448,
+"rva": 775760,
+"forwarder": null,
+"ref": "urlmon.dll!0xbd650"
+},
+{
+"name": null,
+"ordinal": 449,
+"rva": 168496,
+"forwarder": null,
+"ref": "urlmon.dll!0x29230"
+},
+{
+"name": null,
+"ordinal": 450,
+"rva": 418848,
+"forwarder": null,
+"ref": "urlmon.dll!0x66420"
+},
+{
+"name": null,
+"ordinal": 451,
+"rva": 772608,
+"forwarder": null,
+"ref": "urlmon.dll!0xbca00"
+},
+{
+"name": null,
+"ordinal": 452,
+"rva": 775456,
+"forwarder": null,
+"ref": "urlmon.dll!0xbd520"
+},
+{
+"name": null,
+"ordinal": 453,
+"rva": 1176928,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f560"
+},
+{
+"name": null,
+"ordinal": 454,
+"rva": 1177728,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f880"
+},
+{
+"name": null,
+"ordinal": 455,
+"rva": 1181056,
+"forwarder": null,
+"ref": "urlmon.dll!0x120580"
+},
+{
+"name": null,
+"ordinal": 456,
+"rva": 441296,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bbd0"
+},
+{
+"name": null,
+"ordinal": 457,
+"rva": 764080,
+"forwarder": null,
+"ref": "urlmon.dll!0xba8b0"
+},
+{
+"name": null,
+"ordinal": 458,
+"rva": 965568,
+"forwarder": null,
+"ref": "urlmon.dll!0xebbc0"
+},
+{
+"name": null,
+"ordinal": 460,
+"rva": 1043264,
+"forwarder": null,
+"ref": "urlmon.dll!0xfeb40"
+},
+{
+"name": null,
+"ordinal": 461,
+"rva": 1043248,
+"forwarder": null,
+"ref": "urlmon.dll!0xfeb30"
+},
+{
+"name": null,
+"ordinal": 462,
+"rva": 1042992,
+"forwarder": null,
+"ref": "urlmon.dll!0xfea30"
+},
+{
+"name": null,
+"ordinal": 463,
+"rva": 1043120,
+"forwarder": null,
+"ref": "urlmon.dll!0xfeab0"
+},
+{
+"name": null,
+"ordinal": 470,
+"rva": 409024,
+"forwarder": null,
+"ref": "urlmon.dll!0x63dc0"
+},
+{
+"name": null,
+"ordinal": 471,
+"rva": 402896,
+"forwarder": null,
+"ref": "urlmon.dll!0x625d0"
+},
+{
+"name": null,
+"ordinal": 473,
+"rva": 513984,
+"forwarder": null,
+"ref": "urlmon.dll!0x7d7c0"
+},
+{
+"name": null,
+"ordinal": 474,
+"rva": 1178752,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fc80"
+},
+{
+"name": null,
+"ordinal": 475,
+"rva": 1178928,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fd30"
+},
+{
+"name": null,
+"ordinal": 476,
+"rva": 1178992,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fd70"
+},
+{
+"name": null,
+"ordinal": 477,
+"rva": 1179520,
+"forwarder": null,
+"ref": "urlmon.dll!0x11ff80"
+},
+{
+"name": null,
+"ordinal": 478,
+"rva": 1179152,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fe10"
+},
+{
+"name": null,
+"ordinal": 479,
+"rva": 513456,
+"forwarder": null,
+"ref": "urlmon.dll!0x7d5b0"
+},
+{
+"name": null,
+"ordinal": 480,
+"rva": 1179328,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fec0"
+},
+{
+"name": null,
+"ordinal": 481,
+"rva": 513536,
+"forwarder": null,
+"ref": "urlmon.dll!0x7d600"
+},
+{
+"name": null,
+"ordinal": 482,
+"rva": 1178544,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fbb0"
+},
+{
+"name": null,
+"ordinal": 483,
+"rva": 1178592,
+"forwarder": null,
+"ref": "urlmon.dll!0x11fbe0"
+},
+{
+"name": null,
+"ordinal": 484,
+"rva": 493600,
+"forwarder": null,
+"ref": "urlmon.dll!0x78820"
+},
+{
+"name": null,
+"ordinal": 485,
+"rva": 388624,
+"forwarder": null,
+"ref": "urlmon.dll!0x5ee10"
+},
+{
+"name": null,
+"ordinal": 486,
+"rva": 498976,
+"forwarder": null,
+"ref": "urlmon.dll!0x79d20"
+},
+{
+"name": null,
+"ordinal": 487,
+"rva": 1249600,
+"forwarder": null,
+"ref": "urlmon.dll!0x131140"
+},
+{
+"name": null,
+"ordinal": 488,
+"rva": 1249824,
+"forwarder": null,
+"ref": "urlmon.dll!0x131220"
+},
+{
+"name": null,
+"ordinal": 489,
+"rva": 19344,
+"forwarder": null,
+"ref": "urlmon.dll!0x4b90"
+},
+{
+"name": null,
+"ordinal": 490,
+"rva": 824528,
+"forwarder": null,
+"ref": "urlmon.dll!0xc94d0"
+},
+{
+"name": null,
+"ordinal": 491,
+"rva": 402928,
+"forwarder": null,
+"ref": "urlmon.dll!0x625f0"
+},
+{
+"name": null,
+"ordinal": 492,
+"rva": 300112,
+"forwarder": null,
+"ref": "urlmon.dll!0x49450"
+},
+{
+"name": null,
+"ordinal": 493,
+"rva": 311552,
+"forwarder": null,
+"ref": "urlmon.dll!0x4c100"
+},
+{
+"name": null,
+"ordinal": 494,
+"rva": 311504,
+"forwarder": null,
+"ref": "urlmon.dll!0x4c0d0"
+},
+{
+"name": null,
+"ordinal": 495,
+"rva": 45808,
+"forwarder": null,
+"ref": "urlmon.dll!0xb2f0"
+},
+{
+"name": null,
+"ordinal": 496,
+"rva": 413888,
+"forwarder": null,
+"ref": "urlmon.dll!0x650c0"
+},
+{
+"name": null,
+"ordinal": 497,
+"rva": 38784,
+"forwarder": null,
+"ref": "urlmon.dll!0x9780"
+},
+{
+"name": null,
+"ordinal": 498,
+"rva": 276592,
+"forwarder": null,
+"ref": "urlmon.dll!0x43870"
+},
+{
+"name": null,
+"ordinal": 499,
+"rva": 488960,
+"forwarder": null,
+"ref": "urlmon.dll!0x77600"
+},
+{
+"name": null,
+"ordinal": 500,
+"rva": 440992,
+"forwarder": null,
+"ref": "urlmon.dll!0x6baa0"
+},
+{
+"name": null,
+"ordinal": 501,
+"rva": 1177280,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f6c0"
+},
+{
+"name": null,
+"ordinal": 502,
+"rva": 1176560,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f3f0"
+},
+{
+"name": null,
+"ordinal": 503,
+"rva": 324688,
+"forwarder": null,
+"ref": "urlmon.dll!0x4f450"
+},
+{
+"name": null,
+"ordinal": 504,
+"rva": 1191680,
+"forwarder": null,
+"ref": "urlmon.dll!0x122f00"
+},
+{
+"name": null,
+"ordinal": 505,
+"rva": 316464,
+"forwarder": null,
+"ref": "urlmon.dll!0x4d430"
+},
+{
+"name": null,
+"ordinal": 506,
+"rva": 1193088,
+"forwarder": null,
+"ref": "urlmon.dll!0x123480"
+},
+{
+"name": null,
+"ordinal": 507,
+"rva": 325968,
+"forwarder": null,
+"ref": "urlmon.dll!0x4f950"
+},
+{
+"name": null,
+"ordinal": 508,
+"rva": 321968,
+"forwarder": null,
+"ref": "urlmon.dll!0x4e9b0"
+},
+{
+"name": null,
+"ordinal": 509,
+"rva": 386800,
+"forwarder": null,
+"ref": "urlmon.dll!0x5e6f0"
+},
+{
+"name": null,
+"ordinal": 510,
+"rva": 773008,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcb90"
+},
+{
+"name": null,
+"ordinal": 511,
+"rva": 31264,
+"forwarder": null,
+"ref": "urlmon.dll!0x7a20"
+},
+{
+"name": null,
+"ordinal": 512,
+"rva": 773872,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcef0"
+},
+{
+"name": null,
+"ordinal": 513,
+"rva": 441344,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc00"
+},
+{
+"name": null,
+"ordinal": 514,
+"rva": 1193072,
+"forwarder": null,
+"ref": "urlmon.dll!0x123470"
+},
+{
+"name": null,
+"ordinal": 515,
+"rva": 1249744,
+"forwarder": null,
+"ref": "urlmon.dll!0x1311d0"
+},
+{
+"name": null,
+"ordinal": 516,
+"rva": 441360,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc10"
+},
+{
+"name": null,
+"ordinal": 517,
+"rva": 325616,
+"forwarder": null,
+"ref": "urlmon.dll!0x4f7f0"
+},
+{
+"name": null,
+"ordinal": 518,
+"rva": 320944,
+"forwarder": null,
+"ref": "urlmon.dll!0x4e5b0"
+},
+{
+"name": null,
+"ordinal": 519,
+"rva": 199472,
+"forwarder": null,
+"ref": "urlmon.dll!0x30b30"
+},
+{
+"name": null,
+"ordinal": 520,
+"rva": 210464,
+"forwarder": null,
+"ref": "urlmon.dll!0x33620"
+},
+{
+"name": null,
+"ordinal": 521,
+"rva": 201744,
+"forwarder": null,
+"ref": "urlmon.dll!0x31410"
+},
+{
+"name": null,
+"ordinal": 522,
+"rva": 377920,
+"forwarder": null,
+"ref": "urlmon.dll!0x5c440"
+},
+{
+"name": null,
+"ordinal": 523,
+"rva": 377664,
+"forwarder": null,
+"ref": "urlmon.dll!0x5c340"
+},
+{
+"name": null,
+"ordinal": 524,
+"rva": 772736,
+"forwarder": null,
+"ref": "urlmon.dll!0xbca80"
+},
+{
+"name": null,
+"ordinal": 525,
+"rva": 1192576,
+"forwarder": null,
+"ref": "urlmon.dll!0x123280"
+},
+{
+"name": null,
+"ordinal": 526,
+"rva": 1193792,
+"forwarder": null,
+"ref": "urlmon.dll!0x123740"
+},
+{
+"name": null,
+"ordinal": 527,
+"rva": 773616,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcdf0"
+},
+{
+"name": null,
+"ordinal": 528,
+"rva": 1247376,
+"forwarder": null,
+"ref": "urlmon.dll!0x130890"
+},
+{
+"name": null,
+"ordinal": 529,
+"rva": 277664,
+"forwarder": null,
+"ref": "urlmon.dll!0x43ca0"
+},
+{
+"name": null,
+"ordinal": 530,
+"rva": 1246976,
+"forwarder": null,
+"ref": "urlmon.dll!0x130700"
+},
+{
+"name": null,
+"ordinal": 531,
+"rva": 1248048,
+"forwarder": null,
+"ref": "urlmon.dll!0x130b30"
+},
+{
+"name": null,
+"ordinal": 532,
+"rva": 1247552,
+"forwarder": null,
+"ref": "urlmon.dll!0x130940"
+},
+{
+"name": null,
+"ordinal": 533,
+"rva": 19456,
+"forwarder": null,
+"ref": "urlmon.dll!0x4c00"
+},
+{
+"name": null,
+"ordinal": 534,
+"rva": 441344,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc00"
+},
+{
+"name": null,
+"ordinal": 535,
+"rva": 1247968,
+"forwarder": null,
+"ref": "urlmon.dll!0x130ae0"
+},
+{
+"name": null,
+"ordinal": 536,
+"rva": 1177360,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f710"
+},
+{
+"name": null,
+"ordinal": 537,
+"rva": 773904,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcf10"
+},
+{
+"name": null,
+"ordinal": 538,
+"rva": 441344,
+"forwarder": null,
+"ref": "urlmon.dll!0x6bc00"
+},
+{
+"name": null,
+"ordinal": 539,
+"rva": 1247312,
+"forwarder": null,
+"ref": "urlmon.dll!0x130850"
+},
+{
+"name": null,
+"ordinal": 540,
+"rva": 1247488,
+"forwarder": null,
+"ref": "urlmon.dll!0x130900"
+},
+{
+"name": null,
+"ordinal": 543,
+"rva": 773184,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcc40"
+},
+{
+"name": null,
+"ordinal": 544,
+"rva": 1177024,
+"forwarder": null,
+"ref": "urlmon.dll!0x11f5c0"
+},
+{
+"name": null,
+"ordinal": 545,
+"rva": 293216,
+"forwarder": null,
+"ref": "urlmon.dll!0x47960"
+},
+{
+"name": null,
+"ordinal": 546,
+"rva": 773552,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcdb0"
+},
+{
+"name": null,
+"ordinal": 547,
+"rva": 278208,
+"forwarder": null,
+"ref": "urlmon.dll!0x43ec0"
+},
+{
+"name": null,
+"ordinal": 548,
+"rva": 309216,
+"forwarder": null,
+"ref": "urlmon.dll!0x4b7e0"
+},
+{
+"name": null,
+"ordinal": 553,
+"rva": 421568,
+"forwarder": null,
+"ref": "urlmon.dll!0x66ec0"
+},
+{
+"name": null,
+"ordinal": 555,
+"rva": 435152,
+"forwarder": null,
+"ref": "urlmon.dll!0x6a3d0"
+},
+{
+"name": null,
+"ordinal": 557,
+"rva": 412416,
+"forwarder": null,
+"ref": "urlmon.dll!0x64b00"
+},
+{
+"name": null,
+"ordinal": 558,
+"rva": 1111392,
+"forwarder": null,
+"ref": "urlmon.dll!0x10f560"
+},
+{
+"name": null,
+"ordinal": 559,
+"rva": 1111504,
+"forwarder": null,
+"ref": "urlmon.dll!0x10f5d0"
+},
+{
+"name": null,
+"ordinal": 560,
+"rva": 426096,
+"forwarder": null,
+"ref": "urlmon.dll!0x68070"
+},
+{
+"name": null,
+"ordinal": 561,
+"rva": 42112,
+"forwarder": null,
+"ref": "urlmon.dll!0xa480"
+},
+{
+"name": null,
+"ordinal": 562,
+"rva": 1102720,
+"forwarder": null,
+"ref": "urlmon.dll!0x10d380"
+},
+{
+"name": null,
+"ordinal": 563,
+"rva": 1157680,
+"forwarder": null,
+"ref": "urlmon.dll!0x11aa30"
+},
+{
+"name": null,
+"ordinal": 564,
+"rva": 772464,
+"forwarder": null,
+"ref": "urlmon.dll!0xbc970"
+},
+{
+"name": null,
+"ordinal": 565,
+"rva": 237248,
+"forwarder": null,
+"ref": "urlmon.dll!0x39ec0"
+},
+{
+"name": null,
+"ordinal": 566,
+"rva": 503536,
+"forwarder": null,
+"ref": "urlmon.dll!0x7aef0"
+},
+{
+"name": null,
+"ordinal": 567,
+"rva": 317776,
+"forwarder": null,
+"ref": "urlmon.dll!0x4d950"
+},
+{
+"name": null,
+"ordinal": 568,
+"rva": 995504,
+"forwarder": null,
+"ref": "urlmon.dll!0xf30b0"
+},
+{
+"name": null,
+"ordinal": 569,
+"rva": 995712,
+"forwarder": null,
+"ref": "urlmon.dll!0xf3180"
+},
+{
+"name": null,
+"ordinal": 570,
+"rva": 434336,
+"forwarder": null,
+"ref": "urlmon.dll!0x6a0a0"
+},
+{
+"name": null,
+"ordinal": 571,
+"rva": 404720,
+"forwarder": null,
+"ref": "urlmon.dll!0x62cf0"
+},
+{
+"name": null,
+"ordinal": 572,
+"rva": 1244384,
+"forwarder": null,
+"ref": "urlmon.dll!0x12fce0"
+},
+{
+"name": null,
+"ordinal": 573,
+"rva": 1244112,
+"forwarder": null,
+"ref": "urlmon.dll!0x12fbd0"
+},
+{
+"name": null,
+"ordinal": 574,
+"rva": 773744,
+"forwarder": null,
+"ref": "urlmon.dll!0xbce70"
+},
+{
+"name": null,
+"ordinal": 575,
+"rva": 45952,
+"forwarder": null,
+"ref": "urlmon.dll!0xb380"
+},
+{
+"name": null,
+"ordinal": 576,
+"rva": 772880,
+"forwarder": null,
+"ref": "urlmon.dll!0xbcb10"
+},
+{
+"name": null,
+"ordinal": 577,
+"rva": 419920,
+"forwarder": null,
+"ref": "urlmon.dll!0x66850"
+},
+{
+"name": null,
+"ordinal": 578,
+"rva": 421712,
+"forwarder": null,
+"ref": "urlmon.dll!0x66f50"
+},
+{
+"name": null,
+"ordinal": 579,
+"rva": 30816,
+"forwarder": null,
+"ref": "urlmon.dll!0x7860"
+},
+{
+"name": null,
+"ordinal": 580,
+"rva": 1247920,
+"forwarder": null,
+"ref": "urlmon.dll!0x130ab0"
+},
+{
+"name": null,
+"ordinal": 601,
+"rva": 364320,
+"forwarder": null,
+"ref": "urlmon.dll!0x58f20"
+},
+{
+"name": null,
+"ordinal": 602,
+"rva": 1048704,
+"forwarder": null,
+"ref": "urlmon.dll!0x100080"
+},
+{
+"name": null,
+"ordinal": 603,
+"rva": 127984,
+"forwarder": null,
+"ref": "urlmon.dll!0x1f3f0"
+},
+{
+"name": null,
+"ordinal": 604,
+"rva": 1048320,
+"forwarder": null,
+"ref": "urlmon.dll!0xfff00"
+},
+{
+"name": null,
+"ordinal": 605,
+"rva": 1046320,
+"forwarder": null,
+"ref": "urlmon.dll!0xff730"
+}
+]

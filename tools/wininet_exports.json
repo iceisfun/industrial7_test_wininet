@@ -1,0 +1,2291 @@
+[
+{
+"name": null,
+"ordinal": 101,
+"rva": 1299232,
+"forwarder": null,
+"ref": "wininet.dll!0x13d320"
+},
+{
+"name": null,
+"ordinal": 102,
+"rva": 1733424,
+"forwarder": null,
+"ref": "wininet.dll!0x1a7330"
+},
+{
+"name": null,
+"ordinal": 103,
+"rva": 1733664,
+"forwarder": null,
+"ref": "wininet.dll!0x1a7420"
+},
+{
+"name": null,
+"ordinal": 104,
+"rva": 1471024,
+"forwarder": null,
+"ref": "wininet.dll!0x167230"
+},
+{
+"name": null,
+"ordinal": 105,
+"rva": 1471216,
+"forwarder": null,
+"ref": "wininet.dll!0x1672f0"
+},
+{
+"name": "AppCacheCheckManifest",
+"ordinal": 106,
+"rva": 87584,
+"forwarder": null,
+"ref": "wininet.dll!0x15620"
+},
+{
+"name": "AppCacheCloseHandle",
+"ordinal": 107,
+"rva": 454384,
+"forwarder": null,
+"ref": "wininet.dll!0x6eef0"
+},
+{
+"name": null,
+"ordinal": 108,
+"rva": 1265488,
+"forwarder": null,
+"ref": "wininet.dll!0x134f50"
+},
+{
+"name": null,
+"ordinal": 109,
+"rva": 1267248,
+"forwarder": null,
+"ref": "wininet.dll!0x135630"
+},
+{
+"name": null,
+"ordinal": 110,
+"rva": 1265632,
+"forwarder": null,
+"ref": "wininet.dll!0x134fe0"
+},
+{
+"name": null,
+"ordinal": 111,
+"rva": 1267408,
+"forwarder": null,
+"ref": "wininet.dll!0x1356d0"
+},
+{
+"name": null,
+"ordinal": 112,
+"rva": 897248,
+"forwarder": null,
+"ref": "wininet.dll!0xdb0e0"
+},
+{
+"name": "AppCacheCreateAndCommitFile",
+"ordinal": 113,
+"rva": 1696416,
+"forwarder": null,
+"ref": "wininet.dll!0x19e2a0"
+},
+{
+"name": "AppCacheDeleteGroup",
+"ordinal": 114,
+"rva": 1696576,
+"forwarder": null,
+"ref": "wininet.dll!0x19e340"
+},
+{
+"name": "AppCacheDeleteIEGroup",
+"ordinal": 115,
+"rva": 1696720,
+"forwarder": null,
+"ref": "wininet.dll!0x19e3d0"
+},
+{
+"name": null,
+"ordinal": 116,
+"rva": 125488,
+"forwarder": null,
+"ref": "wininet.dll!0x1ea30"
+},
+{
+"name": null,
+"ordinal": 117,
+"rva": 1484656,
+"forwarder": null,
+"ref": "wininet.dll!0x16a770"
+},
+{
+"name": null,
+"ordinal": 118,
+"rva": 1470992,
+"forwarder": null,
+"ref": "wininet.dll!0x167210"
+},
+{
+"name": "AppCacheDuplicateHandle",
+"ordinal": 119,
+"rva": 457760,
+"forwarder": null,
+"ref": "wininet.dll!0x6fc20"
+},
+{
+"name": null,
+"ordinal": 120,
+"rva": 1295600,
+"forwarder": null,
+"ref": "wininet.dll!0x13c4f0"
+},
+{
+"name": null,
+"ordinal": 121,
+"rva": 1295600,
+"forwarder": null,
+"ref": "wininet.dll!0x13c4f0"
+},
+{
+"name": null,
+"ordinal": 122,
+"rva": 1295600,
+"forwarder": null,
+"ref": "wininet.dll!0x13c4f0"
+},
+{
+"name": null,
+"ordinal": 123,
+"rva": 1295600,
+"forwarder": null,
+"ref": "wininet.dll!0x13c4f0"
+},
+{
+"name": "AppCacheFinalize",
+"ordinal": 124,
+"rva": 156656,
+"forwarder": null,
+"ref": "wininet.dll!0x263f0"
+},
+{
+"name": "AppCacheFreeDownloadList",
+"ordinal": 125,
+"rva": 164656,
+"forwarder": null,
+"ref": "wininet.dll!0x28330"
+},
+{
+"name": "AppCacheFreeGroupList",
+"ordinal": 126,
+"rva": 144864,
+"forwarder": null,
+"ref": "wininet.dll!0x235e0"
+},
+{
+"name": "AppCacheFreeIESpace",
+"ordinal": 127,
+"rva": 1696864,
+"forwarder": null,
+"ref": "wininet.dll!0x19e460"
+},
+{
+"name": "AppCacheFreeSpace",
+"ordinal": 128,
+"rva": 1697008,
+"forwarder": null,
+"ref": "wininet.dll!0x19e4f0"
+},
+{
+"name": "AppCacheGetDownloadList",
+"ordinal": 129,
+"rva": 158464,
+"forwarder": null,
+"ref": "wininet.dll!0x26b00"
+},
+{
+"name": "AppCacheGetFallbackUrl",
+"ordinal": 130,
+"rva": 227968,
+"forwarder": null,
+"ref": "wininet.dll!0x37a80"
+},
+{
+"name": "AppCacheGetGroupList",
+"ordinal": 131,
+"rva": 144960,
+"forwarder": null,
+"ref": "wininet.dll!0x23640"
+},
+{
+"name": "AppCacheGetIEGroupList",
+"ordinal": 132,
+"rva": 144208,
+"forwarder": null,
+"ref": "wininet.dll!0x23350"
+},
+{
+"name": "AppCacheGetInfo",
+"ordinal": 133,
+"rva": 147936,
+"forwarder": null,
+"ref": "wininet.dll!0x241e0"
+},
+{
+"name": "AppCacheGetManifestUrl",
+"ordinal": 134,
+"rva": 880672,
+"forwarder": null,
+"ref": "wininet.dll!0xd7020"
+},
+{
+"name": "AppCacheLookup",
+"ordinal": 135,
+"rva": 222928,
+"forwarder": null,
+"ref": "wininet.dll!0x366d0"
+},
+{
+"name": "CommitUrlCacheEntryA",
+"ordinal": 136,
+"rva": 55968,
+"forwarder": null,
+"ref": "wininet.dll!0xdaa0"
+},
+{
+"name": "CommitUrlCacheEntryBinaryBlob",
+"ordinal": 137,
+"rva": 209456,
+"forwarder": null,
+"ref": "wininet.dll!0x33230"
+},
+{
+"name": "CommitUrlCacheEntryW",
+"ordinal": 138,
+"rva": 858144,
+"forwarder": null,
+"ref": "wininet.dll!0xd1820"
+},
+{
+"name": "CreateMD5SSOHash",
+"ordinal": 139,
+"rva": 1551456,
+"forwarder": null,
+"ref": "wininet.dll!0x17ac60"
+},
+{
+"name": "CreateUrlCacheContainerA",
+"ordinal": 140,
+"rva": 54288,
+"forwarder": null,
+"ref": "wininet.dll!0xd410"
+},
+{
+"name": "CreateUrlCacheContainerW",
+"ordinal": 141,
+"rva": 858544,
+"forwarder": null,
+"ref": "wininet.dll!0xd19b0"
+},
+{
+"name": "CreateUrlCacheEntryA",
+"ordinal": 142,
+"rva": 56480,
+"forwarder": null,
+"ref": "wininet.dll!0xdca0"
+},
+{
+"name": "CreateUrlCacheEntryExW",
+"ordinal": 143,
+"rva": 53632,
+"forwarder": null,
+"ref": "wininet.dll!0xd180"
+},
+{
+"name": "CreateUrlCacheEntryW",
+"ordinal": 144,
+"rva": 53584,
+"forwarder": null,
+"ref": "wininet.dll!0xd150"
+},
+{
+"name": "CreateUrlCacheGroup",
+"ordinal": 145,
+"rva": 1702064,
+"forwarder": null,
+"ref": "wininet.dll!0x19f8b0"
+},
+{
+"name": "DeleteIE3Cache",
+"ordinal": 146,
+"rva": 1733408,
+"forwarder": null,
+"ref": "wininet.dll!0x1a7320"
+},
+{
+"name": "DeleteUrlCacheContainerA",
+"ordinal": 147,
+"rva": 1702368,
+"forwarder": null,
+"ref": "wininet.dll!0x19f9e0"
+},
+{
+"name": "DeleteUrlCacheContainerW",
+"ordinal": 148,
+"rva": 136480,
+"forwarder": null,
+"ref": "wininet.dll!0x21520"
+},
+{
+"name": "DeleteUrlCacheEntry",
+"ordinal": 149,
+"rva": 185328,
+"forwarder": null,
+"ref": "wininet.dll!0x2d3f0"
+},
+{
+"name": "DeleteUrlCacheEntryA",
+"ordinal": 150,
+"rva": 185328,
+"forwarder": null,
+"ref": "wininet.dll!0x2d3f0"
+},
+{
+"name": "DeleteUrlCacheEntryW",
+"ordinal": 151,
+"rva": 138256,
+"forwarder": null,
+"ref": "wininet.dll!0x21c10"
+},
+{
+"name": "DeleteUrlCacheGroup",
+"ordinal": 152,
+"rva": 1702688,
+"forwarder": null,
+"ref": "wininet.dll!0x19fb20"
+},
+{
+"name": "DeleteWpadCacheForNetworks",
+"ordinal": 153,
+"rva": 1462576,
+"forwarder": null,
+"ref": "wininet.dll!0x165130"
+},
+{
+"name": "DetectAutoProxyUrl",
+"ordinal": 154,
+"rva": 1465264,
+"forwarder": null,
+"ref": "wininet.dll!0x165bb0"
+},
+{
+"name": "DispatchAPICall",
+"ordinal": 155,
+"rva": 896000,
+"forwarder": null,
+"ref": "wininet.dll!0xdac00"
+},
+{
+"name": "DllCanUnloadNow",
+"ordinal": 156,
+"rva": 1324464,
+"forwarder": null,
+"ref": "wininet.dll!0x1435b0"
+},
+{
+"name": "DllGetClassObject",
+"ordinal": 157,
+"rva": 891024,
+"forwarder": null,
+"ref": "wininet.dll!0xd9890"
+},
+{
+"name": "DllInstall",
+"ordinal": 158,
+"rva": 895984,
+"forwarder": null,
+"ref": "wininet.dll!0xdabf0"
+},
+{
+"name": "DllRegisterServer",
+"ordinal": 159,
+"rva": 1324512,
+"forwarder": null,
+"ref": "wininet.dll!0x1435e0"
+},
+{
+"name": "DllUnregisterServer",
+"ordinal": 160,
+"rva": 1324576,
+"forwarder": null,
+"ref": "wininet.dll!0x143620"
+},
+{
+"name": "FindCloseUrlCache",
+"ordinal": 161,
+"rva": 219968,
+"forwarder": null,
+"ref": "wininet.dll!0x35b40"
+},
+{
+"name": "FindFirstUrlCacheContainerA",
+"ordinal": 162,
+"rva": 168512,
+"forwarder": null,
+"ref": "wininet.dll!0x29240"
+},
+{
+"name": "FindFirstUrlCacheContainerW",
+"ordinal": 163,
+"rva": 170656,
+"forwarder": null,
+"ref": "wininet.dll!0x29aa0"
+},
+{
+"name": "FindFirstUrlCacheEntryA",
+"ordinal": 164,
+"rva": 1702944,
+"forwarder": null,
+"ref": "wininet.dll!0x19fc20"
+},
+{
+"name": "FindFirstUrlCacheEntryExA",
+"ordinal": 165,
+"rva": 33728,
+"forwarder": null,
+"ref": "wininet.dll!0x83c0"
+},
+{
+"name": "FindFirstUrlCacheEntryExW",
+"ordinal": 166,
+"rva": 32128,
+"forwarder": null,
+"ref": "wininet.dll!0x7d80"
+},
+{
+"name": "FindFirstUrlCacheEntryW",
+"ordinal": 167,
+"rva": 1703328,
+"forwarder": null,
+"ref": "wininet.dll!0x19fda0"
+},
+{
+"name": "FindFirstUrlCacheGroup",
+"ordinal": 168,
+"rva": 1703712,
+"forwarder": null,
+"ref": "wininet.dll!0x19ff20"
+},
+{
+"name": "FindNextUrlCacheContainerA",
+"ordinal": 169,
+"rva": 183392,
+"forwarder": null,
+"ref": "wininet.dll!0x2cc60"
+},
+{
+"name": "FindNextUrlCacheContainerW",
+"ordinal": 170,
+"rva": 137408,
+"forwarder": null,
+"ref": "wininet.dll!0x218c0"
+},
+{
+"name": "FindNextUrlCacheEntryA",
+"ordinal": 171,
+"rva": 1704048,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0070"
+},
+{
+"name": "FindNextUrlCacheEntryExA",
+"ordinal": 172,
+"rva": 35728,
+"forwarder": null,
+"ref": "wininet.dll!0x8b90"
+},
+{
+"name": "FindNextUrlCacheEntryExW",
+"ordinal": 173,
+"rva": 1704480,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0220"
+},
+{
+"name": "FindNextUrlCacheEntryW",
+"ordinal": 174,
+"rva": 35392,
+"forwarder": null,
+"ref": "wininet.dll!0x8a40"
+},
+{
+"name": "FindNextUrlCacheGroup",
+"ordinal": 175,
+"rva": 1704960,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0400"
+},
+{
+"name": "ForceNexusLookup",
+"ordinal": 176,
+"rva": 1552032,
+"forwarder": null,
+"ref": "wininet.dll!0x17aea0"
+},
+{
+"name": "ForceNexusLookupExW",
+"ordinal": 177,
+"rva": 1552112,
+"forwarder": null,
+"ref": "wininet.dll!0x17aef0"
+},
+{
+"name": "FreeUrlCacheSpaceA",
+"ordinal": 178,
+"rva": 1705264,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0530"
+},
+{
+"name": "FreeUrlCacheSpaceW",
+"ordinal": 179,
+"rva": 1705872,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0790"
+},
+{
+"name": "FtpCommandA",
+"ordinal": 180,
+"rva": 1379504,
+"forwarder": null,
+"ref": "wininet.dll!0x150cb0"
+},
+{
+"name": "FtpCommandW",
+"ordinal": 181,
+"rva": 1395344,
+"forwarder": null,
+"ref": "wininet.dll!0x154a90"
+},
+{
+"name": "FtpCreateDirectoryA",
+"ordinal": 182,
+"rva": 1380304,
+"forwarder": null,
+"ref": "wininet.dll!0x150fd0"
+},
+{
+"name": "FtpCreateDirectoryW",
+"ordinal": 183,
+"rva": 1395776,
+"forwarder": null,
+"ref": "wininet.dll!0x154c40"
+},
+{
+"name": "FtpDeleteFileA",
+"ordinal": 184,
+"rva": 1380464,
+"forwarder": null,
+"ref": "wininet.dll!0x151070"
+},
+{
+"name": "FtpDeleteFileW",
+"ordinal": 185,
+"rva": 1396160,
+"forwarder": null,
+"ref": "wininet.dll!0x154dc0"
+},
+{
+"name": "FtpFindFirstFileA",
+"ordinal": 186,
+"rva": 1380624,
+"forwarder": null,
+"ref": "wininet.dll!0x151110"
+},
+{
+"name": "FtpFindFirstFileW",
+"ordinal": 187,
+"rva": 1396544,
+"forwarder": null,
+"ref": "wininet.dll!0x154f40"
+},
+{
+"name": "FtpGetCurrentDirectoryA",
+"ordinal": 188,
+"rva": 1381264,
+"forwarder": null,
+"ref": "wininet.dll!0x151390"
+},
+{
+"name": "FtpGetCurrentDirectoryW",
+"ordinal": 189,
+"rva": 1397024,
+"forwarder": null,
+"ref": "wininet.dll!0x155120"
+},
+{
+"name": "FtpGetFileA",
+"ordinal": 190,
+"rva": 1381456,
+"forwarder": null,
+"ref": "wininet.dll!0x151450"
+},
+{
+"name": "FtpGetFileEx",
+"ordinal": 191,
+"rva": 1397456,
+"forwarder": null,
+"ref": "wininet.dll!0x1552d0"
+},
+{
+"name": "FtpGetFileSize",
+"ordinal": 192,
+"rva": 1382064,
+"forwarder": null,
+"ref": "wininet.dll!0x1516b0"
+},
+{
+"name": "FtpGetFileW",
+"ordinal": 193,
+"rva": 1397888,
+"forwarder": null,
+"ref": "wininet.dll!0x155480"
+},
+{
+"name": "FtpOpenFileA",
+"ordinal": 194,
+"rva": 1382704,
+"forwarder": null,
+"ref": "wininet.dll!0x151930"
+},
+{
+"name": "FtpOpenFileW",
+"ordinal": 195,
+"rva": 1398160,
+"forwarder": null,
+"ref": "wininet.dll!0x155590"
+},
+{
+"name": "FtpPutFileA",
+"ordinal": 196,
+"rva": 1382928,
+"forwarder": null,
+"ref": "wininet.dll!0x151a10"
+},
+{
+"name": "FtpPutFileEx",
+"ordinal": 197,
+"rva": 1398304,
+"forwarder": null,
+"ref": "wininet.dll!0x155620"
+},
+{
+"name": "FtpPutFileW",
+"ordinal": 198,
+"rva": 1398704,
+"forwarder": null,
+"ref": "wininet.dll!0x1557b0"
+},
+{
+"name": "FtpRemoveDirectoryA",
+"ordinal": 199,
+"rva": 1383888,
+"forwarder": null,
+"ref": "wininet.dll!0x151dd0"
+},
+{
+"name": "FtpRemoveDirectoryW",
+"ordinal": 200,
+"rva": 1398928,
+"forwarder": null,
+"ref": "wininet.dll!0x155890"
+},
+{
+"name": "FtpRenameFileA",
+"ordinal": 201,
+"rva": 1384048,
+"forwarder": null,
+"ref": "wininet.dll!0x151e70"
+},
+{
+"name": "FtpRenameFileW",
+"ordinal": 202,
+"rva": 1399296,
+"forwarder": null,
+"ref": "wininet.dll!0x155a00"
+},
+{
+"name": "FtpSetCurrentDirectoryA",
+"ordinal": 203,
+"rva": 1384240,
+"forwarder": null,
+"ref": "wininet.dll!0x151f30"
+},
+{
+"name": "FtpSetCurrentDirectoryW",
+"ordinal": 204,
+"rva": 1399888,
+"forwarder": null,
+"ref": "wininet.dll!0x155c50"
+},
+{
+"name": "GetProxyDllInfo",
+"ordinal": 205,
+"rva": 1254960,
+"forwarder": null,
+"ref": "wininet.dll!0x132630"
+},
+{
+"name": "GetUrlCacheConfigInfoA",
+"ordinal": 206,
+"rva": 1706128,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0890"
+},
+{
+"name": "GetUrlCacheConfigInfoW",
+"ordinal": 207,
+"rva": 1706816,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0b40"
+},
+{
+"name": "GetUrlCacheEntryBinaryBlob",
+"ordinal": 208,
+"rva": 634512,
+"forwarder": null,
+"ref": "wininet.dll!0x9ae90"
+},
+{
+"name": "GetUrlCacheEntryInfoA",
+"ordinal": 209,
+"rva": 1707104,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0c60"
+},
+{
+"name": "GetUrlCacheEntryInfoExA",
+"ordinal": 210,
+"rva": 1707568,
+"forwarder": null,
+"ref": "wininet.dll!0x1a0e30"
+},
+{
+"name": "GetUrlCacheEntryInfoExW",
+"ordinal": 211,
+"rva": 47552,
+"forwarder": null,
+"ref": "wininet.dll!0xb9c0"
+},
+{
+"name": "GetUrlCacheEntryInfoW",
+"ordinal": 212,
+"rva": 531200,
+"forwarder": null,
+"ref": "wininet.dll!0x81b00"
+},
+{
+"name": "GetUrlCacheGroupAttributeA",
+"ordinal": 213,
+"rva": 1708160,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1080"
+},
+{
+"name": "GetUrlCacheGroupAttributeW",
+"ordinal": 214,
+"rva": 1708752,
+"forwarder": null,
+"ref": "wininet.dll!0x1a12d0"
+},
+{
+"name": "GetUrlCacheHeaderData",
+"ordinal": 215,
+"rva": 169376,
+"forwarder": null,
+"ref": "wininet.dll!0x295a0"
+},
+{
+"name": "GopherCreateLocatorA",
+"ordinal": 216,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherCreateLocatorW",
+"ordinal": 217,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherFindFirstFileA",
+"ordinal": 218,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherFindFirstFileW",
+"ordinal": 219,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherGetAttributeA",
+"ordinal": 220,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherGetAttributeW",
+"ordinal": 221,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherGetLocatorTypeA",
+"ordinal": 222,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherGetLocatorTypeW",
+"ordinal": 223,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherOpenFileA",
+"ordinal": 224,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "GopherOpenFileW",
+"ordinal": 225,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "HttpAddRequestHeadersA",
+"ordinal": 226,
+"rva": 559504,
+"forwarder": null,
+"ref": "wininet.dll!0x88990"
+},
+{
+"name": "HttpAddRequestHeadersW",
+"ordinal": 227,
+"rva": 559200,
+"forwarder": null,
+"ref": "wininet.dll!0x88860"
+},
+{
+"name": "HttpCheckDavCompliance",
+"ordinal": 228,
+"rva": 1471024,
+"forwarder": null,
+"ref": "wininet.dll!0x167230"
+},
+{
+"name": "HttpCloseDependencyHandle",
+"ordinal": 229,
+"rva": 716624,
+"forwarder": null,
+"ref": "wininet.dll!0xaef50"
+},
+{
+"name": "HttpDuplicateDependencyHandle",
+"ordinal": 230,
+"rva": 812704,
+"forwarder": null,
+"ref": "wininet.dll!0xc66a0"
+},
+{
+"name": "HttpEndRequestA",
+"ordinal": 231,
+"rva": 870080,
+"forwarder": null,
+"ref": "wininet.dll!0xd46c0"
+},
+{
+"name": "HttpEndRequestW",
+"ordinal": 232,
+"rva": 886944,
+"forwarder": null,
+"ref": "wininet.dll!0xd88a0"
+},
+{
+"name": "HttpGetServerCredentials",
+"ordinal": 233,
+"rva": 138464,
+"forwarder": null,
+"ref": "wininet.dll!0x21ce0"
+},
+{
+"name": "HttpGetTunnelSocket",
+"ordinal": 234,
+"rva": 1347600,
+"forwarder": null,
+"ref": "wininet.dll!0x149010"
+},
+{
+"name": "HttpIndicatePageLoadComplete",
+"ordinal": 235,
+"rva": 883264,
+"forwarder": null,
+"ref": "wininet.dll!0xd7a40"
+},
+{
+"name": "HttpIsHostHstsEnabled",
+"ordinal": 236,
+"rva": 770464,
+"forwarder": null,
+"ref": "wininet.dll!0xbc1a0"
+},
+{
+"name": "HttpOpenDependencyHandle",
+"ordinal": 237,
+"rva": 336688,
+"forwarder": null,
+"ref": "wininet.dll!0x52330"
+},
+{
+"name": "HttpOpenRequestA",
+"ordinal": 238,
+"rva": 1474176,
+"forwarder": null,
+"ref": "wininet.dll!0x167e80"
+},
+{
+"name": "HttpOpenRequestW",
+"ordinal": 239,
+"rva": 780816,
+"forwarder": null,
+"ref": "wininet.dll!0xbea10"
+},
+{
+"name": "HttpPushClose",
+"ordinal": 240,
+"rva": 1351088,
+"forwarder": null,
+"ref": "wininet.dll!0x149db0"
+},
+{
+"name": "HttpPushEnable",
+"ordinal": 241,
+"rva": 1351312,
+"forwarder": null,
+"ref": "wininet.dll!0x149e90"
+},
+{
+"name": "HttpPushWait",
+"ordinal": 242,
+"rva": 1351456,
+"forwarder": null,
+"ref": "wininet.dll!0x149f20"
+},
+{
+"name": "HttpQueryInfoA",
+"ordinal": 243,
+"rva": 346848,
+"forwarder": null,
+"ref": "wininet.dll!0x54ae0"
+},
+{
+"name": "HttpQueryInfoW",
+"ordinal": 244,
+"rva": 344880,
+"forwarder": null,
+"ref": "wininet.dll!0x54330"
+},
+{
+"name": "HttpSendRequestA",
+"ordinal": 245,
+"rva": 874720,
+"forwarder": null,
+"ref": "wininet.dll!0xd58e0"
+},
+{
+"name": "HttpSendRequestExA",
+"ordinal": 246,
+"rva": 884528,
+"forwarder": null,
+"ref": "wininet.dll!0xd7f30"
+},
+{
+"name": "HttpSendRequestExW",
+"ordinal": 247,
+"rva": 857856,
+"forwarder": null,
+"ref": "wininet.dll!0xd1700"
+},
+{
+"name": "HttpSendRequestW",
+"ordinal": 248,
+"rva": 817120,
+"forwarder": null,
+"ref": "wininet.dll!0xc77e0"
+},
+{
+"name": "HttpWebSocketClose",
+"ordinal": 249,
+"rva": 1538096,
+"forwarder": null,
+"ref": "wininet.dll!0x177830"
+},
+{
+"name": "HttpWebSocketCompleteUpgrade",
+"ordinal": 250,
+"rva": 1539600,
+"forwarder": null,
+"ref": "wininet.dll!0x177e10"
+},
+{
+"name": "HttpWebSocketQueryCloseStatus",
+"ordinal": 251,
+"rva": 1538464,
+"forwarder": null,
+"ref": "wininet.dll!0x1779a0"
+},
+{
+"name": "HttpWebSocketReceive",
+"ordinal": 252,
+"rva": 1540864,
+"forwarder": null,
+"ref": "wininet.dll!0x178300"
+},
+{
+"name": "HttpWebSocketSend",
+"ordinal": 253,
+"rva": 1542320,
+"forwarder": null,
+"ref": "wininet.dll!0x1788b0"
+},
+{
+"name": "HttpWebSocketShutdown",
+"ordinal": 254,
+"rva": 1543072,
+"forwarder": null,
+"ref": "wininet.dll!0x178ba0"
+},
+{
+"name": "IncrementUrlCacheHeaderData",
+"ordinal": 255,
+"rva": 133472,
+"forwarder": null,
+"ref": "wininet.dll!0x20960"
+},
+{
+"name": "InternetAlgIdToStringA",
+"ordinal": 256,
+"rva": 1589552,
+"forwarder": null,
+"ref": "wininet.dll!0x184130"
+},
+{
+"name": "InternetAlgIdToStringW",
+"ordinal": 257,
+"rva": 1590032,
+"forwarder": null,
+"ref": "wininet.dll!0x184310"
+},
+{
+"name": "InternetAttemptConnect",
+"ordinal": 258,
+"rva": 1276112,
+"forwarder": null,
+"ref": "wininet.dll!0x1378d0"
+},
+{
+"name": "InternetAutodial",
+"ordinal": 259,
+"rva": 1295648,
+"forwarder": null,
+"ref": "wininet.dll!0x13c520"
+},
+{
+"name": "InternetAutodialCallback",
+"ordinal": 260,
+"rva": 1260272,
+"forwarder": null,
+"ref": "wininet.dll!0x133af0"
+},
+{
+"name": "InternetAutodialHangup",
+"ordinal": 261,
+"rva": 1295840,
+"forwarder": null,
+"ref": "wininet.dll!0x13c5e0"
+},
+{
+"name": "InternetCanonicalizeUrlA",
+"ordinal": 262,
+"rva": 1276208,
+"forwarder": null,
+"ref": "wininet.dll!0x137930"
+},
+{
+"name": "InternetCanonicalizeUrlW",
+"ordinal": 263,
+"rva": 870560,
+"forwarder": null,
+"ref": "wininet.dll!0xd48a0"
+},
+{
+"name": "InternetCheckConnectionA",
+"ordinal": 264,
+"rva": 1276496,
+"forwarder": null,
+"ref": "wininet.dll!0x137a50"
+},
+{
+"name": "InternetCheckConnectionW",
+"ordinal": 265,
+"rva": 1281888,
+"forwarder": null,
+"ref": "wininet.dll!0x138f60"
+},
+{
+"name": "InternetClearAllPerSiteCookieDecisions",
+"ordinal": 266,
+"rva": 1476960,
+"forwarder": null,
+"ref": "wininet.dll!0x168960"
+},
+{
+"name": "InternetCloseHandle",
+"ordinal": 267,
+"rva": 380256,
+"forwarder": null,
+"ref": "wininet.dll!0x5cd60"
+},
+{
+"name": "InternetCombineUrlA",
+"ordinal": 268,
+"rva": 1277760,
+"forwarder": null,
+"ref": "wininet.dll!0x137f40"
+},
+{
+"name": "InternetCombineUrlW",
+"ordinal": 269,
+"rva": 219760,
+"forwarder": null,
+"ref": "wininet.dll!0x35a70"
+},
+{
+"name": "InternetConfirmZoneCrossing",
+"ordinal": 270,
+"rva": 1594224,
+"forwarder": null,
+"ref": "wininet.dll!0x185370"
+},
+{
+"name": "InternetConfirmZoneCrossingA",
+"ordinal": 271,
+"rva": 1594224,
+"forwarder": null,
+"ref": "wininet.dll!0x185370"
+},
+{
+"name": "InternetConfirmZoneCrossingW",
+"ordinal": 272,
+"rva": 162160,
+"forwarder": null,
+"ref": "wininet.dll!0x27970"
+},
+{
+"name": "InternetConnectA",
+"ordinal": 273,
+"rva": 1278064,
+"forwarder": null,
+"ref": "wininet.dll!0x138070"
+},
+{
+"name": "InternetConnectW",
+"ordinal": 274,
+"rva": 809584,
+"forwarder": null,
+"ref": "wininet.dll!0xc5a70"
+},
+{
+"name": "InternetConvertUrlFromWireToWideChar",
+"ordinal": 275,
+"rva": 81536,
+"forwarder": null,
+"ref": "wininet.dll!0x13e80"
+},
+{
+"name": "InternetCrackUrlA",
+"ordinal": 276,
+"rva": 185872,
+"forwarder": null,
+"ref": "wininet.dll!0x2d610"
+},
+{
+"name": "InternetCrackUrlW",
+"ordinal": 277,
+"rva": 186000,
+"forwarder": null,
+"ref": "wininet.dll!0x2d690"
+},
+{
+"name": "InternetCreateUrlA",
+"ordinal": 278,
+"rva": 1278544,
+"forwarder": null,
+"ref": "wininet.dll!0x138250"
+},
+{
+"name": "InternetCreateUrlW",
+"ordinal": 279,
+"rva": 395248,
+"forwarder": null,
+"ref": "wininet.dll!0x607f0"
+},
+{
+"name": "InternetDial",
+"ordinal": 280,
+"rva": 1296016,
+"forwarder": null,
+"ref": "wininet.dll!0x13c690"
+},
+{
+"name": "InternetDialA",
+"ordinal": 281,
+"rva": 1296016,
+"forwarder": null,
+"ref": "wininet.dll!0x13c690"
+},
+{
+"name": "InternetDialW",
+"ordinal": 282,
+"rva": 1296224,
+"forwarder": null,
+"ref": "wininet.dll!0x13c760"
+},
+{
+"name": "InternetEnumPerSiteCookieDecisionA",
+"ordinal": 283,
+"rva": 1476976,
+"forwarder": null,
+"ref": "wininet.dll!0x168970"
+},
+{
+"name": "InternetEnumPerSiteCookieDecisionW",
+"ordinal": 284,
+"rva": 1477088,
+"forwarder": null,
+"ref": "wininet.dll!0x1689e0"
+},
+{
+"name": "InternetErrorDlg",
+"ordinal": 285,
+"rva": 1594416,
+"forwarder": null,
+"ref": "wininet.dll!0x185430"
+},
+{
+"name": "InternetFindNextFileA",
+"ordinal": 286,
+"rva": 1393584,
+"forwarder": null,
+"ref": "wininet.dll!0x1543b0"
+},
+{
+"name": "InternetFindNextFileW",
+"ordinal": 287,
+"rva": 1403104,
+"forwarder": null,
+"ref": "wininet.dll!0x1568e0"
+},
+{
+"name": "InternetFortezzaCommand",
+"ordinal": 288,
+"rva": 1351776,
+"forwarder": null,
+"ref": "wininet.dll!0x14a060"
+},
+{
+"name": "InternetFreeCookies",
+"ordinal": 289,
+"rva": 782768,
+"forwarder": null,
+"ref": "wininet.dll!0xbf1b0"
+},
+{
+"name": "InternetFreeProxyInfoList",
+"ordinal": 290,
+"rva": 1466736,
+"forwarder": null,
+"ref": "wininet.dll!0x166170"
+},
+{
+"name": "InternetGetCertByURL",
+"ordinal": 291,
+"rva": 895984,
+"forwarder": null,
+"ref": "wininet.dll!0xdabf0"
+},
+{
+"name": "InternetGetCertByURLA",
+"ordinal": 292,
+"rva": 895984,
+"forwarder": null,
+"ref": "wininet.dll!0xdabf0"
+},
+{
+"name": "InternetGetConnectedState",
+"ordinal": 293,
+"rva": 885472,
+"forwarder": null,
+"ref": "wininet.dll!0xd82e0"
+},
+{
+"name": "InternetGetConnectedStateEx",
+"ordinal": 294,
+"rva": 165600,
+"forwarder": null,
+"ref": "wininet.dll!0x286e0"
+},
+{
+"name": "InternetGetConnectedStateExA",
+"ordinal": 295,
+"rva": 165600,
+"forwarder": null,
+"ref": "wininet.dll!0x286e0"
+},
+{
+"name": "InternetGetConnectedStateExW",
+"ordinal": 296,
+"rva": 885568,
+"forwarder": null,
+"ref": "wininet.dll!0xd8340"
+},
+{
+"name": "InternetGetCookieA",
+"ordinal": 297,
+"rva": 1483024,
+"forwarder": null,
+"ref": "wininet.dll!0x16a110"
+},
+{
+"name": "InternetGetCookieEx2",
+"ordinal": 298,
+"rva": 783104,
+"forwarder": null,
+"ref": "wininet.dll!0xbf300"
+},
+{
+"name": "InternetGetCookieExA",
+"ordinal": 299,
+"rva": 1483072,
+"forwarder": null,
+"ref": "wininet.dll!0x16a140"
+},
+{
+"name": "InternetGetCookieExW",
+"ordinal": 300,
+"rva": 782032,
+"forwarder": null,
+"ref": "wininet.dll!0xbeed0"
+},
+{
+"name": "InternetGetCookieW",
+"ordinal": 301,
+"rva": 1483920,
+"forwarder": null,
+"ref": "wininet.dll!0x16a490"
+},
+{
+"name": "InternetGetLastResponseInfoA",
+"ordinal": 302,
+"rva": 1278704,
+"forwarder": null,
+"ref": "wininet.dll!0x1382f0"
+},
+{
+"name": "InternetGetLastResponseInfoW",
+"ordinal": 303,
+"rva": 1282144,
+"forwarder": null,
+"ref": "wininet.dll!0x139060"
+},
+{
+"name": "InternetGetPerSiteCookieDecisionA",
+"ordinal": 304,
+"rva": 1477344,
+"forwarder": null,
+"ref": "wininet.dll!0x168ae0"
+},
+{
+"name": "InternetGetPerSiteCookieDecisionW",
+"ordinal": 305,
+"rva": 1477440,
+"forwarder": null,
+"ref": "wininet.dll!0x168b40"
+},
+{
+"name": "InternetGetProxyForUrl",
+"ordinal": 306,
+"rva": 1466960,
+"forwarder": null,
+"ref": "wininet.dll!0x166250"
+},
+{
+"name": "InternetGetSecurityInfoByURL",
+"ordinal": 307,
+"rva": 224016,
+"forwarder": null,
+"ref": "wininet.dll!0x36b10"
+},
+{
+"name": "InternetGetSecurityInfoByURLA",
+"ordinal": 308,
+"rva": 224016,
+"forwarder": null,
+"ref": "wininet.dll!0x36b10"
+},
+{
+"name": "InternetGetSecurityInfoByURLW",
+"ordinal": 309,
+"rva": 223792,
+"forwarder": null,
+"ref": "wininet.dll!0x36a30"
+},
+{
+"name": "InternetGoOnline",
+"ordinal": 310,
+"rva": 1296432,
+"forwarder": null,
+"ref": "wininet.dll!0x13c830"
+},
+{
+"name": "InternetGoOnlineA",
+"ordinal": 311,
+"rva": 1296432,
+"forwarder": null,
+"ref": "wininet.dll!0x13c830"
+},
+{
+"name": "InternetGoOnlineW",
+"ordinal": 312,
+"rva": 1296624,
+"forwarder": null,
+"ref": "wininet.dll!0x13c8f0"
+},
+{
+"name": "InternetHangUp",
+"ordinal": 313,
+"rva": 1296816,
+"forwarder": null,
+"ref": "wininet.dll!0x13c9b0"
+},
+{
+"name": "InternetInitializeAutoProxyDll",
+"ordinal": 314,
+"rva": 376704,
+"forwarder": null,
+"ref": "wininet.dll!0x5bf80"
+},
+{
+"name": "InternetLockRequestFile",
+"ordinal": 315,
+"rva": 114240,
+"forwarder": null,
+"ref": "wininet.dll!0x1be40"
+},
+{
+"name": "InternetOpenA",
+"ordinal": 316,
+"rva": 682176,
+"forwarder": null,
+"ref": "wininet.dll!0xa68c0"
+},
+{
+"name": "InternetOpenUrlA",
+"ordinal": 317,
+"rva": 1279152,
+"forwarder": null,
+"ref": "wininet.dll!0x1384b0"
+},
+{
+"name": "InternetOpenUrlW",
+"ordinal": 318,
+"rva": 1282608,
+"forwarder": null,
+"ref": "wininet.dll!0x139230"
+},
+{
+"name": "InternetOpenW",
+"ordinal": 319,
+"rva": 333216,
+"forwarder": null,
+"ref": "wininet.dll!0x515a0"
+},
+{
+"name": "InternetQueryDataAvailable",
+"ordinal": 320,
+"rva": 486176,
+"forwarder": null,
+"ref": "wininet.dll!0x76b20"
+},
+{
+"name": "InternetQueryFortezzaStatus",
+"ordinal": 321,
+"rva": 1351888,
+"forwarder": null,
+"ref": "wininet.dll!0x14a0d0"
+},
+{
+"name": "InternetQueryOptionA",
+"ordinal": 322,
+"rva": 366384,
+"forwarder": null,
+"ref": "wininet.dll!0x59730"
+},
+{
+"name": "InternetQueryOptionW",
+"ordinal": 323,
+"rva": 810320,
+"forwarder": null,
+"ref": "wininet.dll!0xc5d50"
+},
+{
+"name": "InternetReadFile",
+"ordinal": 324,
+"rva": 814960,
+"forwarder": null,
+"ref": "wininet.dll!0xc6f70"
+},
+{
+"name": "InternetReadFileExA",
+"ordinal": 325,
+"rva": 667168,
+"forwarder": null,
+"ref": "wininet.dll!0xa2e20"
+},
+{
+"name": "InternetReadFileExW",
+"ordinal": 326,
+"rva": 667024,
+"forwarder": null,
+"ref": "wininet.dll!0xa2d90"
+},
+{
+"name": "InternetSecurityProtocolToStringA",
+"ordinal": 327,
+"rva": 1590512,
+"forwarder": null,
+"ref": "wininet.dll!0x1844f0"
+},
+{
+"name": "InternetSecurityProtocolToStringW",
+"ordinal": 328,
+"rva": 1590896,
+"forwarder": null,
+"ref": "wininet.dll!0x184670"
+},
+{
+"name": "InternetSetCookieA",
+"ordinal": 329,
+"rva": 1483952,
+"forwarder": null,
+"ref": "wininet.dll!0x16a4b0"
+},
+{
+"name": "InternetSetCookieEx2",
+"ordinal": 330,
+"rva": 837408,
+"forwarder": null,
+"ref": "wininet.dll!0xcc720"
+},
+{
+"name": "InternetSetCookieExA",
+"ordinal": 331,
+"rva": 1484000,
+"forwarder": null,
+"ref": "wininet.dll!0x16a4e0"
+},
+{
+"name": "InternetSetCookieExW",
+"ordinal": 332,
+"rva": 211488,
+"forwarder": null,
+"ref": "wininet.dll!0x33a20"
+},
+{
+"name": "InternetSetCookieW",
+"ordinal": 333,
+"rva": 1484176,
+"forwarder": null,
+"ref": "wininet.dll!0x16a590"
+},
+{
+"name": "InternetSetDialState",
+"ordinal": 334,
+"rva": 1296976,
+"forwarder": null,
+"ref": "wininet.dll!0x13ca50"
+},
+{
+"name": "InternetSetDialStateA",
+"ordinal": 335,
+"rva": 1296976,
+"forwarder": null,
+"ref": "wininet.dll!0x13ca50"
+},
+{
+"name": "InternetSetDialStateW",
+"ordinal": 336,
+"rva": 1297072,
+"forwarder": null,
+"ref": "wininet.dll!0x13cab0"
+},
+{
+"name": "InternetSetFilePointer",
+"ordinal": 337,
+"rva": 1279312,
+"forwarder": null,
+"ref": "wininet.dll!0x138550"
+},
+{
+"name": "InternetSetOptionA",
+"ordinal": 338,
+"rva": 348592,
+"forwarder": null,
+"ref": "wininet.dll!0x551b0"
+},
+{
+"name": "InternetSetOptionExA",
+"ordinal": 339,
+"rva": 1285024,
+"forwarder": null,
+"ref": "wininet.dll!0x139ba0"
+},
+{
+"name": "InternetSetOptionExW",
+"ordinal": 340,
+"rva": 1285280,
+"forwarder": null,
+"ref": "wininet.dll!0x139ca0"
+},
+{
+"name": "InternetSetOptionW",
+"ordinal": 341,
+"rva": 343568,
+"forwarder": null,
+"ref": "wininet.dll!0x53e10"
+},
+{
+"name": "InternetSetPerSiteCookieDecisionA",
+"ordinal": 342,
+"rva": 1477616,
+"forwarder": null,
+"ref": "wininet.dll!0x168bf0"
+},
+{
+"name": "InternetSetPerSiteCookieDecisionW",
+"ordinal": 343,
+"rva": 1477776,
+"forwarder": null,
+"ref": "wininet.dll!0x168c90"
+},
+{
+"name": "InternetSetSecureLegacyServersAppCompat",
+"ordinal": 344,
+"rva": 919904,
+"forwarder": null,
+"ref": "wininet.dll!0xe0960"
+},
+{
+"name": "InternetSetStatusCallback",
+"ordinal": 345,
+"rva": 847392,
+"forwarder": null,
+"ref": "wininet.dll!0xcee20"
+},
+{
+"name": null,
+"ordinal": 346,
+"rva": 1733648,
+"forwarder": null,
+"ref": "wininet.dll!0x1a7410"
+},
+{
+"name": "InternetSetStatusCallbackA",
+"ordinal": 347,
+"rva": 847392,
+"forwarder": null,
+"ref": "wininet.dll!0xcee20"
+},
+{
+"name": "InternetSetStatusCallbackW",
+"ordinal": 348,
+"rva": 847520,
+"forwarder": null,
+"ref": "wininet.dll!0xceea0"
+},
+{
+"name": "InternetShowSecurityInfoByURL",
+"ordinal": 349,
+"rva": 1279776,
+"forwarder": null,
+"ref": "wininet.dll!0x138720"
+},
+{
+"name": "InternetShowSecurityInfoByURLA",
+"ordinal": 350,
+"rva": 1279776,
+"forwarder": null,
+"ref": "wininet.dll!0x138720"
+},
+{
+"name": "InternetShowSecurityInfoByURLW",
+"ordinal": 351,
+"rva": 1283088,
+"forwarder": null,
+"ref": "wininet.dll!0x139410"
+},
+{
+"name": "InternetTimeFromSystemTime",
+"ordinal": 352,
+"rva": 1690832,
+"forwarder": null,
+"ref": "wininet.dll!0x19ccd0"
+},
+{
+"name": "InternetTimeFromSystemTimeA",
+"ordinal": 353,
+"rva": 1690832,
+"forwarder": null,
+"ref": "wininet.dll!0x19ccd0"
+},
+{
+"name": "InternetTimeFromSystemTimeW",
+"ordinal": 354,
+"rva": 1691184,
+"forwarder": null,
+"ref": "wininet.dll!0x19ce30"
+},
+{
+"name": "InternetTimeToSystemTime",
+"ordinal": 355,
+"rva": 1691504,
+"forwarder": null,
+"ref": "wininet.dll!0x19cf70"
+},
+{
+"name": "InternetTimeToSystemTimeA",
+"ordinal": 356,
+"rva": 1691504,
+"forwarder": null,
+"ref": "wininet.dll!0x19cf70"
+},
+{
+"name": "InternetTimeToSystemTimeW",
+"ordinal": 357,
+"rva": 1691584,
+"forwarder": null,
+"ref": "wininet.dll!0x19cfc0"
+},
+{
+"name": "InternetUnlockRequestFile",
+"ordinal": 358,
+"rva": 46992,
+"forwarder": null,
+"ref": "wininet.dll!0xb790"
+},
+{
+"name": "InternetWriteFile",
+"ordinal": 359,
+"rva": 234768,
+"forwarder": null,
+"ref": "wininet.dll!0x39510"
+},
+{
+"name": "InternetWriteFileExA",
+"ordinal": 360,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "InternetWriteFileExW",
+"ordinal": 361,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "IsHostInProxyBypassList",
+"ordinal": 362,
+"rva": 388768,
+"forwarder": null,
+"ref": "wininet.dll!0x5eea0"
+},
+{
+"name": "IsUrlCacheEntryExpiredA",
+"ordinal": 363,
+"rva": 1709312,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1500"
+},
+{
+"name": "IsUrlCacheEntryExpiredW",
+"ordinal": 364,
+"rva": 1709664,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1660"
+},
+{
+"name": "LoadUrlCacheContent",
+"ordinal": 365,
+"rva": 1280016,
+"forwarder": null,
+"ref": "wininet.dll!0x138810"
+},
+{
+"name": "ParseX509EncodedCertificateForListBoxEntry",
+"ordinal": 366,
+"rva": 1591280,
+"forwarder": null,
+"ref": "wininet.dll!0x1847f0"
+},
+{
+"name": "PrivacyGetZonePreferenceW",
+"ordinal": 367,
+"rva": 431664,
+"forwarder": null,
+"ref": "wininet.dll!0x69630"
+},
+{
+"name": "PrivacySetZonePreferenceW",
+"ordinal": 368,
+"rva": 846352,
+"forwarder": null,
+"ref": "wininet.dll!0xcea10"
+},
+{
+"name": "ReadUrlCacheEntryStream",
+"ordinal": 369,
+"rva": 1710032,
+"forwarder": null,
+"ref": "wininet.dll!0x1a17d0"
+},
+{
+"name": "ReadUrlCacheEntryStreamEx",
+"ordinal": 370,
+"rva": 1710336,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1900"
+},
+{
+"name": "RegisterUrlCacheNotification",
+"ordinal": 371,
+"rva": 897248,
+"forwarder": null,
+"ref": "wininet.dll!0xdb0e0"
+},
+{
+"name": "ResumeSuspendedDownload",
+"ordinal": 372,
+"rva": 1295376,
+"forwarder": null,
+"ref": "wininet.dll!0x13c410"
+},
+{
+"name": "RetrieveUrlCacheEntryFileA",
+"ordinal": 373,
+"rva": 1710624,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1a20"
+},
+{
+"name": "RetrieveUrlCacheEntryFileW",
+"ordinal": 374,
+"rva": 1711168,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1c40"
+},
+{
+"name": "RetrieveUrlCacheEntryStreamA",
+"ordinal": 375,
+"rva": 1711728,
+"forwarder": null,
+"ref": "wininet.dll!0x1a1e70"
+},
+{
+"name": "RetrieveUrlCacheEntryStreamW",
+"ordinal": 376,
+"rva": 1712304,
+"forwarder": null,
+"ref": "wininet.dll!0x1a20b0"
+},
+{
+"name": "RunOnceUrlCache",
+"ordinal": 377,
+"rva": 895984,
+"forwarder": null,
+"ref": "wininet.dll!0xdabf0"
+},
+{
+"name": "SetUrlCacheConfigInfoA",
+"ordinal": 378,
+"rva": 1712896,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2300"
+},
+{
+"name": "SetUrlCacheConfigInfoW",
+"ordinal": 379,
+"rva": 1713248,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2460"
+},
+{
+"name": "SetUrlCacheEntryGroup",
+"ordinal": 380,
+"rva": 1713536,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2580"
+},
+{
+"name": "SetUrlCacheEntryGroupA",
+"ordinal": 381,
+"rva": 1713536,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2580"
+},
+{
+"name": "SetUrlCacheEntryGroupW",
+"ordinal": 382,
+"rva": 1714032,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2770"
+},
+{
+"name": "SetUrlCacheEntryInfoA",
+"ordinal": 383,
+"rva": 52128,
+"forwarder": null,
+"ref": "wininet.dll!0xcba0"
+},
+{
+"name": "SetUrlCacheEntryInfoW",
+"ordinal": 384,
+"rva": 1714544,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2970"
+},
+{
+"name": "SetUrlCacheGroupAttributeA",
+"ordinal": 385,
+"rva": 1715072,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2b80"
+},
+{
+"name": "SetUrlCacheGroupAttributeW",
+"ordinal": 386,
+"rva": 1715616,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2da0"
+},
+{
+"name": "SetUrlCacheHeaderData",
+"ordinal": 387,
+"rva": 1716112,
+"forwarder": null,
+"ref": "wininet.dll!0x1a2f90"
+},
+{
+"name": "ShowCertificate",
+"ordinal": 388,
+"rva": 1591280,
+"forwarder": null,
+"ref": "wininet.dll!0x1847f0"
+},
+{
+"name": "ShowClientAuthCerts",
+"ordinal": 389,
+"rva": 1591280,
+"forwarder": null,
+"ref": "wininet.dll!0x1847f0"
+},
+{
+"name": "ShowSecurityInfo",
+"ordinal": 390,
+"rva": 1591328,
+"forwarder": null,
+"ref": "wininet.dll!0x184820"
+},
+{
+"name": "ShowX509EncodedCertificate",
+"ordinal": 391,
+"rva": 1591696,
+"forwarder": null,
+"ref": "wininet.dll!0x184990"
+},
+{
+"name": "UnlockUrlCacheEntryFile",
+"ordinal": 392,
+"rva": 1716432,
+"forwarder": null,
+"ref": "wininet.dll!0x1a30d0"
+},
+{
+"name": "UnlockUrlCacheEntryFileA",
+"ordinal": 393,
+"rva": 1716432,
+"forwarder": null,
+"ref": "wininet.dll!0x1a30d0"
+},
+{
+"name": "UnlockUrlCacheEntryFileW",
+"ordinal": 394,
+"rva": 1716752,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3210"
+},
+{
+"name": "UnlockUrlCacheEntryStream",
+"ordinal": 395,
+"rva": 456720,
+"forwarder": null,
+"ref": "wininet.dll!0x6f810"
+},
+{
+"name": "UpdateUrlCacheContentPath",
+"ordinal": 396,
+"rva": 1717088,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3360"
+},
+{
+"name": "UrlCacheCheckEntriesExist",
+"ordinal": 397,
+"rva": 1717440,
+"forwarder": null,
+"ref": "wininet.dll!0x1a34c0"
+},
+{
+"name": "UrlCacheCloseEntryHandle",
+"ordinal": 398,
+"rva": 1717584,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3550"
+},
+{
+"name": "UrlCacheContainerSetEntryMaximumAge",
+"ordinal": 399,
+"rva": 1717712,
+"forwarder": null,
+"ref": "wininet.dll!0x1a35d0"
+},
+{
+"name": "UrlCacheCreateContainer",
+"ordinal": 400,
+"rva": 196768,
+"forwarder": null,
+"ref": "wininet.dll!0x300a0"
+},
+{
+"name": null,
+"ordinal": 401,
+"rva": 1462976,
+"forwarder": null,
+"ref": "wininet.dll!0x1652c0"
+},
+{
+"name": null,
+"ordinal": 402,
+"rva": 1466256,
+"forwarder": null,
+"ref": "wininet.dll!0x165f90"
+},
+{
+"name": null,
+"ordinal": 403,
+"rva": 1466304,
+"forwarder": null,
+"ref": "wininet.dll!0x165fc0"
+},
+{
+"name": "UrlCacheFindFirstEntry",
+"ordinal": 404,
+"rva": 33216,
+"forwarder": null,
+"ref": "wininet.dll!0x81c0"
+},
+{
+"name": "UrlCacheFindNextEntry",
+"ordinal": 405,
+"rva": 35072,
+"forwarder": null,
+"ref": "wininet.dll!0x8900"
+},
+{
+"name": "UrlCacheFreeEntryInfo",
+"ordinal": 406,
+"rva": 130064,
+"forwarder": null,
+"ref": "wininet.dll!0x1fc10"
+},
+{
+"name": "UrlCacheFreeGlobalSpace",
+"ordinal": 407,
+"rva": 1717856,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3660"
+},
+{
+"name": "UrlCacheGetContentPaths",
+"ordinal": 408,
+"rva": 1718096,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3750"
+},
+{
+"name": "UrlCacheGetEntryInfo",
+"ordinal": 409,
+"rva": 32816,
+"forwarder": null,
+"ref": "wininet.dll!0x8030"
+},
+{
+"name": null,
+"ordinal": 410,
+"rva": 1731040,
+"forwarder": null,
+"ref": "wininet.dll!0x1a69e0"
+},
+{
+"name": null,
+"ordinal": 411,
+"rva": 1731008,
+"forwarder": null,
+"ref": "wininet.dll!0x1a69c0"
+},
+{
+"name": "UrlCacheGetGlobalCacheSize",
+"ordinal": 412,
+"rva": 1718240,
+"forwarder": null,
+"ref": "wininet.dll!0x1a37e0"
+},
+{
+"name": null,
+"ordinal": 413,
+"rva": 1733232,
+"forwarder": null,
+"ref": "wininet.dll!0x1a7270"
+},
+{
+"name": "UrlCacheGetGlobalLimit",
+"ordinal": 414,
+"rva": 1718512,
+"forwarder": null,
+"ref": "wininet.dll!0x1a38f0"
+},
+{
+"name": "UrlCacheReadEntryStream",
+"ordinal": 415,
+"rva": 1718656,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3980"
+},
+{
+"name": "UrlCacheReloadSettings",
+"ordinal": 416,
+"rva": 1718816,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3a20"
+},
+{
+"name": "UrlCacheRetrieveEntryFile",
+"ordinal": 417,
+"rva": 1718960,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3ab0"
+},
+{
+"name": "UrlCacheRetrieveEntryStream",
+"ordinal": 418,
+"rva": 1719104,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3b40"
+},
+{
+"name": "UrlCacheServer",
+"ordinal": 419,
+"rva": 897248,
+"forwarder": null,
+"ref": "wininet.dll!0xdb0e0"
+},
+{
+"name": null,
+"ordinal": 420,
+"rva": 852272,
+"forwarder": null,
+"ref": "wininet.dll!0xd0130"
+},
+{
+"name": null,
+"ordinal": 421,
+"rva": 850704,
+"forwarder": null,
+"ref": "wininet.dll!0xcfb10"
+},
+{
+"name": null,
+"ordinal": 422,
+"rva": 164992,
+"forwarder": null,
+"ref": "wininet.dll!0x28480"
+},
+{
+"name": null,
+"ordinal": 423,
+"rva": 1324640,
+"forwarder": null,
+"ref": "wininet.dll!0x143660"
+},
+{
+"name": "UrlCacheSetGlobalLimit",
+"ordinal": 424,
+"rva": 1719264,
+"forwarder": null,
+"ref": "wininet.dll!0x1a3be0"
+},
+{
+"name": "UrlCacheUpdateEntryExtraData",
+"ordinal": 425,
+"rva": 226224,
+"forwarder": null,
+"ref": "wininet.dll!0x373b0"
+},
+{
+"name": "UrlZonesDetach",
+"ordinal": 426,
+"rva": 1570496,
+"forwarder": null,
+"ref": "wininet.dll!0x17f6c0"
+},
+{
+"name": "_GetFileExtensionFromUrl",
+"ordinal": 427,
+"rva": 1339632,
+"forwarder": null,
+"ref": "wininet.dll!0x1470f0"
+}
+]
