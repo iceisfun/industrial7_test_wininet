@@ -79,8 +79,9 @@ TEST(ot_tls_certificate_string) {
     DWORD l2 = n; SET_ERR(0);
     EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &l2), ERROR_INSUFFICIENT_BUFFER);
     EXPECT_EQ(l2, 1);
+    /* strlen + 1 (room for the NUL) is enough: TRUE, *len = strlen (VM) */
     l2 = n + 1; SET_ERR(0); BOOL r = U(InternetQueryOptionA)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, b, &l2);
-    t_note("SECURITY_CERTIFICATE with strlen+1: r=%d err=%lu len=%lu", r, r ? 0 : GetLastError(), l2);
+    CHECKF(r && l2 == n, "strlen+1: r=%d err=%lu len=%lu want %lu", r, r ? 0 : GetLastError(), l2, n);
     /* W forwards to A for this option: same answers */
     DWORD lw = 0;
     SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionW)(fx->h[OT_T], INTERNET_OPTION_SECURITY_CERTIFICATE, NULL, &lw), ERROR_INSUFFICIENT_BUFFER);
@@ -113,14 +114,19 @@ TEST(ot_tls_server_cert_chain_context) {
 TEST(ot_tls_options_on_plain_http) {
     REQUIRE(U(InternetQueryOptionA));
     ot_fx *fx = ot_fx_all(); if (!fx || !fx->h[OT_X]) { t_skip("fixture"); return; }
-    /* not a TLS request: certificate options fail; recorded per option */
-    static const DWORD opts[] = { INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, INTERNET_OPTION_SECURITY_CERTIFICATE,
-                                  INTERNET_OPTION_SECURITY_KEY_BITNESS, INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT };
+    /* not a TLS request (unsent R and completed X): the certificate options fail with 12016
+     * ERROR_INTERNET_INVALID_OPERATION, the chain context with 12019 ERROR_INTERNET_INCORRECT_HANDLE_STATE (VM, qtab) */
+    static const struct { DWORD opt, err; } m[] = {
+        { INTERNET_OPTION_SECURITY_CERTIFICATE_STRUCT, ERROR_INTERNET_INVALID_OPERATION },
+        { INTERNET_OPTION_SECURITY_CERTIFICATE, ERROR_INTERNET_INVALID_OPERATION },
+        { INTERNET_OPTION_SECURITY_KEY_BITNESS, ERROR_INTERNET_INVALID_OPERATION },
+        { INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT, ERROR_INTERNET_INCORRECT_HANDLE_STATE } };
     for (int i = 0; i < 4; i++)
-        for (int k = OT_R; k <= OT_X; k++) {
-            BYTE b[256]; DWORD l = sizeof b;
-            SET_ERR(0); BOOL r = U(InternetQueryOptionA)(fx->h[k], opts[i], b, &l);
-            CHECKF(!r, "opt %lu on plain HTTP %c succeeded", opts[i], OT_KINDS[k]);
-            t_note("opt %lu on %c: err %lu", opts[i], OT_KINDS[k], GetLastError());
-        }
+        for (int k = OT_R; k <= OT_X; k++)
+            for (int w = 0; w < 2; w++) {
+                if (!fx->h[k]) continue;
+                BYTE b[256]; DWORD l = sizeof b;
+                SET_ERR(0); BOOL r = ot_q(w, fx->h[k], m[i].opt, b, &l);
+                CHECKF(!r && GetLastError() == m[i].err, "opt %lu on plain HTTP %c %c: r=%d err %lu want %lu", m[i].opt, OT_KINDS[k], w ? 'W' : 'A', r, GetLastError(), m[i].err);
+            }
 }

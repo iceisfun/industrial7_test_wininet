@@ -40,4 +40,74 @@ Response-side rows are table-driven: the server sends a raw byte string and clos
 | `HttpQueryInfoW` | 0x54330 | result converted with the ACP |
 
 ## Findings (all [W10] unless tagged)
-(see the per-file comments; summarised after the final boot below)
+
+### Status line (`hep_status.c`) - decomp-explained, VM-frozen
+- Any digit run is accepted as the status, without a range check: 600, 699, 999, 1000, 12345 and 4294967295 are
+  returned as is; 099 -> 99, 001 -> 1, 0200 -> 200, 42, 7. HttpSendRequest succeeds for all of them.
+- The digit run stops at the first non-digit: "200x" -> 200, "2OO" -> 2, "200.5" -> 200, "20 0" -> 20 (text "0 OK").
+- No digits (letters, "+200", "-1", "0xC8", full-width or high-bit digits) and an explicit 0/000 -> the numeric
+  STATUS_CODE query answers 0xFFFFFFFF (the string form is what the parser kept).
+- More than 32 bits ("4294967296", 20 digits) -> HttpSendRequest fails with 12152 (overflow check in ParseStatusLine [D]).
+- Up to 4 junk bytes (or leading blanks/CR/LF/NUL) before "HTTP" are skipped; 5 bytes -> the whole response is
+  treated as an HTTP/0.9 body. "ICY", "RTSP/1.0", a bare "HTTP", "HTTP/1.1" with no status or an unterminated status
+  line + close -> downlevel (`HTTP/1.0 200 OK` synthetic, everything received is body).
+- The version token is kept verbatim after "HTTP": `http/1.1`, `HtTp/1.1`, `HTTP/2`, `HTTP/3`, `HTTPS/1.1`, `HTTPX/1.1`,
+  `HTTP/` are all accepted and returned by HTTP_QUERY_VERSION.
+- Reason phrase: kept verbatim including inner runs of blanks, trailing blanks/TABs, NUL and high bytes; absent reason
+  -> "". RAW_HEADERS_CRLF rebuilds the line as `<ver> <code text as received> <reason>` with single spaces
+  ("HTTP/1.1 099 X", "HTTP/1.1 200 " for a missing reason).
+- Interim 1xx (100, 102, 103, 199) followed by a final status are skipped; 100 then close -> 12152; 101 without an
+  Upgrade request is final (st=101, no body read). 204/304 with body bytes: the bytes are readable on a close-framed
+  connection. An empty reply (FIN, no byte) -> 12152.
+- HTTP/0.9: STATUS_CODE "200", STATUS_TEXT "OK", VERSION "HTTP/1.0", RAW_HEADERS_CRLF "HTTP/1.0 200 OK\r\n\r\n",
+  every other header 12150.
+- Line endings: LF-only, mixed CRLF/LF and CR CR LF all parse; CR-only lines -> one long status line, no
+  Content-Length seen (body empty on that row); LF CR sequences leave a CR in the body.
+
+### Request side (`hep_req.c`)
+- Verb: NULL or "" -> GET [D][W10]; TRACE/TRACK (any case, first 5 characters, so also "TRACES") -> 12016 [D][W10];
+  leading/trailing blanks trimmed; inner blank, TAB, CR/LF, high byte -> 87. The token is sent exactly as given (no
+  case folding) and only the exact upper-case "GET"/"HEAD" are treated as body-less: "get", "head", ... get
+  `Content-Length: 0`, and "head" reads the response body.
+- Object: NULL/"" -> "/"; a relative name gets a leading "/" ("*" -> "/*", "http://x/y" -> "/http://x/y"); dot
+  segments removed, "\" -> "/", TAB/CR/LF removed, space -> %20 (path and query), everything else (including %-escapes,
+  invalid ones, "%00", '"<>{}|^`', DEL and high bytes) verbatim; a fragment is sent.
+- Version: NULL/""/"HTTP/1.0"/"HTTP/0.9"/non-HTTP token -> "HTTP/1.1"; "HTTP/2.0" and "http/1.1" sent verbatim;
+  trailing text or CR/LF after the number -> HttpOpenRequest fails 12153.
+- HttpSendRequestA headers: a blank line in the middle or a bare CR -> 12150 and nothing is sent; a bare LF splits
+  into two headers; a leading blank on a continuation line just starts a new header (no obs-fold); "Host:" replaces
+  the generated Host (in the caller's position); a caller Content-Length goes out verbatim. Headers given to
+  HttpSendRequest stay on the handle for the next HttpSendRequest.
+- User agent and referrer are cut at the first CR or LF; the referrer is otherwise sent verbatim (space, high byte).
+- W entry points: HttpSendRequestW and HttpAddRequestHeadersW put raw UTF-8 on the wire (lone surrogate -> EF BF BD,
+  also for a header name); HttpQueryInfoW returns those bytes through the ACP (two characters for "\u00e9");
+  non-ASCII W verbs are refused.
+- HttpAddRequestHeaders after a send succeeds and applies to the next send, including REPLACE of Host.
+- 200 KB header values and 500 added headers go out intact.
+
+### URLs (`hep_url.c`)
+- No length limit at INTERNET_MAX_URL_LENGTH: InternetOpenUrlA works and sends the full target for 2083, 2084,
+  2085, 4096, 8192, 32768 and 100000-character URLs; HttpOpenRequest objects up to 200000 characters too.
+- Host names longer than 256 characters are cut to 256 (Host header and absolute target via proxy); 64-character
+  labels are accepted.
+- InternetOpenUrl sends the fragment; spaces -> %20; A paths keep high bytes raw; W paths go out as raw UTF-8 for
+  both InternetOpenUrlW and HttpOpenRequestW, whatever INTERNET_OPTION_CODEPAGE / CODEPAGE_PATH / CODEPAGE_EXTRA say.
+- CODEPAGE options: session defaults 0xFFFFFFFF, IDN default 3; global handle -> 12018; set accepts 0, 65000, 65001,
+  437, 932, 1252, 20127, refuses 1, 12345, 0xFFFFFFFF with 87; a 2-byte buffer -> 12010.
+- IDN: W host names become punycode (lower case) in the proxy target and Host for every IDN option value 0..3;
+  InternetConnectW does the same. A host names are not converted: the target %-escapes the high bytes, Host keeps
+  them raw.
+- Proxy request form: default port 80 (also ":80", ":080", ":", port 0 / 80 in InternetConnect) is omitted from
+  target and Host; ":443" and others kept; the target host is lower-cased, Host keeps the caller's case; an empty
+  path becomes "/".
+- IPv6: "[::1]" / "::1" / full form, bracketed or not, connect and give a bracketed Host "[::1]:port"; the
+  v4-mapped form and a zone id fail 12029; "http://::1:port/" is 12005.
+- Userinfo: never pre-emptive; credentials are used on the 401 retry as Basic, %-escapes decoded ("us%40er" ->
+  "us@er", "d%5Cu" -> "d\u"); user only / empty user / empty password -> no retry, the caller gets the 401; a second
+  ':' -> 12005; userinfo is removed from the Host header and from the proxy target.
+
+### Environment
+- Every hep server uses short socket timeouts (HEP_IO_TIMEOUT): WinINet keeps keep-alive sockets pooled after
+  InternetCloseHandle, the server thread then sits in recv(), shutdown(SD_BOTH) does not wake it on Windows and
+  srv_stop() waited its full 3 s per server (`hep_zz_timing_probe`: 4 stops = 12 s with or without an extra open
+  session). This is a property of the shared server library (`common/srv_core.c`), recorded here for the foundation role.

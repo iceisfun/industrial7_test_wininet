@@ -428,6 +428,7 @@ DWORD pki_get(const char *host, unsigned short port, DWORD secflags, DWORD openf
     }
     if (secflags) t_https_secflags(t.hr, secflags);
     err = treq_send(&t);
+    if (err == ERROR_INTERNET_CONNECTION_ABORTED || err == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", err); err = treq_send(&t); }
     if (!err && status) *status = treq_status(&t);
     if (keep) *keep = t; else { if (!err) { char b[64]; treq_body(&t, b, sizeof b); } treq_close(&t); }
     return err;

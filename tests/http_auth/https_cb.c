@@ -116,8 +116,15 @@ TEST(auth_callback_sequence_basic_retry) {
     CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
     EXPECT_EQ(a_status(hr), 200);
     char line[512] = ""; size_t o = 0;
-    for (LONG i = 0; i < g_ncb && i < MAXCB && o + 8 < sizeof line; i++) o += snprintf(line + o, sizeof line - o, "%lu ", g_cb[i]);
-    t_note("callbacks: %s", line);
+    /* RESOLVING_NAME/NAME_RESOLVED (10/11) for an IP literal depend on resolver-cache state (async_callbacks area:
+     * present on some boots, absent on others), so they are left out of the exact sequence and only counted. */
+    int n_resolve = 0;
+    for (LONG i = 0; i < g_ncb && i < MAXCB && o + 8 < sizeof line; i++) {
+        if (g_cb[i] == INTERNET_STATUS_RESOLVING_NAME || g_cb[i] == INTERNET_STATUS_NAME_RESOLVED) { n_resolve++; continue; }
+        o += snprintf(line + o, sizeof line - o, "%lu ", g_cb[i]);
+    }
+    t_note("callbacks: %s (+%d resolve callbacks)", line, n_resolve);
+    CHECK(n_resolve == 0 || n_resolve == 2);
     EXPECT_STR(line, "60 80 20 21 30 31 40 41 80 30 31 40 41 ");   /* Win10 VM: one connect, two send/receive rounds */
     EXPECT_EQ(count_cb(INTERNET_STATUS_SENDING_REQUEST), 2);
     EXPECT_EQ(count_cb(INTERNET_STATUS_REQUEST_SENT), 2);

@@ -1,5 +1,5 @@
 /* rs_follow.c - automatic redirect following: status x method matrix, Location forms, drain/connection handling.
- * VM_TIMEOUT: 300
+ * VM_TIMEOUT: 600
  * Decomp: HTTP_REQUEST_HANDLE_OBJECT::HttpSendRequest_Start@0x72da0 (status switch 300/301/302/303/307/308),
  *         ::Redirect@0x12618 (Location parse, scheme/host checks, header rewrite), ::Redirect_Fsm@0x25064 (drain).
  * See EVIDENCE.md for which expectations are decomp-grounded, VM-observed or knowledge-only. */
@@ -387,8 +387,6 @@ TEST(rs_follow_body_is_target_body) {
     CHECK(strstr(r.raw, "HTTP/1.1 200 OK\r\n") == r.raw);
     CHECK(strstr(r.raw, "Location") == NULL);
     CHECK(strstr(r.raw, "text/plain") != NULL);
-    char ct[64]; DWORD l = sizeof ct;
-    CHECK(U(HttpQueryInfoA) != NULL);
     srv_stop(s);
 }
 

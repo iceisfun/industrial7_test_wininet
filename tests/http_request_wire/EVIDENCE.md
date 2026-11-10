@@ -22,6 +22,7 @@ Sources, as tagged below:
 | `wire_conn.c` | keep-alive reuse, `Connection: close`, HTTP/1.0 servers, the per-server connection limit, proxy request form and CONNECT, Cookie and Authorization emission, cache revalidation |
 | `wire_extra.c` | HTTPS request bytes, `InternetOpenUrl`, the decoding option, blocked ports, redirect follow-up requests |
 | `wire_more.c` | `HttpQueryInfo(REQUEST_HEADERS)` against the wire, more add/replace edge cases, re-sends, CR/LF in caller strings, proxy bypass, cross-server redirects, keep-alive retry, cache validators |
+| `wire_child.c` | facts that depend on per-process WinINet state, measured in a fresh child process (`exe --child ...`, results passed back through a temp file): non-ASCII object bytes, the per-server connection limit, and an encoding-flip probe |
 
 ## Infrastructure note (V)
 WinINet keeps pooled keep-alive sockets after every handle is closed. A server connection thread that is blocked in
@@ -71,8 +72,14 @@ instead of calling `shutdown`, as `srv_stop` already does after its deadline. Th
   - Dot segments are resolved (`/a/../b/./c` gives `/b/c`, and `/a/b/..` gives `/a/`). `/../x` is kept. `%2e%2e` is kept.
   - A space becomes `%20`. A tab, CR and LF are removed. `\` becomes `/`.
   - `*`, `?q` and `http://...` get a leading `/`. `#frag` is kept.
-  - Bytes of 0x80 and above are sent raw, with no escaping (boot C1).
-  - The W object name is UTF-8, sent raw (D `HttpOpenRequestW@0xbea10` UTF-8, V raw).
+  - Bytes of 0x80 and above depend on **per-process state**.
+    - In a process that has only made plain requests, they are sent raw. This was seen in boots C1 and C2, where each
+      filtered group ran as its own process.
+    - After the full suite has run in one process, they are percent-encoded as UTF-8, and an invalid byte becomes
+      `%EF%BF%BD`. This was seen in boots 1 and C3, which ran the whole exe in one process.
+    - The hard checks therefore run in a fresh child (`wire_child.c`), and `hrw_zz_encoding_flip_probe` notes which
+      earlier operation flips the mode.
+  - The W object name is UTF-8 (D `HttpOpenRequestW@0xbea10`). It is sent raw in a fresh process (V).
 - InternetOpenUrl keeps a URL fragment in the request-target (boot C1).
 - `HttpOpenRequestW` with a non-empty referer, ASCII or not, succeeds, but `HttpSendRequest` on that handle fails
   with **87** and nothing reaches the wire. This was seen in boots C1 and C2, in two tests each. An empty W referer
@@ -138,10 +145,16 @@ instead of calling `shutdown`, as `srv_stop` already does after its deadline. Th
 - Per-server limit:
   - `MAX_CONNS_PER_SERVER` is 2 and `MAX_CONNS_PER_1_0_SERVER` is 4.
   - Setting it on a session handle gives 12016.
-  - A third concurrent request waits until a connection is drained, then reuses connection 0.
+  - In a fresh process, a third concurrent request waits until a connection is drained, then reuses connection 0
+    (boots C1 and C2).
+  - After the full suite in one process, the third request got a third connection at once (boot C3). The check
+    therefore runs in a fresh child (`hrw_child_limit_third_request_waits`).
 - Dead pooled socket (RST, or FIN without a reply): the request is re-sent on a new connection and the caller sees
   200 (boot C1).
 - Ignored-certificate TLS connections are not pooled. This matches the https_tls area.
+- A single loopback TLS handshake occasionally fails with 12030 `CONNECTION_ABORTED`: on the 2nd attempt in boot C1,
+  and on the 1st in C3. The pooling test retries a failed attempt (at most 5 in total) and checks the property on
+  the requests that completed.
 
 ## Proxy (V)
 - The request-target is absolute: `GET http://host[:port]/p HTTP/1.1`, with IPv6 hosts bracketed. Host carries a

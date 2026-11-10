@@ -63,9 +63,11 @@ TEST(ot_str_user_agent_null_agent) {
     if (!s) { t_skip("InternetOpen"); return; }
     char b[16]; DWORD l = sizeof b; memset(b, 'Z', sizeof b);
     BOOL r = U(InternetQueryOptionA)(s, INTERNET_OPTION_USER_AGENT, b, &l);
+    /* VM: an empty agent string, TRUE with *len 0 and a NUL written */
+    CHECKF(r, "USER_AGENT with a NULL agent: err %lu", GetLastError());
     if (r) { EXPECT_EQ(l, 0); EXPECT_EQ(b[0], 0); }
-    else t_note("USER_AGENT with a NULL agent: FALSE err %lu len %lu", GetLastError(), l);
-    t_note("USER_AGENT NULL agent: r=%d len=%lu", r, l);
+    l = 0; SET_ERR(0); r = U(InternetQueryOptionA)(s, INTERNET_OPTION_USER_AGENT, NULL, &l);
+    CHECKF(!r && GetLastError() == ERROR_INSUFFICIENT_BUFFER && l == 1, "NULL buffer: r=%d err=%lu len=%lu", r, GetLastError(), l);
     U(InternetCloseHandle)(s);
 }
 
@@ -140,7 +142,6 @@ TEST(ot_str_url_wrong_handles) {
             char b[256]; DWORD l = sizeof b;
             SET_ERR(0); EXPECT_FAIL(!ot_q(w, hs[k], INTERNET_OPTION_URL, b, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
         }
-    DWORD l = 0;
     SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionW)(t.r, INTERNET_OPTION_URL, NULL, NULL), ERROR_INVALID_PARAMETER);
     ot_trio_close(&t);
 }
@@ -159,7 +160,8 @@ TEST(ot_str_username_password_connect) {
         if (r) {
             char b[64]; DWORD l = sizeof b;
             BOOL ok = U(InternetQueryOptionA)(r, INTERNET_OPTION_USERNAME, b, &l);
-            t_note("request USERNAME inherited: r=%d err=%lu len=%lu '%s'", ok, ok ? 0 : GetLastError(), l, ok ? b : "");
+            /* the request answers the connect's credentials (VM) */
+            CHECKF(ok && l == 7 && !strcmp(b, "ot_user"), "request USERNAME: r=%d err=%lu len=%lu '%s'", ok, ok ? 0 : GetLastError(), l, ok ? b : "");
             U(InternetCloseHandle)(r);
         }
         U(InternetCloseHandle)(c);

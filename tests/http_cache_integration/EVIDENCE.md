@@ -147,3 +147,12 @@ Anything that varies from one boot to the next, such as timing, file subdirector
 ## Environment
 - The lab image has no proxy and no autodetect, `SecureProtocols=0x800`, and `CertificateRevocation=1`. Defender and the firewall did not interfere.
 - Runtime is about 160 s per area on the VM (VM_TIMEOUT 420).
+
+## VM boots (this pass)
+| Boot | Build | Result | Triage |
+|---|---|---|---|
+| prev pass boot 2 (`hci-20261109-183254`) | 139 tests | 5 failed / 785 checks | gzip stored decoded, HTTPS hit, CACHE_TIMESTAMPS len, IF_NET_FAIL error, REQUEST_FLAGS before send: fixed from observation |
+| 1 (`hci4-20261110-051521`) | 223 tests | 5 failed, 1911/1928 checks | LM stripped from blob, unparsable LM/max-age, must-revalidate bit 0x100, InfoEx 87, request-file lock semantics |
+| 2 (`hci5-20261110-065037`) | 250 tests | 3 failed, 2214/2224 checks | unsafe methods invalidate GET, zlib deflate not decoded, callbacks, URL keys |
+| 3 (`hci6-20261110-084136`) | 250 tests | 1 failed, 2287/2290 checks | `hci_misc_https_cache_hit`: the first TLS request of the test never reached the server (environment), retried once now |
+| 4 (`hci8-...`) | final | see below | |

@@ -62,7 +62,7 @@ TEST(tls_flow_gzip_body) {
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/gz2", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
     t_https_secflags(hr, 0x100);
-    CHECKF(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0), "err=%lu", GetLastError());
+    CHECKF(tls_send_retry(hr, NULL, 0, NULL, 0), "err=%lu", GetLastError());
     memset(b, 0, sizeof b); n = t_inet_read_all(hr, b, sizeof b, NULL);
     srv_wait_requests(s, 2, 2000);
     ae = srv_req_header(s, 1, "Accept-Encoding");
@@ -82,7 +82,7 @@ TEST(tls_flow_post_body_and_wire) {
     t_https_secflags(t.hr, 0x100);
     static const char hdr[] = "Content-Type: text/plain\r\nX-Tls-Test: 1\r\n";
     SET_ERR(0);
-    CHECKF(U(HttpSendRequestA)(t.hr, hdr, (DWORD)-1, "payload-123", 11), "err=%lu", GetLastError());
+    CHECKF(tls_send_retry(t.hr, hdr, (DWORD)-1, "payload-123", 11), "err=%lu", GetLastError());
     EXPECT_EQ(treq_status(&t), 201);
     CHECK(srv_wait_requests(s, 1, 2000));
     EXPECT_STR(srv_req_line(s, 0), "POST /post?x=1 HTTP/1.1");
@@ -105,7 +105,7 @@ TEST(tls_flow_head_same_as_plain_http) {
     CHECK(treq_open(&a, "127.0.0.1", srv_port(s1), "GET", "/same", T_INET_FRESH | INTERNET_FLAG_SECURE));
     CHECK(treq_open(&b, "127.0.0.1", srv_port(s2), "GET", "/same", T_INET_FRESH));
     t_https_secflags(a.hr, 0x100);
-    SEND_EQ(&a, 0); SEND_EQ(&b, 0);
+    SEND_OK(&a); SEND_EQ(&b, 0);
     CHECK(srv_wait_requests(s1, 1, 2000)); CHECK(srv_wait_requests(s2, 1, 2000));
     int n1 = srv_req_header_count(s1, 0), n2 = srv_req_header_count(s2, 0);
     t_note("https headers=%d http headers=%d", n1, n2);
@@ -125,7 +125,7 @@ TEST(tls_flow_ignored_cert_connection_not_pooled) {
     for (int i = 0; i < 3; i++) {
         HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/k", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE | INTERNET_FLAG_KEEP_CONNECTION, 0);
         t_https_secflags(hr, 0x100);
-        CHECKF(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0), "i=%d err=%lu", i, GetLastError());
+        CHECKF(tls_send_retry(hr, NULL, 0, NULL, 0), "i=%d err=%lu", i, GetLastError());
         char b[8]; t_inet_read_all(hr, b, sizeof b, NULL);
         U(InternetCloseHandle)(hr);
     }
@@ -147,7 +147,7 @@ TEST(tls_flow_connection_close_new_handshake) {
     for (int i = 0; i < 2; i++) {
         HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/cc", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
         t_https_secflags(hr, 0x100);
-        CHECKF(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0), "i=%d err=%lu", i, GetLastError());
+        CHECKF(tls_send_retry(hr, NULL, 0, NULL, 0), "i=%d err=%lu", i, GetLastError());
         char b[8] = ""; t_inet_read_all(hr, b, sizeof b, NULL); EXPECT_STR(b, "cc");
         U(InternetCloseHandle)(hr);
     }

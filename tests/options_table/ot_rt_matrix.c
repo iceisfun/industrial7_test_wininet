@@ -56,10 +56,10 @@ CHILD(ot_rtm) {
         qtok(hs[k], opt, got, sizeof got); n++;
         if (!tok_eq(got, want)) { printf("  RTM opt=%d h=%c initial query got %s want %s\n", opt, kn[k], got, want); bad++; }
         for (int i = 0; i < 8; i++) {
-            DWORD v = RT_VALS[i];
+            DWORD v = RT_VALS[i], vb[2] = { v, 0 };   /* zero tail: string options read up to a NUL */
             if (!next_tok(&p, want, sizeof want)) return 0xC0DE0005;
             SetLastError(0xdead);
-            BOOL sr = U(InternetSetOptionA)(hs[k], opt, &v, 4); DWORD se = GetLastError();
+            BOOL sr = U(InternetSetOptionA)(hs[k], opt, vb, 4); DWORD se = GetLastError();
             if (sr) strcpy(got, "ok"); else snprintf(got, sizeof got, "%lu", se);
             n++;
             if (!tok_eq(got, want)) { printf("  RTM opt=%d h=%c set 0x%lx got %s want %s\n", opt, kn[k], v, got, want); bad++; }

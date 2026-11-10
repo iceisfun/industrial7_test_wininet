@@ -459,11 +459,13 @@ TEST(sh_close_async_pending_send) {
         CHECK(sh_close(r));
         DWORD w = WaitForSingleObject(g_async_evt, 6000);
         t_note("async pending send closed: completion wait=%lu seen=%lu result=%lu err=%lu (%s)", w, g_async_seen, g_async_res, g_async_err, t_inet_errname(g_async_err));
-        if (w == WAIT_OBJECT_0) { EXPECT_EQ(g_async_res, 0); EXPECT_EQ(g_async_err, ERROR_INTERNET_OPERATION_CANCELLED); }
+        CHECKF(w == WAIT_OBJECT_0, "no REQUEST_COMPLETE within 6 s of closing the pending request");   /* VM: always delivered */
+        if (w == WAIT_OBJECT_0) { EXPECT_EQ(g_async_seen, 1); EXPECT_EQ(g_async_res, 0); EXPECT_EQ(g_async_err, ERROR_INTERNET_OPERATION_CANCELLED); }
     }
     if (c) sh_close(c);
     if (s) sh_close(s);
     Sleep(200);
     srv_stop(sv);
-    CloseHandle(g_async_evt);
+    /* keep the event alive if the completion never came: a late callback must not SetEvent a closed (reused) handle */
+    if (g_async_seen) CloseHandle(g_async_evt);
 }

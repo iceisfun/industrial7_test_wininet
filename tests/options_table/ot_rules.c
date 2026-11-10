@@ -152,7 +152,7 @@ TEST(ot_rule_handle_type_ftp_find_and_file) {
             DWORD v = 0, l = sizeof v;
             CHECK(U(InternetQueryOptionA)(hfind, INTERNET_OPTION_HANDLE_TYPE, &v, &l)); EXPECT_EQ(v, INTERNET_HANDLE_TYPE_FTP_FIND);
             l = sizeof v; CHECK(U(InternetQueryOptionA)(hfind, INTERNET_OPTION_REQUEST_FLAGS, &v, &l));
-            t_note("ftp find REQUEST_FLAGS 0x%lx", v);
+            EXPECT_EQ(v, INTERNET_REQFLAG_NO_HEADERS);   /* VM: an FTP find handle has no HTTP headers */
             U(InternetCloseHandle)(hfind);
         } else t_note("FtpFindFirstFile failed %lu", GetLastError());
         HINTERNET hfile = U(FtpOpenFileA)(hf, "/hello.txt", GENERIC_READ, FTP_TRANSFER_TYPE_BINARY | INTERNET_FLAG_RELOAD, 0);

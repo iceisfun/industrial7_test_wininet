@@ -105,6 +105,13 @@ static size_t async_read_all(areq *q, arec *r, char *buf, size_t cap) {
     return tot;
 }
 #define ASKIP(s) do { if (!(s)) { TLS_SKIP_SRV(); } } while (0)
+/* success-path async send: one retry on a transient abort/reset of a fresh loopback TLS connection (seen about once
+ * per boot on the VM in several areas), noted */
+static DWORD async_send_ok(areq *q, arec *r, int *pend, DWORD_PTR *res) {
+    DWORD e = async_send(q, r, pend, res);
+    if (e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on async send, retrying once", e); e = async_send(q, r, pend, res); }
+    return e;
+}
 
 /* ------------------------------------------------------------------ certificate errors through the completion */
 TEST(tls_async_unknown_ca_completion) {
@@ -136,7 +143,7 @@ TEST(tls_async_retry_with_flag_then_read) {
     DWORD e = async_send(&q, &r, &pend, &res);
     EXPECT_EQ(e, ERROR_INTERNET_INVALID_CA);
     CHECK(t_https_secflags(q.hr, 0x100));
-    e = async_send(&q, &r, &pend, &res);
+    e = async_send_ok(&q, &r, &pend, &res);
     EXPECT_EQ(e, 0);
     EXPECT_EQ(pend, 1);
     EXPECT_EQ(res, 1);
@@ -163,7 +170,7 @@ TEST(tls_async_success_status_order) {
     t_https_secflags(q.hr, 0x100);
     arec_reset(&r);
     int pend; DWORD_PTR res;
-    DWORD e = async_send(&q, &r, &pend, &res);
+    DWORD e = async_send_ok(&q, &r, &pend, &res);
     EXPECT_EQ(e, 0);
     arec_dump(&r, "success");
     int con = arec_first(&r, INTERNET_STATUS_CONNECTING_TO_SERVER, 0), cod = arec_first(&r, INTERNET_STATUS_CONNECTED_TO_SERVER, 0);
@@ -227,7 +234,7 @@ TEST(tls_async_cert_error_matrix) {
         if (!areq_open(&q, &r, "127.0.0.1", srv_port(s), 0)) { areq_close(&q, &r); srv_stop(s); t_skip("async open failed"); return; }
         t_https_secflags(q.hr, rows[i].sec);
         int pend; DWORD_PTR res;
-        DWORD e = async_send(&q, &r, &pend, &res);
+        DWORD e = rows[i].want ? async_send(&q, &r, &pend, &res) : async_send_ok(&q, &r, &pend, &res);
         CHECKF(e == rows[i].want, "%s sec=0x%lx: %lu want %lu", rows[i].name, rows[i].sec, e, rows[i].want);
         CHECKF(pend == 1, "%s: not pending", rows[i].name);
         if (!rows[i].want) { char b[64]; size_t n = async_read_all(&q, &r, b, sizeof b); CHECKF(n == 5, "%s body %zu", rows[i].name, n); }
@@ -251,7 +258,7 @@ TEST(tls_async_client_cert_needed) {
     /* continue without a certificate (index -1), resend */
     DWORD idx = (DWORD)-1;
     CHECK(U(InternetSetOptionA)(q.hr, INTERNET_OPTION_SECURITY_SELECT_CLIENT_CERT, &idx, sizeof idx));
-    e = async_send(&q, &r, &pend, &res);
+    e = async_send_ok(&q, &r, &pend, &res);
     EXPECT_EQ(e, 0);
     areq_close(&q, &r);
     srv_stop(s);
@@ -283,7 +290,7 @@ TEST(tls_async_info_options_after_completion) {
     if (!areq_open(&q, &r, "127.0.0.1", srv_port(s), 0)) { areq_close(&q, &r); srv_stop(s); t_skip("async open failed"); return; }
     t_https_secflags(q.hr, 0x100);
     int pend; DWORD_PTR res;
-    EXPECT_EQ(async_send(&q, &r, &pend, &res), 0);
+    { DWORD e0 = async_send_ok(&q, &r, &pend, &res); EXPECT_EQ(e0, 0); }
     tls_sec_conn_info ci; memset(&ci, 0, sizeof ci); ci.dwSize = sizeof ci; DWORD l = sizeof ci;
     CHECK(U(InternetQueryOptionA)(q.hr, INTERNET_OPTION_SECURITY_CONNECTION_INFO, &ci, &l));
     EXPECT_EQ(ci.fSecure, 1);
@@ -361,8 +368,37 @@ TEST(tls_async_ignore_flags_at_open) {
     if (!areq_open(&q, &r, "127.0.0.1", srv_port(s), INTERNET_FLAG_IGNORE_CERT_CN_INVALID)) { areq_close(&q, &r); srv_stop(s); t_skip("async open failed"); return; }
     t_https_secflags(q.hr, 0x100);
     int pend; DWORD_PTR res;
-    EXPECT_EQ(async_send(&q, &r, &pend, &res), 0);
+    { DWORD e0 = async_send_ok(&q, &r, &pend, &res); EXPECT_EQ(e0, 0); }
     char b[64]; size_t bn = async_read_all(&q, &r, b, sizeof b); EXPECT_EQ(bn, 5);
+    areq_close(&q, &r);
+    srv_stop(s);
+}
+
+/* ERROR_MASK COMBINED_SEC_CERT in async mode: 12055 arrives as REQUEST_COMPLETE dwError, the read-back flags name the
+ * errors (DLG_FLAGS_INVALID_CA | DLG_FLAGS_SEC_CERT_CN_INVALID), and the retry with both ignore bits completes */
+TEST(tls_async_combined_cert_errors) {
+    REQUIRE(U(InternetSetStatusCallbackA));
+    static arec r; arec_reset(&r);
+    srv *s = tls_srv(SRV_CERT_CN_OTHER, NULL, 0); ASKIP(s);
+    areq q;
+    if (!areq_open(&q, &r, "127.0.0.1", srv_port(s), 0)) { areq_close(&q, &r); srv_stop(s); t_skip("async open failed"); return; }
+    DWORD m = INTERNET_ERROR_MASK_COMBINED_SEC_CERT;
+    CHECK(U(InternetSetOptionA)(q.hr, INTERNET_OPTION_ERROR_MASK, &m, sizeof m));
+    int pend; DWORD_PTR res;
+    DWORD e = async_send(&q, &r, &pend, &res);
+    EXPECT_EQ(pend, 1);
+    EXPECT_EQ(e, ERROR_INTERNET_SEC_CERT_ERRORS);
+    EXPECT_EQ(res, 0);
+    DWORD f = tls_secflags(q.hr);
+    t_note("async combined: flags=0x%lx", f);
+    EXPECT_EQ(f & 0x07A00000, 0x03000000);
+    t_https_secflags(q.hr, 0x1100);
+    e = async_send_ok(&q, &r, &pend, &res);
+    EXPECT_EQ(e, 0);
+    EXPECT_EQ(res, 1);
+    char b[64]; size_t n = async_read_all(&q, &r, b, sizeof b);
+    EXPECT_EQ(n, 5);
+    EXPECT_EQ(srv_req_count(s), 1);
     areq_close(&q, &r);
     srv_stop(s);
 }

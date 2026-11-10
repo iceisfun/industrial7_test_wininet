@@ -191,13 +191,11 @@ TEST(ot_conns_wrong_handles) {
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
     for (int i = 0; i < 2; i++) {
         DWORD opt = CONN_OPTS[i];
-        /* session / request: not an HCon -> 12016; an unused connect accepts the value (clamped 2..128, VM) */
+        /* session / request: not an HCon -> 12016 */
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.s, opt, 4), ERROR_INTERNET_INVALID_OPERATION);
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.r, opt, 4), ERROR_INTERNET_INVALID_OPERATION);
-        /* unused connect: SetNewLimit on its CServerInfo, or 12016 when it has none yet (varied between boots) */
-        SET_ERR(0); BOOL r = ot_sdw(t.c, opt, 4);
-        CHECKF(r || GetLastError() == ERROR_INTERNET_INVALID_OPERATION, "opt %lu set on connect err %lu", opt, GetLastError());
-        t_note("opt %lu set 4 on an unused connect: r=%d", opt, r);
+        /* a non-zero set on the connect is not made here: it would change the shared per-host record of
+         * 127.0.0.1 for the rest of this process (see ot_conns_child.c, which pins it in child processes) */
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.c, opt, 0), ERROR_BAD_ARGUMENTS);   /* 0 is checked first */
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.s, opt, 0), ERROR_BAD_ARGUMENTS);
     }

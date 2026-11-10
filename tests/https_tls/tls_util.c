@@ -102,6 +102,17 @@ DWORD treq_status(treq *t) {
     if (!U(HttpQueryInfoA)(t->hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &st, &l, NULL)) return 0;
     return st;
 }
+BOOL tls_send_retry(HINTERNET hr, const char *hdr, DWORD hl, void *opt, DWORD ol) {
+    SetLastError(0xDEAD);
+    BOOL ok = U(HttpSendRequestA)(hr, hdr, hl, opt, ol);
+    DWORD e = ok ? 0 : GetLastError();
+    if (e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET) {
+        t_note("transient %lu on send, retrying once", e);
+        SetLastError(0xDEAD);
+        ok = U(HttpSendRequestA)(hr, hdr, hl, opt, ol);
+    }
+    return ok;
+}
 size_t treq_body(treq *t, char *buf, size_t cap) { return t_inet_read_all(t->hr, buf, cap, NULL); }
 DWORD tls_secflags(HINTERNET h) {
     DWORD f = 0, l = sizeof f;
@@ -116,6 +127,8 @@ DWORD tls_try(srv *s, const char *host, DWORD secflags, DWORD openflags, DWORD *
     if (!treq_open(&t, host ? host : "127.0.0.1", srv_port(s), "GET", "/x", T_INET_FRESH | INTERNET_FLAG_SECURE | openflags)) { err = GetLastError(); treq_close(&t); return err ? err : 1; }
     if (secflags) t_https_secflags(t.hr, secflags);
     err = treq_send(&t);
+    /* a fresh loopback TLS connection aborts transiently about once per boot (VM, several areas): retry once, noted */
+    if (err == ERROR_INTERNET_CONNECTION_ABORTED || err == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", err); err = treq_send(&t); }
     if (!err) { char b[64]; *status = treq_status(&t); treq_body(&t, b, sizeof b); }
     treq_close(&t);
     return err;

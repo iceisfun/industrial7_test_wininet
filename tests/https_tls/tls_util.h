@@ -85,6 +85,8 @@ DWORD tls_ev_field(const char *data, const char *key);
 #define SEND_OK(tp) do { DWORD se_ = treq_send(tp); \
     if (se_ == ERROR_INTERNET_CONNECTION_ABORTED || se_ == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", se_); se_ = treq_send(tp); } \
     EXPECT_EQ(se_, 0); } while (0)
+/* HttpSendRequestA on a success path with the same one-retry rule as SEND_OK; TRUE/FALSE with GetLastError preserved */
+BOOL  tls_send_retry(HINTERNET hr, const char *hdr, DWORD hl, void *opt, DWORD ol);
 #define TLS_SKIP_SRV() do { t_skip("HTTPS server unavailable: %s", srv_strerror(srv_last_error())); return; } while (0)
 
 /* ------------------------------------------------------------------ raw ClientHello observer */

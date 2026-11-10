@@ -122,6 +122,16 @@ static void blob_report(blob_srv *c, const char *tag) {
 #define CT_CRL  "Content-Type: application/pkix-crl\r\n"
 #define CT_CERT "Content-Type: application/pkix-cert\r\n"
 
+/* unique helper-server path per use (pid + counter): CryptoAPI keeps a per-user URL cache for AIA/CDP fetches, and a
+ * port reused by a later run on a non-disposable machine must not hit an entry left by an earlier run */
+static const char *uniq_path(const char *stem, const char *ext) {
+    static char b[4][96]; static LONG n;
+    LONG k = InterlockedIncrement(&n);
+    char *o = b[k & 3];
+    snprintf(o, 96, "/%s-%lu-%ld.%s", stem, GetCurrentProcessId(), k, ext);
+    return o;
+}
+
 /* ------------------------------------------------------------------ factory sanity (scaffolding) */
 TEST(tls_pki_factory_chain_shape) {
     REQUIRE(U(CertCreateCertificateContext));
@@ -640,7 +650,7 @@ TEST(tls_pki_rsa4096_leaf_keybitness) {
 /* ------------------------------------------------------------------ CDP without a reachable issuer: no CRL fetch */
 static void cdp_partial_case(int status, int revoke, const char *tag) {
     blob_srv c; if (!blob_start(&c, status, CT_CRL)) PKI_SKIP();
-    pki_ent *leaf = mk_leaf("CN=localhost", SAN_LOCAL, PKI_EKU_SERVER, -1, 30, PKI_SHA256, 0, srv_url(c.s, "/i7.crl"), NULL, NULL);
+    pki_ent *leaf = mk_leaf("CN=localhost", SAN_LOCAL, PKI_EKU_SERVER, -1, 30, PKI_SHA256, 0, srv_url(c.s, uniq_path("i7", "crl")), NULL, NULL);
     if (!leaf) { blob_stop(&c); PKI_SKIP(); }
     if (status == 200) {
         pki_ent *rv[1] = { leaf }; DWORD n = 0;
@@ -665,7 +675,7 @@ TEST(tls_pki_cdp_partial_chain_good_crl) { REQUIRE(U(HttpSendRequestA)); cdp_par
 TEST(tls_pki_cdp_closed_port) {
     REQUIRE(U(HttpSendRequestA));
     blob_srv c; if (!blob_start(&c, 404, CT_CRL)) PKI_SKIP();
-    char url[128]; snprintf(url, sizeof url, "%s", srv_url(c.s, "/gone.crl"));
+    char url[128]; snprintf(url, sizeof url, "%s", srv_url(c.s, uniq_path("gone", "crl")));
     blob_stop(&c);
     mts *m = serve(mk_leaf("CN=localhost", SAN_LOCAL, PKI_EKU_SERVER, -1, 30, PKI_SHA256, 0, url, NULL, NULL));
     if (!m) PKI_SKIP();
@@ -675,7 +685,7 @@ TEST(tls_pki_cdp_closed_port) {
 }
 
 /* ------------------------------------------------------------------ AIA: the client fetches the issuer */
-typedef struct { blob_srv aia, crl; pki_ent *iss, *leaf; mts *m; } aia_fx;
+typedef struct { blob_srv aia, crl; pki_ent *iss, *leaf; mts *m; char aia_path[96]; } aia_fx;
 /* crl_status: 0 = no CDP, 404, or 200 with a CRL revoking the leaf when revoke */
 static int aia_setup(aia_fx *f, pki_ent *issuer, int crl_status, int revoke, int nb, int na) {
     memset(f, 0, sizeof *f);
@@ -683,8 +693,11 @@ static int aia_setup(aia_fx *f, pki_ent *issuer, int crl_status, int revoke, int
     if (!f->iss || !blob_start(&f->aia, 200, CT_CERT)) return 0;
     blob_set(&f->aia, f->iss->cert->pbCertEncoded, f->iss->cert->cbCertEncoded);
     if (crl_status && !blob_start(&f->crl, crl_status, CT_CRL)) { blob_stop(&f->aia); return 0; }
-    f->leaf = mk_leaf("CN=localhost", SAN_LOCAL, PKI_EKU_SERVER, nb, na, PKI_SHA256, 0, crl_status ? srv_url(f->crl.s, "/aia.crl") : NULL,
-                      srv_url(f->aia.s, "/issuer.crt"), f->iss);
+    char cdp[160] = "", aia[160];
+    if (crl_status) snprintf(cdp, sizeof cdp, "%s", srv_url(f->crl.s, uniq_path("aia", "crl")));
+    snprintf(f->aia_path, sizeof f->aia_path, "%s", uniq_path("issuer", "crt"));
+    snprintf(aia, sizeof aia, "%s", srv_url(f->aia.s, f->aia_path));
+    f->leaf = mk_leaf("CN=localhost", SAN_LOCAL, PKI_EKU_SERVER, nb, na, PKI_SHA256, 0, crl_status ? cdp : NULL, aia, f->iss);
     if (f->leaf && crl_status == 200) {
         pki_ent *rv[1] = { f->leaf }; DWORD n = 0;
         BYTE *der = pki_crl(f->iss, rv, revoke ? 1 : 0, 7, &n);
@@ -706,7 +719,8 @@ TEST(tls_pki_aia_complete_chain) {
     blob_report(&f.aia, "aia");
     CHECK(srv_req_count(f.aia.s) >= 1);
     if (srv_req_count(f.aia.s) >= 1) {
-        EXPECT_STR(srv_req_line(f.aia.s, 0), "GET /issuer.crt HTTP/1.1");
+        char want[160]; snprintf(want, sizeof want, "GET %s HTTP/1.1", f.aia_path);
+        EXPECT_STR(srv_req_line(f.aia.s, 0), want);
         const char *ua = srv_req_header(f.aia.s, 0, "User-Agent");
         EXPECT_STR(ua, "Microsoft-CryptoAPI/10.0");
         EXPECT_STR(srv_req_header(f.aia.s, 0, "Host"), srv_hostport(f.aia.s));

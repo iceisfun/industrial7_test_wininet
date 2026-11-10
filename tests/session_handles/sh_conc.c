@@ -25,7 +25,8 @@ TEST(sh_conc_racing_close_exactly_one_wins) {
         sh_closer cl[4]; HANDLE th[4];
         for (int k = 0; k < 4; k++) { cl[k].h = c; cl[k].go = go; cl[k].ok = -1; cl[k].err = 0; th[k] = CreateThread(NULL, 0, sh_closer_thread, &cl[k], 0, NULL); }
         SetEvent(go);
-        WaitForMultipleObjects(4, th, TRUE, 10000);
+        DWORD w = WaitForMultipleObjects(4, th, TRUE, 10000);
+        if (w >= WAIT_OBJECT_0 + 4) { CHECK(!"closer threads did not finish within 10 s"); return; }   /* cl[] still in use */
         int wins = 0;
         for (int k = 0; k < 4; k++) { if (cl[k].ok == 1) wins++; else if (cl[k].err != ERROR_INVALID_HANDLE) bad_err++; CloseHandle(th[k]); }
         CloseHandle(go);
@@ -42,7 +43,9 @@ TEST(sh_conc_racing_close_exactly_one_wins) {
 typedef struct { HINTERNET r; volatile LONG stop; LONG ok, inval, other; } sh_qloop;
 static DWORD WINAPI sh_qloop_thread(LPVOID p) {
     sh_qloop *q = (sh_qloop *)p;
-    for (int i = 0; i < 200000 && !q->stop; i++) {
+    DWORD t0 = GetTickCount();
+    /* run until the main thread says stop (bounded by 5 s): a fixed iteration count can finish before the close */
+    for (int i = 0; !q->stop && GetTickCount() - t0 < 5000; i++) {
         DWORD v = 0, len = sizeof v;
         SetLastError(0);
         if (U(InternetQueryOptionA)(q->r, INTERNET_OPTION_HANDLE_TYPE, &v, &len)) {

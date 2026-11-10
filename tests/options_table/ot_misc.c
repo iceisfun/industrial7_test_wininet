@@ -101,7 +101,7 @@ TEST(ot_misc_per_connection_option_session) {
     /* argument checks (case 0x4b): NULL buffer 87, short length 122 or 12010 */
     l = sizeof list; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(s, INTERNET_OPTION_PER_CONNECTION_OPTION, NULL, &l), ERROR_INVALID_PARAMETER);
     l = 8; SET_ERR(0); r = U(InternetQueryOptionA)(s, INTERNET_OPTION_PER_CONNECTION_OPTION, &list, &l);
-    CHECK(!r); t_note("PER_CONNECTION_OPTION with len 8: err %lu len %lu", GetLastError(), l);
+    CHECKF(!r && GetLastError() == ERROR_INTERNET_BAD_OPTION_LENGTH, "len 8: r=%d err %lu len %lu", r, GetLastError(), l);   /* VM: 12010 */
     /* set with a short list fails before anything is written */
     l = 8; SET_ERR(0); EXPECT_FAIL(!U(InternetSetOptionA)(s, INTERNET_OPTION_PER_CONNECTION_OPTION, &list, 8), ERROR_INTERNET_BAD_OPTION_LENGTH);
     SET_ERR(0); EXPECT_FAIL(!U(InternetSetOptionA)(s, INTERNET_OPTION_PER_CONNECTION_OPTION, NULL, 0), ERROR_INVALID_PARAMETER);
@@ -153,7 +153,8 @@ TEST(ot_misc_datafile_name_cached_download) {
     if (fx && fx->h[OT_X]) {
         char fn[MAX_PATH]; DWORD l = sizeof fn;
         SET_ERR(0); BOOL r = U(InternetQueryOptionA)(fx->h[OT_X], INTERNET_OPTION_DATAFILE_NAME, fn, &l);
-        CHECK(!r); t_note("DATAFILE_NAME on a NO_CACHE_WRITE request: err %lu", GetLastError());
+        /* VM: 12028 ERROR_INTERNET_ITEM_NOT_FOUND */
+        CHECKF(!r && GetLastError() == ERROR_INTERNET_ITEM_NOT_FOUND, "DATAFILE_NAME on a NO_CACHE_WRITE request: r=%d err %lu", r, GetLastError());
     }
     t_inet_close(hi);
     t_net_cleanup();

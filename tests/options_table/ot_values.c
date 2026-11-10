@@ -117,7 +117,8 @@ TEST(ot_val_buffer_sizes) {
         SET_ERR(0); EXPECT_FAIL(!ot_sdw(t.s, opts[i], 4096), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
         HINTERNET hs[] = { t.c, t.r };
         for (int k = 0; k < 2; k++) {
-            DWORD d; CHECK(ot_qdw(hs[k], opts[i], &d)); t_note("opt %lu kind %c default %lu", opts[i], k ? 'R' : 'C', d);
+            /* default 4096 on a fresh connect and request (VM, qtab rows 12/13) */
+            DWORD d; CHECK(ot_qdw(hs[k], opts[i], &d)); CHECKF(d == 4096, "opt %lu kind %c default %lu", opts[i], k ? 'R' : 'C', d);
             CHECK(ot_sdw(hs[k], opts[i], 12345)); CHECK(ot_qdw(hs[k], opts[i], &v)); EXPECT_EQ(v, 12345);
             CHECK(ot_sdw(hs[k], opts[i], 1)); CHECK(ot_qdw(hs[k], opts[i], &v)); EXPECT_EQ(v, 1);
             SET_ERR(0); EXPECT_FAIL(!ot_sdw(hs[k], opts[i], 0), ERROR_INVALID_PARAMETER);
@@ -145,7 +146,7 @@ TEST(ot_val_codepage_options) {
             SET_ERR(0); EXPECT_FAIL(!ot_sdw(hs[k], o, 1), ERROR_INVALID_PARAMETER);
         }
         /* IDN (102): any value */
-        CHECK(ot_sdw(hs[k], 102, 1)); CHECK(ot_qdw(hs[k], 102, &v)); t_note("IDN after set 1: %lu", v);
+        CHECK(ot_sdw(hs[k], 102, 1)); CHECK(ot_qdw(hs[k], 102, &v)); CHECKF(v == 1, "IDN after set 1: %lu", v);
     }
     ot_trio_close(&t);
 }
@@ -159,8 +160,9 @@ TEST(ot_val_http_decoding) {
         CHECK(ot_qdw(hs[k], INTERNET_OPTION_HTTP_DECODING, &v)); EXPECT_EQ(v, 0);
         CHECK(ot_sdw(hs[k], INTERNET_OPTION_HTTP_DECODING, 1)); CHECK(ot_qdw(hs[k], INTERNET_OPTION_HTTP_DECODING, &v)); EXPECT_EQ(v, 1);
         CHECK(ot_sdw(hs[k], INTERNET_OPTION_HTTP_DECODING, 0)); CHECK(ot_qdw(hs[k], INTERNET_OPTION_HTTP_DECODING, &v)); EXPECT_EQ(v, 0);
+        /* case 0x41 stores the DWORD as given (no normalisation to 0/1) [D][VM] */
         CHECK(ot_sdw(hs[k], INTERNET_OPTION_HTTP_DECODING, 7)); CHECK(ot_qdw(hs[k], INTERNET_OPTION_HTTP_DECODING, &v));
-        t_note("HTTP_DECODING after set 7 on %c: %lu", "SCR"[k], v);
+        CHECKF(v == 7, "HTTP_DECODING after set 7 on %c: %lu", "SCR"[k], v);
     }
     DWORD v, l = sizeof v;
     SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(NULL, INTERNET_OPTION_HTTP_DECODING, &v, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
@@ -169,8 +171,10 @@ TEST(ot_val_http_decoding) {
     CHECK(ot_sdw(t.s, INTERNET_OPTION_HTTP_DECODING, 1));
     HINTERNET c2 = U(InternetConnectA)(t.s, "127.0.0.1", 80, NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET r2 = c2 ? U(HttpOpenRequestA)(c2, "GET", "/", NULL, NULL, NULL, T_INET_FRESH, 0) : NULL;
-    if (r2) { CHECK(ot_qdw(c2, INTERNET_OPTION_HTTP_DECODING, &v)); t_note("connect created after session decoding=1: %lu", v);
-              CHECK(ot_qdw(r2, INTERNET_OPTION_HTTP_DECODING, &v)); t_note("request created after session decoding=1: %lu", v); U(InternetCloseHandle)(r2); }
+    /* copied into handles created afterwards (VM, inherit table row 65) */
+    CHECK(r2 != NULL);
+    if (r2) { CHECK(ot_qdw(c2, INTERNET_OPTION_HTTP_DECODING, &v)); CHECKF(v == 1, "connect created after session decoding=1: %lu", v);
+              CHECK(ot_qdw(r2, INTERNET_OPTION_HTTP_DECODING, &v)); CHECKF(v == 1, "request created after session decoding=1: %lu", v); U(InternetCloseHandle)(r2); }
     if (c2) U(InternetCloseHandle)(c2);
     ot_trio_close(&t);
 }
@@ -250,29 +254,17 @@ TEST(ot_val_max_conns_defaults_global) {
     DWORD a, b;
     CHECK(ot_qdw(NULL, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &a));
     CHECK(ot_qdw(NULL, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &b));
-    t_note("MAX_CONNS_PER_SERVER %lu, PER_1_0_SERVER %lu (registry-configurable; IE11 defaults 10/10 on Win10)", a, b);
+    t_note("MAX_CONNS_PER_SERVER %lu, PER_1_0_SERVER %lu (registry-configurable; the VM image reads 2 and 4)", a, b);
     CHECK(a >= 2 && a <= 128); CHECK(b >= 2 && b <= 128);
-    /* connect: PER_SERVER reads the limit of the connect's CServerInfo when it has one, else 12016 (case 0x49).
-     * Whether an unused connect already has one varied between VM boots (see EVIDENCE.md), so either is accepted;
-     * when it answers, the value is the global limit. PER_1_0_SERVER on any real handle is 12016 (case 0x4a). */
+    /* connect handles: PER_SERVER depends on whether a CServerInfo record exists for the host name, which depends
+     * on earlier requests in this process; that is pinned in fresh child processes by ot_conns_child.c. Here only
+     * the record-independent answers are checked. PER_1_0_SERVER on any real handle is 12016 (case 0x4a). */
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
     DWORD v = 0xdeadbeef, l = sizeof v;
-    SET_ERR(0); BOOL r = U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l);
-    CHECKF(r ? (l == 4 && v == a) : GetLastError() == ERROR_INTERNET_INVALID_OPERATION, "connect PER_SERVER r=%d err=%lu v=%lu global %lu", r, GetLastError(), v, a);
-    t_note("unused connect MAX_CONNS_PER_SERVER: r=%d v=%lu", r, r ? v : 0);
-    l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
+    SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     /* session / request: 12016 */
     l = sizeof v;
     SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.s, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.r, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     ot_trio_close(&t);
-}
-
-TEST(ot_val_max_conns_used_connect) {
-    REQUIRE(U(InternetQueryOptionA));
-    ot_fx *fx = ot_fx_all(); if (!fx || !fx->h[OT_X]) { t_skip("fixture"); return; }
-    DWORD g, v;
-    CHECK(ot_qdw(NULL, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &g));
-    /* the connect that carried X now has server info: it answers the server limit */
-    CHECK(ot_qdw(fx->h[OT_C], INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v)); EXPECT_EQ(v, g);
 }

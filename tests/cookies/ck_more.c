@@ -331,7 +331,7 @@ static DWORD WINAPI setter(void *p) {
 }
 TEST(ck_more_threads_concurrent_setters) {
     REQUIRE(U(InternetSetCookieA));
-    thr_arg args[8]; HANDLE th[8]; int nt = 0;
+    static thr_arg args[8]; HANDLE th[8]; int nt = 0;   /* static: a thread still running after a wait timeout must not see a dead stack frame */
     const char *shared = ck_url(ck_host("thr"), "/");
     for (int t = 0; t < 8; t++) {
         snprintf(args[t].url, sizeof args[t].url, "%s", (t & 1) ? shared : ck_url(ck_host("thr"), "/"));

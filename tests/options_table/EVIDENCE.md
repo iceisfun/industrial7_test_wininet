@@ -94,6 +94,8 @@ Every other set runs in its own child process, so per-process globals cannot lea
 | ot_strings.c | USER_AGENT, URL, USERNAME/PASSWORD/PROXY_*, SECONDARY_CACHE_KEY: exact A/W size contracts | [D] + [VM] |
 | ot_struct.c | PROXY structure on A/W, per-session proxy set, USER_AGENT edge cases | [VM] (structure layout [D]) |
 | ot_tls.c | TLS options on the loopback HTTPS request | [VM]. Cipher, key size and protocol strings are noted only |
+| ot_conns_child.c | MAX_CONNS_PER_SERVER / PER_1_0_SERVER on connect handles, each scenario in a fresh child process | [D] (GetServerInfo, case 0x49/0x4a) + [VM] |
+| ot_live.c | DIAGNOSTIC_SOCKET_INFO mid-body (HTTP and HTTPS), URL after a redirect, USER_AGENT on the wire, RECEIVE_TIMEOUT effect, hidden connect of InternetOpenUrl, FTP/file kinds, ERROR_MASK, SUPPRESS_BEHAVIOR and CONNECTED_STATE sets (child) | [D] + [VM] |
 | ot_misc.c | callback, socket info, extended error, request-state gates, per-connection option, DATAFILE_NAME, REQUEST_FLAGS from cache, KEEP_CONNECTION | [D] + [VM]. Cache paths are noted only |
 | ot_query_matrix.c / ot_set_matrix.c / ot_rt_matrix.c / ot_inherit.c | table drivers (each range or option in a child process) | [VM] tables above |
 
@@ -113,3 +115,40 @@ VM (it takes about 8 s), then:
 | optr2-20261110-050542 | probe (query + round trip, 2 passes), every hand-written group in its own process, inheritance observation | data. Hand-written failures were triaged: 9 expectations corrected from the observed values, 2 relaxed to t_note |
 | optr3-20261110-061011 | full area, one process | 125/128 pass. Every generated matrix passes. 3 fixes: REQUEST_FLAGS constant name, MAX_CONNS on unused connects (state-dependent, relaxed) |
 | optr4-20261110-074816 | full area after the fixes, one process | **PASS** 128/128 tests, 4752 checks in the parent plus every matrix child (0 mismatches) |
+
+## Review pass 2 (adversarial review)
+Problems found and fixed:
+* **Order dependence of MAX_CONNS on connects.** The per-server limit lives in a CServerInfo record keyed by the
+  lower-cased host name only (GetServerInfo@0x64198: `_strlwr` + FindServerInfo, no port). A connect handle answers
+  73 only when a record exists for its host, so the answer depended on whether an earlier test in the same process
+  had made a request to 127.0.0.1. `ot_conns_wrong_handles` also set 4 on that shared record, which changed what
+  `ot_val_max_conns_used_connect` and `ot_val_max_conns_defaults_global` read when tests ran in another order or
+  under a name filter. The connect-handle parts were moved into fresh child processes (`ot_conns_child.c`) with hard
+  checks, and the parent no longer makes a non-zero set on a connect. Pinned in the children: no record in a fresh
+  process gives 12016 for query and set (0 still gives 160 first); after one request, every connect to that host
+  name shares one record, including connects to another port; "localhost" has its own record (12016 until used);
+  a connect set changes the record for all connects and leaves the global alone; clamping 2..128 with an unsigned
+  compare; a NULL-handle set of 73 **or 74** pushes the value into every existing record
+  (InternetSetOptionA case 0x4a calls CServerInfo::SetNewLimit with the 1.0 limit) [D][VM].
+  Side note: `ot_conns_global_clamped_2_128` restores both globals, which leaves every existing record at the
+  PER_1_0 value; nothing in the parent reads a record afterwards.
+* **Note-only checks that could not fail**, now hard checks from the VM observations of boots optr2-optr4:
+  USER_AGENT of a NULL-agent session (TRUE, *len 0; size probe 1), certificate options on plain HTTP requests
+  (32/35/36 -> 12016, 105 -> 12019, A and W), SECURITY_CERTIFICATE with strlen+1 (TRUE, *len strlen),
+  PER_CONNECTION_OPTION with length 8 (12010), DATAFILE_NAME on a NO_CACHE_WRITE request (12028), FTP find
+  REQUEST_FLAGS (8), request USERNAME answered from the connect, HTTP_DECODING stores 7 as given, children created
+  after a session decoding set read 1, IDN set 1 reads 1, READ/WRITE_BUFFER_SIZE default 4096.
+* The MAX_CONNS note claimed "IE11 defaults 10/10"; the image reads 2 and 4.
+
+New coverage (ot_live.c): DIAGNOSTIC_SOCKET_INFO while a 64 KiB body is half read (valid socket, DestPort = server
+port, SourcePort set, IDSI_FLAG_SECURE only on HTTPS, no PROXY/TUNNEL, A = W, 23-byte buffer -> 122/24, and
+INVALID_SOCKET with zero ports once the body is read); handle gates of option 67; URL (34) after an automatic 302
+(final URL, A and W sizes) and with NO_AUTO_REDIRECT (original URL); USER_AGENT set with A and W on a session reaches
+the User-Agent header of requests opened afterwards (a request opened before the change is noted); RECEIVE_TIMEOUT
+500 on the request turns a 4 s server stall into 12002 (no timing assert); InternetOpenUrl request: parent is a
+hidden CONNECT_HTTP handle whose parent is the session, context and URL; FTP connect and file: handles: parent is the
+session, CONTEXT_VALUE round trip; FTP connect copies session timeouts and keeps its own; ERROR_MASK values (bits
+1, 2, 8 allowed, anything else 87, length != 4 12010, query 87, NULL handle 12018); SUPPRESS_BEHAVIOR in a child
+(0, 1, 2, 4 TRUE; 5, 6, 0x10, 0x7fffffff, 0xffffffff 87; length 3/8 12010; query 87; value 3 is never sent because it
+purges the in-memory cookie jar); CONNECTED_STATE set in a child (8 bytes TRUE and ignored: the state still reads 1
+after an offline request; 4 or 12 bytes 12010).
