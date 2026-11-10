@@ -13,7 +13,7 @@ static hep_srv *start2(const srv_step *a, int na, const srv_step *b, int nb) {
     sc[0].steps = a; sc[0].nsteps = na; sc[1].steps = b; sc[1].nsteps = nb;
     h->blob = sc;
     srv_config cfg; memset(&cfg, 0, sizeof cfg);
-    cfg.kind = SRV_HTTP; cfg.scripts = sc; cfg.nscripts = 2; cfg.lifetime_ms = 30000;
+    cfg.kind = SRV_HTTP; cfg.scripts = sc; cfg.nscripts = 2; cfg.lifetime_ms = 30000; cfg.io_timeout_ms = 1000;
     if (srv_start(&cfg, &h->s) != SRV_OK) { t_skip("server unavailable"); free(sc); free(h); return NULL; }
     return h;
 }
@@ -279,6 +279,7 @@ static void early_reply_post(const char *tag, size_t bodylen, int drain, const c
     if (drain) st[k++].op = SRV_RECV_BODY;
     else { st[k].op = SRV_SLEEP; st[k].arg = 300; k++; }
     st[k++].op = SRV_CLOSE;
+    hep_io_timeout_next(3000);
     HEP_SRV(h, hep_start(st, k));
     char *body = (char *)malloc(bodylen); memset(body, 'p', bodylen);
     hep_req rq = {0}; hep_res r; rq.verb = "POST"; rq.opt = body; rq.optlen = (DWORD)bodylen; rq.timeout_ms = 3000;
@@ -296,6 +297,7 @@ GTEST(hep_early_reply_large_post_not_read, 20000)   { HEP_REQUIRE_HTTP(); early_
 
 /* ------------------------------------------------------------ Expect: 100-continue */
 static void expect_case(const char *tag, const srv_step *st, int n, const char *want, const char *want_body) {
+    hep_io_timeout_next(5000);
     HEP_SRV(h, hep_start(st, n));
     hep_req rq = {0}; hep_res r; rq.verb = "POST"; rq.opt = "payload!"; rq.optlen = 8; rq.timeout_ms = 3000;
     rq.hdrs = "Expect: 100-continue\r\n";
@@ -347,6 +349,7 @@ GTEST(hep_expect_100_headers_not_merged, 20000) {
     HEP_REQUIRE_HTTP();
     static const srv_step st[] = { S_HEAD(), S_SEND("HTTP/1.1 100 Continue\r\nX-Interim: yes\r\n\r\n"), S_BODY(),
                                    S_REPLY(200, "X-Final: yes\r\n", "ok"), S_CLOSE() };
+    hep_io_timeout_next(5000);
     HEP_SRV(h, hep_start(st, 5));
     HINTERNET hi = hep_session(NULL, 0), hc = hep_connect(hi, h);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "POST", "/e", NULL, NULL, NULL, HEP_F, 0);

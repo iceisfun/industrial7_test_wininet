@@ -38,6 +38,14 @@
 #endif
 
 /* ---------------------------------------------------------------- servers */
+/* Per-connection SO_RCVTIMEO/SO_SNDTIMEO of every hep server. Win10 VM (hep_zz_timing_probe): WinINet keeps the
+ * keep-alive socket pooled after InternetCloseHandle, the server thread then sits in recv() for the next head and
+ * shutdown(SD_BOTH) does not wake it, so srv_stop() waited its full 3 s per server. A 1 s receive timeout bounds that
+ * cost; requests inside one test follow each other within milliseconds (hep_conn.c servers use 1 s, servers that wait on
+ * the client use hep_io_timeout_next). */
+#define HEP_IO_TIMEOUT 300
+/* one-shot override for the next hep_start*() (tests whose server waits on the client for longer) */
+void hep_io_timeout_next(DWORD ms);
 /* A server owning its (heap) script; freed by hep_stop. */
 typedef struct hep_srv {
     srv *s;

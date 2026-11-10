@@ -256,7 +256,7 @@ GTEST(hep_split_every_boundary, 150000) {
         h->steps = (srv_step *)calloc(2, sizeof *h->steps); memcpy(h->steps, st, sizeof st); h->nsteps = 2;
         h->sc.steps = h->steps; h->sc.nsteps = 2;
         int *arg = (int *)malloc(sizeof *arg); *arg = at; h->blob = arg;
-        srv_config cfg; memset(&cfg, 0, sizeof cfg); cfg.kind = SRV_HTTP; cfg.scripts = &h->sc; cfg.nscripts = 1; cfg.user = arg;
+        srv_config cfg; memset(&cfg, 0, sizeof cfg); cfg.kind = SRV_HTTP; cfg.scripts = &h->sc; cfg.nscripts = 1; cfg.user = arg; cfg.io_timeout_ms = HEP_IO_TIMEOUT;
         if (srv_start(&cfg, &h->s) != SRV_OK) { t_skip("server unavailable"); free(arg); free(h->steps); free(h); return; }
         hep_req rq = {0}; hep_res r; rq.qname = "X-T";
         hep_do(h, &rq, &r);

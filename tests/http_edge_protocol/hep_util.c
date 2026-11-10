@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 /* ---------------------------------------------------------------- servers */
+static DWORD g_io_next;
+void hep_io_timeout_next(DWORD ms) { g_io_next = ms; }
 hep_srv *hep_start_v4(const srv_step *st, int n, int v4_only) {
     hep_srv *h = (hep_srv *)calloc(1, sizeof *h);
     h->steps = (srv_step *)calloc((size_t)n + 1, sizeof *h->steps);
@@ -12,7 +14,7 @@ hep_srv *hep_start_v4(const srv_step *st, int n, int v4_only) {
     h->sc.steps = h->steps; h->sc.nsteps = n;
     srv_config cfg; memset(&cfg, 0, sizeof cfg);
     cfg.kind = SRV_HTTP; cfg.scripts = &h->sc; cfg.nscripts = 1; cfg.v4_only = v4_only;
-    cfg.lifetime_ms = 30000;
+    cfg.lifetime_ms = 30000; cfg.io_timeout_ms = g_io_next ? g_io_next : HEP_IO_TIMEOUT; g_io_next = 0;
     int rc = srv_start(&cfg, &h->s);
     if (rc != SRV_OK) { t_skip("server unavailable: %s", srv_strerror(rc)); free(h->steps); free(h); return NULL; }
     return h;
