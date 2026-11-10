@@ -1,6 +1,7 @@
 /* bio_cl_variants.c - Content-Length header spellings and conflicts, LF-only heads, Content-Length on
  * responses that also carry Connection: close, and how much of the body each one delivers.
  * Each case runs on its own server and connection (the server closes after the body + 300 ms).
+ * Cases marked "VM boot 2" were observed on the Win10 VM and are asserted; the CL query results stay notes.
  * VM_TIMEOUT: 300 */
 #include "bio.h"
 #include <stdlib.h>
@@ -21,28 +22,28 @@ static const clv_case clv[] = {
     { "CL tab",                "HTTP/1.1 200 OK\r\nContent-Length:\t5\r\n\r\nhelloXXXX", 1, 5, "hello" },
     { "CL lower-case name",    "HTTP/1.1 200 OK\r\ncontent-length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },
     { "CL upper-case name",    "HTTP/1.1 200 OK\r\nCONTENT-LENGTH: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },
-    { "CL duplicate equal",    "HTTP/1.1 200 OK\r\nContent-Length: 5\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL duplicate differ",   "HTTP/1.1 200 OK\r\nContent-Length: 3\r\nContent-Length: 7\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL list 5, 5",          "HTTP/1.1 200 OK\r\nContent-Length: 5, 5\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL non-numeric",        "HTTP/1.1 200 OK\r\nContent-Length: abc\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL negative",           "HTTP/1.1 200 OK\r\nContent-Length: -5\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL trailing garbage",   "HTTP/1.1 200 OK\r\nContent-Length: 5x\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL empty value",        "HTTP/1.1 200 OK\r\nContent-Length:\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "CL 2^32+5",             "HTTP/1.1 200 OK\r\nContent-Length: 4294967301\r\n\r\nhelloXXXX", 1, -1, NULL },
+    { "CL duplicate equal",    "HTTP/1.1 200 OK\r\nContent-Length: 5\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
+    { "CL duplicate differ",   "HTTP/1.1 200 OK\r\nContent-Length: 3\r\nContent-Length: 7\r\n\r\nhelloXXXX", 1, 3, "hel" },  /* VM boot 2 */
+    { "CL list 5, 5",          "HTTP/1.1 200 OK\r\nContent-Length: 5, 5\r\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
+    { "CL non-numeric",        "HTTP/1.1 200 OK\r\nContent-Length: abc\r\n\r\nhelloXXXX", 1, 0, "" },  /* VM boot 2 */
+    { "CL negative",           "HTTP/1.1 200 OK\r\nContent-Length: -5\r\n\r\nhelloXXXX", 1, 0, "" },  /* VM boot 2 */
+    { "CL trailing garbage",   "HTTP/1.1 200 OK\r\nContent-Length: 5x\r\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
+    { "CL empty value",        "HTTP/1.1 200 OK\r\nContent-Length:\r\n\r\nhelloXXXX", 1, 0, "" },  /* VM boot 2 */
+    { "CL 2^32+5",             "HTTP/1.1 200 OK\r\nContent-Length: 4294967301\r\n\r\nhelloXXXX", 1, 9, "helloXXXX" },  /* VM boot 2 */
     { "CL huge digits",        "HTTP/1.1 200 OK\r\nContent-Length: 99999999999999999999999\r\n\r\nhelloXXXX", 0, -1, NULL },  /* VM boot 2: 12153 */
     { "CL + Connection close", "HTTP/1.1 200 OK\r\nContent-Length: 5\r\nConnection: close\r\n\r\nhelloXXXX", 1, 5, "hello" },
     { "LF-only head",          "HTTP/1.1 200 OK\nContent-Length: 5\n\nhelloXXXX", 1, 5, "hello" },
-    { "mixed CRLF/LF head",    "HTTP/1.1 200 OK\r\nContent-Length: 5\n\r\nhelloXXXX", 1, -1, NULL },
+    { "mixed CRLF/LF head",    "HTTP/1.1 200 OK\r\nContent-Length: 5\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
     { "HTTP/1.0 CL",           "HTTP/1.0 200 OK\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },
     { "HTTP/1.0 no length",    "HTTP/1.0 200 OK\r\n\r\nhelloXXXX", 1, 9, "helloXXXX" },
     { "no reason phrase",      "HTTP/1.1 200\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },
-    { "folded header before CL", "HTTP/1.1 200 OK\r\nX-Fold: a\r\n b\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "TE identity + CL",      "HTTP/1.1 200 OK\r\nTransfer-Encoding: identity\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "TE gzip, chunked (no decoding)", "HTTP/1.1 200 OK\r\nTransfer-Encoding: gzip, chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n", 1, -1, NULL },
-    { "TE unknown",            "HTTP/1.1 200 OK\r\nTransfer-Encoding: foo\r\n\r\nhelloXXXX", 1, -1, NULL },
+    { "folded header before CL", "HTTP/1.1 200 OK\r\nX-Fold: a\r\n b\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
+    { "TE identity + CL",      "HTTP/1.1 200 OK\r\nTransfer-Encoding: identity\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
+    { "TE gzip, chunked (no decoding)", "HTTP/1.1 200 OK\r\nTransfer-Encoding: gzip, chunked\r\n\r\n5\r\nhello\r\n0\r\n\r\n", 1, 15, "5\r\nhello\r\n0\r\n\r\n" },  /* VM boot 2 */
+    { "TE unknown",            "HTTP/1.1 200 OK\r\nTransfer-Encoding: foo\r\n\r\nhelloXXXX", 1, 9, "helloXXXX" },  /* VM boot 2 */
     { "CL 0 with body bytes",  "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\nhelloXXXX", 1, 0, "" },
-    { "204 with body bytes",   "HTTP/1.1 204 No Content\r\n\r\nhelloXXXX", 1, -1, NULL },
-    { "304 with CL 5",         "HTTP/1.1 304 Not Modified\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, -1, NULL },
+    { "204 with body bytes",   "HTTP/1.1 204 No Content\r\n\r\nhelloXXXX", 1, 0, "" },  /* VM boot 2 */
+    { "304 with CL 5",         "HTTP/1.1 304 Not Modified\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },  /* VM boot 2 */
     { "1xx 102 then 200",      "HTTP/1.1 102 Processing\r\n\r\nHTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nhelloXXXX", 1, 5, "hello" },
 };
 

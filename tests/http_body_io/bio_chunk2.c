@@ -66,6 +66,9 @@ static void ch2_run(const ch2_case *c, DWORD piece) {
     if (!ok) {
         t_note("[%s] send failed err=%lu %s", c->name, err, t_inet_errname(err));
         CHECKF(!c->valid, "[%s] send failed err=%lu", c->name, err);
+        /* Win10 VM boot 2: the whole response arrives with the head, the parser runs inside HttpSendRequest and its
+         * error is returned as is: 12152 for the size overflow, 12004 for every other syntax error ([D]) */
+        if (!c->valid) EXPECT_EQ(err, strstr(c->name, "17 hex") ? ERROR_HTTP_INVALID_SERVER_RESPONSE : ERROR_INTERNET_INTERNAL_ERROR);
         bio_h(hr); bio_close(&e); return;
     }
     char b[256]; bio_rd r; size_t n = bio_read(hr, b, sizeof b, piece, &r);
@@ -75,6 +78,7 @@ static void ch2_run(const ch2_case *c, DWORD piece) {
         CHECKF(n == wl && !memcmp(b, c->want, wl), "[%s] got %u bytes '%.*s' want '%s'", c->name, (unsigned)n, (int)(n < 40 ? n : 40), b, c->want);
     } else {
         t_note("[%s] read ok=%d err=%lu %s n=%u", c->name, r.ok, r.err, r.ok ? "" : t_inet_errname(r.err), (unsigned)n);
+        CHECKF(0, "[%s] invalid framing was accepted by HttpSendRequest (boot 2: it failed there)", c->name);
         CHECKF(n <= wl && !memcmp(b, c->want, n), "[%s] delivered %u bytes '%.*s', more than the valid prefix '%s'", c->name, (unsigned)n, (int)(n < 40 ? n : 40), b, c->want);
     }
     EXPECT_EQ(r.over, 0);

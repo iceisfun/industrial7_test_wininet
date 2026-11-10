@@ -159,7 +159,7 @@ TEST(bio_d2_ct_text_plain_decoded) { REQUIRE(U(InternetReadFile)); ce_case(CE_GZ
 TEST(bio_d2_ct_octet_stream_decoded) { REQUIRE(U(InternetReadFile)); ce_case(CE_GZIP "Content-Type: application/octet-stream\r\n", GZ_FOX, 1, "CT application/octet-stream"); }
 TEST(bio_d2_ct_x_tar_deflate_left_encoded) { REQUIRE(U(InternetReadFile)); ce_case(CE_DEFL "Content-Type: application/x-tar\r\n", ZL_FOX, 0, "CT application/x-tar, deflate"); }
 /* other compression-looking types: observed only */
-static void ct_probe(const char *ct) {
+static void ct_probe(const char *ct, int want_dec) {
     char h[160]; snprintf(h, sizeof h, CE_GZIP "Content-Type: %s\r\n", ct);
     d2_in in = { GZ_FOX, 0, 0, h, AE_GD, NULL, 1, 4096 };
     d2_out o; d2_run(&in, &o);
@@ -167,14 +167,15 @@ static void ct_probe(const char *ct) {
         int dec = o.r.ok && o.n == SRV_FOX_LEN && !memcmp(o.b, srv_fox_text(), SRV_FOX_LEN);
         int raw = o.r.ok && o.n == srv_fox_gzip_len && !memcmp(o.b, srv_fox_gzip, o.n);
         t_note("Content-Type %s with gzip: %s", ct, dec ? "decoded" : raw ? "left encoded" : "other");
-        CHECK(dec || raw);
+        CHECK(want_dec ? dec : raw);
     }
     d2_free(&o);
 }
-TEST(bio_d2_ct_probe_zip) { REQUIRE(U(InternetReadFile)); ct_probe("application/zip"); }
-TEST(bio_d2_ct_probe_gzip) { REQUIRE(U(InternetReadFile)); ct_probe("application/gzip"); }
-TEST(bio_d2_ct_probe_x_gtar) { REQUIRE(U(InternetReadFile)); ct_probe("application/x-gtar"); }
-TEST(bio_d2_ct_probe_x_spoon) { REQUIRE(U(InternetReadFile)); ct_probe("application/x-spoon"); }
+/* Win10 VM boot 2: application/x-spoon is in the exclusion table too (string at wininet!0x4036f0); zip, gzip, x-gtar are not */
+TEST(bio_d2_ct_probe_zip) { REQUIRE(U(InternetReadFile)); ct_probe("application/zip", 1); }
+TEST(bio_d2_ct_probe_gzip) { REQUIRE(U(InternetReadFile)); ct_probe("application/gzip", 1); }
+TEST(bio_d2_ct_probe_x_gtar) { REQUIRE(U(InternetReadFile)); ct_probe("application/x-gtar", 1); }
+TEST(bio_d2_ct_probe_x_spoon) { REQUIRE(U(InternetReadFile)); ct_probe("application/x-spoon", 0); }
 
 /* ------------------------------------------------------------------ headers after decoding */
 TEST(bio_d2_ce_header_removed_when_decoded) {
@@ -296,22 +297,27 @@ static void odd_case(const void *body, size_t blen, const char *ce, const char *
 }
 TEST(bio_d2_gzip_bad_isize) {
     REQUIRE(U(InternetReadFile)); d2_out o;
-    odd_case(bio_gz_badisize, bio_gz_badisize_len, CE_GZIP, srv_fox_text(), SRV_FOX_LEN, "bad ISIZE", &o); d2_free(&o);
+    odd_case(bio_gz_badisize, bio_gz_badisize_len, CE_GZIP, srv_fox_text(), SRV_FOX_LEN, "bad ISIZE", &o);
+    if (o.ran) { CHECK(!o.r.ok); EXPECT_EQ(o.n, 0); }      /* VM boot 2: 12175, nothing delivered (zlib "incorrect length check") */
+    d2_free(&o);
 }
 TEST(bio_d2_gzip_two_members) {
     REQUIRE(U(InternetReadFile)); d2_out o;
     odd_case(bio_gz_two_members, bio_gz_two_members_len, CE_GZIP, "first-member|second-member", 26, "two members", &o);
-    if (o.ran && o.r.ok) CHECK(o.n >= 13);
+    if (o.ran) { CHECK(o.r.ok); EXPECT_EQ(o.n, 13); }        /* VM boot 2: only the first member */
     d2_free(&o);
 }
 TEST(bio_d2_gzip_trailing_garbage) {
     REQUIRE(U(InternetReadFile)); d2_out o;
     odd_case(bio_gz_trailing_garbage, bio_gz_trailing_garbage_len, CE_GZIP, srv_fox_text(), SRV_FOX_LEN, "member + junk", &o);
+    if (o.ran) { CHECK(o.r.ok); EXPECT_EQ(o.n, SRV_FOX_LEN); }   /* VM boot 2: junk after the member ignored */
     d2_free(&o);
 }
 TEST(bio_d2_gzip_no_trailer) {
     REQUIRE(U(InternetReadFile)); d2_out o;
-    odd_case(bio_gz_no_trailer, bio_gz_no_trailer_len, CE_GZIP, srv_fox_text(), SRV_FOX_LEN, "no trailer", &o); d2_free(&o);
+    odd_case(bio_gz_no_trailer, bio_gz_no_trailer_len, CE_GZIP, srv_fox_text(), SRV_FOX_LEN, "no trailer", &o);
+    if (o.ran) { CHECK(o.r.ok); EXPECT_EQ(o.n, SRV_FOX_LEN); }   /* VM boot 2: the body ends cleanly without the trailer */
+    d2_free(&o);
 }
 TEST(bio_d2_gzip_truncated_by_close) {
     REQUIRE(U(InternetReadFile));
