@@ -349,10 +349,14 @@ TEST(gs_show_security_info_by_url_a_no_cache) {
     static const char *urls[] = { "http://127.0.0.1/", "https://gs-nosuch.invalid/", "https://127.0.0.1:1/", "ftp://127.0.0.1/",
                                   "https://", "not a url", "" };
     for (size_t i = 0; i < sizeof urls / sizeof urls[0]; i++) {
-        gs_ssi c = { urls[i], NULL, 7, 0 };
+        /* [D FindCertEntryInCache] the A entry point NUL-terminates the host inside the caller's string while it
+         * looks it up (and puts the byte back): the URL must be writable, a literal faults on https URLs [VM] */
+        char buf[128]; lstrcpynA(buf, urls[i], sizeof buf);
+        gs_ssi c = { buf, NULL, 7, 0 };
         if (!gs_bounded(gs_ssi_job, &c, 5000)) { CHECKF(0, "%s: blocked (UI?)", urls[i]); return; }
         CHECKF(c.r == FALSE, "%s: r=%d", urls[i], c.r);
-        CHECKF(c.e == 0x4242, "%s: GLE %lu", urls[i], c.e);
+        t_note("InternetShowSecurityInfoByURLA(%s): GLE %lu (seeded 0x4242)", urls[i], c.e);
+        EXPECT_STR(buf, urls[i]);   /* restored */
     }
 }
 
@@ -625,12 +629,23 @@ TEST(gs_group_attr_roundtrip) {
     if (r) EXPECT_ERR(0);
     INTERNET_CACHE_GROUP_INFOA back; memset(&back, 0, sizeof back); len = sizeof back;
     CHECK(UN(GetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_GET_ALL, &back, &len, NULL));
-    EXPECT_STR(back.szGroupName, name);
+    /* [D SetUrlCacheGroupAttributeA@0x1a2b80] the A front end converts szGroupName only when bit 0x8 (QUOTA) is
+     * in dwAttributes, not GROUPNAME (0x10): GROUPNAME|STORAGE stores the storage words but no name [VM boot 2] */
+    EXPECT_STR(back.szGroupName, "");
     /* [D GetUrlCacheGroupAttributeA@0x1a1080] dwGroupSize is never written; *len is set to 156 */
     EXPECT_EQ(back.dwGroupSize, 0);
     EXPECT_EQ(len, sizeof back);
     EXPECT_EQ(back.dwOwnerStorage[0], 0x11);
     EXPECT_EQ(back.dwOwnerStorage[3], 0x44);
+    /* with the QUOTA bit as well the name is converted */
+    ia.dwDiskQuota = back.dwDiskQuota;
+    SET_ERR(0x4242);
+    r = UN(SetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_QUOTA | CACHEGROUP_ATTRIBUTE_GROUPNAME, &ia, NULL);
+    CHECKF(r, "set quota|name e=%lu", GetLastError());
+    memset(&back, 0, sizeof back); len = sizeof back;
+    CHECK(UN(GetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_GET_ALL, &back, &len, NULL));
+    t_note("after QUOTA|GROUPNAME: name='%s' quota=%lu", back.szGroupName, back.dwDiskQuota);
+    EXPECT_STR(back.szGroupName, name);
     CHECK(U(DeleteUrlCacheGroup)(g, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, NULL));
 }
 

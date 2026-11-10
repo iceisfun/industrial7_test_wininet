@@ -35,8 +35,13 @@ static int gs_cache_entry(const char *url) {
     HANDLE h = CreateFileA(file, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
     if (h == INVALID_HANDLE_VALUE) return 0;
     DWORD w; WriteFile(h, "gs", 2, &w, NULL); CloseHandle(h);
-    FILETIME z = { 0 };
-    if (!U(CommitUrlCacheEntryA)(url, file, z, z, NORMAL_CACHE_ENTRY, NULL, 0, NULL, NULL)) return 0;
+    /* expiry 30 days ahead, last-modified one day back (same shape as the urlcache_enum_groups fixtures) */
+    FILETIME now; GetSystemTimeAsFileTime(&now);
+    ULARGE_INTEGER u; u.LowPart = now.dwLowDateTime; u.HighPart = now.dwHighDateTime;
+    ULARGE_INTEGER ex = u, lm = u;
+    ex.QuadPart += 30ULL * 86400ULL * 10000000ULL; lm.QuadPart -= 86400ULL * 10000000ULL;
+    FILETIME fe = { ex.LowPart, ex.HighPart }, fl = { lm.LowPart, lm.HighPart };
+    if (!U(CommitUrlCacheEntryA)(url, file, fe, fl, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL)) return 0;
     t_cache_track(url);
     return 1;
 }
@@ -45,11 +50,15 @@ static int gs_cache_entry(const char *url) {
 static GROUPID gs_group_with(int n, char urls[][200]) {
     if (!U(CreateUrlCacheGroup) || !U(SetUrlCacheEntryGroupA)) return 0;
     GROUPID g = U(CreateUrlCacheGroup)(0, NULL);
-    if (!g) return 0;
+    if (!g) { t_note("CreateUrlCacheGroup failed: %lu", GetLastError()); return 0; }
     for (int i = 0; i < n; i++) {
         char tag[32]; snprintf(tag, sizeof tag, "gs_ord103_%d", i);
         lstrcpynA(urls[i], t_uniq_cache_url(tag), 200);
-        if (!gs_cache_entry(urls[i]) || !U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)) {
+        int step = 0; DWORD e = 0;
+        if (!gs_cache_entry(urls[i])) { step = 1; e = GetLastError(); }
+        else if (!U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)) { step = 2; e = GetLastError(); }
+        if (step) {
+            t_note("group setup: entry %d failed at %s with %lu", i, step == 1 ? "create/commit" : "SetUrlCacheEntryGroupA", e);
             U(DeleteUrlCacheGroup)(g, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, NULL);
             return 0;
         }
