@@ -59,7 +59,7 @@ TEST(tls_more_status_text_and_version) {
     CHECK(strncmp(rq, "GET /t HTTP/1.1\r\n", 17) == 0);
     char hh[96]; snprintf(hh, sizeof hh, "\r\nHost: %s\r\n", srv_hostport(s));
     CHECK(strstr(rq, hh) != NULL);
-    char body[8]; EXPECT_EQ(treq_body(&t, body, sizeof body), 2);
+    char body[8]; size_t bn = treq_body(&t, body, sizeof body); EXPECT_EQ(bn, 2);
     treq_close(&t); srv_stop(s);
 }
 
@@ -104,7 +104,8 @@ TEST(tls_more_sendrequestex_chunked_upload) {
         CHECK(b && !memcmp(b, "hello world", 11));
         EXPECT_EQ(srv_req_body_chunked(s, 0), 1);
         EXPECT_STR(srv_req_header(s, 0, "Transfer-Encoding"), "chunked");
-        EXPECT_EQ(srv_req_header(s, 0, "Content-Length"), NULL);
+        /* Win10: the caller's chunked header does not suppress "Content-Length: 0" from dwBufferTotal (see http_request_wire) */
+        EXPECT_STR(srv_req_header(s, 0, "Content-Length"), "0");
     } else CHECK(0);
     char r[16]; treq_body(&t, r, sizeof r);
     treq_close(&t); srv_stop(s);

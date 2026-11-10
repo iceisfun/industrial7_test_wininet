@@ -196,6 +196,11 @@ TEST(tls_async_cert_error_status_sequence) {
     EXPECT_EQ(arec_count(&r, INTERNET_STATUS_RECEIVING_RESPONSE), 0);
     EXPECT_EQ(arec_count(&r, INTERNET_STATUS_RESPONSE_RECEIVED), 0);
     EXPECT_EQ(arec_last(&r, INTERNET_STATUS_REQUEST_COMPLETE), (int)r.n - 1);
+    /* Win10: 80 20 21 50 51 100 (DETECTING_PROXY, CONNECTING, CONNECTED, CLOSING_CONNECTION, CONNECTION_CLOSED, COMPLETE) */
+    EXPECT_EQ(arec_count(&r, INTERNET_STATUS_SENDING_REQUEST), 0);
+    EXPECT_EQ(arec_count(&r, INTERNET_STATUS_REQUEST_SENT), 0);
+    EXPECT_EQ(arec_count(&r, INTERNET_STATUS_CLOSING_CONNECTION), 1);
+    EXPECT_EQ(arec_count(&r, INTERNET_STATUS_CONNECTION_CLOSED), 1);
     t_note("12045: SENDING_REQUEST=%d REQUEST_SENT=%d CLOSING_CONNECTION=%d CONNECTION_CLOSED=%d", arec_count(&r, INTERNET_STATUS_SENDING_REQUEST),
            arec_count(&r, INTERNET_STATUS_REQUEST_SENT), arec_count(&r, INTERNET_STATUS_CLOSING_CONNECTION), arec_count(&r, INTERNET_STATUS_CONNECTION_CLOSED));
     areq_close(&q, &r);
@@ -308,7 +313,7 @@ TEST(tls_async_openurl_unknown_ca) {
     EXPECT_EQ(h, NULL);
     EXPECT_EQ(e, ERROR_IO_PENDING);
     if (!h && e == ERROR_IO_PENDING) {
-        EXPECT_EQ(WaitForSingleObject(r.done, 8000), WAIT_OBJECT_0);
+        DWORD w_ = WaitForSingleObject(r.done, 8000); EXPECT_EQ(w_, WAIT_OBJECT_0);
         int i = arec_first(&r, INTERNET_STATUS_REQUEST_COMPLETE, 0);
         CHECK(i >= 0);
         if (i >= 0) {
@@ -337,7 +342,7 @@ TEST(tls_async_sendrequestex_unknown_ca) {
     BOOL ok = U(HttpSendRequestExA)(q.hr, &ib, NULL, 0, (DWORD_PTR)&r);
     DWORD e = ok ? 0 : GetLastError();
     if (!ok && e == ERROR_IO_PENDING) {
-        EXPECT_EQ(WaitForSingleObject(r.done, 8000), WAIT_OBJECT_0);
+        DWORD w_ = WaitForSingleObject(r.done, 8000); EXPECT_EQ(w_, WAIT_OBJECT_0);
         int i = arec_last(&r, INTERNET_STATUS_REQUEST_COMPLETE);
         e = i >= 0 ? (r.res[i] ? 0 : r.err[i]) : 0xDEAD0002;
     }
@@ -357,7 +362,7 @@ TEST(tls_async_ignore_flags_at_open) {
     t_https_secflags(q.hr, 0x100);
     int pend; DWORD_PTR res;
     EXPECT_EQ(async_send(&q, &r, &pend, &res), 0);
-    char b[64]; EXPECT_EQ(async_read_all(&q, &r, b, sizeof b), 5);
+    char b[64]; size_t bn = async_read_all(&q, &r, b, sizeof b); EXPECT_EQ(bn, 5);
     areq_close(&q, &r);
     srv_stop(s);
 }

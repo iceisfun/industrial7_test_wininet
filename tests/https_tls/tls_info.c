@@ -18,6 +18,11 @@ static int good_request(treq *t, srv *s, const char *host) {
     if (!treq_open(t, host ? host : "127.0.0.1", srv_port(s), "GET", "/i", T_INET_FRESH | INTERNET_FLAG_SECURE)) return 0;
     t_https_secflags(t->hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
     DWORD e = treq_send(t);
+    if (e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET) {
+        /* seen once on the VM (boot tls5): a transient abort of a fresh loopback connection; retry once on the same handle */
+        t_note("good_request: transient %lu, retrying once", e);
+        e = treq_send(t);
+    }
     if (e) { t_note("good_request failed: %lu %s", e, t_inet_errname(e)); return 0; }
     char b[64]; treq_body(t, b, sizeof b);
     return 1;

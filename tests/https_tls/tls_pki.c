@@ -316,15 +316,27 @@ TEST(tls_pki_chain_context_partial) {
         PCERT_SIMPLE_CHAIN sc = ch->rgpChain[0];
         EXPECT_EQ(sc->cElement, 1);
         if (sc->cElement >= 1) CHECK(U(CertCompareCertificate)(X509_ASN_ENCODING, sc->rgpElement[0]->pCertContext->pCertInfo, leaf->cert->pCertInfo));
-        DWORD es = ch->TrustStatus.dwErrorStatus;
-        CHECK(es & CERT_TRUST_IS_PARTIAL_CHAIN);
-        CHECK(!(es & CERT_TRUST_IS_UNTRUSTED_ROOT));
-        if (revocation_enabled()) EXPECT_EQ(es, CERT_TRUST_IS_PARTIAL_CHAIN | CERT_TRUST_REVOCATION_STATUS_UNKNOWN | CERT_TRUST_IS_OFFLINE_REVOCATION);
+        /* after a success with 0x180 the stored chain only says PARTIAL_CHAIN (boot tls5) */
+        EXPECT_EQ(ch->TrustStatus.dwErrorStatus, CERT_TRUST_IS_PARTIAL_CHAIN);
         EXPECT_EQ(ch->TrustStatus.dwInfoStatus & CERT_TRUST_IS_SELF_SIGNED, 0);
         U(CertFreeCertificateChain)(ch);
     }
     char b[16]; treq_body(&t, b, sizeof b);
     treq_close(&t);
+    /* after the 12057 failure (0x100 only) the unverified chain carries the revocation bits (boot tls4) */
+    if (revocation_enabled()) {
+        e = pki_get("127.0.0.1", mts_port(m), 0x100, 0, &st, &t);
+        EXPECT_EQ(e, E_REVF);
+        ch = NULL; l = sizeof ch;
+        ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT, &ch, &l);
+        CHECK(ok && ch);
+        if (ok && ch) {
+            EXPECT_EQ(ch->rgpChain[0]->cElement, 1);
+            EXPECT_EQ(ch->TrustStatus.dwErrorStatus, CERT_TRUST_IS_PARTIAL_CHAIN | CERT_TRUST_REVOCATION_STATUS_UNKNOWN | CERT_TRUST_IS_OFFLINE_REVOCATION);
+            U(CertFreeCertificateChain)(ch);
+        }
+        treq_close(&t);
+    }
     mts_stop(m);
 }
 
@@ -465,7 +477,7 @@ TEST(tls_pki_eku_matrix) {
         { PKI_EKU_SERVER, 0, "serverAuth" },
         { PKI_EKU_BOTH, 0, "serverAuth+clientAuth" },
         { PKI_EKU_NONE, 0, "no EKU" },
-        { PKI_EKU_ANY, 0xFFFFFFFF, "anyExtendedKeyUsage" },
+        { PKI_EKU_ANY, 0, "anyExtendedKeyUsage" },   /* accepted for serverAuth (boot tls5) */
         { PKI_EKU_CLIENT, E_INV, "clientAuth" },
         { PKI_EKU_CODESIGN, E_INV, "codeSigning" },
     };
@@ -689,7 +701,8 @@ TEST(tls_pki_aia_complete_chain) {
     aia_fx f; if (!aia_setup(&f, NULL, 0, 0, -1, 30)) PKI_SKIP();
     static const prow rows[] = { { "127.0.0.1", 0, 0, E_CA }, { "127.0.0.1", 0x1000 | 0x2000 | 0x200 | 0x80, 0, E_CA }, { "127.0.0.1", OKF, 0, 0 } };
     run_prows(f.m, "aia", rows, 3);
-    observe(f.m, "aia no CDP", "127.0.0.1", 0x100);
+    static const prow rows2[] = { { "127.0.0.1", 0x100, 0, REVF } };   /* no CDP: revocation unknown */
+    run_prows(f.m, "aia no CDP", rows2, 1);
     blob_report(&f.aia, "aia");
     CHECK(srv_req_count(f.aia.s) >= 1);
     if (srv_req_count(f.aia.s) >= 1) {
@@ -703,8 +716,17 @@ TEST(tls_pki_aia_complete_chain) {
     treq t; DWORD st;
     if (!pki_get("127.0.0.1", mts_port(f.m), OKF, 0, &st, &t)) {
         PCCERT_CHAIN_CONTEXT ch = NULL; DWORD l = sizeof ch;
-        if (U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT, &ch, &l) && ch) {
-            t_note("aia chain: elements=%lu error=0x%lx info=0x%lx", ch->rgpChain[0]->cElement, ch->TrustStatus.dwErrorStatus, ch->TrustStatus.dwInfoStatus);
+        BOOL ok = U(InternetQueryOptionA)(t.hr, INTERNET_OPTION_SERVER_CERT_CHAIN_CONTEXT, &ch, &l);
+        CHECK(ok && ch);
+        if (ok && ch) {
+            /* complete chain (leaf + fetched root): UNTRUSTED_ROOT, info HAS_PREFERRED_ISSUER... as observed (boot tls5) */
+            EXPECT_EQ(ch->rgpChain[0]->cElement, 2);
+            EXPECT_EQ(ch->TrustStatus.dwErrorStatus, CERT_TRUST_IS_UNTRUSTED_ROOT);
+            EXPECT_EQ(ch->TrustStatus.dwInfoStatus, 0x100);
+            if (ch->rgpChain[0]->cElement == 2) {
+                CHECK(U(CertCompareCertificate)(X509_ASN_ENCODING, ch->rgpChain[0]->rgpElement[1]->pCertContext->pCertInfo, f.iss->cert->pCertInfo));
+                CHECK(ch->rgpChain[0]->rgpElement[1]->TrustStatus.dwInfoStatus & CERT_TRUST_IS_SELF_SIGNED);
+            }
             U(CertFreeCertificateChain)(ch);
         }
         char b[16]; treq_body(&t, b, sizeof b);
@@ -713,19 +735,18 @@ TEST(tls_pki_aia_complete_chain) {
     aia_teardown(&f);
 }
 
+/* complete chain to an untrusted root plus a reachable CDP: Windows does not fetch the CRL for an untrusted chain, so the
+ * result is 12057 whatever the CRL says (404, valid, revoking the leaf), and IGNORE_REVOCATION clears it (boot tls5).
+ * 12170 (revoked) needs a trusted root, i.e. a store change: dx_ area only. */
 static void aia_cdp_case(int status, int revoke, const char *tag) {
     aia_fx f; if (!aia_setup(&f, NULL, status, revoke, -1, 30)) PKI_SKIP();
-    DWORD a = observe(f.m, tag, "127.0.0.1", 0x100);
+    static const prow rows[] = {
+        { "127.0.0.1", 0, 0, E_CA }, { "127.0.0.1", 0x100, 0, REVF }, { "127.0.0.1", OKF, 0, 0 }, { "127.0.0.1", SECURITY_SET_MASK | 0x10000, 0, 0 },
+    };
+    run_prows(f.m, tag, rows, 4);
     blob_report(&f.crl, tag);
-    DWORD b = observe(f.m, tag, "127.0.0.1", OKF);
-    DWORD c = observe(f.m, tag, "127.0.0.1", SECURITY_SET_MASK | 0x10000);
-    (void)a; (void)b; (void)c;
-    if (srv_req_count(f.crl.s) >= 1) {
-        const char *ua = srv_req_header(f.crl.s, 0, "User-Agent");
-        t_note("%s: CRL fetch UA=%s", tag, ua ? ua : "(none)");
-    }
-    static const prow rows[] = { { "127.0.0.1", 0, 0, E_CA } };
-    run_prows(f.m, tag, rows, 1);
+    EXPECT_EQ(srv_req_count(f.crl.s), 0);
+    CHECK(srv_req_count(f.aia.s) >= 1);
     aia_teardown(&f);
 }
 TEST(tls_pki_aia_cdp_404) { REQUIRE(U(HttpSendRequestA)); aia_cdp_case(404, 0, "aia+cdp 404"); }
@@ -740,9 +761,10 @@ TEST(tls_pki_aia_expired_issuer) {
     pki_ent *old = pki_make(&sp, NULL);
     if (!old) PKI_SKIP();
     aia_fx f; if (!aia_setup(&f, old, 0, 0, -1, 30)) PKI_SKIP();
-    observe(f.m, "aia expired issuer", "127.0.0.1", 0x100);
-    observe(f.m, "aia expired issuer", "127.0.0.1", OKF);
-    observe(f.m, "aia expired issuer", "127.0.0.1", OKF | 0x2000);
+    /* an expired issuer in the (complete) chain is a validity error like an expired leaf (boot tls5) */
+    static const prow rows[] = { { "127.0.0.1", 0, 0, E_CA }, { "127.0.0.1", 0x100, 0, E_DATE }, { "127.0.0.1", OKF, 0, E_DATE },
+                                 { "127.0.0.1", 0x2100, 0, REVF }, { "127.0.0.1", OKF | 0x2000, 0, 0 } };
+    run_prows(f.m, "aia expired issuer", rows, 5);
     blob_report(&f.aia, "aia expired issuer");
     aia_teardown(&f);
 }
