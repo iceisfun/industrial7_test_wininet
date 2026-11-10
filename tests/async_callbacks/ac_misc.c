@@ -54,8 +54,12 @@ TEST(ac_openurl_async_sequence) {
     CHECK(hu == NULL);
     CHECK(ac_wait_complete(CTX_URL, 1, 8000, &r));
     ac_quiesce(100, 400);
-    /* everything carries the InternetOpenUrl context; the result handle is created first */
-    EXPECT_STR(ac_seq(0, NULL), "60,80,20,21,30,31,40,41,100");
+    /* everything carries the InternetOpenUrl context; the result handle is created first.
+     * [W10] round 3: InternetOpenUrl to the 127.0.0.1 literal reported RESOLVING_NAME/NAME_RESOLVED (10,11) right
+     * after DETECTING_PROXY on one boot and not on the others (resolver-cache state): accepted only as that pair. */
+    const char *sq = ac_seq(0, NULL);
+    t_note("openurl async sequence: %s", sq);
+    CHECKF(!strcmp(sq, "60,80,20,21,30,31,40,41,100") || !strcmp(sq, "60,80,10,11,20,21,30,31,40,41,100"), "seq %s", sq);
     CHECK(ac_find(INTERNET_STATUS_HANDLE_CREATED, CTX_URL, 0) == 0);
     for (int i = 0; i < ac_count(); i++) { ac_ev ev; ac_get(i, &ev); CHECKF(ev.ctx == CTX_URL, "event %d ctx %llx st %lu", i, (unsigned long long)ev.ctx, ev.st); }
     if (r.dwResult) ac_close_wait((HINTERNET)r.dwResult, CTX_URL);

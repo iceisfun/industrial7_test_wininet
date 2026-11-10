@@ -33,25 +33,25 @@ TEST(ac_pending_query_status_during_send) {
     EXPECT_EQ(ac_status_code(f.hr), 200);
     ac_flow_close(&f);
 }
-TEST(ac_pending_second_send) {
-    REQ_ASYNC_API();
+/* A second HttpSendRequest on a request whose first send is still pending is accepted with 997 [W10 rounds 2,3],
+ * but in round 3 the process then died with STATUS_HEAP_CORRUPTION (0xc0000374) inside WinINet. The probe therefore
+ * runs in a child process that reports the immediate return through its exit code and terminates itself at once
+ * (TerminateProcess skips DLL detach, so the corrupted state is never walked). */
+CHILD(ac_second_send_child) {
+    (void)argc; (void)argv;
     ac_begin(); ac_flow f;
-    if (!start_pending(&f, ST_LATE, 4)) return;
+    if (!start_pending(&f, ST_LATE, 4)) return 2;
     SetLastError(0xdeadbeef);
     BOOL ok = U(HttpSendRequestA)(f.hr, NULL, 0, NULL, 0);
     DWORD e = GetLastError();
-    t_note("second send while pending: ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
-    /* [W10] round 2: accepted (997) and a second request reached the server; the first completion reported
-     * failure. Only the immediate return is asserted; the rest is recorded. */
-    EXPECT_EQ(ok, FALSE); EXPECT_EQ(e, ERROR_IO_PENDING);
-    ac_wait_st(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ, 2, 5000);
-    ac_quiesce(200, 1500);
-    for (int k = 1; k <= ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, CTX_REQ); k++) {
-        INTERNET_ASYNC_RESULT r; ac_wait_complete(CTX_REQ, k, 10, &r);
-        t_note("completion %d: dwResult=%llu dwError=%lu (%s)", k, (unsigned long long)r.dwResult, r.dwError, t_inet_errname(r.dwError));
-    }
-    t_note("requests at server: %d, seq %s", srv_req_count(f.s), ac_seq(CTX_REQ, NULL));
-    ac_flow_close(&f);
+    TerminateProcess(GetCurrentProcess(), ok ? 41 : e == ERROR_IO_PENDING ? 42 : 100 + (e & 0xff));
+    return 3;
+}
+TEST(ac_pending_second_send) {
+    REQ_ASYNC_API();
+    DWORD code = t_run_child("ac_second_send_child", NULL, 15000);
+    t_note("second send while pending (child): exit=0x%lx (41 TRUE, 42 FALSE+997, 100+n other error)", code);
+    EXPECT_EQ(code, 42);
 }
 TEST(ac_pending_read_during_send) {
     REQ_ASYNC_API();

@@ -1,0 +1,128 @@
+# async_callbacks: evidence for the expectations
+
+Area prefix `ac_`. Files: `ac.h`/`ac_util.c` (callback recorder, flow helpers), `ac_setcb.c` (InternetSetStatusCallback,
+inheritance, HANDLE_CREATED/HANDLE_CLOSING, CALLBACK/CONTEXT_VALUE options), `ac_send.c` (HttpSendRequest sequences,
+sync and async, errors), `ac_read.c` (InternetReadFile / InternetReadFileEx / InternetQueryDataAvailable in async mode,
+reads chained inside the callback), `ac_misc.c` (InternetOpenUrl, redirects, cookies, 100-continue, auth, closing with
+operations pending, HttpSendRequestEx, FTP, HTTPS), `ac_more.c` (calls made while an operation is pending, contexts and
+callbacks changed mid-operation, several requests in flight, status-code / body-size / verb tables, W entry points).
+
+Every peer is an in-process loopback server (`common/srv.h`); no test uses the internet. Sessions are
+`INTERNET_OPEN_TYPE_DIRECT`. Async output parameters live in static storage because WinINet writes them from a worker
+thread after the call returned 997.
+
+Oracle: Windows 10 22H2 VM (10.0.19045.2965, wininet 11.0.19041.2193), boots `wininet-ac-20261109-171245-b1`
+(round 1), `wininet-ac-20261109-173323-b1` (round 2) and the round-3 validation boot (`results/win10/async_callbacks.txt`).
+
+Tags: **[D]** read in the Win10 decompilation (corpus explorer, wininet.dll), **[W10]** observed on the VM (round
+number), **[K]** documented/known behaviour only (asserted only where also observed).
+
+## Decomp-grounded [D]
+
+| Fact | Source | Tests |
+|---|---|---|
+| `InternetSetStatusCallback(NULL, cb)` returns `INTERNET_INVALID_STATUS_CALLBACK` with error 12018 | `InternetSetStatusCallbackCore@0xcef20` (`param_1 == 0 -> 0x2ef2`) | `ac_setcb_null_handle_*` |
+| invalid/closed handle: -1 and the MapHandleToAddress error (6) | same | `ac_setcb_garbage_handle`, `ac_setcb_closed_handle` |
+| success returns the previous callback and sets last error 0 | same (`SetLastError(dwErrCode)` with 0) | `ac_setcb_first_returns_null_error_zero`, `ac_setcb_returns_previous_chain` |
+| the new value is not validated: -1 is stored and returned next time | `RExchangeStatusCallback@0xcefd4` | `ac_setcb_invalid_value_stored` |
+| any handle type accepts a callback ("Wild" type check) | `RExchangeStatusCallback` `IsValid(0x646c6957)` | `ac_setcb_every_handle_type` |
+| `InternetSetStatusCallback` == `InternetSetStatusCallbackA` (same RVA), W is separate | exports at 0xcee20 / 0xceea0 | `ac_setcb_plain_export_is_ansi` |
+| no delivery when the callback or the context is 0 | `InternetIndicateStatus@0x5e500` (`pcVar13 != 0 && lVar10 != 0`) | `ac_created_context_zero_silent`, `ac_opt_context_value_zero_silences`, `ac_async_context_zero_request`, `ac_openurl_async_context_zero` |
+| the callback gets a copy of the status information (local/heap buffer) | `InternetIndicateStatus` memcpy into `local_148`/HeapAlloc | `ac_callback_info_is_copy` |
+| HANDLE_CREATED carries the 8-byte new handle | `InternetIndicateStatusNewHandle@0x13c124` | `ac_created_*` |
+| the W wrapper converts only RESOLVING_NAME (10) and REDIRECT (110); HANDLE_CLOSING suppressed only when `GlobalDisableUnicodeHandleClosingCallback` | `UnicodeStatusCallbackWrapper@0x6d3e0` | `ac_async_w_callback_strings`, `ac_redirect_w_callback_url_wide`, `ac_closing_w_callback` |
+| `InternetReadFileExA`: `dwStructSize != 0x38` -> 87; completion context is the handle's (thread ctx = handle+0xb8), not the dwContext argument | `InternetReadFileExA@0xa2e20` | `ac_rfex_bad_struct_size`, `ac_rfex_irf_async_pending` |
+| `InternetReadFileExW`: NULL buffers or `lpcszHeader != NULL` -> 87 | docs/research/02 6.2 | `ac_rfex_w_header_rejected` |
+| option 1 CALLBACK: set -> 12011, NULL handle -> 12018; 16/30 query -> 120 | docs/research/02 7.1/7.2 | `ac_opt_callback_*`, `ac_async_option_queries` |
+| CONTEXT_VALUE set needs length 8 (else 12010) | docs/research/02 7.2 | `ac_opt_context_value_set_bad_length` |
+
+## VM-observed [W10]
+
+Status numbers: 20 CONNECTING, 21 CONNECTED, 30 SENDING, 31 SENT, 40 RECEIVING, 41 RECEIVED, 50 CLOSING_CONNECTION,
+51 CONNECTION_CLOSED, 60 HANDLE_CREATED, 70 HANDLE_CLOSING, 80 DETECTING_PROXY, 100 REQUEST_COMPLETE, 110 REDIRECT,
+120 INTERMEDIATE_RESPONSE, 320 COOKIE_SENT, 321 COOKIE_RECEIVED.
+
+Sequences (all hard-checked):
+
+| Scenario | Sequence | Tests |
+|---|---|---|
+| async GET, fresh connection to 127.0.0.1 | `80,20,21,30,31,40,41,100` | `ac_async_send_sequence_fresh_connection`, `ac_status_code_table` (20 codes), `ac_w_apis_async` |
+| same, kept-alive connection | `80,30,31,40,41,100` | `ac_async_send_keepalive_reuse_sequence` |
+| sync GET | `80,20,21,30,31,40,41` (no 100, all on the calling thread) | `ac_sync_send_sequence`, `ac_sync_send_all_on_calling_thread` |
+| async InternetOpenUrl | `60,80,20,21,30,31,40,41,100` (60 from the worker) | `ac_openurl_async_sequence`, `ac_openurl_w_async` |
+| sync InternetOpenUrl | `60,80,20,21,30,31,40,41` | `ac_openurl_sync_with_callback` |
+| redirect, same connection | `80,20,21,30,31,40,41,110,80,30,31,40,41,100` | `ac_redirect_sequence_exact`, `ac_sync_redirect_sequence` (no 100) |
+| redirect to another port | `80,20,21,30,31,40,41,110,80,20,21,30,31,40,41,100` | `ac_redirect_cross_port_new_connection` |
+| Set-Cookie response | `80,20,21,30,31,40,41,321,100` | `ac_cookie_received_and_sent`, `ac_sync_cookie_received` |
+| request sending a cookie (reused conn) | `80,320,30,31,40,41,100` | `ac_cookie_received_and_sent` |
+| 100 Continue before the final reply | `80,20,21,30,31,40,41,120,40,41,100` (120 payload DWORD 100) | `ac_intermediate_response_100` |
+| connect refused (async / sync) | `80,20,100` (12029) / `80,20` | `ac_async_send_connect_refused`, `ac_sync_connect_refused_events` |
+| server closes without reply | `80,20,21,30,31,40,41,50,51,100` (12152) | `ac_async_send_server_closes_without_reply` |
+| server resets | 50,51 before 100, dwError 12031 | `ac_async_send_server_resets` |
+| close request with send or read pending | `50,51,100,70`; the completion is FALSE/12017 | `ac_close_request_send_pending`, `ac_close_request_read_pending` |
+| close session with send pending | `50,51,100,70,70` (request before connect) | `ac_close_session_with_send_pending` |
+| InternetOpenUrl refused | `60,80,20,70,100` (internal handle closed before the failure) | `ac_openurl_async_connect_refused` |
+| HttpSendRequestEx / InternetWriteFile / HttpEndRequest | `80,20,21,30,31,100` / writes TRUE synchronously / `40,41,100` | `ac_sendex_write_end_async` |
+| HTTPS with IGNORE_UNKNOWN_CA | `80,20,21,30,31,40,41,100` (no extra TLS status) | `ac_https_async_sequence` |
+| close request after the body was read (keep-alive) | `70` | `ac_async_keepalive_close_statuses` |
+| close request whose body was not read | `50,51,70` | `ac_sync_closing_on_calling_thread`, `ac_async_close_unread_response` |
+| pending async read | `40,41,100` | `ac_read_pending_statuses` |
+
+Other observations, hard-checked:
+- IP literals produce no RESOLVING_NAME / NAME_RESOLVED, but DETECTING_PROXY (80) is raised for every request even on
+  a DIRECT session.
+- Name resolution statuses are raised only when WinINet actually resolves: the first `localhost` lookup in the process
+  reports 10/11, later ones come from WinINet's resolver cache and report nothing. Tests check 10/11 only when present
+  (`ac_async_localhost_resolution_sequence`, `ac_sync_localhost_resolution_sequence`, `ac_async_w_callback_strings`).
+  FTP connects to 127.0.0.1 did report 10/11 (note only).
+- `localhost` connects to `[::1]`; CONNECTING/CONNECTED_TO_SERVER carry `"[::1]"` (len 6) or `"127.0.0.1"` (len 10),
+  i.e. narrow strings with the NUL counted. Narrow REDIRECT length also counts the NUL; in the W callback RESOLVING_NAME
+  and REDIRECT are UTF-16 with the length in characters without the NUL (9 for `localhost`).
+- SENDING_REQUEST, RECEIVING_RESPONSE and DETECTING_PROXY have no information (NULL, 0). REQUEST_SENT is a DWORD equal
+  to the request head size (head + body for a POST sent with HttpSendRequest); RESPONSE_RECEIVED is a DWORD byte count.
+- HANDLE_CREATED: `hInternet` is the parent handle, info = new handle, length 8, delivered synchronously on the calling
+  thread for InternetConnect/HttpOpenRequest (sync and async sessions), on the worker for async InternetOpenUrl.
+- HANDLE_CLOSING: `hInternet` and info are the closing handle, length 8; children close before their parent; a session
+  (context 0) reports nothing unless a context is set with INTERNET_OPTION_CONTEXT_VALUE. Inside the HANDLE_CLOSING
+  callback the handle is already invalid for InternetQueryOption (error 6).
+- REQUEST_COMPLETE: length 16 (INTERNET_ASYNC_RESULT); HttpSendRequest -> dwResult TRUE / dwError 0; InternetOpenUrl ->
+  dwResult = the new handle, delivered with `hInternet` = the session; async FTP InternetConnect -> NULL + 997 and
+  dwResult = the FTP handle.
+- Async: HttpSendRequest, HttpSendRequestEx, HttpEndRequest, InternetOpenUrl (even for an unparsable URL, which then
+  completes with 12006) and FTP InternetConnect return FALSE/NULL with 997. InternetConnect(HTTP) and HttpOpenRequest
+  return the handle at once (last error 0). InternetOpenUrl("") fails synchronously with 87.
+- All send-phase statuses of an async request come from a WinINet worker thread; in a synchronous session every status
+  is delivered on the calling thread and REQUEST_COMPLETE is never sent.
+- Async InternetReadFile: returns TRUE synchronously when enough data is buffered (no REQUEST_COMPLETE); otherwise 997
+  and the completion fills the buffer up to its size or the end of the body (5 buffered + 5 late bytes -> one
+  completion of 10). Before HttpSendRequest and with a zero-length buffer it returns TRUE with 0 bytes.
+- InternetReadFileEx in an async session: IRF_ASYNC, IRF_SYNC and IRF_NO_WAIT all go pending (997) when nothing is
+  buffered.
+- InternetQueryDataAvailable async: 997, completion dwResult TRUE with **dwError = bytes available**, and the output
+  DWORD is written too; reserved dwFlags/dwContext are not validated.
+- While a send is pending: HttpQueryInfo, InternetReadFile and InternetQueryDataAvailable fail with 12019; a second
+  HttpSendRequest is accepted with 997 (only that return is checked, the rest is noted).
+- Changing CONTEXT_VALUE while a send is pending does not change the completion's context; removing the callback while
+  pending suppresses the completion; replacing it routes the completion to the new callback.
+- COOKIE_RECEIVED carries an `IncomingCookieState` (32 bytes, cSession = cookies set); COOKIE_SENT an
+  `OutgoingCookieState` (16 bytes, cSent = 1). Not raised with INTERNET_FLAG_NO_COOKIES.
+- A header line without a colon in async HttpSendRequest fails synchronously with 12150 and no status at all.
+- After a failed async send, `HTTP_QUERY_STATUS_CODE|FLAG_NUMBER` succeeds and answers 0.
+- A truncated Content-Length body ends with the bytes received (5 of 10) and no read error.
+
+## Noted only (variable or not understood; `t_note`)
+- A 1 s INTERNET_OPTION_RECEIVE_TIMEOUT on the request did not cut short a 3 s server delay in async mode (completed 200).
+- HTTPS with an untrusted certificate in async mode: round 2 completed in 31 ms with 12045 (`80,20,21,50,51,100`);
+  round 1 did not complete within 8 s. Recorded by `ac_https_async_cert_error_probe` only.
+- Second HttpSendRequest while pending (round 2): first completion reported failure, two requests reached the server.
+- 401 with credentials sequence (`80,20,21,30,31,40,41,40,41,80,30,31,40,41,100`), FTP connect sequence, number of
+  pending reads for chunked/large bodies, RESPONSE_RECEIVED byte counts (segmentation dependent).
+
+## Knowledge-only [K] (not asserted beyond what the VM confirmed)
+- Child handles inherit the parent's callback at creation (confirmed [W10]: `ac_setcb_*inherit*`).
+- INTERNET_STATUS_CTL_RESPONSE_RECEIVED (42), PREFETCH (43), STATE_CHANGE (200), USER_INPUT_REQUIRED (140), P3P (325/326),
+  COOKIE_HISTORY (327), PRIVACY_IMPACTED (324) and 330 (0x14a): never observed in these scenarios; no test asserts them.
+
+## Environment
+Guest has no internet, firewall/Defender as installed; nothing interfered with loopback. `autodetect=1` in the
+per-user settings does not matter for DIRECT sessions, but DETECTING_PROXY (80) is still reported per request.
