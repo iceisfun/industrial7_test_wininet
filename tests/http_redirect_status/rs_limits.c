@@ -144,16 +144,32 @@ static void refused(const char *loc, int code) {
 TEST(rs_refuse_ftp_scheme)        { refused("ftp://127.0.0.1:%P/f.txt", 302); }
 TEST(rs_refuse_file_scheme)       { refused("file:///C:/Windows/win.ini", 302); }
 TEST(rs_refuse_mailto_scheme)     { refused("mailto:nobody@i7test.example", 302); }
-TEST(rs_refuse_javascript_scheme) { refused("javascript:alert(1)", 302); }
+/* Win10 VM rs3: these two Locations do not even crack: HttpSendRequest fails with 12005, the 302 stays queryable */
+static void invalid_location(const char *loc) {
+    REQUIRE(U(HttpSendRequestA));
+    rs_router rt; rs_router_init(&rt);
+    char hdr[300]; snprintf(hdr, sizeof hdr, "Location: %s\r\n", loc);
+    rs_add(&rt, "/src", 302, hdr, "refused-body");
+    rs_add(&rt, "*", 200, NULL, "landed");
+    srv *s; RS_START(&rt, SRV_HTTP, s);
+    rs_opt o = { 0 }; o.flags = RS_FRESH; rs_res r;
+    rs_do(s, "GET", "/src", &o, &r);
+    Sleep(30);
+    CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_INTERNET_INVALID_URL);
+    EXPECT_EQ(r.status, 302); EXPECT_EQ(srv_req_count(s), 1); EXPECT_EQ(r.nbody, 0);
+    EXPECT_STR(r.url, srv_url(s, "/src"));
+    srv_stop(s);
+}
+TEST(rs_refuse_javascript_scheme) { invalid_location("javascript:alert(1)"); }
 TEST(rs_refuse_gopher_scheme)     { refused("gopher://127.0.0.1:%P/1", 302); }
 TEST(rs_refuse_about_scheme)      { refused("about:blank", 302); }
 TEST(rs_refuse_unknown_scheme)    { refused("i7x://127.0.0.1:%P/x", 302); }
 TEST(rs_refuse_ftp_scheme_301)    { refused("ftp://127.0.0.1:%P/f.txt", 301); }
 TEST(rs_refuse_ftp_scheme_307)    { refused("ftp://127.0.0.1:%P/f.txt", 307); }
 TEST(rs_refuse_ftp_scheme_303)    { refused("ftp://127.0.0.1:%P/f.txt", 303); }
-TEST(rs_refuse_empty_host)        { refused("http:///nohost", 302); }
+TEST(rs_refuse_empty_host)        { invalid_location("http:///nohost"); }
 
-static void odd_location(const char *loc) {
+static void odd_location(const char *loc, const char *want_tgt, const char *want_url_path) {
     REQUIRE(U(HttpSendRequestA));
     rs_router rt; rs_router_init(&rt);
     char hdr[300]; snprintf(hdr, sizeof hdr, "Location: %s\r\n", loc);
@@ -165,13 +181,18 @@ static void odd_location(const char *loc) {
     Sleep(50);
     t_note("odd Location '%s': ok=%d err=%lu(%s) status=%lu reqs=%d tgt1=%s url=%s", loc, r.ok, r.err, rs_err(r.err), r.status, srv_req_count(s),
            srv_req_target(s, 1) ? srv_req_target(s, 1) : "-", r.url);
+    /* Win10 VM rs3 */
+    CHECKF(r.ok, "err=%lu", r.err); EXPECT_EQ(r.status, 200); EXPECT_EQ(srv_req_count(s), 2);
+    EXPECT_STR(srv_req_target(s, 1), want_tgt);
+    char url[256]; snprintf(url, sizeof url, want_url_path, srv_port(s));
+    EXPECT_STR(r.url, url);
     srv_stop(s);
 }
-TEST(rs_odd_location_empty)        { odd_location(""); }
-TEST(rs_odd_location_space_in_path){ odd_location("/a b"); }
-TEST(rs_odd_location_utf8)         { odd_location("/caf\xc3\xa9"); }
-TEST(rs_odd_location_backslash)    { odd_location("\\back"); }
-TEST(rs_odd_location_userinfo)     { odd_location("http://user:pw@127.0.0.1:%P/ui"); }
+TEST(rs_odd_location_empty)        { odd_location("", "/", "http://127.0.0.1:%u/"); }
+TEST(rs_odd_location_space_in_path){ odd_location("/a b", "/a%20b", "http://127.0.0.1:%u/a%%20b"); }
+TEST(rs_odd_location_utf8)         { odd_location("/caf\xc3\xa9", "/caf%C3%A9", "http://127.0.0.1:%u/caf\xc3\xa9"); }
+TEST(rs_odd_location_backslash)    { odd_location("\\back", "/back", "http://127.0.0.1:%u/back"); }
+TEST(rs_odd_location_userinfo)     { odd_location("http://user:pw@127.0.0.1:%P/ui", "/ui", "http://user:pw@127.0.0.1:%u/ui"); }
 
 /* ------------------------------------------------------------------ NO_AUTO_REDIRECT */
 static void noauto(int code, const char *method) {
@@ -217,7 +238,7 @@ TEST(rs_noauto_location_buffer_protocol) {
     rs_add(&rt, "/src", 302, "Location: ../rel/path?x=1\r\n", "");
     srv *s; RS_START(&rt, SRV_HTTP, s);
     rs_opt o = { 0 }; o.flags = RS_NOREDIR; o.keep_open = 1; HINTERNET hi = NULL, hr = NULL; o.out_hi = &hi; o.out_hreq = &hr; rs_res r;
-    rs_do(s, "GET", "/a/src", &o, &r);
+    rs_do(s, "GET", "/src", &o, &r);
     EXPECT_STR(r.location, "../rel/path?x=1");
     if (hr) {
         DWORD l = 0;
@@ -380,9 +401,13 @@ TEST(rs_hdr_wininet_adds_no_referer) {
     CHECK(r.ok); EXPECT_EQ(rs_wait(s, 2, 2000), 2);
     CHECK(srv_req_header(s, 1, "Referer") == NULL);
     for (int i = 0; i < srv_req_header_count(s, 1); i++) t_note("hop hdr[%d] %s: %s", i, srv_req_header_name(s, 1, i), srv_req_header_value(s, 1, i));
-    EXPECT_EQ(srv_req_header_count(s, 1), srv_req_header_count(s, 0));
-    for (int i = 0; i < srv_req_header_count(s, 0) && i < srv_req_header_count(s, 1); i++)
-        EXPECT_STR(srv_req_header_name(s, 1, i), srv_req_header_name(s, 0, i));
+    /* Win10 VM rs3: the first request is User-Agent, Host, Cache-Control; the hop adds "Connection: Keep-Alive" */
+    static const char *n0[] = { "User-Agent", "Host", "Cache-Control" };
+    static const char *n1[] = { "User-Agent", "Host", "Cache-Control", "Connection" };
+    EXPECT_EQ(srv_req_header_count(s, 0), 3); EXPECT_EQ(srv_req_header_count(s, 1), 4);
+    for (int i = 0; i < 3 && i < srv_req_header_count(s, 0); i++) EXPECT_STR(srv_req_header_name(s, 0, i), n0[i]);
+    for (int i = 0; i < 4 && i < srv_req_header_count(s, 1); i++) EXPECT_STR(srv_req_header_name(s, 1, i), n1[i]);
+    EXPECT_STR(srv_req_header(s, 1, "Connection"), "Keep-Alive");
     srv_stop(s);
 }
 
@@ -431,11 +456,12 @@ static void scheme_change(int from_https, DWORD extra_flags, const char *method,
         EXPECT_STR(srv_req_line(s2, 0), want);
         EXPECT_STR(r.url, srv_url(s2, "/landing"));
     } else {
-        CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err));
-        EXPECT_EQ(r.status, 200);
-        EXPECT_EQ(srv_req_count(s2), 1);
+        /* Win10 VM rs3: security flags set on the http request do not cover the https hop (and
+         * IGNORE_REDIRECT_TO_HTTPS does not either): 12045, handle already moved to the https URL, no request reached
+         * the target. Setting the flag on the same handle and re-sending completes it (https_tls retry protocol). */
+        CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_INTERNET_INVALID_CA);
+        EXPECT_EQ(srv_req_count(s2), 0);
         EXPECT_STR(r.url, srv_url(s2, "/landing"));
-        EXPECT_STR(srv_req_header(s2, 0, "Referer"), "http://ref.i7test.example/r");
     }
     srv_stop(s); srv_stop(s2);
 }
@@ -465,6 +491,36 @@ TEST(rs_scheme_http_to_https_untrusted_cert) {
     srv_stop(s); srv_stop(s2);
 }
 
+/* after the 12045 on the https hop: OR in IGNORE_UNKNOWN_CA on the same handle and re-send */
+TEST(rs_scheme_http_to_https_resend_with_flag) {
+    REQUIRE(U(HttpSendRequestA));
+    rs_router r2; rs_router_init(&r2);
+    rs_add(&r2, "/landing", 200, NULL, "landed");
+    srv *s2 = rs_start(&r2, SRV_HTTPS);
+    if (!s2) { t_skip("https server unavailable: %s", srv_strerror(srv_last_error())); return; }
+    rs_router rt; rs_router_init(&rt); rt.alt_port = srv_port(s2);
+    rs_add(&rt, "/src", 302, "Location: https://127.0.0.1:%A/landing\r\n", "m");
+    srv *s = rs_start(&rt, SRV_HTTP);
+    if (!s) { srv_stop(s2); t_skip("server unavailable"); return; }
+    HINTERNET hi = t_inet_open(NULL);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/src", NULL, NULL, NULL, RS_FRESH, 0);
+    SET_ERR(0);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0); DWORD e = GetLastError();
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_INVALID_CA);
+    int fl = t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
+    SET_ERR(0);
+    ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0); e = GetLastError();
+    t_note("resend after 12045: secflags=%d ok=%d err=%lu(%s) status=%lu src=%d dst=%d", fl, ok, ok ? 0 : e, rs_err(ok ? 0 : e), rs_status(hr),
+           srv_req_count(s), srv_req_count(s2));
+    CHECKF(ok, "err=%lu %s", e, rs_err(e));
+    EXPECT_EQ(rs_status(hr), 200);
+    EXPECT_EQ(srv_req_count(s2), 1);
+    EXPECT_STR(srv_req_line(s2, 0), "GET /landing HTTP/1.1");
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi);
+    srv_stop(s); srv_stop(s2);
+}
+
 /* https -> https on the same server (certificate flags of the handle stay in force) */
 TEST(rs_scheme_https_same_server) {
     REQUIRE(U(HttpSendRequestA));
@@ -474,6 +530,17 @@ TEST(rs_scheme_https_same_server) {
     srv *s; RS_START(&rt, SRV_HTTPS, s);
     rs_opt o = { 0 }; o.flags = RS_FRESH; rs_res r;
     rs_do(s, "GET", "/src", &o, &r);
+    if (!r.ok && r.err == ERROR_INTERNET_CONNECTION_ABORTED && srv_req_count(s) == 0) {
+        /* Win10 VM rs3: the first schannel handshake of the process (this test runs first) once aborted with 12030
+         * before any request: an environment effect of the loopback TLS server, not redirect behaviour. Retry once. */
+        t_note("first HTTPS attempt aborted (12030, no request): retrying once");
+        srv_stop(s);
+        rs_router_init(&rt);
+        rs_add(&rt, "/src", 301, "Location: /secure-dst\r\n", "");
+        rs_add(&rt, "/secure-dst", 200, NULL, "secure-landed");
+        RS_START(&rt, SRV_HTTPS, s);
+        rs_do(s, "GET", "/src", &o, &r);
+    }
     CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err));
     EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "secure-landed");
     EXPECT_STR(r.url, srv_url(s, "/secure-dst"));
@@ -529,5 +596,6 @@ TEST(rs_option_flags_reflect_noauto) {
     DWORD f = 0, l = sizeof f;
     CHECKF(U(InternetQueryOptionA)(hr, INTERNET_OPTION_REQUEST_FLAGS, &f, &l), "err=%lu", GetLastError());
     t_note("INTERNET_OPTION_REQUEST_FLAGS (NO_AUTO_REDIRECT request) = 0x%lx", f);
+    EXPECT_EQ(f, 0x8);   /* Win10 VM rs3: request flags (INTERNET_REQFLAG_*), not the open flags */
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }

@@ -130,10 +130,14 @@ static void no_location(int code) {
     Sleep(50);
     int n = srv_req_count(s);
     t_note("%d without Location: ok=%d err=%lu(%s) status=%lu reqs=%d body=%s", code, r.ok, r.err, rs_err(r.err), r.status, n, r.body);
-    CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err));
+    /* Win10 VM boot rs3, matching the decomp: 301/302/303/307 enter the redirect path unconditionally; Redirect_Fsm drains
+     * the body, Redirect() finds no Location header (0x21) and its 12150 is returned as is (only 12156/12160 are turned
+     * into success). 300 and 308 are only taken into the redirect path when a Location header exists
+     * (HttpSendRequest_Start checks the Location list head at +0xe38), so a 308 without one is plain data. */
     EXPECT_EQ(r.status, (DWORD)code);
     EXPECT_EQ(n, 1);
-    EXPECT_STR(r.body, "nowhere");
+    if (code == 308) { CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err)); EXPECT_STR(r.body, "nowhere"); }
+    else { CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_HTTP_HEADER_NOT_FOUND); EXPECT_EQ(r.nbody, 0); }
     char url[128]; snprintf(url, sizeof url, "http://%s/src", rs_hp(s));
     EXPECT_STR(r.url, url);
     srv_stop(s);
@@ -300,6 +304,7 @@ TEST(rs_loc_host_change_from_localhost) {
     EXPECT_STR(srv_req_header(s, 0, "Host"), lh);
     EXPECT_STR(srv_req_header(s, 1, "Host"), rs_hp(s));
     t_note("conn of req0=%d req1=%d", srv_req_conn(s, 0), srv_req_conn(s, 1));
+    EXPECT_NE(srv_req_conn(s, 1), srv_req_conn(s, 0));   /* Win10 VM rs3: new host name, new connection */
     srv_stop(s);
 }
 
@@ -328,7 +333,22 @@ static void chain(int hops) {
 TEST(rs_chain_2) { chain(2); }
 TEST(rs_chain_5) { chain(5); }
 TEST(rs_chain_10) { chain(10); }
-TEST(rs_chain_20) { chain(20); }
+/* 11 redirects exceed the budget of 10: the 11th 302 is returned with 12156 */
+TEST(rs_chain_11_exceeds_budget) {
+    REQUIRE(U(HttpSendRequestA));
+    rs_router rt; rs_router_init(&rt);
+    rs_add(&rt, "/loop/11", 200, NULL, "end");
+    rs_add(&rt, "/loop/*", 302, "Location: /loop/%N\r\n", "");
+    srv *s; RS_START(&rt, SRV_HTTP, s);
+    rs_opt o = { 0 }; o.flags = RS_FRESH; rs_res r;
+    rs_do(s, "GET", "/loop/0", &o, &r);
+    Sleep(30);
+    CHECK(!r.ok); EXPECT_EQ(r.err, ERROR_HTTP_REDIRECT_FAILED);
+    EXPECT_EQ(r.status, 302); EXPECT_EQ(srv_req_count(s), 11);
+    EXPECT_STR(r.url, srv_url(s, "/loop/10"));
+    EXPECT_STR(r.location, "/loop/11");
+    srv_stop(s);
+}
 
 static void drain_case(unsigned flags, int big, int want_conns /* -1 = note only */) {
     REQUIRE(U(HttpSendRequestA));
@@ -348,11 +368,11 @@ static void drain_case(unsigned flags, int big, int want_conns /* -1 = note only
 }
 TEST(rs_drain_small_body_keepalive)  { drain_case(0, 0, 1); }
 TEST(rs_drain_chunked_body)          { drain_case(RS_F_CHUNKED, 0, 1); }
-TEST(rs_drain_64k_body)              { drain_case(0, 65536, -1); }
-TEST(rs_drain_300k_body)             { drain_case(0, 300000, -1); }
+TEST(rs_drain_64k_body)              { drain_case(0, 65536, 1); }    /* Win10 VM rs3: drained, connection reused */
+TEST(rs_drain_300k_body)             { drain_case(0, 300000, 1); }
 TEST(rs_drain_connection_close)      { drain_case(RS_F_CLOSE, 0, 2); }
 TEST(rs_drain_close_delimited)       { drain_case(RS_F_NOLEN, 0, 2); }
-TEST(rs_drain_http10)                { drain_case(RS_F_HTTP10, 0, -1); }
+TEST(rs_drain_http10)                { drain_case(RS_F_HTTP10, 0, 2); }  /* Win10 VM rs3: HTTP/1.0 without keep-alive */
 
 /* the 3xx body is never handed to the caller when the redirect is followed */
 TEST(rs_follow_body_is_target_body) {

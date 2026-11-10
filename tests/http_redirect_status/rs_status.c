@@ -234,9 +234,10 @@ TEST(rs_retry_after_503_not_retried) {
         DWORD n = 0; l = sizeof n;
         SET_ERR(0xdeadbeef);
         BOOL okn = U(HttpQueryInfoA)(hr, HTTP_QUERY_RETRY_AFTER | HTTP_QUERY_FLAG_NUMBER, &n, &l, NULL);
+        DWORD en = okn ? 0 : GetLastError();
         /* Win10 VM boot rs2: the FLAG_NUMBER form of RETRY_AFTER fails (only the string form works) */
-        t_note("RETRY_AFTER|FLAG_NUMBER: ok=%d err=%lu val=%lu len=%lu", okn, okn ? 0 : GetLastError(), n, l);
-        CHECK(!okn);
+        t_note("RETRY_AFTER|FLAG_NUMBER: ok=%d err=%lu val=%lu len=%lu", okn, en, n, l);
+        CHECK(!okn); EXPECT_EQ(en, ERROR_HTTP_INVALID_QUERY_REQUEST);   /* Win10 VM rs3: 12154 */
     }
     t_inet_close(hi);
     Sleep(1500);

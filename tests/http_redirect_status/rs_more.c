@@ -425,10 +425,12 @@ TEST(rs_query_status_before_send) {
     DWORD v = 0, l = sizeof v; SET_ERR(0);
     BOOL ok = U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &v, &l, NULL); DWORD e = GetLastError();
     t_note("STATUS_CODE before send: ok=%d err=%lu(%s) val=%lu len=%lu", ok, e, rs_err(e), v, l);
-    CHECK(ok);   /* Win10 VM boot rs2: succeeds before any response exists */
+    CHECK(ok); EXPECT_EQ(v, 0); EXPECT_EQ(l, 4);   /* Win10 VM boots rs2/rs3: succeeds with 0 before any response exists */
     char t[32]; DWORD tl = sizeof t; t[0] = 0; SET_ERR(0);
     BOOL okt = U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_TEXT, t, &tl, NULL);
-    t_note("STATUS_TEXT before send: ok=%d err=%lu text='%s' len=%lu", okt, okt ? 0 : GetLastError(), okt ? t : "", tl);
+    DWORD et = okt ? 0 : GetLastError();
+    t_note("STATUS_TEXT before send: ok=%d err=%lu text='%s' len=%lu", okt, et, okt ? t : "", tl);
+    CHECK(!okt); EXPECT_EQ(et, ERROR_HTTP_HEADER_NOT_FOUND);   /* Win10 VM rs3 */
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -539,4 +541,5 @@ TEST(rs_option_89_session_budget_probe) {
     DWORD v3 = 3, v20 = 20;
     int n3 = budget_with(&v3), n20 = budget_with(&v20);
     t_note("budget: default %d requests, option89=3 -> %d, option89=20 -> %d", d, n3, n20);
+    EXPECT_EQ(n3, 11); EXPECT_EQ(n20, 11);   /* Win10 VM rs3: accepted but no effect on the redirect budget */
 }

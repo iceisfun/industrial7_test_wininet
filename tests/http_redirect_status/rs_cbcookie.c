@@ -58,7 +58,7 @@ TEST(rs_cb_redirect_chain_urls) {
 
 TEST(rs_cb_redirect_absolute_other_port) {
     REQUIRE(U(InternetSetStatusCallbackA));
-    rs_router r2; rs_router_init(&r2); rs_add(&r2, "/far", 200, NULL, "far");
+    rs_router r2; rs_router_init(&r2); rs_add(&r2, "/far*", 200, NULL, "far");
     srv *s2; RS_START(&r2, SRV_HTTP, s2);
     rs_router rt; rs_router_init(&rt); rt.alt_port = srv_port(s2);
     rs_add(&rt, "/src", 307, "Location: http://localhost:%A/far?q=1\r\n", "");
@@ -88,7 +88,7 @@ TEST(rs_cb_redirect_fragment_in_string) {
     rs_do(s, "GET", "/src", &o, &r);
     int i = rs_cb_index(INTERNET_STATUS_REDIRECT, 0);
     CHECK(r.ok); CHECK(i >= 0);
-    if (i >= 0) t_note("REDIRECT with fragment: '%s'", g_rs_cb.str[i]);
+    if (i >= 0) EXPECT_STR(g_rs_cb.str[i], srv_url(s, "/dst#frag"));   /* Win10 VM rs3: the fragment stays in the string */
     EXPECT_STR(srv_req_target(s, 1), "/dst");
     srv_stop(s);
 }
@@ -253,6 +253,8 @@ TEST(rs_cookie_from_302_sent_on_hop) {
     CHECK(U(InternetGetCookieA)(c.url, NULL, jar, &l));
     EXPECT_STR(jar, "rsck=v1");
     t_note("cookie callbacks: received=%d sent=%d", rs_cb_count(INTERNET_STATUS_COOKIE_RECEIVED), rs_cb_count(INTERNET_STATUS_COOKIE_SENT));
+    EXPECT_EQ(rs_cb_count(INTERNET_STATUS_COOKIE_RECEIVED), 1);   /* Win10 VM rs3 */
+    EXPECT_EQ(rs_cb_count(INTERNET_STATUS_COOKIE_SENT), 1);
     t_net_cleanup();
     srv_stop(s);
 }
@@ -350,6 +352,7 @@ TEST(rs_keep_connection_flag_visible) {
     DWORD f = 0, l = sizeof f;
     CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_REQUEST_FLAGS, &f, &l));
     t_note("flags with KEEP_CONNECTION: 0x%lx", f);
+    EXPECT_EQ(f, 0x8);   /* Win10 VM rs3 */
     CHECK(U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
     EXPECT_EQ(rs_status(hr), 200);
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
@@ -382,12 +385,13 @@ TEST(rs_cache_304_revalidation) {
     EXPECT_EQ(cached_get(s, path, CACHE_FLAGS, body, sizeof body, &st), 0);
     EXPECT_EQ(st, 200); EXPECT_STR(body, "cached-v1");
     int e = cached_get(s, path, CACHE_FLAGS | INTERNET_FLAG_RESYNCHRONIZE, body, sizeof body, &st);
-    int n = rs_wait(s, 2, 2000);
+    int n = rs_wait(s, 3, 1000);
+    for (int k = 0; k < n; k++) t_note("req%d: %s INM=%s", k, srv_req_line(s, k), srv_req_header(s, k, "If-None-Match") ? srv_req_header(s, k, "If-None-Match") : "-");
     t_note("revalidation: err=%d status=%lu body=%s requests=%d INM=%s IMS=%s", e, st, body, n,
            srv_req_header(s, 1, "If-None-Match") ? srv_req_header(s, 1, "If-None-Match") : "-",
            srv_req_header(s, 1, "If-Modified-Since") ? srv_req_header(s, 1, "If-Modified-Since") : "-");
     EXPECT_EQ(e, 0);
-    EXPECT_EQ(n, 2);
+    CHECKF(n >= 2 && n <= 3, "requests=%d", n);   /* Win10 VM rs3: 3 requests seen (logged above) */
     EXPECT_STR(body, "cached-v1");             /* body comes from the cache entry */
     EXPECT_STR(srv_req_header(s, 1, "If-None-Match"), "\"rs-v1\"");
     EXPECT_STR(srv_req_header(s, 1, "If-Modified-Since"), "Wed, 21 Oct 2015 07:28:00 GMT");
@@ -449,8 +453,9 @@ TEST(rs_cache_redirect_301_note) {
     char body[64]; DWORD st;
     EXPECT_EQ(cached_get(s, src, CACHE_FLAGS, body, sizeof body, &st), 0);
     EXPECT_EQ(st, 200); EXPECT_STR(body, "cached-target");
-    int n1 = rs_wait(s, 2, 2000);
-    EXPECT_EQ(n1, 2);
+    int n1 = rs_wait(s, 3, 1000);
+    for (int k = 0; k < n1; k++) t_note("req%d: %s", k, srv_req_line(s, k));
+    CHECKF(n1 >= 2, "requests=%d", n1);   /* Win10 VM rs3: 3 requests for the first fetch (logged above) */
     EXPECT_EQ(cached_get(s, src, CACHE_FLAGS, body, sizeof body, &st), 0);
     Sleep(100);
     int n2 = srv_req_count(s);
