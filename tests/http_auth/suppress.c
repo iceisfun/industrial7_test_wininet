@@ -47,8 +47,9 @@ TEST(auth_suppress_explicit_basic_creds) {
     a_dump(s);
     t_note("SUPPRESS_SERVER_AUTH + explicit Basic creds: status=%lu requests=%d", r.status, srv_req_count(s));
     CHECKF(r.ok, "err=%lu", r.err);
-    CHECK(r.status == 200 || r.status == 401);
-    CHECK(srv_req_count(s) <= 2);
+    /* Win10 VM: SUPPRESS_SERVER_AUTH disables origin authentication with explicit credentials too */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s), 1);
     CHECK(srv_req_count(s) < 1 || REQ_AUTH(s, 0) == NULL);
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
@@ -62,8 +63,10 @@ TEST(auth_suppress_explicit_ntlm_creds) {
     a_dump(s);
     t_note("SUPPRESS_SERVER_AUTH + explicit NTLM creds: status=%lu requests=%d v2ok=%d", r.status, srv_req_count(s), g.ntlm_v2_ok);
     CHECKF(r.ok, "err=%lu", r.err);
-    CHECK(r.status == 200 || r.status == 401);
-    CHECK(srv_req_count(s) <= 3);
+    /* Win10 VM: SUPPRESS_SERVER_AUTH disables origin authentication with explicit credentials too */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s), 1);
+    EXPECT_EQ(g.ntlm_v2_ok, 0);
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -76,8 +79,9 @@ TEST(auth_suppress_explicit_digest_creds) {
     a_dump(s);
     t_note("SUPPRESS_SERVER_AUTH + explicit Digest creds: status=%lu requests=%d", r.status, srv_req_count(s));
     CHECKF(r.ok, "err=%lu", r.err);
-    CHECK(r.status == 200 || r.status == 401);
-    CHECK(srv_req_count(s) <= 2);
+    /* Win10 VM: SUPPRESS_SERVER_AUTH disables origin authentication with explicit credentials too */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s), 1);
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -106,7 +110,8 @@ TEST(auth_suppress_set_after_send) {
     DWORD v = 1; SetLastError(0xdeadbeef);
     BOOL ok = U(InternetSetOptionA)(hr, INTERNET_OPTION_SUPPRESS_SERVER_AUTH, &v, sizeof v); DWORD e = ok ? 0 : GetLastError();
     t_note("SUPPRESS_SERVER_AUTH after HttpSendRequest: ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
-    CHECK(ok || e == ERROR_INTERNET_INCORRECT_HANDLE_STATE);
+    /* decomp: +0x149c & 0x20 -> 12019; Win10 VM: set after the send */
+    CHECK(!ok); EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_STATE);
     a_close(hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -155,8 +160,10 @@ TEST(auth_suppress_cached_credentials_preemptive) {
     a_dump(s);
     const char *a = srv_req_count(s) > before ? REQ_AUTH(s, before) : NULL;
     t_note("SUPPRESS after a cached Basic success: status=%lu legs=%d first-leg auth=%s", r.status, srv_req_count(s) - before, a ? a : "(none)");
-    CHECK(r.status == 200 || r.status == 401);
-    CHECK(srv_req_count(s) - before <= 2);
+    /* Win10 VM: no pre-emptive header from the credential cache either */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s) - before, 1);
+    CHECK(a == NULL);
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
@@ -204,7 +211,7 @@ TEST(auth_suppress_proxy_then_origin_challenge) {
     a_dump(s);
     t_note("SUPPRESS via proxy, origin 401 with connect creds: status=%lu requests=%d", st_, srv_req_count(s));
     CHECKF(ok, "err=%lu", GetLastError());
-    CHECK(st_ == 200 || st_ == 401);
-    CHECK(srv_req_count(s) <= 2);
+    EXPECT_EQ(st_, 401);   /* Win10 VM */
+    EXPECT_EQ(srv_req_count(s), 1);
     a_close(hr); a_close(hc); a_close(hi); srv_stop(s);
 }

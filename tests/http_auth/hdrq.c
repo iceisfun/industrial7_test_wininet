@@ -258,6 +258,7 @@ TEST(auth_hq_add_request_headers_authorization_sent) {
     EXPECT_EQ(srv_req_header_occurrences(s, 0, "Authorization"), 1);
     char b[128]; DWORD idx = 0; int kept = a_query(hr, HTTP_QUERY_AUTHORIZATION | HTTP_QUERY_FLAG_REQUEST_HEADERS, &idx, b, sizeof b);
     t_note("HttpAddRequestHeaders Authorization in the request view after send: %d [%s]", kept, kept ? b : "");
+    CHECK(!kept);   /* Win10 VM: dropped after the send, like a HttpSendRequest header */
     a_close(hr); a_close(hc); t_inet_close(hi); srv_stop(s);
 }
 
