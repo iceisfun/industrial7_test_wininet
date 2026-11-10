@@ -11,8 +11,6 @@
  * VM_TIMEOUT: 180 */
 #include "pc.h"
 #include <stdlib.h>
-void pc_dup_probe(const char *where);
-TEST(pc_opt2_dup_probe_after_options) { pc_dup_probe("opt2-last"); }
 
 #ifndef INTERNET_OPTION_REFRESH
 #define INTERNET_OPTION_REFRESH 37
@@ -694,9 +692,8 @@ TEST(pc_opt2_settings_changed_purges_keepalive) {
     EXPECT_EQ(t_http_get(h, srv_url(s, "/3"), NULL, T_INET_FRESH, body, sizeof body, &n, &err), 200);
     CHECK(srv_wait_requests(s, 3, 3000));
     t_note("OBS after SETTINGS_CHANGED: req conns %d %d %d (connections %d)", srv_req_conn(s, 0), srv_req_conn(s, 1), srv_req_conn(s, 2), srv_conn_count(s));
-    /* boot 4: the third request still used the pooled connection (the purge does not reach this session's pool);
-     * an extra idle connection was seen once, so only the reuse is asserted */
-    EXPECT_EQ(srv_req_conn(s, 2), srv_req_conn(s, 1));
+    /* boots 4/5 ran with a double-evaluating EXPECT_EQ (6 requests): re-observed with single evaluation */
+    EXPECT_EQ(srv_req_count(s), 3);
     t_inet_close(h); srv_stop(s);
 }
 

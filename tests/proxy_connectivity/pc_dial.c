@@ -262,7 +262,7 @@ TEST(pc_dial_connected_state_ex_a_truncation) {
             EXPECT_EQ(b[len - 1], 0);
             CHECKF(strlen(b) == len - 1 && !strncmp(b, full, len - 1), "len %lu: \"%s\"", len, b);
             CHECKF(b[len] == 'Z', "len %lu: wrote past the buffer", len);
-            t_note("ExA len %lu: ok=%d err %lu", len, r, e);
+            EXPECT_EQ(e, ERROR_INSUFFICIENT_BUFFER);   /* boot 5: TRUE, with WideCharToMultiByte's 122 left in GetLastError */
         }
     }
 }
@@ -334,12 +334,16 @@ TEST(pc_dial_check_connection_force_scheme_forms) {
         char url[128]; snprintf(url, sizeof url, fmts[i], srv_port(s));
         icc_res r = icc(url, FLAG_ICC_FORCE_CONNECTION);
         t_note("ICC FORCE %s -> %d err %lu (%s) %lu ms", url, r.ok, r.err, t_inet_errname(r.err), r.ms);
-        if (i < 6) CHECKF(r.ok, "%s: err %lu", url, r.err);
+        /* boot 5: http/https forms are a bare TCP connect; ftp waits for an FTP banner that never comes (12111 after ~5 s);
+         * gopher is rejected with 87 */
+        if (i == 3) CHECKF(!r.ok && r.err == ERROR_FTP_DROPPED, "%s: ok %d err %lu", url, r.ok, r.err);
+        else if (i == 6) CHECKF(!r.ok && r.err == ERROR_INVALID_PARAMETER, "%s: ok %d err %lu", url, r.ok, r.err);
+        else CHECKF(r.ok, "%s: err %lu", url, r.err);
     }
     Sleep(200);
     t_note("server saw %d requests, %d connections", srv_req_count(s), srv_conn_count(s));
     EXPECT_EQ(srv_req_count(s), 0);
-    CHECK(srv_conn_count(s) >= 6);
+    EXPECT_EQ(srv_conn_count(s), 7);
     srv_stop(s);
 }
 
@@ -413,19 +417,19 @@ TEST(pc_dial_check_connection_bad_url_table) {
         { "not a url", ERROR_INTERNET_UNRECOGNIZED_SCHEME, 1 },
         { "http//x", ERROR_INTERNET_UNRECOGNIZED_SCHEME, 1 },
         { "mailto:a@b", ERROR_INVALID_PARAMETER, 1 },
-        { "", ERROR_INTERNET_UNRECOGNIZED_SCHEME, 0 },
-        { "http://", 0, 0 },
-        { "http:///path", 0, 0 },
-        { "file:///c:/x", 0, 0 },
-        { "about:blank", 0, 0 },
-        { "javascript:1", 0, 0 },
-        { "http://127.0.0.1:99999/", 0, 0 },
-        { "http://127.0.0.1:0/", 0, 0 },
+        { "", ERROR_INTERNET_UNRECOGNIZED_SCHEME, 1 },
+        { "http://", ERROR_INTERNET_UNRECOGNIZED_SCHEME, 1 },
+        { "http:///path", ERROR_INTERNET_INVALID_URL, 1 },
+        { "file:///c:/x", 0, 1 },            /* boot 5: TRUE (no host to connect to) */
+        { "about:blank", 0, 1 },
+        { "javascript:1", ERROR_INVALID_PARAMETER, 1 },
+        { "http://127.0.0.1:99999/", ERROR_INTERNET_INVALID_URL, 1 },
+        { "http://127.0.0.1:0/", ERROR_INTERNET_CANNOT_CONNECT, 1 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         icc_res r = icc(t[i].url, FLAG_ICC_FORCE_CONNECTION);
         t_note("ICC FORCE \"%s\" -> %d err %lu (%s) %lu ms", t[i].url, r.ok, r.err, t_inet_errname(r.err), r.ms);
-        if (t[i].certain) { CHECKF(!r.ok && r.err == t[i].err, "\"%s\": ok %d err %lu want %lu", t[i].url, r.ok, r.err, t[i].err); }
+        if (t[i].certain) { CHECKF(r.ok == !t[i].err && r.err == t[i].err, "\"%s\": ok %d err %lu want %lu", t[i].url, r.ok, r.err, t[i].err); }
     }
 }
 
@@ -454,6 +458,7 @@ TEST(pc_dial_check_connection_long_host) {
     icc_res r = icc(url, FLAG_ICC_FORCE_CONNECTION);
     t_note("ICC long host (%zu chars) -> %d err %lu (%s) %lu ms", p - 7, r.ok, r.err, t_inet_errname(r.err), r.ms);
     CHECK(r.ms < 30000);
+    CHECK(r.ok);   /* decomp + boot 5: a host over 0x100 chars is not copied, nothing is connected, the check "succeeds" */
 }
 
 /* ------------------------------------------------------------------ autoproxy helpers: more argument forms */
@@ -467,10 +472,11 @@ static DWORD WINAPI gp2_thread(void *p) { gp2_arg *a = p; memset(&a->l, 0xcc, si
 TEST(pc_dial_get_proxy_for_url_scheme_table) {
     REQUIRE(UN(InternetGetProxyForUrl)); REQUIRE(UN(InternetFreeProxyInfoList));
     static const struct { const WCHAR *url; int certain_ok; } t[] = {
-        { L"http://pc-gp.invalid/", 1 }, { L"https://pc-gp.invalid/", 1 }, { L"ftp://pc-gp.invalid/", 0 }, { L"HTTP://PC-GP.INVALID/", 1 },
-        { L"http://[::1]:8080/", 0 }, { L"http://127.0.0.1/", 1 }, { L"ws://pc-gp.invalid/", 0 }, { L"wss://pc-gp.invalid/", 0 },
-        { L"gopher://pc-gp.invalid/", 0 }, { L"file:///c:/x.txt", 0 }, { L"not a url", 0 }, { L"pc-gp.invalid", 0 }, { L"http://", 0 },
-        { L"mailto:a@b.invalid", 0 },
+        /* certain_ok: 1 = ERROR_SUCCESS, otherwise the error observed on Win10 boot 5 */
+        { L"http://pc-gp.invalid/", 1 }, { L"https://pc-gp.invalid/", 1 }, { L"ftp://pc-gp.invalid/", 1 }, { L"HTTP://PC-GP.INVALID/", 1 },
+        { L"http://[::1]:8080/", 1 }, { L"http://127.0.0.1/", 1 }, { L"ws://pc-gp.invalid/", 1 }, { L"wss://pc-gp.invalid/", 1 },
+        { L"gopher://pc-gp.invalid/", 1 }, { L"file:///c:/x.txt", ERROR_INTERNET_INVALID_URL }, { L"not a url", ERROR_INTERNET_UNRECOGNIZED_SCHEME },
+        { L"pc-gp.invalid", ERROR_INTERNET_UNRECOGNIZED_SCHEME }, { L"http://", ERROR_INTERNET_INVALID_URL }, { L"mailto:a@b.invalid", 1 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         static gp2_arg a; a.url = t[i].url; a.r = 0xdead;
@@ -479,7 +485,8 @@ TEST(pc_dial_get_proxy_for_url_scheme_table) {
                a.r == 0 ? a.l.dwProxyInfoCount : 0, a.r == 0 && a.l.dwProxyInfoCount ? a.l.pProxyInfo[0].fProxy : -1,
                a.r == 0 && a.l.dwProxyInfoCount ? a.l.pProxyInfo[0].fBypass : -1, a.r == 0 && a.l.dwProxyInfoCount ? (int)a.l.pProxyInfo[0].ProxyScheme : -1,
                a.r == 0 && a.l.dwProxyInfoCount ? a.l.pProxyInfo[0].ProxyPort : 0);
-        if (t[i].certain_ok) CHECKF(a.r == 0, "%ls -> %lu", t[i].url, a.r);
+        CHECKF(a.r == (t[i].certain_ok == 1 ? 0 : (DWORD)t[i].certain_ok), "%ls -> %lu", t[i].url, a.r);
+        if (a.r == 0 && a.l.dwProxyInfoCount && !a.l.pProxyInfo[0].fProxy) { EXPECT_EQ(a.l.pProxyInfo[0].fBypass, FALSE); EXPECT_EQ(a.l.pProxyInfo[0].ProxyPort, 0); }
         if (a.r == 0) { CHECK(a.l.dwProxyInfoCount >= 1); UN(InternetFreeProxyInfoList)(&a.l); }
         else EXPECT_EQ(a.l.dwProxyInfoCount, 0);
     }
@@ -523,6 +530,8 @@ TEST(pc_dial_detect_auto_proxy_url_flag_values) {
         if (!pc_bounded(dap2_thread, &a, 20000)) { t_skip("DetectAutoProxyUrl blocked > 20 s"); return; }
         t_note("OBS DetectAutoProxyUrl(flags 0x%lx) -> %d err %lu buf0 %d", fl[i], a.r, a.e, buf[0]);
         CHECK(!a.r);
+        EXPECT_EQ(a.e, ERROR_INVALID_PARAMETER);   /* boot 5: only DHCP (1) / DNS_A (2) bits are accepted */
+        EXPECT_EQ(buf[0], 0);
     }
 }
 
@@ -541,5 +550,7 @@ TEST(pc_dial_is_host_in_bypass_list_lengths) {
         if (!pc_bounded(ihb2_thread, &a, 15000)) { t_skip("blocked"); return; }
         t_note("OBS IsHostInProxyBypassList(http, \"%s\", %lu) -> %d err %lu", t[i].h, t[i].cch, a.r, a.e);
         if (!pe) EXPECT_EQ(a.r, FALSE);
+        /* boot 5: "<local>" is not a host name (12005); every other form leaves GetLastError 0 */
+        EXPECT_EQ(a.e, !strcmp(t[i].h, "<local>") ? ERROR_INTERNET_INVALID_URL : 0);
     }
 }

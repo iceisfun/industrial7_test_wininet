@@ -20,32 +20,6 @@ static char *basic(const char *up) {
 }
 
 
-/* ------------------------------------------------------------------ diagnostics: duplicate requests (boot 4) */
-/* Boot 4 saw every request arrive twice (each on its own connection) in the second half of this file's tests while
- * the same pattern earlier in the run was exact. These probes record, at several points of the run, how many heads
- * and connections one InternetOpenUrl through a proxy and one direct request produce, with timestamps. */
-void pc_dup_probe(const char *where) {
-    srv *p = srv_http(k_ok, (int)(sizeof k_ok / sizeof k_ok[0]));
-    if (!p) { t_note("dup probe %s: no server", where); return; }
-    HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
-    char body[32]; DWORD err, ms;
-    int st = pc_get(h, "http://pc-dup.invalid/probe", 0, body, sizeof body, &err, &ms);
-    Sleep(1500);
-    int nreq = srv_req_count(p), nconn = srv_conn_count(p);
-    t_note("DUP %s t=%lu proxy: status %d %lu ms heads %d conns %d", where, GetTickCount(), st, ms, nreq, nconn);
-    if (nreq != 1 || nconn != 1) srv_dump(p);
-    t_inet_close(h); srv_stop(p);
-    srv *o = srv_http(k_ok, (int)(sizeof k_ok / sizeof k_ok[0]));
-    if (!o) return;
-    h = pc_open("pc_agent", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 3000);
-    st = pc_get(h, srv_url(o, "/probe"), 0, body, sizeof body, &err, &ms);
-    Sleep(1500);
-    t_note("DUP %s direct: status %d heads %d conns %d", where, st, srv_req_count(o), srv_conn_count(o));
-    if (srv_req_count(o) != 1 || srv_conn_count(o) != 1) srv_dump(o);
-    t_inet_close(h); srv_stop(o);
-}
-
-TEST(pc_wire2_dup_probe_end_of_file_run) { pc_dup_probe("wire2-last"); }
 
 /* ------------------------------------------------------------------ URL forms in the request line */
 typedef struct { const char *url; const char *line; const char *host; int certain; } url_case;
@@ -174,6 +148,7 @@ TEST(pc_wire2_user_agent_forms) {
             const char *ua = srv_req_header(p, before, "User-Agent");
             t_note("OBS agent \"%s\" -> User-Agent %s%s%s", agents[i], ua ? "\"" : "", ua ? ua : "(absent)", ua ? "\"" : "");
             if (agents[i][0]) CHECKF(ua && !strcmp(ua, agents[i]), "agent \"%s\": got \"%s\"", agents[i], ua ? ua : "(absent)");
+            else CHECKF(ua == NULL, "empty agent sent User-Agent \"%s\"", ua);   /* boot 5: no header at all */
         }
         U(InternetCloseHandle)(h);
     }
@@ -237,7 +212,7 @@ TEST(pc_wire2_redirect_to_bypassed_name) {
     int code = pc_get(h, "http://pc-src2.invalid/", 0, body, sizeof body, &err, NULL);
     t_note("OBS redirect to bypassed host: status %d err %lu (%s) proxy reqs %d", code, err, t_inet_errname(err), srv_req_count(p));
     EXPECT_EQ(srv_req_count(p), 1);       /* the redirected request does not go to the proxy */
-    CHECK(code != 200);
+    EXPECT_EQ(code, 0); EXPECT_EQ(err, ERROR_INTERNET_NAME_NOT_RESOLVED);   /* boot 5: followed directly -> DNS failure */
     t_inet_close(h); srv_stop(p);
 }
 
@@ -308,8 +283,12 @@ TEST(pc_wire2_407_creds_reused_on_next_request) {
     for (int i = 0; i < srv_req_count(p); i++)
         t_note("OBS req %d conn %d %s Proxy-Authorization \"%s\"", i, srv_req_conn(p, i), srv_req_line(p, i),
                srv_req_header(p, i, "Proxy-Authorization") ? srv_req_header(p, i, "Proxy-Authorization") : "-");
+    EXPECT_EQ(srv_req_count(p), 4);
     EXPECT_STR(srv_req_header(p, 1, "Proxy-Authorization"), basic("ru:rp"));
-    /* observed: later requests to the same proxy carry the cached proxy credentials pre-emptively */
+    /* boot 5: later requests through the same proxy (same or other origin, request handles without credentials) carry
+     * the cached proxy credentials pre-emptively */
+    EXPECT_STR(srv_req_header(p, 2, "Proxy-Authorization"), basic("ru:rp"));
+    EXPECT_STR(srv_req_header(p, 3, "Proxy-Authorization"), basic("ru:rp"));
     t_inet_close(h); srv_stop(p);
 }
 
@@ -323,7 +302,7 @@ TEST(pc_wire2_407_wrong_creds_returns_407) {
     t_note("OBS 407 always + creds: status %d err %lu requests %d", code, err, srv_req_count(p));
     EXPECT_EQ(code, 407);
     EXPECT_STR(body, "denied");
-    CHECK(srv_req_count(p) >= 2 && srv_req_count(p) <= 4);   /* bounded: no endless retry */
+    EXPECT_EQ(srv_req_count(p), 2);   /* boot 5: one retry with the credentials, then the 407 is returned */
     EXPECT_STR(srv_req_header(p, 1, "Proxy-Authorization"), basic("bad:creds"));
     t_inet_close(h); srv_stop(p);
 }
@@ -357,6 +336,7 @@ TEST(pc_wire2_407_creds_on_connect_handle) {
     int code = status_of(hr);
     t_note("OBS 407 with connect-level proxy creds -> %d, requests %d", code, srv_req_count(p));
     EXPECT_EQ(code, 200);
+    EXPECT_EQ(srv_req_count(p), 2);
     if (srv_req_count(p) >= 2) EXPECT_STR(srv_req_header(p, 1, "Proxy-Authorization"), basic("chu:chp"));
     drain(hr); U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(h); srv_stop(p);
 }
@@ -469,8 +449,6 @@ TEST(pc_wire2_proxy_chunked_gzip_response) {
     t_inet_close(h); srv_stop(p);
 }
 
-TEST(pc_wire2_dup_probe_middle) { pc_dup_probe("wire2-middle"); }
-
 /* ------------------------------------------------------------------ several sessions / proxies */
 TEST(pc_wire2_two_sessions_two_proxies) {
     PROXY2_OR_SKIP(a);
@@ -543,8 +521,6 @@ TEST(pc_wire2_http_only_proxy_https_goes_direct) {
     EXPECT_EQ(srv_req_count(p), 0);
     t_inet_close(h); srv_stop(p);
 }
-
-TEST(pc_wire2_dup_probe_before_sessions) { pc_dup_probe("wire2-before-sessions"); }
 
 /* ------------------------------------------------------------------ CONNECT variants */
 static const srv_step k_tls2[] = { S_HEAD(), S_REPLY(200, "Content-Type: text/plain\r\n", "tunnelled2"), S_CLOSE_IF_ASKED(), S_LOOP() };
@@ -646,8 +622,6 @@ TEST(pc_wire2_connect_https_scheme_proxy_entry_uppercase) {
     EXPECT_EQ(pc_relay_heads(e.r), 1);
     tun2_done(&e);
 }
-
-TEST(pc_wire2_dup_probe_before_connect) { pc_dup_probe("wire2-before-connect"); }
 
 /* ------------------------------------------------------------------ bypass lists: size and whitespace */
 static int via_proxy(srv *p, const char *bypass, const char *url, int *st, DWORD *err) {
@@ -783,4 +757,3 @@ TEST(pc_wire2_ftp_proxy_entry_used_for_ftp_urls) {
     t_inet_close(h); srv_stop(p);
 }
 
-TEST(pc_wire2_dup_probe_first_in_file_run) { pc_dup_probe("wire2-first"); }

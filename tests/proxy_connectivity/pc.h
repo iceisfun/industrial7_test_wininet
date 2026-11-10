@@ -10,6 +10,15 @@
 #include "srv.h"
 #include "tnet.h"
 
+/* common/t.h's EXPECT_EQ/EXPECT_NE evaluate their first argument twice (comparison + "got" value). Here that sent every
+ * EXPECT_EQ(pc_get(...), 200) request twice (found in Win10 boot 5). Single-evaluation versions for this area: */
+#undef EXPECT_EQ
+#undef EXPECT_NE
+#define EXPECT_EQ(a, b) do { ULONG_PTR pa_ = (ULONG_PTR)(a), pb_ = (ULONG_PTR)(b); \
+    t_check(pa_ == pb_, __FILE__, __LINE__, #a " == " #b, "got 0x%llx want 0x%llx", (unsigned long long)pa_, (unsigned long long)pb_); } while (0)
+#define EXPECT_NE(a, b) do { ULONG_PTR pa_ = (ULONG_PTR)(a), pb_ = (ULONG_PTR)(b); \
+    t_check(pa_ != pb_, __FILE__, __LINE__, #a " != " #b, "got 0x%llx", (unsigned long long)pa_); } while (0)
+
 #define START_OR_SKIP(cfgp, sp) do { int rc_ = srv_start((cfgp), (sp)); if (rc_) { t_skip("server unavailable: %s", srv_strerror(rc_)); return; } } while (0)
 #define HTTP_OR_SKIP(var, steps) srv *var = srv_http((steps), (int)(sizeof(steps) / sizeof((steps)[0]))); \
     if (!var) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; }

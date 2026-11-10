@@ -11,7 +11,7 @@ static int status_of(HINTERNET hr) {
 }
 
 /* ------------------------------------------------------------------ CONNECT through a misbehaving proxy */
-typedef struct { const char *name; const srv_step *steps; int n; int want_status; DWORD want_err; int certain; } cstage;
+typedef struct { const char *name; const srv_step *steps; int n; int want_status; DWORD want_err; int certain; const char *body; } cstage;
 #define STEPS2(...) (const srv_step[]){ __VA_ARGS__ }, (int)(sizeof((const srv_step[]){ __VA_ARGS__ }) / sizeof(srv_step))
 
 static void run_connect_stage(const cstage *c) {
@@ -32,18 +32,19 @@ static void run_connect_stage(const cstage *c) {
 }
 
 static const cstage k_connect_stages[] = {
-    { "close without reply", STEPS2(S_HEAD(), S_CLOSE()), 0, 0, 0 },
-    { "reset without reply", STEPS2(S_HEAD(), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 0 },
-    { "garbage reply then close", STEPS2(S_HEAD(), S_SEND("garbage\r\n\r\n"), S_CLOSE()), 0, 0, 0 },
-    { "200 then close", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 Connection established\r\n\r\n"), S_CLOSE()), 0, 0, 0 },
-    { "200 then reset", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 Connection established\r\n\r\n"), S_SLEEP(100), S_RESET()), 0, 0, 0 },
+    /* outcomes observed on Win10 boot 5 */
+    { "close without reply", STEPS2(S_HEAD(), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 1 },
+    { "reset without reply", STEPS2(S_HEAD(), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 1 },
+    { "garbage reply then close", STEPS2(S_HEAD(), S_SEND("garbage\r\n\r\n"), S_CLOSE()), 0, ERROR_INTERNET_CANNOT_CONNECT, 1 },
+    { "200 then close", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 Connection established\r\n\r\n"), S_CLOSE()), 0, ERROR_INTERNET_CANNOT_CONNECT, 1 },
+    { "200 then reset", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 Connection established\r\n\r\n"), S_SLEEP(100), S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 1 },
     { "200 then plaintext", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 Connection established\r\n\r\n"), S_BYTES(5),
-                                  S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 0, 0, 0 },
-    { "partial status line", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 2"), S_CLOSE()), 0, 0, 0 },
-    { "407 without auth header", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 407 Proxy Authentication Required\r\nContent-Length: 0\r\n\r\n"), S_LOOP()), 407, 0, 0 },
-    { "301 to CONNECT", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 301 Moved\r\nLocation: http://x.invalid/\r\nContent-Length: 0\r\n\r\n"), S_LOOP()), 0, 0, 0 },
-    { "HTTP/1.0 403 close", STEPS2(S_HEAD(), S_SEND("HTTP/1.0 403 Forbidden\r\n\r\nno tunnel"), S_CLOSE()), 403, 0, 0 },
-    { "100 then close", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 100 Continue\r\n\r\n"), S_CLOSE()), 0, 0, 0 },
+                                  S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 0, ERROR_INTERNET_SECURITY_CHANNEL_ERROR, 1 },
+    { "partial status line", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 2"), S_CLOSE()), 0, ERROR_INTERNET_CANNOT_CONNECT, 1 },
+    { "407 without auth header", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 407 Proxy Authentication Required\r\nContent-Length: 0\r\n\r\n"), S_LOOP()), 407, 0, 1 },
+    { "301 to CONNECT", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 301 Moved\r\nLocation: http://x.invalid/\r\nContent-Length: 0\r\n\r\n"), S_LOOP()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 1 },
+    { "HTTP/1.0 403 close", STEPS2(S_HEAD(), S_SEND("HTTP/1.0 403 Forbidden\r\n\r\nno tunnel"), S_CLOSE()), 403, 0, 1 },
+    { "100 then close", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 100 Continue\r\n\r\n"), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 1 },
 };
 TEST(pc_fail2_connect_stage_table) {
     REQUIRE(U(HttpSendRequestA));
@@ -64,22 +65,23 @@ TEST(pc_fail2_connect_proxy_refused) {
 
 /* ------------------------------------------------------------------ the server misbehaves before / around the request */
 static const cstage k_early[] = {
-    { "close at accept", STEPS2(S_CLOSE()), 0, 0, 0 },
-    { "reset at accept", STEPS2(S_RESET()), 0, 0, 0 },
-    { "response before request", STEPS2(S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nearly"), S_HEAD(), S_CLOSE()), 0, 0, 0 },
-    { "100 then close", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 100 Continue\r\n\r\n"), S_CLOSE()), 0, 0, 0 },
-    { "status line only", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\n"), S_CLOSE()), 200, 0, 0 },
-    { "one byte", STEPS2(S_HEAD(), S_SEND("H"), S_CLOSE()), 0, 0, 0 },
-    { "LF-only head", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\nContent-Length: 2\n\nok"), S_CLOSE()), 200, 0, 1 },
-    { "unknown status 999", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 999 Odd\r\nContent-Length: 0\r\n\r\n"), S_CLOSE()), 999, 0, 0 },
-    { "chunked truncated", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nab"), S_CLOSE()), 200, 0, 0 },
-    { "chunked bad size", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\nzz\r\nab\r\n0\r\n\r\n"), S_CLOSE()), 200, 0, 0 },
-    { "Content-Length negative", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: -5\r\n\r\nabc"), S_CLOSE()), 200, 0, 0 },
-    { "Content-Length garbage", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: abc\r\n\r\nxyz"), S_CLOSE()), 200, 0, 0 },
-    { "HTTP/2 status line", STEPS2(S_HEAD(), S_SEND("HTTP/2 200\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 0, 0, 0 },
-    { "HTTP/1.1 no reason", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 200, 0, 1 },
-    { "lowercase http", STEPS2(S_HEAD(), S_SEND("http/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 0, 0, 0 },
-    { "slow head 3 pieces", STEPS2(S_HEAD(), S_SPLIT("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nslow", 12, 100), S_CLOSE()), 200, 0, 1 },
+    /* outcomes observed on Win10 boot 5, identical direct and through a proxy */
+    { "close at accept", STEPS2(S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 1 },
+    { "reset at accept", STEPS2(S_RESET()), 0, ERROR_INTERNET_CONNECTION_RESET, 1 },
+    { "response before request", STEPS2(S_SEND("HTTP/1.1 200 OK\r\nContent-Length: 5\r\n\r\nearly"), S_HEAD(), S_CLOSE()), 200, 0, 1, "early" },
+    { "100 then close", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 100 Continue\r\n\r\n"), S_CLOSE()), 0, ERROR_HTTP_INVALID_SERVER_RESPONSE, 1 },
+    { "status line only", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\n"), S_CLOSE()), 200, 0, 1, "" },
+    { "one byte", STEPS2(S_HEAD(), S_SEND("H"), S_CLOSE()), 200, 0, 1, "H" },
+    { "LF-only head", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\nContent-Length: 2\n\nok"), S_CLOSE()), 200, 0, 1, "ok" },
+    { "unknown status 999", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 999 Odd\r\nContent-Length: 0\r\n\r\n"), S_CLOSE()), 999, 0, 1, "" },
+    { "chunked truncated", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n5\r\nab"), S_CLOSE()), 200, 0, 1, "ab" },
+    { "chunked bad size", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\nzz\r\nab\r\n0\r\n\r\n"), S_CLOSE()), 0, ERROR_INTERNET_INTERNAL_ERROR, 1 },
+    { "Content-Length negative", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: -5\r\n\r\nabc"), S_CLOSE()), 200, 0, 1, "" },
+    { "Content-Length garbage", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200 OK\r\nContent-Length: abc\r\n\r\nxyz"), S_CLOSE()), 200, 0, 1, "" },
+    { "HTTP/2 status line", STEPS2(S_HEAD(), S_SEND("HTTP/2 200\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 200, 0, 1, "ok" },
+    { "HTTP/1.1 no reason", STEPS2(S_HEAD(), S_SEND("HTTP/1.1 200\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 200, 0, 1, "ok" },
+    { "lowercase http", STEPS2(S_HEAD(), S_SEND("http/1.1 200 OK\r\nContent-Length: 2\r\n\r\nok"), S_CLOSE()), 200, 0, 1, "ok" },
+    { "slow head 3 pieces", STEPS2(S_HEAD(), S_SPLIT("HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nslow", 12, 100), S_CLOSE()), 200, 0, 1, "slow" },
 };
 
 static void run_early(const cstage *c, int proxy) {
@@ -94,6 +96,7 @@ static void run_early(const cstage *c, int proxy) {
     if (c->certain) {
         CHECKF(st == c->want_status, "%s%s: status %d want %d", proxy ? "proxy " : "", c->name, st, c->want_status);
         if (!c->want_status) CHECKF(err == c->want_err, "%s: err %lu want %lu", c->name, err, c->want_err);
+        if (c->body) CHECKF(!strcmp(body, c->body), "%s%s: body \"%s\" want \"%s\"", proxy ? "proxy " : "", c->name, body, c->body);
     }
     t_inet_close(h); srv_stop(s);
 }
@@ -118,15 +121,17 @@ TEST(pc_fail2_request_handle_after_refused_send) {
     DWORD v = 0, l = sizeof v; SetLastError(0xdeadbeef);
     BOOL q = U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &v, &l, NULL);
     DWORD qe = GetLastError();
-    t_note("OBS status query after refused send -> %d err %lu", q, qe);
-    CHECK(!q);
+    t_note("OBS status query after refused send -> %d err %lu value %lu", q, qe, v);
+    CHECK(q);   /* boot 5: the status query still succeeds on the failed request handle */
     char b[16]; DWORD rd = 7; SetLastError(0xdeadbeef);
     BOOL r = U(InternetReadFile)(hr, b, sizeof b, &rd);
     t_note("OBS InternetReadFile after refused send -> %d err %lu read %lu", r, r ? 0 : GetLastError(), rd);
+    CHECK(r); EXPECT_EQ(rd, 0);
     /* the request line headers are still queryable */
     char raw[512]; l = sizeof raw; SetLastError(0xdeadbeef);
     BOOL rq = U(HttpQueryInfoA)(hr, HTTP_QUERY_RAW_HEADERS_CRLF | HTTP_QUERY_FLAG_REQUEST_HEADERS, raw, &l, NULL);
-    t_note("OBS request headers after refused send -> %d err %lu", rq, rq ? 0 : GetLastError());
+    CHECK(rq);
+    if (rq) CHECK(!strncmp(raw, "GET /hs HTTP/1.1\r\n", 18));
     /* a second send on the same handle fails the same way */
     SetLastError(0xdeadbeef);
     CHECK(!U(HttpSendRequestA)(hr, NULL, 0, NULL, 0));
@@ -196,6 +201,8 @@ TEST(pc_fail2_bad_port_urls) {
         int st = pc_get(h, urls[i], 0, body, sizeof body, &err, &ms);
         t_note("OBS %s -> status %d err %lu (%s) %lu ms", urls[i], st, err, t_inet_errname(err), ms);
         CHECK(ms < 15000);
+        /* boot 5: port 0 and an empty port are tried (refused: 12029); out-of-range or non-numeric ports are 12005 */
+        CHECKF(st == 0 && err == (i == 0 || i == 5 ? ERROR_INTERNET_CANNOT_CONNECT : ERROR_INTERNET_INVALID_URL), "%s: err %lu", urls[i], err);
     }
     t_inet_close(h);
 }
@@ -212,6 +219,8 @@ TEST(pc_fail2_timeout_option_roundtrip) {
         BOOL ok = U(InternetQueryOptionA)(h, opts[o], &d, &l);
         t_note("OBS PROXY session option %lu default -> %d value %lu", opts[o], ok, d);
         CHECK(ok);
+        /* boot 5 defaults: connect 60 s, send/receive/data 30 s, 5 connect retries */
+        EXPECT_EQ(d, opts[o] == INTERNET_OPTION_CONNECT_TIMEOUT ? 60000 : opts[o] == INTERNET_OPTION_CONNECT_RETRIES ? 5 : 30000);
         for (size_t v = 0; v < sizeof vals / sizeof vals[0]; v++) {
             DWORD x = vals[v];
             BOOL s = U(InternetSetOptionA)(h, opts[o], &x, sizeof x);
@@ -222,7 +231,9 @@ TEST(pc_fail2_timeout_option_roundtrip) {
         DWORD z = 0; SetLastError(0xdeadbeef);
         BOOL s0 = U(InternetSetOptionA)(h, opts[o], &z, sizeof z);
         DWORD back = 7; l = sizeof back; U(InternetQueryOptionA)(h, opts[o], &back, &l);
-        t_note("OBS option %lu set 0 -> %d err %lu, reads back %lu", opts[o], s0, s0 ? 0 : GetLastError(), back);
+        CHECK(s0);
+        /* boot 5: CONNECT_TIMEOUT 0 reads back as 0xFFFFFFFF (infinite); the others keep 0 */
+        EXPECT_EQ(back, opts[o] == INTERNET_OPTION_CONNECT_TIMEOUT ? 0xffffffffu : 0);
         SetLastError(0xdeadbeef);
         CHECK(!U(InternetSetOptionA)(h, opts[o], &z, 2));
         EXPECT_ERR(ERROR_INTERNET_BAD_OPTION_LENGTH);
@@ -243,7 +254,7 @@ TEST(pc_fail2_connect_timeout_inherited_by_children) {
     /* changing the session afterwards does not change existing children */
     v = 4321; CHECK(U(InternetSetOptionA)(h, INTERNET_OPTION_CONNECT_TIMEOUT, &v, sizeof v));
     l = sizeof r; if (hr) CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_CONNECT_TIMEOUT, &r, &l));
-    t_note("OBS request CONNECT_TIMEOUT after session change: %lu", r);
+    EXPECT_EQ(r, 1234);   /* boot 5: copied at creation, later session changes do not propagate */
     if (hr) U(InternetCloseHandle)(hr);
     if (hc) U(InternetCloseHandle)(hc);
     U(InternetCloseHandle)(h);
@@ -276,9 +287,9 @@ TEST(pc_fail2_error_message_texts) {
         { ERROR_HTTP_INVALID_SERVER_RESPONSE, "The server returned an invalid or unrecognized response" },
         { ERROR_INTERNET_INVALID_URL, "The URL is invalid" },
         { ERROR_INTERNET_UNRECOGNIZED_SCHEME, "The URL does not use a recognized protocol" },
-        { ERROR_INTERNET_INCORRECT_HANDLE_TYPE, "The type of handle supplied is incorrect for this operation" },
-        { ERROR_INTERNET_BAD_OPTION_LENGTH, "The length of an option supplied is incorrect for the type of option specified" },
-        { ERROR_INTERNET_INVALID_OPTION, "An invalid option value was specified" },
+        { ERROR_INTERNET_INCORRECT_HANDLE_TYPE, "The supplied handle is the wrong type for the requested operation" },
+        { ERROR_INTERNET_BAD_OPTION_LENGTH, "The length is incorrect for the option type" },
+        { ERROR_INTERNET_INVALID_OPTION, "The option is invalid" },
         { ERROR_INTERNET_INVALID_CA, NULL }, { ERROR_INTERNET_PROXY_SERVER_UNREACHABLE, NULL }, { ERROR_INTERNET_DISCONNECTED, NULL },
         { ERROR_INTERNET_NOT_PROXY_REQUEST, NULL }, { ERROR_INTERNET_INVALID_PROXY_REQUEST, NULL }, { ERROR_INTERNET_BAD_AUTO_PROXY_SCRIPT, NULL },
         { ERROR_INTERNET_UNABLE_TO_DOWNLOAD_SCRIPT, NULL }, { ERROR_INTERNET_SERVER_UNREACHABLE, NULL }, { ERROR_INTERNET_INCORRECT_HANDLE_STATE, NULL },
