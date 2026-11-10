@@ -109,7 +109,7 @@ RCASEH(ct_charset_bogus,        S200 "Content-Type: text/html; charset=\"x-bogus
 RCASEH(ct_no_type,              S200 "Content-Type:\r\n" CL2, "Content-Type", NULL)
 
 /* ------------------------------------------------------------ the body bytes are never transcoded */
-TEST(hep_ct_charset_body_bytes_identical) {
+GTEST(hep_ct_charset_body_bytes_identical, 60000) {
     HEP_REQUIRE_HTTP();
     static const char *types[] = { "text/plain; charset=utf-8", "text/plain; charset=iso-8859-1", "text/html; charset=shift_jis",
                                    "application/json; charset=utf-16", "text/plain; charset=koi8-r", "application/octet-stream" };
@@ -144,15 +144,15 @@ static void long_header_case(size_t vlen, const char *want_sig, int also_value) 
     (void)also_value;
     hep_stop(h);
 }
-TEST(hep_size_header_value_1k)   { HEP_REQUIRE_HTTP(); long_header_case(1024, NULL, 1); }
-TEST(hep_size_header_value_8k)   { HEP_REQUIRE_HTTP(); long_header_case(8192, NULL, 1); }
-TEST(hep_size_header_value_16k)  { HEP_REQUIRE_HTTP(); long_header_case(16384, NULL, 1); }
-TEST(hep_size_header_value_64k)  { HEP_REQUIRE_HTTP(); long_header_case(65536, NULL, 1); }
-TEST(hep_size_header_value_128k) { HEP_REQUIRE_HTTP(); long_header_case(131072, NULL, 1); }
-TEST(hep_size_header_value_256k) { HEP_REQUIRE_HTTP(); long_header_case(262144, NULL, 1); }
-TEST(hep_size_header_value_1m)   { HEP_REQUIRE_HTTP(); long_header_case(1048576, NULL, 1); }
+GTEST(hep_size_header_value_1k, 60000)   { HEP_REQUIRE_HTTP(); long_header_case(1024, NULL, 1); }
+GTEST(hep_size_header_value_8k, 60000)   { HEP_REQUIRE_HTTP(); long_header_case(8192, NULL, 1); }
+GTEST(hep_size_header_value_16k, 60000)  { HEP_REQUIRE_HTTP(); long_header_case(16384, NULL, 1); }
+GTEST(hep_size_header_value_64k, 60000)  { HEP_REQUIRE_HTTP(); long_header_case(65536, NULL, 1); }
+GTEST(hep_size_header_value_128k, 60000) { HEP_REQUIRE_HTTP(); long_header_case(131072, NULL, 1); }
+GTEST(hep_size_header_value_256k, 60000) { HEP_REQUIRE_HTTP(); long_header_case(262144, NULL, 1); }
+GTEST(hep_size_header_value_1m, 60000)   { HEP_REQUIRE_HTTP(); long_header_case(1048576, NULL, 1); }
 
-TEST(hep_size_long_header_value_roundtrip_64k) {
+GTEST(hep_size_long_header_value_roundtrip_64k, 60000) {
     /* when a 64 KB value is accepted, HttpQueryInfo returns it byte for byte */
     HEP_REQUIRE_HTTP();
     size_t vlen = 65536, cap = vlen + 256; char *raw = (char *)malloc(cap);
@@ -206,12 +206,12 @@ static void many_headers_case(int count, int distinct, const char *want_sig) {
     t_note("%s: %lu ms", tag, GetTickCount() - t0);
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_count_headers_100)          { HEP_REQUIRE_HTTP(); many_headers_case(100, 1, NULL); }
-TEST(hep_count_headers_1000)         { HEP_REQUIRE_HTTP(); many_headers_case(1000, 1, NULL); }
-TEST(hep_count_headers_5000)         { HEP_REQUIRE_HTTP(); many_headers_case(5000, 1, NULL); }
-TEST(hep_count_headers_20000)        { HEP_REQUIRE_HTTP(); many_headers_case(20000, 1, NULL); }
-TEST(hep_count_same_name_1000)       { HEP_REQUIRE_HTTP(); many_headers_case(1000, 0, NULL); }
-TEST(hep_count_same_name_10000)      { HEP_REQUIRE_HTTP(); many_headers_case(10000, 0, NULL); }
+GTEST(hep_count_headers_100, 60000)          { HEP_REQUIRE_HTTP(); many_headers_case(100, 1, NULL); }
+GTEST(hep_count_headers_1000, 60000)         { HEP_REQUIRE_HTTP(); many_headers_case(1000, 1, NULL); }
+GTEST(hep_count_headers_5000, 60000)         { HEP_REQUIRE_HTTP(); many_headers_case(5000, 1, NULL); }
+GTEST(hep_count_headers_20000, 60000)        { HEP_REQUIRE_HTTP(); many_headers_case(20000, 1, NULL); }
+GTEST(hep_count_same_name_1000, 60000)       { HEP_REQUIRE_HTTP(); many_headers_case(1000, 0, NULL); }
+GTEST(hep_count_same_name_10000, 60000)      { HEP_REQUIRE_HTTP(); many_headers_case(10000, 0, NULL); }
 
 /* ------------------------------------------------------------ tiny TCP segments */
 static void split_case(const char *tag, int piece, int ms, const char *want_sig) {
@@ -227,12 +227,12 @@ static void split_case(const char *tag, int piece, int ms, const char *want_sig)
     hep_stop(h);
 }
 #define SPLIT_WANT "ok=1 st=200 ver=HTTP/1.1 txt=OK h=split-value n=10 body=0123456789"
-TEST(hep_split_1byte_0ms)   { HEP_REQUIRE_HTTP(); split_case("split_1_0", 1, 0, SPLIT_WANT); }
-TEST(hep_split_1byte_2ms)   { HEP_REQUIRE_HTTP(); split_case("split_1_2", 1, 2, SPLIT_WANT); }
-TEST(hep_split_2byte_5ms)   { HEP_REQUIRE_HTTP(); split_case("split_2_5", 2, 5, SPLIT_WANT); }
-TEST(hep_split_3byte_1ms)   { HEP_REQUIRE_HTTP(); split_case("split_3_1", 3, 1, SPLIT_WANT); }
-TEST(hep_split_7byte_10ms)  { HEP_REQUIRE_HTTP(); split_case("split_7_10", 7, 10, SPLIT_WANT); }
-TEST(hep_split_17byte_20ms) { HEP_REQUIRE_HTTP(); split_case("split_17_20", 17, 20, SPLIT_WANT); }
+GTEST(hep_split_1byte_0ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_1_0", 1, 0, SPLIT_WANT); }
+GTEST(hep_split_1byte_2ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_1_2", 1, 2, SPLIT_WANT); }
+GTEST(hep_split_2byte_5ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_2_5", 2, 5, SPLIT_WANT); }
+GTEST(hep_split_3byte_1ms, 60000)   { HEP_REQUIRE_HTTP(); split_case("split_3_1", 3, 1, SPLIT_WANT); }
+GTEST(hep_split_7byte_10ms, 60000)  { HEP_REQUIRE_HTTP(); split_case("split_7_10", 7, 10, SPLIT_WANT); }
+GTEST(hep_split_17byte_20ms, 60000) { HEP_REQUIRE_HTTP(); split_case("split_17_20", 17, 20, SPLIT_WANT); }
 
 static int split_at_call(srv_conn *c, const srv_step *st, void *user) {
     /* send the response in two writes split exactly at offset *(int*)user, 60 ms apart */
@@ -244,7 +244,7 @@ static int split_at_call(srv_conn *c, const srv_step *st, void *user) {
     srv_conn_send(c, raw + at, sizeof raw - 1 - (size_t)at);
     return -1;
 }
-TEST(hep_split_every_boundary) {
+GTEST(hep_split_every_boundary, 60000) {
     /* a two-segment response, split at every offset of the head: CR|LF, inside the status line, inside "\r\n\r\n" */
     HEP_REQUIRE_HTTP();
     static const char raw[] = "HTTP/1.1 200 OK\r\nX-T: split-value\r\nContent-Length: 10\r\n\r\n0123456789";

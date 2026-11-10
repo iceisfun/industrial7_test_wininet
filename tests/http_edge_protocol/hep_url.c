@@ -29,14 +29,14 @@ static void long_openurl(size_t total_len) {
     if (got && tg) { EXPECT_EQ(strlen(tg), plen); EXPECT_STR(tg, path); }
     t_inet_close(hi); free(url); free(path); hep_stop(h);
 }
-TEST(hep_url_openurl_len_2000)  { HEP_REQUIRE_HTTP(); long_openurl(2000); }
-TEST(hep_url_openurl_len_2048)  { HEP_REQUIRE_HTTP(); long_openurl(2048); }
-TEST(hep_url_openurl_len_2083)  { HEP_REQUIRE_HTTP(); long_openurl(2083); }
-TEST(hep_url_openurl_len_2084)  { HEP_REQUIRE_HTTP(); long_openurl(2084); }
-TEST(hep_url_openurl_len_2085)  { HEP_REQUIRE_HTTP(); long_openurl(2085); }
-TEST(hep_url_openurl_len_4096)  { HEP_REQUIRE_HTTP(); long_openurl(4096); }
-TEST(hep_url_openurl_len_8192)  { HEP_REQUIRE_HTTP(); long_openurl(8192); }
-TEST(hep_url_openurl_len_32768) { HEP_REQUIRE_HTTP(); long_openurl(32768); }
+GTEST(hep_url_openurl_len_2000, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2000); }
+GTEST(hep_url_openurl_len_2048, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2048); }
+GTEST(hep_url_openurl_len_2083, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2083); }
+GTEST(hep_url_openurl_len_2084, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2084); }
+GTEST(hep_url_openurl_len_2085, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(2085); }
+GTEST(hep_url_openurl_len_4096, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(4096); }
+GTEST(hep_url_openurl_len_8192, 60000)  { HEP_REQUIRE_HTTP(); long_openurl(8192); }
+GTEST(hep_url_openurl_len_32768, 60000) { HEP_REQUIRE_HTTP(); long_openurl(32768); }
 TEST(hep_url_openurl_len_100000){ HEP_REQUIRE_HTTP(); long_openurl(100000); }
 
 static void long_query_openurl(size_t qlen) {
@@ -54,8 +54,8 @@ static void long_query_openurl(size_t qlen) {
     if (tg) EXPECT_EQ(strlen(tg), 3 + qlen);
     t_inet_close(hi); free(url); hep_stop(h);
 }
-TEST(hep_url_openurl_query_2100)  { HEP_REQUIRE_HTTP(); long_query_openurl(2100); }
-TEST(hep_url_openurl_query_16000) { HEP_REQUIRE_HTTP(); long_query_openurl(16000); }
+GTEST(hep_url_openurl_query_2100, 60000)  { HEP_REQUIRE_HTTP(); long_query_openurl(2100); }
+GTEST(hep_url_openurl_query_16000, 60000) { HEP_REQUIRE_HTTP(); long_query_openurl(16000); }
 
 /* ------------------------------------------------------------ long objects through HttpOpenRequestA */
 static void long_object(size_t len) {
@@ -70,11 +70,11 @@ static void long_object(size_t len) {
     if (tg) EXPECT_EQ(strlen(tg), len);
     free(path); hep_stop(h);
 }
-TEST(hep_url_object_len_2048)   { HEP_REQUIRE_HTTP(); long_object(2048); }
-TEST(hep_url_object_len_2084)   { HEP_REQUIRE_HTTP(); long_object(2084); }
-TEST(hep_url_object_len_8192)   { HEP_REQUIRE_HTTP(); long_object(8192); }
-TEST(hep_url_object_len_65536)  { HEP_REQUIRE_HTTP(); long_object(65536); }
-TEST(hep_url_object_len_200000) { HEP_REQUIRE_HTTP(); long_object(200000); }
+GTEST(hep_url_object_len_2048, 60000)   { HEP_REQUIRE_HTTP(); long_object(2048); }
+GTEST(hep_url_object_len_2084, 60000)   { HEP_REQUIRE_HTTP(); long_object(2084); }
+GTEST(hep_url_object_len_8192, 60000)   { HEP_REQUIRE_HTTP(); long_object(8192); }
+GTEST(hep_url_object_len_65536, 60000)  { HEP_REQUIRE_HTTP(); long_object(65536); }
+GTEST(hep_url_object_len_200000, 60000) { HEP_REQUIRE_HTTP(); long_object(200000); }
 
 /* ------------------------------------------------------------ long host names (via proxy: no DNS) */
 static void long_host(size_t label, size_t total) {
@@ -93,21 +93,33 @@ static void long_host(size_t label, size_t total) {
     int got = r.ok && srv_wait_requests(h->s, 1, 2000);
     t_note("OBS host label=%zu total=%zu -> %s target_len=%zu host_hdr_len=%zu", label, n, hep_sig(&r, 0),
            got ? strlen(srv_req_target(h->s, 0)) : 0, got && srv_req_header(h->s, 0, "Host") ? strlen(srv_req_header(h->s, 0, "Host")) : 0);
+    /* Win10 VM: accepted at every length; the host name is cut to 256 characters in both the absolute
+     * request-target and the Host header */
+    CHECK(got);
+    if (got) {
+        size_t want = n > 256 ? 256 : n;
+        const char *hh = srv_req_header(h->s, 0, "Host");
+        CHECK(hh != NULL);
+        if (hh) { EXPECT_EQ(strlen(hh), want); CHECK(!strncmp(hh, host, want)); }
+        EXPECT_EQ(strlen(srv_req_target(h->s, 0)), want + 10);   /* "http://" + host + "/lh" */
+    }
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_url_host_label_63)        { HEP_REQUIRE_HTTP(); long_host(63, 63); }
-TEST(hep_url_host_label_64)        { HEP_REQUIRE_HTTP(); long_host(64, 64); }
-TEST(hep_url_host_total_253)       { HEP_REQUIRE_HTTP(); long_host(50, 253); }
-TEST(hep_url_host_total_256)       { HEP_REQUIRE_HTTP(); long_host(50, 256); }
-TEST(hep_url_host_total_1000)      { HEP_REQUIRE_HTTP(); long_host(50, 1000); }
+GTEST(hep_url_host_label_63, 60000)        { HEP_REQUIRE_HTTP(); long_host(63, 63); }
+GTEST(hep_url_host_label_64, 60000)        { HEP_REQUIRE_HTTP(); long_host(64, 64); }
+GTEST(hep_url_host_total_253, 60000)       { HEP_REQUIRE_HTTP(); long_host(50, 253); }
+GTEST(hep_url_host_total_256, 60000)       { HEP_REQUIRE_HTTP(); long_host(50, 256); }
+GTEST(hep_url_host_total_1000, 60000)      { HEP_REQUIRE_HTTP(); long_host(50, 1000); }
 
 /* ------------------------------------------------------------ fragments */
 typedef struct { const char *path; const char *want; } frag_case;
+/* Win10 VM: InternetOpenUrl does NOT strip the fragment; it is sent as part of the request-target (same as
+ * http_request_wire hrw_openurl_fragment_kept). */
 static const frag_case frags[] = {
-    { "/f#frag", "/f" }, { "/f?q=1#frag", "/f?q=1" }, { "/f#", "/f" }, { "/#x", "/" }, { "/f#a#b", "/f" },
-    { "/f#frag?notquery", "/f" }, { "/f%23notfrag", "/f%23notfrag" },
+    { "/f#frag", "/f#frag" }, { "/f?q=1#frag", "/f?q=1#frag" }, { "/f#", "/f#" }, { "/#x", "/#x" }, { "/f#a#b", "/f#a#b" },
+    { "/f#frag?notquery", "/f#frag?notquery" }, { "/f%23notfrag", "/f%23notfrag" },
 };
-TEST(hep_url_fragment_stripped_openurl) {
+GTEST(hep_url_fragment_sent_openurl, 60000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof frags / sizeof frags[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -121,40 +133,45 @@ TEST(hep_url_fragment_stripped_openurl) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-TEST(hep_url_fragment_openurl_w) {
+GTEST(hep_url_fragment_openurl_w, 60000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW));
     HEP_SRV(h, hep_start_ok());
     WCHAR url[128]; swprintf(url, 128, L"http://127.0.0.1:%u/fw?x=1#frag", srv_port(h->s));
     HINTERNET hi = hep_session(NULL, 0);
     hep_res r; hep_openurl_w(hi, url, 0, &r);
     CHECK(r.ok);
-    if (r.ok && srv_wait_requests(h->s, 1, 2000)) EXPECT_STR(srv_req_target(h->s, 0), "/fw?x=1");
+    if (r.ok && srv_wait_requests(h->s, 1, 2000)) EXPECT_STR(srv_req_target(h->s, 0), "/fw?x=1#frag");
     t_inet_close(hi); hep_stop(h);
 }
 
 /* ------------------------------------------------------------ path bytes: A and W, openurl and openrequest */
-typedef struct { const char *a; const WCHAR *w; const char *tag; } path_case;
+/* want_a / want_w: request-target seen on the wire (escaped as hep_esc prints it) for the A entry points
+ * (InternetOpenUrlA and HttpOpenRequestA agree) and the W entry points (InternetOpenUrlW and HttpOpenRequestW agree).
+ * Win10 VM: spaces -> %20 (path and query), existing %-escapes kept verbatim (even invalid ones), dot segments
+ * removed, backslash -> '/', TAB dropped, '"<>' kept; A high bytes go out raw, W text goes out as raw UTF-8 bytes
+ * (not %-escaped) whatever INTERNET_OPTION_CODEPAGE_* says. */
+typedef struct { const char *a; const WCHAR *w; const char *tag; const char *want_a; const char *want_w; } path_case;
 static const path_case paths[] = {
-    { "/a b", L"/a b", "space" },
-    { "/a%20b", L"/a%20b", "pct20" },
-    { "/sp ace?q=a b", L"/sp ace?q=a b", "space_query" },
-    { "/%41", L"/%41", "pct41" },
-    { "/%zz", L"/%zz", "pct_bad" },
-    { "/%", L"/%", "pct_alone" },
-    { "/%2f", L"/%2f", "pct2f_lower" },
-    { "/%00", L"/%00", "pct00" },
-    { "/a/../b", L"/a/../b", "dotdot" },
-    { "/a/./b", L"/a/./b", "dot" },
-    { "/a/%2e%2e/b", L"/a/%2e%2e/b", "pct_dotdot" },
-    { "/a\\b", L"/a\\b", "backslash" },
-    { "/t\tab", L"/t\tab", "tab" },
-    { "/q\"<>", L"/q\"<>", "quote_lt_gt" },
-    { "/\xe9", L"/\x00e9", "e_acute" },
-    { "/\xc3\xa9", L"/\x00c3\x00a9", "utf8_bytes_as_latin1" },
-    { NULL, L"/\x4e2d\x6587", "cjk" },
-    { NULL, L"/\x20ac", "euro" },
-    { NULL, L"/\xd83d\xde00", "emoji" },
-    { NULL, L"/\x00e9?q=\x00e9", "e_acute_query" },
+    { "/a b", L"/a b", "space", "/a%20b", "/a%20b" },
+    { "/a%20b", L"/a%20b", "pct20", "/a%20b", "/a%20b" },
+    { "/sp ace?q=a b", L"/sp ace?q=a b", "space_query", "/sp%20ace?q=a%20b", "/sp%20ace?q=a%20b" },
+    { "/%41", L"/%41", "pct41", "/%41", "/%41" },
+    { "/%zz", L"/%zz", "pct_bad", "/%zz", "/%zz" },
+    { "/%", L"/%", "pct_alone", "/%", "/%" },
+    { "/%2f", L"/%2f", "pct2f_lower", "/%2f", "/%2f" },
+    { "/%00", L"/%00", "pct00", "/%00", "/%00" },
+    { "/a/../b", L"/a/../b", "dotdot", "/b", "/b" },
+    { "/a/./b", L"/a/./b", "dot", "/a/b", "/a/b" },
+    { "/a/%2e%2e/b", L"/a/%2e%2e/b", "pct_dotdot", "/a/%2e%2e/b", "/a/%2e%2e/b" },
+    { "/a\\b", L"/a\\b", "backslash", "/a/b", "/a/b" },
+    { "/t\tab", L"/t\tab", "tab", "/tab", "/tab" },
+    { "/q\"<>", L"/q\"<>", "quote_lt_gt", "/q\"<>", "/q\"<>" },
+    { "/\xe9", L"/\x00e9", "e_acute", "/\\xe9", "/\\xc3\\xa9" },
+    { "/\xc3\xa9", L"/\x00c3\x00a9", "utf8_bytes_as_latin1", "/\\xc3\\xa9", "/\\xc3\\x83\\xc2\\xa9" },
+    { NULL, L"/\x4e2d\x6587", "cjk", NULL, "/\\xe4\\xb8\\xad\\xe6\\x96\\x87" },
+    { NULL, L"/\x20ac", "euro", NULL, "/\\xe2\\x82\\xac" },
+    { NULL, L"/\xd83d\xde00", "emoji", NULL, "/\\xf0\\x9f\\x98\\x80" },
+    { NULL, L"/\x00e9?q=\x00e9", "e_acute_query", NULL, "/\\xc3\\xa9?q=\\xc3\\xa9" },
 };
 static void path_run(const path_case *c, int mode) {
     /* mode 0: InternetOpenUrlA, 1: InternetOpenUrlW, 2: HttpOpenRequestA, 3: HttpOpenRequestW */
@@ -180,14 +197,17 @@ static void path_run(const path_case *c, int mode) {
     static const char *mn[] = { "OpenUrlA", "OpenUrlW", "OpenRequestA", "OpenRequestW" };
     const char *tg = ok && srv_wait_requests(h->s, 1, 2000) ? srv_req_target(h->s, 0) : NULL;
     t_note("OBS path %s %s -> ok=%d err=%lu target=%s", mn[mode], c->tag, ok, err, tg ? hep_esc(tg, strlen(tg)) : "-");
+    CHECKF(ok, "%s %s err %lu", mn[mode], c->tag, err);
+    const char *want = (mode == 0 || mode == 2) ? c->want_a : c->want_w;
+    if (tg && want) t_check(!strcmp(hep_esc(tg, strlen(tg)), want), __FILE__, __LINE__, c->tag, "%s got %s want %s", mn[mode], hep_esc(tg, strlen(tg)), want);
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_url_path_bytes_openurl_a)     { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 0); }
-TEST(hep_url_path_bytes_openurl_w)     { HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 1); }
-TEST(hep_url_path_bytes_openrequest_a) { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 2); }
-TEST(hep_url_path_bytes_openrequest_w) { HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 3); }
+GTEST(hep_url_path_bytes_openurl_a, 60000)     { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 0); }
+GTEST(hep_url_path_bytes_openurl_w, 60000)     { HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 1); }
+GTEST(hep_url_path_bytes_openrequest_a, 60000) { HEP_REQUIRE_HTTP(); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 2); }
+GTEST(hep_url_path_bytes_openrequest_w, 60000) { HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); for (size_t i = 0; i < sizeof paths / sizeof paths[0]; i++) path_run(&paths[i], 3); }
 
-TEST(hep_url_openrequest_w_object_is_utf8) {
+GTEST(hep_url_openrequest_w_object_is_utf8, 60000) {
     /* decomp HttpOpenRequestW@0xbea10: the object name is converted with CP_UTF8 */
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     HEP_SRV(h, hep_start_ok());
@@ -202,7 +222,7 @@ TEST(hep_url_openrequest_w_object_is_utf8) {
 }
 
 /* ------------------------------------------------------------ code page options */
-TEST(hep_url_codepage_options_defaults) {
+GTEST(hep_url_codepage_options_defaults, 60000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetQueryOptionA));
     HINTERNET hi = hep_session(NULL, 0);
     static const DWORD opts[] = { INTERNET_OPTION_CODEPAGE, INTERNET_OPTION_CODEPAGE_PATH, INTERNET_OPTION_CODEPAGE_EXTRA, INTERNET_OPTION_IDN };
@@ -211,9 +231,13 @@ TEST(hep_url_codepage_options_defaults) {
         DWORD v = 0xdeadbeef, l = sizeof v;
         BOOL q = U(InternetQueryOptionA)(hi, opts[i], &v, &l);
         t_note("OBS session option %s: q=%d err=%lu v=%lu (0x%lx) len=%lu", nm[i], q, q ? 0 : GetLastError(), v, v, l);
+        /* Win10 VM: session defaults CODEPAGE/CODEPAGE_PATH/CODEPAGE_EXTRA = 0xffffffff (unset), IDN = 3 */
+        CHECK(q); EXPECT_EQ(l, 4); EXPECT_EQ(v, i == 3 ? 3u : 0xffffffffu);
         DWORD gv = 0xdeadbeef, gl = sizeof gv;
+        SetLastError(0);
         BOOL gq = U(InternetQueryOptionA)(NULL, opts[i], &gv, &gl);
         t_note("OBS global option %s: q=%d err=%lu v=%lu", nm[i], gq, gq ? 0 : GetLastError(), gv);
+        CHECK(!gq); EXPECT_ERR(ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     }
     t_inet_close(hi);
 }
@@ -229,9 +253,12 @@ static void cp_case(DWORD opt, DWORD val, int on_session, const WCHAR *wpath, co
     const char *tg = ok && srv_wait_requests(h->s, 1, 2000) ? srv_req_target(h->s, 0) : NULL;
     t_note("OBS codepage %s opt=%lu val=%lu %s set=%d/%lu -> ok=%d target=%s", tag, opt, val, on_session ? "session" : "request", s, se, ok,
            tg ? hep_esc(tg, strlen(tg)) : "-");
+    /* Win10 VM: the option is accepted but the W object still goes out as UTF-8 */
+    CHECK(s); CHECK(ok);
+    if (tg) { char w[64]; WideCharToMultiByte(CP_UTF8, 0, wpath, -1, w, sizeof w, NULL, NULL); EXPECT_STR(tg, w); }
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_url_codepage_path_option_effect) {
+GTEST(hep_url_codepage_path_option_effect, 60000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(InternetSetOptionA));
     cp_case(INTERNET_OPTION_CODEPAGE_PATH, CP_UTF8, 0, L"/\x00e9", "path_utf8_req");
     cp_case(INTERNET_OPTION_CODEPAGE_PATH, 1252, 0, L"/\x00e9", "path_1252_req");
@@ -239,7 +266,7 @@ TEST(hep_url_codepage_path_option_effect) {
     cp_case(INTERNET_OPTION_CODEPAGE_EXTRA, 1252, 0, L"/p?q=\x00e9", "extra_1252_req");
     cp_case(INTERNET_OPTION_CODEPAGE, 1252, 0, L"/\x00e9", "codepage_1252_req");
 }
-TEST(hep_url_codepage_path_openurl_w) {
+GTEST(hep_url_codepage_path_openurl_w, 60000) {
     /* set CODEPAGE_PATH / EXTRA on the session and use InternetOpenUrlW */
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); REQUIRE(U(InternetSetOptionA));
     static const struct { DWORD opt, val; const char *tag; } cs[] = {
@@ -255,28 +282,38 @@ TEST(hep_url_codepage_path_openurl_w) {
         hep_res r; hep_openurl_w(hi, url, 0, &r);
         const char *tg = r.ok && srv_wait_requests(h->s, 1, 2000) ? srv_req_target(h->s, 0) : NULL;
         t_note("OBS openurlW codepage %s set=%d/%lu -> ok=%d err=%lu target=%s", cs[i].tag, s, se, r.ok, r.err, tg ? hep_esc(tg, strlen(tg)) : "-");
+        CHECK(s); CHECK(r.ok);
+        if (tg) EXPECT_STR(hep_esc(tg, strlen(tg)), "/\\xc3\\xa9?q=\\xc3\\xa9");
         t_inet_close(hi); hep_stop(h);
     }
 }
-TEST(hep_url_codepage_invalid_values) {
+GTEST(hep_url_codepage_invalid_values, 60000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetSetOptionA));
     HINTERNET hi = hep_session(NULL, 0);
     static const DWORD opts[] = { INTERNET_OPTION_CODEPAGE, INTERNET_OPTION_CODEPAGE_PATH, INTERNET_OPTION_CODEPAGE_EXTRA };
     static const DWORD vals[] = { 0, 1, 12345, 65000, 65001, 0xffffffff };
+    /* Win10 VM: 0, 65000, 65001 accepted; 1, 12345, 0xffffffff -> 87 (looks like an IsValidCodePage check that lets 0 through) */
+    static const int okv[] = { 1, 0, 0, 1, 1, 0 };
     for (int i = 0; i < 3; i++) for (int j = 0; j < 6; j++) {
         DWORD v = vals[j];
         SetLastError(0);
         BOOL s = U(InternetSetOptionA)(hi, opts[i], &v, sizeof v);
-        t_note("OBS set opt %lu = %lu -> %d err %lu", opts[i], v, s, s ? 0 : GetLastError());
+        DWORD e = s ? 0 : GetLastError();
+        t_note("OBS set opt %lu = %lu -> %d err %lu", opts[i], v, s, e);
+        CHECKF(!!s == okv[j], "opt %lu value %lu -> %d", opts[i], v, s);
+        if (!okv[j]) CHECKF(e == ERROR_INVALID_PARAMETER, "opt %lu value %lu err %lu", opts[i], v, e);
     }
+    static const DWORD more[] = { 437, 1252, 932, 20127 };
+    for (int j = 0; j < 4; j++) { DWORD v = more[j]; CHECKF(U(InternetSetOptionA)(hi, INTERNET_OPTION_CODEPAGE_PATH, &v, sizeof v), "cp %lu err %lu", v, GetLastError()); }
     DWORD v = CP_UTF8; SetLastError(0);
     BOOL s = U(InternetSetOptionA)(hi, INTERNET_OPTION_CODEPAGE_PATH, &v, 2);
     t_note("OBS set CODEPAGE_PATH short buffer -> %d err %lu", s, s ? 0 : GetLastError());
+    CHECK(!s); EXPECT_ERR(ERROR_INTERNET_BAD_OPTION_LENGTH);
     t_inet_close(hi);
 }
 
 /* ------------------------------------------------------------ IDN hosts through a proxy */
-static void idn_case(const WCHAR *host, DWORD idn_opt, int set_idn, const char *tag) {
+static void idn_case(const WCHAR *host, DWORD idn_opt, int set_idn, const char *tag, const char *want_host) {
     hep_srv *h = hep_start_ok(); if (!h) return;
     HINTERNET hi = hep_proxy_session(h, "hep-idn");
     BOOL s = TRUE; DWORD se = 0;
@@ -287,24 +324,28 @@ static void idn_case(const WCHAR *host, DWORD idn_opt, int set_idn, const char *
     const char *tg = got ? srv_req_target(h->s, 0) : NULL, *hh = got ? srv_req_header(h->s, 0, "Host") : NULL;
     t_note("OBS idn %s idnopt=%s%lu set=%d/%lu -> ok=%d err=%lu target=%s host=%s", tag, set_idn ? "" : "(unset)", idn_opt, s, se, r.ok, r.err,
            tg ? hep_esc(tg, strlen(tg)) : "-", hh ? hep_esc(hh, strlen(hh)) : "-");
+    /* Win10 VM: W host names are converted to punycode (lower case) for both the absolute target and Host,
+     * for every INTERNET_OPTION_IDN value 0..3 */
+    CHECK(s); CHECK(got);
+    if (got) { char wt[256]; snprintf(wt, sizeof wt, "http://%s/idn", want_host); EXPECT_STR(tg, wt); EXPECT_STR(hh, want_host); }
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_idn_openurl_w_default) {
+GTEST(hep_idn_openurl_w_default, 60000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW));
-    idn_case(L"b\x00fc" L"cher.example", 0, 0, "buecher");
-    idn_case(L"\x4e2d\x6587.example", 0, 0, "cjk");
-    idn_case(L"M\x00dc" L"NCHEN.example", 0, 0, "upper");
-    idn_case(L"xn--bcher-kva.example", 0, 0, "already_puny");
-    idn_case(L"\x00e9.\x00e9.example", 0, 0, "two_labels");
+    idn_case(L"b\x00fc" L"cher.example", 0, 0, "buecher", "xn--bcher-kva.example");
+    idn_case(L"\x4e2d\x6587.example", 0, 0, "cjk", "xn--fiq228c.example");
+    idn_case(L"M\x00dc" L"NCHEN.example", 0, 0, "upper", "xn--mnchen-3ya.example");
+    idn_case(L"xn--bcher-kva.example", 0, 0, "already_puny", "xn--bcher-kva.example");
+    idn_case(L"\x00e9.\x00e9.example", 0, 0, "two_labels", "xn--9ca.xn--9ca.example");
 }
-TEST(hep_idn_option_values) {
+GTEST(hep_idn_option_values, 60000) {
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetOpenUrlW)); REQUIRE(U(InternetSetOptionA));
-    idn_case(L"b\x00fc" L"cher.example", 0, 1, "idn0");
-    idn_case(L"b\x00fc" L"cher.example", 1, 1, "idn1_direct");
-    idn_case(L"b\x00fc" L"cher.example", 2, 1, "idn2_proxy");
-    idn_case(L"b\x00fc" L"cher.example", 3, 1, "idn3");
+    idn_case(L"b\x00fc" L"cher.example", 0, 1, "idn0", "xn--bcher-kva.example");
+    idn_case(L"b\x00fc" L"cher.example", 1, 1, "idn1_direct", "xn--bcher-kva.example");
+    idn_case(L"b\x00fc" L"cher.example", 2, 1, "idn2_proxy", "xn--bcher-kva.example");
+    idn_case(L"b\x00fc" L"cher.example", 3, 1, "idn3", "xn--bcher-kva.example");
 }
-TEST(hep_idn_openurl_a_high_bytes) {
+GTEST(hep_idn_openurl_a_high_bytes, 60000) {
     HEP_REQUIRE_HTTP();
     static const char *hosts[] = { "b\xfc" "cher.example", "b\xc3\xbc" "cher.example" };
     for (int i = 0; i < 2; i++) {
@@ -315,10 +356,14 @@ TEST(hep_idn_openurl_a_high_bytes) {
         int got = r.ok && srv_wait_requests(h->s, 1, 2000);
         const char *tg = got ? srv_req_target(h->s, 0) : NULL, *hh = got ? srv_req_header(h->s, 0, "Host") : NULL;
         t_note("OBS idn A %d -> ok=%d err=%lu target=%s host=%s", i, r.ok, r.err, tg ? hep_esc(tg, strlen(tg)) : "-", hh ? hep_esc(hh, strlen(hh)) : "-");
+        /* Win10 VM: no IDN conversion for A; the target %-escapes the high bytes (upper-case hex), Host carries them raw */
+        static const char *wt[] = { "http://b%FCcher.example/idn", "http://b%C3%BCcher.example/idn" };
+        CHECK(got);
+        if (got) { EXPECT_STR(tg, wt[i]); EXPECT_STR(hh, hosts[i]); }
         t_inet_close(hi); hep_stop(h);
     }
 }
-TEST(hep_idn_connect_w_host_header) {
+GTEST(hep_idn_connect_w_host_header, 60000) {
     /* InternetConnectW with a Unicode server name through the proxy: HostWCharToCharEx (IDN aware) per decomp */
     HEP_REQUIRE_HTTP(); REQUIRE(U(InternetConnectW)); REQUIRE(U(HttpOpenRequestW)); REQUIRE(U(HttpSendRequestW));
     HEP_SRV(h, hep_start_ok());
@@ -330,6 +375,8 @@ TEST(hep_idn_connect_w_host_header) {
     int got = ok && srv_wait_requests(h->s, 1, 2000);
     const char *tg = got ? srv_req_target(h->s, 0) : NULL, *hh = got ? srv_req_header(h->s, 0, "Host") : NULL;
     t_note("OBS ConnectW IDN -> ok=%d err=%lu target=%s host=%s", ok, ok ? 0 : GetLastError(), tg ? hep_esc(tg, strlen(tg)) : "-", hh ? hep_esc(hh, strlen(hh)) : "-");
+    CHECK(got);
+    if (got) { EXPECT_STR(tg, "http://xn--bcher-kva.example:8080/c"); EXPECT_STR(hh, "xn--bcher-kva.example:8080"); }
     if (hr) U(InternetCloseHandle)(hr);
     if (hc) U(InternetCloseHandle)(hc);
     t_inet_close(hi); hep_stop(h);
@@ -339,17 +386,17 @@ TEST(hep_idn_connect_w_host_header) {
 typedef struct { const char *url; const char *want_target; const char *want_host; } dp_case;
 static const dp_case dps[] = {
     { "http://dp.example/x", "http://dp.example/x", "dp.example" },
-    { "http://dp.example:80/x", NULL, NULL },
+    { "http://dp.example:80/x", "http://dp.example/x", "dp.example" },
     { "http://dp.example:8080/x", "http://dp.example:8080/x", "dp.example:8080" },
-    { "http://dp.example:080/x", NULL, NULL },
-    { "http://DP.Example/x", NULL, NULL },
-    { "http://dp.example./x", NULL, NULL },
-    { "http://dp.example:/x", NULL, NULL },
-    { "http://dp.example", NULL, NULL },
-    { "http://dp.example?q", NULL, NULL },
-    { "http://dp.example:443/x", NULL, NULL },
+    { "http://dp.example:080/x", "http://dp.example/x", "dp.example" },
+    { "http://DP.Example/x", "http://dp.example/x", "DP.Example" },     /* target lower-cased, Host keeps the case */
+    { "http://dp.example./x", "http://dp.example./x", "dp.example." },
+    { "http://dp.example:/x", "http://dp.example/x", "dp.example" },
+    { "http://dp.example", "http://dp.example/", "dp.example" },
+    { "http://dp.example?q", "http://dp.example/?q", "dp.example" },
+    { "http://dp.example:443/x", "http://dp.example:443/x", "dp.example:443" },
 };
-TEST(hep_default_port_host_header_via_proxy) {
+GTEST(hep_default_port_host_header_via_proxy, 60000) {
     HEP_REQUIRE_HTTP();
     for (size_t i = 0; i < sizeof dps / sizeof dps[0]; i++) {
         hep_srv *h = hep_start_ok(); if (!h) return;
@@ -362,7 +409,7 @@ TEST(hep_default_port_host_header_via_proxy) {
         t_inet_close(hi); hep_stop(h);
     }
 }
-TEST(hep_default_port_connect_port_values_via_proxy) {
+GTEST(hep_default_port_connect_port_values_via_proxy, 60000) {
     HEP_REQUIRE_HTTP();
     static const INTERNET_PORT ports[] = { 0, 80, 443, 8080, 65535 };
     for (int i = 0; i < 5; i++) {
@@ -373,13 +420,19 @@ TEST(hep_default_port_connect_port_values_via_proxy) {
         BOOL ok = hr && U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
         int got = ok && srv_wait_requests(h->s, 1, 2000);
         t_note("OBS connect port %u -> ok=%d target=%s host=%s", ports[i], ok, got ? srv_req_target(h->s, 0) : "-", got ? srv_req_header(h->s, 0, "Host") : "-");
-        if (i == 0 || i == 1) { CHECK(got); if (got) { EXPECT_STR(srv_req_target(h->s, 0), "http://dp.example/p"); EXPECT_HDR(h->s, 0, "Host", "dp.example"); } }
+        CHECK(got);
+        if (got) {
+            char wt[64], wh[64];
+            if (ports[i] == 0 || ports[i] == 80) { strcpy(wt, "http://dp.example/p"); strcpy(wh, "dp.example"); }
+            else { snprintf(wt, sizeof wt, "http://dp.example:%u/p", ports[i]); snprintf(wh, sizeof wh, "dp.example:%u", ports[i]); }
+            EXPECT_STR(srv_req_target(h->s, 0), wt); EXPECT_HDR(h->s, 0, "Host", wh);
+        }
         if (hr) U(InternetCloseHandle)(hr);
         if (hc) U(InternetCloseHandle)(hc);
         t_inet_close(hi); hep_stop(h);
     }
 }
-TEST(hep_direct_host_header_has_port) {
+GTEST(hep_direct_host_header_has_port, 60000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     hep_req rq = {0}; hep_res r; hep_do(h, &rq, &r);
@@ -390,7 +443,7 @@ TEST(hep_direct_host_header_has_port) {
 }
 
 /* ------------------------------------------------------------ IPv6 literals */
-TEST(hep_ipv6_openurl_brackets) {
+GTEST(hep_ipv6_openurl_brackets, 60000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     if (!srv_has_v6(h->s)) { t_skip("no [::1] listener in this guest"); hep_stop(h); return; }
@@ -404,7 +457,7 @@ TEST(hep_ipv6_openurl_brackets) {
     }
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_ipv6_connect_forms) {
+GTEST(hep_ipv6_connect_forms, 60000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     if (!srv_has_v6(h->s)) { t_skip("no [::1] listener in this guest"); hep_stop(h); return; }
@@ -419,14 +472,20 @@ TEST(hep_ipv6_connect_forms) {
         if (ok) { char b[8]; t_inet_read_all(hr, b, sizeof b, NULL); }
         int got = ok && srv_wait_requests(h->s, before + 1, 2000);
         t_note("OBS connect [%s] -> ok=%d err=%lu host=%s", names[i], ok, e, got ? srv_req_header(h->s, before, "Host") : "-");
-        if (i == 0 && got) { char want[64]; snprintf(want, sizeof want, "[::1]:%u", srv_port(h->s)); EXPECT_HDR(h->s, before, "Host", want); }
+        /* Win10 VM: bare and bracketed literals both work and the Host header is bracketed; the v4-mapped form and a
+         * zone id fail with 12029 (no listener / no such scope) */
+        if (i < 4) {
+            CHECK(got);
+            char want[64]; snprintf(want, sizeof want, "[%s]:%u", i < 2 ? "::1" : "0:0:0:0:0:0:0:1", srv_port(h->s));
+            if (got) EXPECT_HDR(h->s, before, "Host", want);
+        } else { CHECK(!ok); CHECKF(e == ERROR_INTERNET_CANNOT_CONNECT, "err %lu", e); }
         if (hr) U(InternetCloseHandle)(hr);
         if (hc) U(InternetCloseHandle)(hc);
         t_inet_close(hi);
     }
     hep_stop(h);
 }
-TEST(hep_ipv6_openurl_variants) {
+GTEST(hep_ipv6_openurl_variants, 60000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     if (!srv_has_v6(h->s)) { t_skip("no [::1] listener in this guest"); hep_stop(h); return; }
@@ -442,13 +501,20 @@ TEST(hep_ipv6_openurl_variants) {
         hep_res r; hep_openurl(hi, urls[i], NULL, 0, NULL, &r);
         int got = r.ok && srv_wait_requests(h->s, before + 1, 2000);
         t_note("OBS v6 url %s -> ok=%d err=%lu target=%s host=%s", urls[i], r.ok, r.err, got ? srv_req_target(h->s, before) : "-", got ? srv_req_header(h->s, before, "Host") : "-");
+        static const char *wt[] = { "/", "/x", "/x?y#z", NULL, NULL };
+        static const char *wh[] = { "[::1]", "[0:0:0:0:0:0:0:1]", "[::1]", NULL, NULL };
+        if (wt[i]) { CHECK(got); if (got) { char hp[64]; snprintf(hp, sizeof hp, "%s:%u", wh[i], srv_port(h->s));
+                                            EXPECT_STR(srv_req_target(h->s, before), wt[i]); EXPECT_HDR(h->s, before, "Host", hp); } }
+        else { CHECK(!r.ok); EXPECT_EQ(r.err, i == 3 ? ERROR_INTERNET_INVALID_URL : ERROR_INTERNET_CANNOT_CONNECT); }
         t_inet_close(hi);
     }
     hep_stop(h);
 }
 
 /* ------------------------------------------------------------ userinfo in InternetOpenUrl */
-static void userinfo_case(const char *ui, const char *tag) {
+/* want_decoded: Basic credentials sent on the retry after the 401 (NULL: no retry, the caller gets the 401);
+ * want_err != 0: InternetOpenUrl fails with it. Win10 VM. */
+static void userinfo_case(const char *ui, const char *tag, const char *want_decoded, DWORD want_err) {
     static const srv_step st[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"r\"\r\n", "no"), S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP_TO(2) };
     hep_srv *h = hep_start(st, 5); if (!h) return;
     char url[256]; snprintf(url, sizeof url, "http://%s@127.0.0.1:%u/ui", ui, srv_port(h->s));
@@ -463,19 +529,27 @@ static void userinfo_case(const char *ui, const char *tag) {
     if (a && !strncmp(a, "Basic ", 6)) { size_t n = 0; unsigned char *d = srv_unb64(a + 6, &n); if (d) { snprintf(dec, sizeof dec, "%s", hep_esc(d, n)); free(d); } }
     t_note("OBS userinfo %s [%s] -> %s reqs=%d auth0=%s auth1=%s decoded=%s target=%s", tag, ui, hep_sig(&r, 0), nreq, a0 ? a0 : "-", a1 ? a1 : "-", dec,
            nreq ? srv_req_target(h->s, 0) : "-");
+    if (want_err) { CHECK(!r.ok); EXPECT_EQ(r.err, want_err); EXPECT_EQ(nreq, 0); }
+    else {
+        CHECK(r.ok);
+        CHECKF(a0 == NULL, "%s: first request already carries Authorization", tag);   /* never pre-emptive */
+        if (want_decoded) { EXPECT_EQ(r.status, 200); EXPECT_EQ(nreq, 2); EXPECT_STR(dec, want_decoded); }
+        else { EXPECT_EQ(r.status, 401); EXPECT_EQ(nreq, 1); }
+        if (nreq) EXPECT_STR(srv_req_target(h->s, 0), "/ui");
+    }
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_userinfo_table) {
+GTEST(hep_userinfo_table, 60000) {
     HEP_REQUIRE_HTTP();
-    userinfo_case("user:pass", "plain");
-    userinfo_case("user", "user_only");
-    userinfo_case("user:", "empty_pass");
-    userinfo_case(":pass", "empty_user");
-    userinfo_case("us%40er:p%3Ass", "pct_escaped");
-    userinfo_case("u:p:q", "colon_in_pass");
-    userinfo_case("d%5Cu:p", "domain_backslash");
+    userinfo_case("user:pass", "plain", "user:pass", 0);
+    userinfo_case("user", "user_only", NULL, 0);
+    userinfo_case("user:", "empty_pass", NULL, 0);
+    userinfo_case(":pass", "empty_user", NULL, 0);
+    userinfo_case("us%40er:p%3Ass", "pct_escaped", "us@er:p:ss", 0);              /* %-escapes decoded */
+    userinfo_case("u:p:q", "colon_in_pass", NULL, ERROR_INTERNET_INVALID_URL);   /* second ':' -> port parse fails */
+    userinfo_case("d%5Cu:p", "domain_backslash", "d\\\\u:p", 0);
 }
-TEST(hep_userinfo_basic_preemptive_or_challenge) {
+GTEST(hep_userinfo_basic_preemptive_or_challenge, 60000) {
     /* the userinfo credentials end up in a Basic Authorization header; record whether the first request carries it */
     HEP_REQUIRE_HTTP();
     static const srv_step st[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"r\"\r\n", "no"), S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP_TO(2) };
@@ -493,7 +567,7 @@ TEST(hep_userinfo_basic_preemptive_or_challenge) {
     for (int i = 0; i < srv_req_count(h->s); i++) EXPECT_STR(srv_req_target(h->s, i), "/ui");
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_userinfo_not_in_host_header) {
+GTEST(hep_userinfo_not_in_host_header, 60000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     char url[256]; snprintf(url, sizeof url, "http://u:p@127.0.0.1:%u/h", srv_port(h->s));
@@ -504,10 +578,11 @@ TEST(hep_userinfo_not_in_host_header) {
         EXPECT_HDR(h->s, 0, "Host", hep_hostport(h));
         EXPECT_STR(srv_req_target(h->s, 0), "/h");
         t_note("OBS userinfo on 200 server: auth0=%s", srv_req_header(h->s, 0, "Authorization") ? srv_req_header(h->s, 0, "Authorization") : "-");
+        EXPECT_NOHDR(h->s, 0, "Authorization");
     }
     t_inet_close(hi); hep_stop(h);
 }
-TEST(hep_userinfo_via_proxy_absolute_form) {
+GTEST(hep_userinfo_via_proxy_absolute_form, 60000) {
     HEP_REQUIRE_HTTP();
     HEP_SRV(h, hep_start_ok());
     HINTERNET hi = hep_proxy_session(h, "hep-ui");
@@ -515,5 +590,8 @@ TEST(hep_userinfo_via_proxy_absolute_form) {
     int got = r.ok && srv_wait_requests(h->s, 1, 2000);
     t_note("OBS userinfo via proxy -> ok=%d target=%s host=%s auth=%s", r.ok, got ? srv_req_target(h->s, 0) : "-", got ? srv_req_header(h->s, 0, "Host") : "-",
            got && srv_req_header(h->s, 0, "Authorization") ? srv_req_header(h->s, 0, "Authorization") : "-");
+    /* Win10 VM: userinfo is removed from the absolute target, no pre-emptive Authorization */
+    CHECK(got);
+    if (got) { EXPECT_STR(srv_req_target(h->s, 0), "http://ui.example/z"); EXPECT_HDR(h->s, 0, "Host", "ui.example"); EXPECT_NOHDR(h->s, 0, "Authorization"); }
     t_inet_close(hi); hep_stop(h);
 }

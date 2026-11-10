@@ -63,6 +63,7 @@ typedef struct {
     DWORD err;         /* GetLastError when !ok */
     int status;        /* STATUS_CODE|NUMBER, -1 if the query failed */
     DWORD status_err;  /* error of that query */
+    int status_qfail;  /* the STATUS_CODE|NUMBER query failed (signature "st=?<err>") */
     char ver[64];      /* HTTP_QUERY_VERSION or "?<err>" */
     char txt[128];     /* HTTP_QUERY_STATUS_TEXT or "?<err>" */
     char hval[1024];   /* value of the custom header asked for (hep_req.qname) or "?<err>" */

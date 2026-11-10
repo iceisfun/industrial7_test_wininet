@@ -256,20 +256,20 @@ GTEST(hep_stale_close_after_reading_second_head_post, 30000) {
 static void early(const char *tag, const char *raw, int mode, const char *want) {
     hep_rcase(tag, raw, strlen(raw), mode, NULL, 0, want);
 }
-TEST(hep_early_close_before_any_byte)      { HEP_REQUIRE_HTTP(); early("close_0", "", 0, NULL); }
-TEST(hep_early_reset_before_any_byte)      { HEP_REQUIRE_HTTP(); early("rst_0", "", 2, NULL); }
-TEST(hep_early_reset_mid_status)           { HEP_REQUIRE_HTTP(); early("rst_status", "HTTP/1.1 20", 2, NULL); }
-TEST(hep_early_reset_after_status)         { HEP_REQUIRE_HTTP(); early("rst_after_status", "HTTP/1.1 200 OK\r\n", 2, NULL); }
-TEST(hep_early_reset_mid_headers)          { HEP_REQUIRE_HTTP(); early("rst_mid_hdr", "HTTP/1.1 200 OK\r\nContent-Le", 2, NULL); }
-TEST(hep_early_reset_after_headers)        { HEP_REQUIRE_HTTP(); early("rst_after_hdr", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n", 2, NULL); }
-TEST(hep_early_reset_mid_body)             { HEP_REQUIRE_HTTP(); early("rst_mid_body", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nab", 2, NULL); }
-TEST(hep_early_reset_mid_chunked)          { HEP_REQUIRE_HTTP(); early("rst_mid_chunk", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nab", 2, NULL); }
-TEST(hep_early_reset_close_delimited)      { HEP_REQUIRE_HTTP(); early("rst_closedelim", "HTTP/1.1 200 OK\r\n\r\nabcd", 2, NULL); }
-TEST(hep_early_shutwr_mid_body)            { HEP_REQUIRE_HTTP(); early("shut_mid_body", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nab", 1, NULL); }
-TEST(hep_early_shutwr_mid_chunked)         { HEP_REQUIRE_HTTP(); early("shut_mid_chunk", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nab", 1, NULL); }
-TEST(hep_early_shutwr_after_headers_cl)    { HEP_REQUIRE_HTTP(); early("shut_after_hdr", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n", 1, NULL); }
-TEST(hep_early_close_mid_chunk_size)       { HEP_REQUIRE_HTTP(); early("close_chunk_size", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4", 0, NULL); }
-TEST(hep_early_close_before_last_chunk)    { HEP_REQUIRE_HTTP(); early("close_no_last", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nabcd\r\n", 0, NULL); }
+GTEST(hep_early_close_before_any_byte, 60000)      { HEP_REQUIRE_HTTP(); early("close_0", "", 0, NULL); }
+GTEST(hep_early_reset_before_any_byte, 60000)      { HEP_REQUIRE_HTTP(); early("rst_0", "", 2, NULL); }
+GTEST(hep_early_reset_mid_status, 60000)           { HEP_REQUIRE_HTTP(); early("rst_status", "HTTP/1.1 20", 2, NULL); }
+GTEST(hep_early_reset_after_status, 60000)         { HEP_REQUIRE_HTTP(); early("rst_after_status", "HTTP/1.1 200 OK\r\n", 2, NULL); }
+GTEST(hep_early_reset_mid_headers, 60000)          { HEP_REQUIRE_HTTP(); early("rst_mid_hdr", "HTTP/1.1 200 OK\r\nContent-Le", 2, NULL); }
+GTEST(hep_early_reset_after_headers, 60000)        { HEP_REQUIRE_HTTP(); early("rst_after_hdr", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n", 2, NULL); }
+GTEST(hep_early_reset_mid_body, 60000)             { HEP_REQUIRE_HTTP(); early("rst_mid_body", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nab", 2, NULL); }
+GTEST(hep_early_reset_mid_chunked, 60000)          { HEP_REQUIRE_HTTP(); early("rst_mid_chunk", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nab", 2, NULL); }
+GTEST(hep_early_reset_close_delimited, 60000)      { HEP_REQUIRE_HTTP(); early("rst_closedelim", "HTTP/1.1 200 OK\r\n\r\nabcd", 2, NULL); }
+GTEST(hep_early_shutwr_mid_body, 60000)            { HEP_REQUIRE_HTTP(); early("shut_mid_body", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nab", 1, NULL); }
+GTEST(hep_early_shutwr_mid_chunked, 60000)         { HEP_REQUIRE_HTTP(); early("shut_mid_chunk", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nab", 1, NULL); }
+GTEST(hep_early_shutwr_after_headers_cl, 60000)    { HEP_REQUIRE_HTTP(); early("shut_after_hdr", "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n", 1, NULL); }
+GTEST(hep_early_close_mid_chunk_size, 60000)       { HEP_REQUIRE_HTTP(); early("close_chunk_size", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4", 0, NULL); }
+GTEST(hep_early_close_before_last_chunk, 60000)    { HEP_REQUIRE_HTTP(); early("close_no_last", "HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nabcd\r\n", 0, NULL); }
 
 /* ------------------------------------------------------------ response before the request body was read */
 static void early_reply_post(const char *tag, size_t bodylen, int drain, const char *reply, const char *want) {

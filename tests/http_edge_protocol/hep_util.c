@@ -1,5 +1,5 @@
 /* hep_util.c - helpers for the http_edge_protocol area (see hep.h).
- * VM_TIMEOUT: 480 */
+ * VM_TIMEOUT: 720 */
 #include "hep.h"
 #include <stdlib.h>
 
@@ -90,7 +90,7 @@ static void q_str(HINTERNET hr, DWORD level, const char *name, char *out, size_t
 static void fill_after_send(HINTERNET hr, const char *qname, hep_res *r) {
     DWORD st = 0, l = sizeof st;
     if (U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &st, &l, NULL)) r->status = (int)st;
-    else { r->status = -1; r->status_err = GetLastError(); }
+    else { r->status = -1; r->status_qfail = 1; r->status_err = GetLastError(); }
     q_str(hr, HTTP_QUERY_VERSION, NULL, r->ver, sizeof r->ver);
     q_str(hr, HTTP_QUERY_STATUS_TEXT, NULL, r->txt, sizeof r->txt);
     q_str(hr, HTTP_QUERY_CONTENT_LENGTH, NULL, r->cl, sizeof r->cl);
@@ -172,8 +172,9 @@ const char *hep_sig(const hep_res *r, unsigned what) {
     static char b[8][2400]; static volatile LONG k;
     char *o = b[InterlockedIncrement(&k) & 7]; size_t j = 0;
     if (!r->ok) { snprintf(o, 2400, "ok=0 err=%lu", r->err); return o; }
-    j += snprintf(o + j, 2400 - j, "ok=1 st=%d", r->status);
-    if (r->status < 0) j += snprintf(o + j, 2400 - j, " sterr=%lu", r->status_err);
+    if (r->status_qfail) j += snprintf(o + j, 2400 - j, "ok=1 st=");
+    else j += snprintf(o + j, 2400 - j, "ok=1 st=%lu", (unsigned long)(DWORD)r->status);
+    if (r->status_qfail) j += snprintf(o + j, 2400 - j, "?%lu", r->status_err);
     if (what & 1) j += snprintf(o + j, 2400 - j, " ver=%s", r->ver);
     if (what & 2) j += snprintf(o + j, 2400 - j, " txt=%s", r->txt);
     if (what & 4) j += snprintf(o + j, 2400 - j, " h=%s", r->hval);
