@@ -286,8 +286,9 @@ TEST(uce_info_w_null_buffer_large_size) {
     DWORD sz = 100000;
     SET_ERR(0xdeadbeef);
     BOOL r = U(GetUrlCacheEntryInfoW)(uce_w(url), NULL, &sz);
-    DWORD e = GetLastError();
-    t_note("W NULL buffer, size 100000: r=%d err=%lu size=%lu", r, e, sz);
+    /* unlike A, W succeeds when *size is large enough and the buffer is NULL (nothing copied)
+       [D ConvertCacheEntryInfoW: size check before the NULL-buffer check] [W10] */
+    CHECK(r); EXPECT_ERR(0);
     DWORD want = UCE_INFO_SIZE + uce_slotw(strlen(url)) + uce_slotw(strlen(p)) + uce_slotw(3);
     EXPECT_EQ(sz, want);
     CHECK(uce_del(url));
@@ -326,7 +327,7 @@ TEST(uce_info_a_vs_w_fields) {
         EXPECT_EQ(a->dwHeaderInfoSize, w->dwHeaderInfoSize);
         CHECK(!lstrcmpiW(w->lpszLocalFileName, uce_w(a->lpszLocalFileName)));
         CHECK(!lstrcmpW(w->lpszFileExtension, L"css"));
-        t_note("use count A=%lu W=%lu", a->dwUseCount, w->dwUseCount);
+        EXPECT_EQ(a->dwUseCount, 0); EXPECT_EQ(w->dwUseCount, 0);
     }
     free(a); free(w);
     CHECK(uce_del(url));
@@ -602,7 +603,11 @@ TEST(uce_set_type_table) {
         INTERNET_CACHE_ENTRY_INFOA n; fill_new(&n); n.CacheEntryType = types[k];
         CHECK(U(SetUrlCacheEntryInfoA)(url, &n, CACHE_ENTRY_ATTRIBUTE_FC));
         DWORD e; INTERNET_CACHE_ENTRY_INFOA *a = uce_info(url, NULL, &e);
-        if (a) { CHECKF(a->CacheEntryType == types[k], "set 0x%lx got 0x%lx", types[k], a->CacheEntryType); free(a); } else CHECK(0);
+        /* the type is stored verbatim (no NORMAL bit added, unlike commit) [W10]; a SPARSE entry is hidden from Get [W10] */
+        if (types[k] & SPARSE_CACHE_ENTRY) CHECKF(!a && e == ERROR_FILE_NOT_FOUND, "sparse: info err %lu", e);
+        else if (a) CHECKF(a->CacheEntryType == types[k], "set 0x%lx got 0x%lx", types[k], a->CacheEntryType);
+        else CHECKF(0, "set 0x%lx info err %lu", types[k], e);
+        free(a);
         CHECK(uce_del(url));
     }
 }
@@ -638,6 +643,11 @@ TEST(uce_set_does_not_change_strings) {
     DWORD all = 0; for (size_t k = 0; k < sizeof g_fc / sizeof *g_fc; k++) all |= g_fc[k].fc;
     CHECK(U(SetUrlCacheEntryInfoA)(url, &n, all | CACHE_ENTRY_HEADERINFO_FC));
     DWORD e; INTERNET_CACHE_ENTRY_INFOA *a = uce_info(url, NULL, &e);
-    if (a) { CHECK(!_stricmp(a->lpszLocalFileName, p)); EXPECT_STR(a->lpszFileExtension, "txt"); EXPECT_STR(a->lpszSourceUrlName, url); EXPECT_EQ(a->dwSizeLow, 7); free(a); } else CHECK(0);
+    if (a) {
+        CHECKF(a->lpszLocalFileName && !_stricmp(a->lpszLocalFileName, p), "local %s want %s", a->lpszLocalFileName ? a->lpszLocalFileName : "(null)", p);
+        EXPECT_STR(a->lpszFileExtension, "txt"); EXPECT_STR(a->lpszSourceUrlName, url); EXPECT_EQ(a->dwSizeLow, 7);
+        t_note("after set-all: type=0x%lx local=%s", a->CacheEntryType, a->lpszLocalFileName ? a->lpszLocalFileName : "(null)");
+        free(a);
+    } else CHECK(0);
     CHECK(uce_del(url));
 }

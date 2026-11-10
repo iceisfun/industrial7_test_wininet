@@ -3,6 +3,7 @@
  * CreateUrlCacheEntryHelper@0xe1b4, CreateUniqueCacheFile@0xf9bc, _ProcessExtension@0xfd48,
  * _CreateFileWithSuffix@0x10530 ("<name>[%d].<ext>"). VM_TIMEOUT: 240 */
 #include "uce.h"
+#include <ctype.h>
 
 UDECL(BOOL, CreateUrlCacheEntryExW, (LPCWSTR, DWORD, LPCWSTR, LPWSTR, DWORD, BOOL));
 
@@ -218,7 +219,7 @@ TEST(uce_create_ext_percent_decoded) {
     /* _DecodePercentEncodedString on the extension [D] */
     BOOL r = U(CreateUrlCacheEntryA)(uce_url("extpct"), 0, "t%78t", path, 0);
     CHECK(r);
-    if (r) { t_note("t%%78t -> %s", path); CHECK(strlen(path) > 4 && !strcmp(path + strlen(path) - 4, ".txt")); DeleteFileA(path); }
+    if (r) { CHECK(strlen(path) > 4 && !strcmp(path + strlen(path) - 4, ".txt")); DeleteFileA(path); }
 }
 TEST(uce_create_ext_null_and_empty) {
     REQUIRE(U(CreateUrlCacheEntryA));
@@ -236,7 +237,8 @@ TEST(uce_create_ext_leading_dot) {
     char path[MAX_PATH] = "";
     BOOL r = U(CreateUrlCacheEntryA)(uce_url("extdot"), 0, ".txt", path, 0);
     CHECK(r);
-    if (r) { t_note(".txt -> %s", path); CHECK(strstr(path, ".txt") != NULL); DeleteFileA(path); }
+    /* a leading dot does not double: "extdot[N].txt" [W10] */
+    if (r) { CHECK(strstr(path, "\\extdot[") != NULL); CHECK(strstr(path, "..") == NULL); CHECK(!strcmp(path + strlen(path) - 4, ".txt")); DeleteFileA(path); }
 }
 TEST(uce_create_ext_too_long_w) {
     REQUIRE(U(CreateUrlCacheEntryW));
@@ -254,8 +256,7 @@ TEST(uce_create_ext_too_long_a) {
     BOOL r = U(CreateUrlCacheEntryA)(uce_url("extlonga"), 0, ext, path, 0);
     DWORD e = GetLastError();
     CHECK(!r);
-    t_note("A ext 299 chars: r=%d err=%lu", r, e);
-    CHECK(e != 0);
+    EXPECT_EQ(e, ERROR_INVALID_PARAMETER);   /* [W10] */
     if (r) DeleteFileA(path);
 }
 
@@ -286,7 +287,13 @@ TEST(uce_create_name_root_url) {
     char path[MAX_PATH] = "";
     BOOL r = U(CreateUrlCacheEntryA)(url, 0, "htm", path, 0);
     CHECK(r);
-    if (r) { t_note("root url -> %s", path); CHECK(uce_file_exists(path)); CHECK(strstr(path, ".htm") != NULL); DeleteFileA(path); }
+    /* no file name in the URL -> random 8-character name + ext [D _CreateFileWithRandomFilename] [W10] */
+    if (r) {
+        const char *leaf = strrchr(path, '\\'); leaf = leaf ? leaf + 1 : path;
+        CHECKF(strlen(leaf) == 12 && !strcmp(leaf + 8, ".htm"), "%s", leaf);
+        for (int k = 0; k < 8 && leaf[k]; k++) CHECKF(isalnum((unsigned char)leaf[k]), "%s", leaf);
+        CHECK(uce_file_exists(path)); DeleteFileA(path);
+    }
 }
 TEST(uce_create_name_cookie_url_random) {
     REQUIRE(U(CreateUrlCacheEntryA));
@@ -294,8 +301,15 @@ TEST(uce_create_name_cookie_url_random) {
     char url[300]; snprintf(url, sizeof url, "Cookie:%s@%s/", t_uniq("u"), t_uniq_host("ck"));
     char path[MAX_PATH] = "";
     BOOL r = U(CreateUrlCacheEntryA)(url, 0, "txt", path, 0);
-    t_note("cookie url create r=%d err=%lu path=%s", r, r ? 0 : GetLastError(), path);
-    if (r) { CHECK(uce_file_exists(path)); DeleteFileA(path); }
+    CHECK(r);
+    /* the cookie container lives in INetCookies; random 8-character name [W10] */
+    if (r) {
+        char up[MAX_PATH]; strcpy(up, path); CharUpperA(up);
+        CHECKF(strstr(up, "\\INETCOOKIES\\") != NULL, "%s", path);
+        const char *leaf = strrchr(path, '\\'); leaf = leaf ? leaf + 1 : path;
+        CHECKF(strlen(leaf) == 12 && !strcmp(leaf + 8, ".txt"), "%s", leaf);
+        CHECK(uce_file_exists(path)); DeleteFileA(path);
+    }
 }
 TEST(uce_create_name_non_http_scheme) {
     REQUIRE(U(CreateUrlCacheEntryA));
@@ -303,7 +317,7 @@ TEST(uce_create_name_non_http_scheme) {
     char path[MAX_PATH] = "";
     BOOL r = U(CreateUrlCacheEntryA)(url, 0, "bin", path, 0);
     CHECK(r);
-    if (r) { t_note("ftp url -> %s", path); CHECK(strstr(path, "file[") != NULL); DeleteFileA(path); }
+    if (r) { CHECK(strstr(path, "file[") != NULL); DeleteFileA(path); }
 }
 
 /* --------------------------------------------------------------- invalid URLs */
@@ -341,9 +355,15 @@ TEST(uce_create_empty_url) {
     char path[MAX_PATH]; strcpy(path, "keep");
     SET_ERR(0xdeadbeef);
     BOOL r = U(CreateUrlCacheEntryA)("", 0, "txt", path, 0);
-    DWORD e = GetLastError();
-    t_note("empty url: r=%d err=%lu path=%s", r, e, path);
-    if (r) DeleteFileA(path);
+    /* "" maps to the default (content) container and gets a random name [D UrlCacheGetContainer *url == 0] [W10] */
+    CHECK(r); EXPECT_ERR(0);
+    if (r) {
+        char up[MAX_PATH]; strcpy(up, path); CharUpperA(up);
+        CHECK(strstr(up, "\\INETCACHE\\") != NULL);
+        const char *leaf = strrchr(path, '\\'); leaf = leaf ? leaf + 1 : path;
+        CHECKF(strlen(leaf) == 12 && !strcmp(leaf + 8, ".txt"), "%s", leaf);
+        DeleteFileA(path);
+    }
 }
 TEST(uce_create_unknown_scheme_ok) {
     REQUIRE(U(CreateUrlCacheEntryA));
@@ -351,8 +371,8 @@ TEST(uce_create_unknown_scheme_ok) {
     char url[300]; snprintf(url, sizeof url, "i7test:%s/opaque", t_uniq("os"));
     char path[MAX_PATH] = "";
     BOOL r = U(CreateUrlCacheEntryA)(url, 0, "txt", path, 0);
-    t_note("opaque scheme create r=%d err=%lu path=%s", r, r ? 0 : GetLastError(), path);
-    if (r) DeleteFileA(path);
+    CHECK(r);
+    if (r) { CHECK(strstr(path, "\\opaque[") != NULL); DeleteFileA(path); }   /* name from the last path segment [W10] */
 }
 
 /* --------------------------------------------------------------- CreateUrlCacheEntryExW */
@@ -369,9 +389,9 @@ TEST(uce_create_exw_filename_hint) {
     /* fPreserveIncomingFileName: the incoming buffer is the requested file name [D: param_6 != 0 passes lpszFileName] */
     WCHAR path[MAX_PATH]; lstrcpyW(path, L"hinted.dat");
     BOOL r = UN(CreateUrlCacheEntryExW)(uce_w(uce_url("exhint")), 0, L"txt", path, 0, TRUE);
-    DWORD e = GetLastError();
-    t_note("ExW preserve: r=%d err=%lu path=%s", r, e, uce_a(path));
-    if (r) { CHECK(wcsstr(path, L"hinted") != NULL); DeleteFileW(path); }
+    /* the hint's own extension wins over lpszFileExtension: "hinted[N].dat" [W10] */
+    CHECK(r); EXPECT_ERR(0);
+    if (r) { CHECK(wcsstr(path, L"\\hinted[") != NULL); const WCHAR *d = wcsrchr(path, L'.'); CHECK(d && !lstrcmpW(d, L".dat")); DeleteFileW(path); }
 }
 
 /* --------------------------------------------------------------- create without commit leaves no entry */

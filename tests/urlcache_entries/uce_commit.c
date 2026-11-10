@@ -58,10 +58,9 @@ TEST(uce_commit_file_outside_container) {
     SET_ERR(0xdeadbeef);
     BOOL r = U(CommitUrlCacheEntryA)(url, p, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL);
     DWORD e = GetLastError();
-    /* non-EDITED entries must live in the container (VerifyCacheEntryPath) [D] */
+    /* non-EDITED entries must live in the container (VerifyCacheEntryPath -> E_INVALIDARG) [D] [W10] */
     CHECK(!r);
-    t_note("outside-container commit err=%lu", e);
-    CHECK(e != 0);
+    EXPECT_EQ(e, ERROR_INVALID_PARAMETER);
     CHECK(!uce_exists(url));
     CHECK(uce_file_exists(p));          /* the caller's file is left alone */
     if (r) uce_del(url);
@@ -74,8 +73,7 @@ TEST(uce_commit_edited_file_outside_container) {
     SET_ERR(0xdeadbeef);
     /* EDITED_CACHE_ENTRY skips VerifyCacheEntryPath [D AddUrl (flags & 8)] */
     BOOL r = U(CommitUrlCacheEntryA)(url, p, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY | EDITED_CACHE_ENTRY, NULL, 0, "txt", NULL);
-    DWORD e = GetLastError();
-    t_note("EDITED outside commit r=%d err=%lu", r, e);
+    CHECK(r); EXPECT_ERR(0);              /* [W10] */
     if (r) {
         DWORD err; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &err);
         CHECK(i != NULL);
@@ -105,15 +103,16 @@ TEST(uce_commit_a_basic) {
     EXPECT_EQ(i->dwStructSize, UCE_INFO_SIZE);
     EXPECT_STR(i->lpszSourceUrlName, url);
     CHECK(i->lpszLocalFileName && !_stricmp(i->lpszLocalFileName, path));
-    EXPECT_EQ(i->CacheEntryType & NORMAL_CACHE_ENTRY, NORMAL_CACHE_ENTRY);
-    t_note("NORMAL CacheEntryType=0x%lx use=%lu hit=%lu exempt=%lu", i->CacheEntryType, i->dwUseCount, i->dwHitRate, i->dwExemptDelta);
+    EXPECT_EQ(i->CacheEntryType, NORMAL_CACHE_ENTRY);
+    EXPECT_EQ(i->dwUseCount, 0);          /* use count = current lock count [W10] */
+    EXPECT_EQ(i->dwHitRate, 1);           /* a new entry starts at 1 [D AddUrl local_1c4 = 1] [W10] */
     EXPECT_EQ(i->dwSizeLow, 10);
     EXPECT_EQ(i->dwSizeHigh, 0);
     EXPECT_EQ(uce_u64(i->ExpireTime), uce_u64(exp));
     EXPECT_EQ(uce_u64(i->LastModifiedTime), uce_u64(mod));
     ULONGLONG la = uce_u64(i->LastAccessTime), ls = uce_u64(i->LastSyncTime);
     CHECKF(la + UCE_DAY > t0 && la < t0 + UCE_DAY, "LastAccess %llx now %llx", la, t0);   /* set to now at commit [D] */
-    t_note("LastSyncTime=%llx (now %llx)", ls, t0);
+    CHECKF(ls + UCE_DAY > t0 && ls < t0 + UCE_DAY, "LastSync %llx now %llx", ls, t0);    /* commit time too [W10] */
     EXPECT_EQ(i->lpHeaderInfo, NULL);
     EXPECT_EQ(i->dwHeaderInfoSize, 0);
     EXPECT_STR(i->lpszFileExtension, "txt");
@@ -230,7 +229,8 @@ static const struct { DWORD type; const char *name; } g_types[] = {
     { EDITED_CACHE_ENTRY, "EDITED" }, { NORMAL_CACHE_ENTRY | EDITED_CACHE_ENTRY, "NORMAL|EDITED" },
     { TRACK_OFFLINE_CACHE_ENTRY, "TRACK_OFFLINE" }, { TRACK_ONLINE_CACHE_ENTRY, "TRACK_ONLINE" },
     { SPARSE_CACHE_ENTRY, "SPARSE" }, { COOKIE_CACHE_ENTRY, "COOKIE" }, { URLHISTORY_CACHE_ENTRY, "URLHISTORY" },
-    { 0, "zero" }, { NORMAL_CACHE_ENTRY | 0x00000002, "NORMAL|0x2" },
+    { 0, "zero" }, { NORMAL_CACHE_ENTRY | 0x00000002, "NORMAL|0x2" }, { SPARSE_CACHE_ENTRY | NORMAL_CACHE_ENTRY, "SPARSE|NORMAL" },
+    { STICKY_CACHE_ENTRY | EDITED_CACHE_ENTRY | URLHISTORY_CACHE_ENTRY, "STICKY|EDITED|HIST" },
 };
 TEST(uce_commit_types_roundtrip) {
     REQUIRE(U(CommitUrlCacheEntryA));
@@ -241,11 +241,16 @@ TEST(uce_commit_types_roundtrip) {
         CHECKF(r, "%s err %lu", g_types[k].name, err);
         if (!r) continue;
         INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &err);
-        CHECKF(i != NULL, "%s info err %lu", g_types[k].name, err);
+        if (g_types[k].type & SPARSE_CACHE_ENTRY) {
+            /* sparse entries exist (delete works) but GetUrlCacheEntryInfo does not report them [W10] */
+            CHECKF(i == NULL && err == ERROR_FILE_NOT_FOUND, "%s info err %lu", g_types[k].name, err);
+            free(i); i = NULL;
+        } else CHECKF(i != NULL, "%s info err %lu", g_types[k].name, err);
         if (i) {
-            /* the committed type bits come back (Convert clears only 0x200) [D ConvertCacheEntryInfoA] */
-            CHECKF((i->CacheEntryType & g_types[k].type) == g_types[k].type, "%s got 0x%lx", g_types[k].name, i->CacheEntryType);
-            t_note("type %-14s -> 0x%08lx exempt=%lu", g_types[k].name, i->CacheEntryType, i->dwExemptDelta);
+            /* the committed bits come back with the content container's NORMAL bit (0x1) ORed in
+               [D AddUrl: container flags | type] [W10] */
+            CHECKF(i->CacheEntryType == (g_types[k].type | NORMAL_CACHE_ENTRY), "%s got 0x%lx", g_types[k].name, i->CacheEntryType);
+            CHECKF(i->dwExemptDelta == ((g_types[k].type & STICKY_CACHE_ENTRY) ? 86400u : 0u), "%s exempt %lu", g_types[k].name, i->dwExemptDelta);
             free(i);
         }
         CHECKF(uce_del(url), "%s del err %lu", g_types[k].name, GetLastError());
@@ -408,7 +413,7 @@ TEST(uce_commit_w_header_readback_w) {
     DWORD sz, e; INTERNET_CACHE_ENTRY_INFOW *i = uce_infoW(w, &sz, &e);
     if (i) {
         /* W info returns the stored header bytes; dwHeaderInfoSize unit noted */
-        t_note("W info header size=%lu", i->dwHeaderInfoSize);
+        EXPECT_EQ(i->dwHeaderInfoSize, (DWORD)lstrlenW(hdr));   /* characters, header widened again [D ConvertCacheEntryInfoW] [W10] */
         CHECK(i->lpHeaderInfo != NULL);
         if (i->lpHeaderInfo) CHECK(uce_inside(i->lpHeaderInfo, i, sz));
         if (i->lpHeaderInfo && i->dwHeaderInfoSize == lstrlenW(hdr)) CHECK(!memcmp(i->lpHeaderInfo, hdr, lstrlenW(hdr) * 2));
@@ -428,8 +433,8 @@ TEST(uce_commit_ext_table) {
         if (!r) continue;
         DWORD e; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &e);
         if (i) {
-            if (exts[k][0]) CHECKF(i->lpszFileExtension && !strcmp(i->lpszFileExtension, exts[k]), "ext %s got %s", exts[k], i->lpszFileExtension ? i->lpszFileExtension : "(null)");
-            else t_note("empty ext -> %s", i->lpszFileExtension ? i->lpszFileExtension : "(null)");
+            /* stored verbatim; "" stays "" (not NULL) [W10] */
+            CHECKF(i->lpszFileExtension && !strcmp(i->lpszFileExtension, exts[k]), "ext %s got %s", exts[k], i->lpszFileExtension ? i->lpszFileExtension : "(null)");
             free(i);
         } else CHECK(0);
         CHECK(uce_del(url));
@@ -477,7 +482,10 @@ TEST(uce_commit_replace_entry) {
         EXPECT_EQ(uce_u64(i2->ExpireTime), 3000);
         EXPECT_EQ(uce_u64(i2->LastModifiedTime), 4000);
         EXPECT_EQ(i2->dwHeaderInfoSize, 7);
-        t_note("use count %lu -> %lu, hit rate %lu -> %lu", i1->dwUseCount, i2->dwUseCount, i1->dwHitRate, i2->dwHitRate);
+        /* replacement keeps counting: hit rate = old + 1 [D AddUrl local_fc + 1] [W10] */
+        EXPECT_EQ(i1->dwHitRate, 1);
+        EXPECT_EQ(i2->dwHitRate, 2);
+        EXPECT_EQ(i2->dwUseCount, 0);
     }
     free(i1); free(i2);
     CHECK(!uce_file_exists(p1));         /* the replaced file is deleted [D DeleteEntryFile when names differ] */
@@ -515,7 +523,7 @@ TEST(uce_commit_replace_type_change) {
     CHECK(U(CommitUrlCacheEntryA)(url, NULL, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY | STICKY_CACHE_ENTRY, NULL, 0, NULL, NULL));
     CHECK(U(CommitUrlCacheEntryA)(url, NULL, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, NULL, NULL));
     DWORD e; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &e);
-    if (i) { CHECK(!(i->CacheEntryType & STICKY_CACHE_ENTRY)); t_note("after replace type=0x%lx exempt=%lu", i->CacheEntryType, i->dwExemptDelta); free(i); } else CHECK(0);
+    if (i) { EXPECT_EQ(i->CacheEntryType, NORMAL_CACHE_ENTRY); EXPECT_EQ(i->dwExemptDelta, 0); free(i); } else CHECK(0);
     CHECK(uce_del(url));
 }
 TEST(uce_commit_over_locked_entry) {

@@ -161,16 +161,17 @@ TEST(uce_retr_delete_while_locked) {
     SET_ERR(0xdeadbeef);
     BOOL d = uce_del(url);
     DWORD e = GetLastError();
-    /* the row is deleted but the locked file is not: 0x80070020 [D CCacheContainer::DeleteUrl] */
+    /* deleting a locked entry fails with 0x80070020 [D CCacheContainer::DeleteUrl] and leaves entry and file alone [W10] */
     CHECK(!d);
     EXPECT_EQ(e, ERROR_SHARING_VIOLATION);
-    BOOL still = uce_exists(url);
-    t_note("after delete of locked entry: exists=%d file=%d", still, uce_file_exists(p));
-    CHECK(uce_file_exists(p));                   /* the file stays readable while locked */
+    CHECK(uce_exists(url));
+    CHECK(uce_file_exists(p));
     SET_ERR(0xdeadbeef);
-    BOOL u = U(UnlockUrlCacheEntryFileA)(url, 0);
-    t_note("unlock after delete: r=%d err=%lu", u, GetLastError());
-    if (uce_exists(url)) CHECK(uce_del(url));
+    CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
+    EXPECT_ERR(0);
+    SET_ERR(0xdeadbeef);
+    CHECK(uce_del(url)); EXPECT_ERR(0);
+    CHECK(!uce_file_exists(p));
     CHECK(!uce_exists(url));
 }
 TEST(uce_retr_lock_counts) {
@@ -187,9 +188,10 @@ TEST(uce_retr_lock_counts) {
     SET_ERR(0xdeadbeef);
     BOOL c = U(CommitUrlCacheEntryA)(url, p2, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL);
     DWORD e = GetLastError();
-    t_note("commit after 2 retrieve + 1 unlock: r=%d err=%lu", c, e);
+    /* locks are counted: one retrieve is still outstanding [W10] */
+    CHECK(!c); EXPECT_EQ(e, ERROR_SHARING_VIOLATION);
     CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
-    if (!c) { CHECK(U(CommitUrlCacheEntryA)(url, p2, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL)); }
+    CHECK(U(CommitUrlCacheEntryA)(url, p2, uce_zero_ft, uce_zero_ft, NORMAL_CACHE_ENTRY, NULL, 0, "txt", NULL));
     CHECK(uce_del(url));
     DeleteFileA(p2);
 }
@@ -203,13 +205,17 @@ TEST(uce_retr_updates_use_count) {
     INTERNET_CACHE_ENTRY_INFOA *r1 = (INTERNET_CACHE_ENTRY_INFOA *)buf;
     INTERNET_CACHE_ENTRY_INFOA *a = uce_info(url, NULL, &e);
     if (a && b) {
-        t_note("before: use=%lu hit=%lu acc=%llx; retrieve: use=%lu hit=%lu; after: use=%lu hit=%lu acc=%llx",
-               b->dwUseCount, b->dwHitRate, uce_u64(b->LastAccessTime), r1->dwUseCount, r1->dwHitRate,
-               a->dwUseCount, a->dwHitRate, uce_u64(a->LastAccessTime));
+        /* dwUseCount is the live lock count, dwHitRate counts retrievals [W10] */
+        EXPECT_EQ(b->dwUseCount, 0); EXPECT_EQ(b->dwHitRate, 1);
+        EXPECT_EQ(r1->dwUseCount, 1); EXPECT_EQ(r1->dwHitRate, 2);
+        EXPECT_EQ(a->dwUseCount, 1); EXPECT_EQ(a->dwHitRate, 2);
         CHECK(uce_u64(a->LastAccessTime) >= uce_u64(b->LastAccessTime));
-    }
+        t_note("LastAccessTime before %llx after retrieve %llx", uce_u64(b->LastAccessTime), uce_u64(a->LastAccessTime));
+    } else CHECK(0);
     free(a); free(b);
     CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
+    a = uce_info(url, NULL, &e);
+    if (a) { EXPECT_EQ(a->dwUseCount, 0); EXPECT_EQ(a->dwHitRate, 2); free(a); } else CHECK(0);
     CHECK(uce_del(url));
 }
 TEST(uce_retr_entry_without_file) {
@@ -219,9 +225,9 @@ TEST(uce_retr_entry_without_file) {
     char buf[4096]; DWORD sz = sizeof buf;
     SET_ERR(0xdeadbeef);
     BOOL r = U(RetrieveUrlCacheEntryFileA)(url, (INTERNET_CACHE_ENTRY_INFOA *)buf, &sz, 0);
-    DWORD e = GetLastError();
-    t_note("retrieve of entry without file: r=%d err=%lu", r, e);
-    if (r) U(UnlockUrlCacheEntryFileA)(url, 0);
+    /* an entry without a local file can still be "retrieved" (lpszLocalFileName NULL) [W10] */
+    CHECK(r); EXPECT_ERR(0);
+    if (r) { EXPECT_EQ(((INTERNET_CACHE_ENTRY_INFOA *)buf)->lpszLocalFileName, NULL); CHECK(U(UnlockUrlCacheEntryFileA)(url, 0)); }
     CHECK(uce_del(url));
 }
 TEST(uce_retr_file_deleted_externally) {
@@ -232,12 +238,11 @@ TEST(uce_retr_file_deleted_externally) {
     char buf[4096]; DWORD sz = sizeof buf;
     SET_ERR(0xdeadbeef);
     BOOL r = U(RetrieveUrlCacheEntryFileA)(url, (INTERNET_CACHE_ENTRY_INFOA *)buf, &sz, 0);
-    DWORD e = GetLastError();
-    t_note("retrieve with file deleted: r=%d err=%lu exists-after=%d", r, e, uce_exists(url));
-    CHECK(!r);
-    CHECK(e == ERROR_FILE_NOT_FOUND);
-    if (r) U(UnlockUrlCacheEntryFileA)(url, 0);
-    uce_del(url);
+    /* the file is not checked: retrieve succeeds and returns the stale path [W10] */
+    CHECK(r); EXPECT_ERR(0);
+    if (r) { CHECK(!_stricmp(((INTERNET_CACHE_ENTRY_INFOA *)buf)->lpszLocalFileName, p)); CHECK(U(UnlockUrlCacheEntryFileA)(url, 0)); }
+    CHECK(uce_exists(url));
+    CHECK(uce_del(url));
 }
 
 /* --------------------------------------------------------------- UnlockUrlCacheEntryFile */
@@ -268,7 +273,6 @@ TEST(uce_unlock_missing_entry) {
     SET_ERR(0xdeadbeef);
     BOOL r = U(UnlockUrlCacheEntryFileA)(uce_url("umiss"), 0);
     DWORD e = GetLastError();
-    t_note("unlock of missing entry: r=%d err=%lu", r, e);
     CHECK(!r);
     EXPECT_EQ(e, ERROR_FILE_NOT_FOUND);
 }
@@ -278,7 +282,9 @@ TEST(uce_unlock_not_locked) {
     CHECK(mk(url, p));
     SET_ERR(0xdeadbeef);
     BOOL r = U(UnlockUrlCacheEntryFileA)(url, 0);
-    t_note("unlock of unlocked entry: r=%d err=%lu", r, GetLastError());
+    CHECK(r); EXPECT_ERR(0);              /* unlocking an unlocked entry is not an error [W10] */
+    SET_ERR(0xdeadbeef);
+    CHECK(U(UnlockUrlCacheEntryFileW)(uce_w(url), 0)); EXPECT_ERR(0);
     CHECK(uce_del(url));
 }
 
@@ -451,7 +457,6 @@ TEST(uce_stream_stale_handle) {
     HANDLE h = U(RetrieveUrlCacheEntryStreamA)(url, (INTERNET_CACHE_ENTRY_INFOA *)ib, &sz, FALSE, 0);
     CHECK(h != NULL);
     if (!h) { uce_del(url); return; }
-    t_note("stream handle value %p", h);
     CHECK(((ULONG_PTR)h & 1) == 1);                  /* handle-table cookie, odd [D UnlockUrlCacheEntryStreamHelper] */
     CHECK(U(UnlockUrlCacheEntryStream)(h, 0));
     char rb[16]; DWORD n = sizeof rb;
@@ -580,8 +585,8 @@ TEST(uce_delete_stream_locked) {
     /* the open stream still reads the data */
     char rb[8]; DWORD n = 3;
     if (h) { CHECK(U(ReadUrlCacheEntryStream)(h, 0, rb, &n, 0)); CHECK(n == 3 && !memcmp(rb, "The", 3)); }
-    t_note("stream-locked delete: exists=%d", uce_exists(url));
+    CHECK(uce_exists(url));               /* [W10] */
     if (h) CHECK(U(UnlockUrlCacheEntryStream)(h, 0));
-    if (uce_exists(url)) CHECK(uce_del(url));
+    CHECK(uce_del(url));
     CHECK(!uce_exists(url));
 }

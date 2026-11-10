@@ -87,10 +87,11 @@ TEST(uce_key_host_case) {
     t_cache_track(a); t_cache_track(b);
     CHECK(commit_nofile(a));
     char s[512]; stored_name(a, s, sizeof s);
-    t_note("upper-case host stored as %s", s);
-    BOOL same = uce_exists(b);
-    t_note("lower-case lookup finds it: %d", same);
-    uce_del(a); uce_del(b);
+    EXPECT_STR(s, a);                     /* the host is stored as typed [W10] */
+    CHECK(!uce_exists(b));                /* and the key is case-sensitive [W10] */
+    SET_ERR(0xdeadbeef);
+    EXPECT_FAIL(!uce_del(b), ERROR_FILE_NOT_FOUND);
+    CHECK(uce_del(a));
     CHECK(!uce_exists(a));
 }
 TEST(uce_key_scheme_case) {
@@ -100,8 +101,11 @@ TEST(uce_key_scheme_case) {
     t_cache_track(a); t_cache_track(b);
     CHECK(commit_nofile(a));
     char s[512]; stored_name(a, s, sizeof s);
-    t_note("upper-case scheme stored as %s; lower lookup %d", s, uce_exists(b));
-    uce_del(a); uce_del(b);
+    EXPECT_STR(s, a);                     /* scheme copied as typed [D ReconstructCacheHttpUrlW memcpy] [W10] */
+    CHECK(!uce_exists(b));                /* case-sensitive key [W10] */
+    CHECK(commit_nofile(b));              /* so both spellings can coexist */
+    CHECK(uce_exists(a) && uce_exists(b));
+    CHECK(uce_del(a)); CHECK(uce_del(b));
     CHECK(!uce_exists(a));
 }
 TEST(uce_key_path_case_distinct) {
@@ -112,8 +116,8 @@ TEST(uce_key_path_case_distinct) {
     CHECK(commit_nofile(a));
     char s[512]; stored_name(a, s, sizeof s);
     EXPECT_STR(s, a);                      /* path copied as typed [D] */
-    t_note("path-case lookup finds it: %d", uce_exists(b));
-    uce_del(a); uce_del(b);
+    CHECK(!uce_exists(b));                 /* distinct key [W10] */
+    CHECK(uce_del(a));
 }
 
 /* --------------------------------------------------------------- fragments, queries */
@@ -126,8 +130,15 @@ TEST(uce_key_fragment) {
     t_cache_track(a); t_cache_track(b); t_cache_track(c);
     CHECK(commit_nofile(a));
     char s[512]; stored_name(a, s, sizeof s);
-    t_note("fragment url stored as %s; no-fragment lookup %d; other-fragment lookup %d", s, uce_exists(b), uce_exists(c));
-    uce_del(a); uce_del(b); uce_del(c);
+    /* the #fragment is part of the key: not stripped, not ignored on lookup [W10] */
+    EXPECT_STR(s, a);
+    CHECK(!uce_exists(b));
+    CHECK(!uce_exists(c));
+    CHECK(commit_nofile(b));
+    CHECK(uce_exists(a) && uce_exists(b));
+    CHECK(uce_del(b));
+    CHECK(uce_exists(a));
+    CHECK(uce_del(a));
     CHECK(!uce_exists(a));
 }
 TEST(uce_key_query_distinct) {
@@ -161,8 +172,9 @@ TEST(uce_key_host_only_vs_root) {
     BOOL r = commit_nofile(a);
     CHECK(r);
     char s[512]; stored_name(a, s, sizeof s);
-    t_note("host-only stored as %s; root lookup %d", s, uce_exists(b));
-    uce_del(a); uce_del(b);
+    EXPECT_STR(s, a);                      /* no "/" appended [W10] */
+    CHECK(!uce_exists(b));
+    if (r) CHECK(uce_del(a));
 }
 TEST(uce_key_http_vs_https_distinct) {
     REQUIRE(U(CommitUrlCacheEntryA));
@@ -195,10 +207,11 @@ TEST(uce_key_userinfo) {
     char a[300], b[300]; snprintf(a, sizeof a, "http://user:pw@%s/u", host); snprintf(b, sizeof b, "http://%s/u", host);
     t_cache_track(a); t_cache_track(b);
     BOOL r = commit_nofile(a);
-    DWORD e = GetLastError();
+    CHECK(r);                              /* user info allowed (GlobalProcessDisableUserPswdForHttp is 0) [D] [W10] */
     char s[512]; s[0] = 0; if (r) stored_name(a, s, sizeof s);
-    t_note("userinfo key: r=%d err=%lu stored=%s plain-lookup=%d", r, r ? 0 : e, s, uce_exists(b));
-    uce_del(a); uce_del(b);
+    EXPECT_STR(s, a);                      /* kept in the key [W10] */
+    CHECK(!uce_exists(b));
+    if (r) CHECK(uce_del(a));
 }
 TEST(uce_key_idn_host_w) {
     REQUIRE(U(CommitUrlCacheEntryW)); REQUIRE(U(GetUrlCacheEntryInfoW));
@@ -212,13 +225,12 @@ TEST(uce_key_idn_host_w) {
     DWORD e; INTERNET_CACHE_ENTRY_INFOW *i = uce_infoW(u, NULL, &e);
     CHECK(i != NULL);
     if (i) {
-        t_note("IDN stored as %s", uce_a(i->lpszSourceUrlName));
-        CHECK(!wcsncmp(i->lpszSourceUrlName, puny, wcslen(puny)));
-        /* the punycode spelling is the same key */
-        CHECK(U(GetUrlCacheEntryInfoW)(i->lpszSourceUrlName, NULL, NULL));
-        CHECK(U(DeleteUrlCacheEntryW)(i->lpszSourceUrlName));
+        /* IdnToAscii only validates the host: the stored key keeps the Unicode spelling [W10] */
+        EXPECT_WSTR(i->lpszSourceUrlName, u);
+        CHECK(wcsncmp(i->lpszSourceUrlName, puny, wcslen(puny)) != 0);
         free(i);
     }
+    CHECK(U(DeleteUrlCacheEntryW)(u));
     CHECK(!U(GetUrlCacheEntryInfoW)(u, NULL, NULL));
 }
 TEST(uce_key_utf8_path_w_vs_a) {
@@ -250,19 +262,20 @@ TEST(uce_key_opaque_scheme) {
     char a[300]; snprintf(a, sizeof a, "i7test:%s", t_uniq("opaque"));
     t_cache_track(a);
     BOOL r = commit_nofile(a);
-    DWORD e = GetLastError();
-    t_note("opaque key commit r=%d err=%lu", r, r ? 0 : e);
+    CHECK(r);
     if (r) { char s[512]; stored_name(a, s, sizeof s); EXPECT_STR(s, a); CHECK(uce_del(a)); }
 }
 TEST(uce_key_bad_http_never_stored) {
     REQUIRE(U(CommitUrlCacheEntryA));
-    static const char *bad[] = { "http:", "http:/", "http://", "https://:80/", "http://h:65536/", "http://h:-1/", "http://[zz/" };
+    /* note: a bare "http:" (nothing after the colon) is NOT parsed and is accepted as a verbatim key [D (p[1] == 0) path] [W10];
+       it is not exercised here because it is a shared, non-unique key */
+    static const char *bad[] = { "http:/", "http://", "https://:80/", "http://h:65536/", "http://h:-1/", "http://[zz/", "HTTP:x", "https:/a" };
     for (size_t k = 0; k < sizeof bad / sizeof *bad; k++) {
         SET_ERR(0xdeadbeef);
         BOOL r = commit_nofile(bad[k]);
         DWORD e = GetLastError();
-        t_note("bad key %-16s r=%d err=%lu", bad[k], r, e);
         CHECKF(!r, "%s accepted", bad[k]);
+        CHECKF(e == ERROR_INTERNET_INVALID_URL, "%s err %lu", bad[k], e);
         if (r) uce_del(bad[k]);
     }
 }
@@ -316,15 +329,15 @@ TEST(uce_xproc_child_sees_parent_entry) {
     REQUIRE(U(CommitUrlCacheEntryA));
     const char *url = uce_url("xp1"); char p[MAX_PATH]; DWORD err;
     CHECK(uce_make_ex(url, "txt", "from parent", 11, NORMAL_CACHE_ENTRY, NULL, uce_zero_ft, uce_zero_ft, p, &err));
-    EXPECT_EQ(t_run_child("uce_exists", args2(url, NULL), 20000), 0);
-    EXPECT_EQ(t_run_child("uce_readfile", args2(url, "from parent"), 20000), 0);
+    { DWORD rc_ = t_run_child("uce_exists", args2(url, NULL), 20000); EXPECT_EQ(rc_, 0); }
+    { DWORD rc_ = t_run_child("uce_readfile", args2(url, "from parent"), 20000); EXPECT_EQ(rc_, 0); }
     CHECK(uce_del(url));
-    EXPECT_EQ(t_run_child("uce_exists", args2(url, NULL), 20000), 10 + ERROR_FILE_NOT_FOUND);
+    { DWORD rc_ = t_run_child("uce_exists", args2(url, NULL), 20000); EXPECT_EQ(rc_, 10 + ERROR_FILE_NOT_FOUND); }
 }
 TEST(uce_xproc_parent_sees_child_entry) {
     REQUIRE(U(CommitUrlCacheEntryA));
     const char *url = uce_url("xp2");
-    EXPECT_EQ(t_run_child("uce_commit", args2(url, "from child"), 20000), 0);
+    { DWORD rc_ = t_run_child("uce_commit", args2(url, "from child"), 20000); EXPECT_EQ(rc_, 0); }
     DWORD e; INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &e);
     CHECK(i != NULL);
     if (i) {
@@ -332,12 +345,12 @@ TEST(uce_xproc_parent_sees_child_entry) {
         CHECK(n == 10 && !memcmp(rb, "from child", 10));
         free(i);
     }
-    EXPECT_EQ(t_run_child("uce_delete", args2(url, NULL), 20000), 0);
+    { DWORD rc_ = t_run_child("uce_delete", args2(url, NULL), 20000); EXPECT_EQ(rc_, 0); }
     CHECK(!uce_exists(url));
 }
 TEST(uce_xproc_child_delete_missing) {
     const char *url = uce_url("xp3");
-    EXPECT_EQ(t_run_child("uce_delete", args2(url, NULL), 20000), 40 + ERROR_FILE_NOT_FOUND);
+    { DWORD rc_ = t_run_child("uce_delete", args2(url, NULL), 20000); EXPECT_EQ(rc_, 40 + ERROR_FILE_NOT_FOUND); }
 }
 TEST(uce_xproc_child_deletes_parent_locked) {
     REQUIRE(U(RetrieveUrlCacheEntryFileA)); REQUIRE(U(UnlockUrlCacheEntryFileA));
@@ -346,9 +359,10 @@ TEST(uce_xproc_child_deletes_parent_locked) {
     char buf[4096]; DWORD sz = sizeof buf;
     CHECK(U(RetrieveUrlCacheEntryFileA)(url, (INTERNET_CACHE_ENTRY_INFOA *)buf, &sz, 0));
     DWORD rc = t_run_child("uce_delete", args2(url, NULL), 20000);
-    t_note("child delete of parent-locked entry: rc=%lu (0=deleted, 40+err)", rc);
-    CHECK(rc == 0 || rc == 40 + ERROR_SHARING_VIOLATION);
-    U(UnlockUrlCacheEntryFileA)(url, 0);
+    /* locks are held by the shared cache store: another process sees 32 [W10] */
+    EXPECT_EQ(rc, 40 + ERROR_SHARING_VIOLATION);
+    CHECK(uce_exists(url));
+    CHECK(U(UnlockUrlCacheEntryFileA)(url, 0));
     if (uce_exists(url)) CHECK(uce_del(url));
     CHECK(!uce_exists(url));
 }
@@ -356,19 +370,24 @@ TEST(uce_xproc_child_lock_released_at_exit) {
     REQUIRE(U(CommitUrlCacheEntryA));
     const char *url = uce_url("xp5"); char p[MAX_PATH]; DWORD err;
     CHECK(uce_make_ex(url, "txt", "child locks", 11, NORMAL_CACHE_ENTRY, NULL, uce_zero_ft, uce_zero_ft, p, &err));
-    EXPECT_EQ(t_run_child("uce_lock_and_exit", args2(url, NULL), 20000), 0);
+    { DWORD rc_ = t_run_child("uce_lock_and_exit", args2(url, NULL), 20000); EXPECT_EQ(rc_, 0); }
     SET_ERR(0xdeadbeef);
-    BOOL d = uce_del(url);
-    t_note("delete after child exited holding a lock: r=%d err=%lu", d, d ? 0 : GetLastError());
-    if (!d && uce_exists(url)) uce_del(url);
+    /* the child's lock went away with the child [W10] */
+    CHECK(uce_del(url)); EXPECT_ERR(0);
+    if (uce_exists(url)) uce_del(url);
 }
 TEST(uce_xproc_replace_by_child) {
     REQUIRE(U(CommitUrlCacheEntryA));
     const char *url = uce_url("xp6"); char p[MAX_PATH]; DWORD err;
     CHECK(uce_make_ex(url, "txt", "v1", 2, NORMAL_CACHE_ENTRY, NULL, uce_zero_ft, uce_zero_ft, p, &err));
-    EXPECT_EQ(t_run_child("uce_commit", args2(url, "version two"), 20000), 0);
+    { DWORD rc_ = t_run_child("uce_commit", args2(url, "version two"), 20000); EXPECT_EQ(rc_, 0); }
     INTERNET_CACHE_ENTRY_INFOA *i = uce_info(url, NULL, &err);
-    if (i) { EXPECT_EQ(i->dwSizeLow, 11); CHECK(_stricmp(i->lpszLocalFileName, p) != 0); free(i); } else CHECK(0);
-    CHECK(!uce_file_exists(p));
+    if (i) {
+        EXPECT_EQ(i->dwSizeLow, 11);
+        char rb[64]; int n = i->lpszLocalFileName ? uce_read_file(i->lpszLocalFileName, rb, sizeof rb) : -1;
+        CHECK(n == 11 && !memcmp(rb, "version two", 11));
+        t_note("parent file %s, after child replace %s (exists=%d)", p, i->lpszLocalFileName, uce_file_exists(p));
+        free(i);
+    } else CHECK(0);
     CHECK(uce_del(url));
 }
