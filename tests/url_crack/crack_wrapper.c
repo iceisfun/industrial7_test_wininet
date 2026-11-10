@@ -241,14 +241,16 @@ TEST(url_crack_wrap_W_acp_retry) {
     }
 }
 TEST(url_crack_wrap_file_url_8bit_escape) {
-    /* file:///C:/%E9: A gives byte 0xE9; W (ACP 1252) gives U+00C3 U+00A9 (the UTF-8 bytes of the W->UTF-8
-     * conversion read back through the ACP), and with ICU_ESCAPE U+FFFD + the stale "E9" tail */
+    /* [VM] file:///C:/%E9: A gives the byte 0xE9 (crack_table2.c); W (ACP 1252) gives U+00E9, length 4, last error 0;
+     * with ICU_ESCAPE W gives U+FFFD + the stale "E9" tail, length 6 (A: 0xE9 "E9", crack_flags2.c) */
     REQUIRE(U(InternetCrackUrlW));
     if (!acp_1252()) { t_skip("needs ACP 1252"); return; }
     URL_COMPONENTSW c; WCHAR pa[64];
     zcw(&c); c.lpszUrlPath = pa; c.dwUrlPathLength = 64;
+    SET_ERR(0xdead);
     CHECK(U(InternetCrackUrlW)(L"file:///C:/%E9", 0, 0, &c));
-    EXPECT_WSTR(pa, L"C:\\\u00c3\u00a9"); EXPECT_EQ(c.dwUrlPathLength, 5);
+    EXPECT_ERR(0);
+    EXPECT_WSTR(pa, L"C:\\\u00e9"); EXPECT_EQ(c.dwUrlPathLength, 4);
     zcw(&c); c.lpszUrlPath = pa; c.dwUrlPathLength = 64;
     CHECK(U(InternetCrackUrlW)(L"file:///C:/%E9", 0, ICU_ESCAPE, &c));
     EXPECT_WSTR(pa, L"C:\\\ufffdE9"); EXPECT_EQ(c.dwUrlPathLength, 6);
