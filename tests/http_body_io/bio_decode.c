@@ -90,8 +90,23 @@ TEST(bio_dec_gzip_chunked) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_gzip
 TEST(bio_dec_gzip_closedelim) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_gzip, srv_fox_gzip_len, SRV_R_CLOSE, "Content-Encoding: gzip\r\n", AE, DEC_SESSION, FOXT, 4096); }
 TEST(bio_dec_xgzip) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_gzip, srv_fox_gzip_len, 0, "Content-Encoding: x-gzip\r\n", AE, DEC_SESSION, FOXT, 4096); }
 TEST(bio_dec_gzip_uppercase_token) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_gzip, srv_fox_gzip_len, 0, "Content-Encoding: GZIP\r\n", AE, DEC_SESSION, FOXT, 4096); }
-TEST(bio_dec_zlib_deflate) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_zlib, srv_fox_zlib_len, 0, "Content-Encoding: deflate\r\n", AE, DEC_SESSION, FOXT, 4096); }
-TEST(bio_dec_zlib_by_1) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_zlib, srv_fox_zlib_len, 0, "Content-Encoding: deflate\r\n", AE, DEC_SESSION, FOXT, 1); }
+/* Win10 VM boot 2: "Content-Encoding: deflate" is decoded as RAW deflate only; zlib-wrapped data (RFC 1950, what the
+ * RFC calls deflate) fails the first read with 12175 and delivers nothing. (HttpReadData_Fsm@0x77430 only takes the
+ * zlib path when this+0x1660 or GlobalEnableZlibDeflate is set; the default lands on the raw decoder.) */
+static void dec_zlib_fails(const void *body, size_t blen, unsigned flags, DWORD piece) {
+    srv_step st[] = { S_HEAD(), { SRV_REPLY, (const char *)body, blen, 200, flags & SRV_R_DEFLATE ? NULL : "Content-Encoding: deflate\r\n", flags, flags & SRV_R_CHUNKED ? 100 : 0 }, S_LOOP() };
+    bio_env e; if (!bio_open_dec(&e, st, 3, 1)) return;
+    BOOL ok; DWORD err;
+    HINTERNET hr = bio_req(&e, "GET", "/z", 0, AE, &ok, &err);
+    CHECK(ok);
+    unsigned char *b = malloc(blen + 300000); bio_rd r; size_t n = bio_read(hr, b, blen + 300000, piece, &r);
+    CHECKF(!r.ok && r.err == ERROR_INTERNET_DECODING_FAILED, "zlib under deflate: ok=%d err=%lu n=%u", r.ok, r.err, (unsigned)n);
+    EXPECT_EQ(n, 0);
+    free(b); bio_h(hr); bio_close(&e);
+}
+TEST(bio_dec_zlib_deflate) { REQUIRE(U(InternetReadFile)); dec_zlib_fails(srv_fox_zlib, srv_fox_zlib_len, 0, 4096); }
+TEST(bio_dec_zlib_by_1) { REQUIRE(U(InternetReadFile)); dec_zlib_fails(srv_fox_zlib, srv_fox_zlib_len, 0, 1); }
+TEST(bio_dec_rawdeflate_by_1) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_raw, srv_fox_raw_len, 0, "Content-Encoding: deflate\r\n", AE, DEC_SESSION, FOXT, 1); }
 TEST(bio_dec_zlib_off_passthrough) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_zlib, srv_fox_zlib_len, 0, "Content-Encoding: deflate\r\n", AE, DEC_OFF, srv_fox_zlib, srv_fox_zlib_len, 4096); }
 TEST(bio_dec_rawdeflate) { REQUIRE(U(InternetReadFile)); dec_case(srv_fox_raw, srv_fox_raw_len, 0, "Content-Encoding: deflate\r\n", AE, DEC_SESSION, FOXT, 4096); }
 TEST(bio_dec_identity_passthrough) { REQUIRE(U(InternetReadFile)); dec_case("plain text", 10, 0, "Content-Encoding: identity\r\n", AE, DEC_SESSION, "plain text", 10, 4096); }
@@ -100,7 +115,7 @@ TEST(bio_dec_unknown_encoding_passthrough) { REQUIRE(U(InternetReadFile)); dec_c
 
 /* stored-block encodings built at run time */
 TEST(bio_dec_stored_gzip) { REQUIRE(U(InternetReadFile)); dec_case("stored gzip body", 16, SRV_R_GZIP, NULL, AE, DEC_SESSION, "stored gzip body", 16, 4096); }
-TEST(bio_dec_stored_zlib) { REQUIRE(U(InternetReadFile)); dec_case("stored zlib body", 16, SRV_R_DEFLATE, NULL, AE, DEC_SESSION, "stored zlib body", 16, 4096); }
+TEST(bio_dec_stored_zlib) { REQUIRE(U(InternetReadFile)); dec_zlib_fails("stored zlib body", 16, SRV_R_DEFLATE, 4096); }
 TEST(bio_dec_stored_raw) { REQUIRE(U(InternetReadFile)); dec_case("stored raw body", 15, SRV_R_RAWDEFLATE, NULL, AE, DEC_SESSION, "stored raw body", 15, 4096); }
 TEST(bio_dec_stored_gzip_chunked) { REQUIRE(U(InternetReadFile)); dec_case("chunked stored gzip body", 24, SRV_R_GZIP | SRV_R_CHUNKED, NULL, AE, DEC_SESSION, "chunked stored gzip body", 24, 3); }
 
@@ -111,7 +126,8 @@ static void dec_large(size_t n, unsigned flags, DWORD piece) {
 }
 TEST(bio_dec_stored_gzip_65537) { REQUIRE(U(InternetReadFile)); dec_large(65537, SRV_R_GZIP, 65536); }
 TEST(bio_dec_stored_gzip_300000) { REQUIRE(U(InternetReadFile)); dec_large(300000, SRV_R_GZIP, 8192); }
-TEST(bio_dec_stored_zlib_200000_chunked) { REQUIRE(U(InternetReadFile)); dec_large(200000, SRV_R_DEFLATE | SRV_R_CHUNKED, 4096); }
+TEST(bio_dec_stored_zlib_200000_chunked) { REQUIRE(U(InternetReadFile)); unsigned char *p = bio_pattern(200000); dec_zlib_fails(p, 200000, SRV_R_DEFLATE | SRV_R_CHUNKED, 4096); free(p); }
+TEST(bio_dec_stored_raw_200000_chunked) { REQUIRE(U(InternetReadFile)); dec_large(200000, SRV_R_RAWDEFLATE | SRV_R_CHUNKED, 4096); }
 TEST(bio_dec_stored_gzip_1mb) { REQUIRE(U(InternetReadFile)); dec_large(1048576, SRV_R_GZIP, 65536); }
 
 /* Accept-Encoding header variants the application may send */

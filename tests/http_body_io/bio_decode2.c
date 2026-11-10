@@ -73,9 +73,11 @@ static void expect_raw(d2_out *o, const void *body, size_t blen, const char *tag
     CHECKF(o->n == blen && !memcmp(o->b, body, blen), "%s: got %u bytes, want the %u encoded bytes", tag, (unsigned)o->n, (unsigned)blen);
 }
 static int is_pattern(const unsigned char *b, size_t n) { return srv_pattern_check(b, n, 0); }
+static void mislabel_case(const void *body, size_t blen, const char *ce, const char *tag);
 
 #define GZ_FOX srv_fox_gzip, srv_fox_gzip_len
 #define ZL_FOX srv_fox_zlib, srv_fox_zlib_len
+#define RAW_FOX srv_fox_raw, srv_fox_raw_len
 #define CE_GZIP "Content-Encoding: gzip\r\n"
 #define CE_DEFL "Content-Encoding: deflate\r\n"
 #define CE_BR   "Content-Encoding: br\r\n"
@@ -95,7 +97,7 @@ static void ae_case(const char *ae, const void *body, size_t blen, const char *c
 TEST(bio_d2_ae_gzip_only) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: gzip\r\n", GZ_FOX, CE_GZIP, 1); }
 TEST(bio_d2_ae_deflate_only_gzip_body) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: deflate\r\n", GZ_FOX, CE_GZIP, 0); }
 TEST(bio_d2_ae_gzip_only_deflate_body) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: gzip\r\n", ZL_FOX, CE_DEFL, 0); }
-TEST(bio_d2_ae_deflate_only_deflate_body) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: deflate\r\n", ZL_FOX, CE_DEFL, 1); }
+TEST(bio_d2_ae_deflate_only_deflate_body) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: deflate\r\n", RAW_FOX, CE_DEFL, 1); }
 TEST(bio_d2_ae_uppercase_pair) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: GZIP, DEFLATE\r\n", GZ_FOX, CE_GZIP, 1); }
 TEST(bio_d2_ae_spaced_tokens) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: deflate ,   gzip  \r\n", GZ_FOX, CE_GZIP, 1); }
 TEST(bio_d2_ae_no_space_tokens) { REQUIRE(U(InternetReadFile)); ae_case("Accept-Encoding: deflate,gzip\r\n", GZ_FOX, CE_GZIP, 1); }
@@ -142,7 +144,7 @@ static void ce_case(const char *rhdrs, const void *body, size_t blen, int want_d
 TEST(bio_d2_ce_two_headers_not_decoded) { REQUIRE(U(InternetReadFile)); ce_case(CE_GZIP CE_GZIP, GZ_FOX, 0, "two Content-Encoding: gzip lines"); }
 TEST(bio_d2_ce_list_not_decoded) { REQUIRE(U(InternetReadFile)); ce_case("Content-Encoding: gzip, identity\r\n", GZ_FOX, 0, "Content-Encoding: gzip, identity"); }
 TEST(bio_d2_ce_mixed_case_decoded) { REQUIRE(U(InternetReadFile)); ce_case("Content-Encoding: gZiP\r\n", GZ_FOX, 1, "Content-Encoding: gZiP"); }
-TEST(bio_d2_ce_deflate_uppercase) { REQUIRE(U(InternetReadFile)); ce_case("Content-Encoding: DEFLATE\r\n", ZL_FOX, 1, "Content-Encoding: DEFLATE"); }
+TEST(bio_d2_ce_deflate_uppercase) { REQUIRE(U(InternetReadFile)); ce_case("Content-Encoding: DEFLATE\r\n", RAW_FOX, 1, "Content-Encoding: DEFLATE"); }
 TEST(bio_d2_ce_compress_not_decoded) { REQUIRE(U(InternetReadFile)); ce_case("Content-Encoding: compress\r\n", GZ_FOX, 0, "Content-Encoding: compress"); }
 TEST(bio_d2_ce_lowercase_name) { REQUIRE(U(InternetReadFile)); ce_case("content-encoding: gzip\r\n", GZ_FOX, 1, "content-encoding: gzip"); }
 
@@ -247,6 +249,7 @@ TEST(bio_d2_content_length_after_decoding) {
     DWORD cl = 0, l = sizeof cl;
     BOOL clok = U(HttpQueryInfoA)(hr, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER, &cl, &l, NULL);
     t_note("Content-Length after decoding: ok=%d value=%lu (wire %u)", clok, cl, (unsigned)srv_fox_gzip_len);
+    CHECK(!clok);                              /* Win10 VM boot 2: the Content-Length header is gone after decoding */
     char *b = malloc(4096); bio_rd r; size_t n = bio_read(hr, b, 4096, 0, &r);
     CHECK(r.ok); EXPECT_EQ(n, SRV_FOX_LEN);
     cl = 0; l = sizeof cl;
@@ -270,7 +273,10 @@ TEST(bio_d2_gzip_all_flags) { REQUIRE(U(InternetReadFile)); fmt_case(bio_gz_allf
 TEST(bio_d2_gzip_ftext_mtime) { REQUIRE(U(InternetReadFile)); fmt_case(bio_gz_ftext_mtime, bio_gz_ftext_mtime_len, CE_GZIP, "FTEXT+MTIME"); }
 /* [D Decompress]: "incorrect data check" ends the stream cleanly */
 TEST(bio_d2_gzip_bad_crc_ignored) { REQUIRE(U(InternetReadFile)); fmt_case(bio_gz_badcrc, bio_gz_badcrc_len, CE_GZIP, "bad CRC32"); }
-TEST(bio_d2_zlib_bad_adler_ignored) { REQUIRE(U(InternetReadFile)); fmt_case(bio_zl_badadler, bio_zl_badadler_len, CE_DEFL, "bad Adler-32"); }
+/* zlib data under the deflate label fails (Win10 VM boot 2), so the Adler-32 case can only be seen under the gzip label,
+ * which on the VM also accepted zlib data (bio_d2_zlib_body_labelled_gzip) */
+TEST(bio_d2_zlib_bad_adler_ignored) { REQUIRE(U(InternetReadFile)); fmt_case(bio_zl_badadler, bio_zl_badadler_len, CE_GZIP, "bad Adler-32 under gzip"); }
+TEST(bio_d2_zlib_bad_adler_under_deflate_fails) { REQUIRE(U(InternetReadFile)); mislabel_case(bio_zl_badadler, bio_zl_badadler_len, CE_DEFL, "zlib (bad Adler) under deflate"); }
 TEST(bio_d2_br_fox_by_1) {
     REQUIRE(U(InternetReadFile));
     d2_in in = { bio_br_fox, bio_br_fox_len, 0, 0, CE_BR, AE_GDB, NULL, 1, 1 };
@@ -342,7 +348,9 @@ static void mislabel_case(const void *body, size_t blen, const char *ce, const c
     d2_free(&o);
 }
 TEST(bio_d2_gzip_body_labelled_deflate) { REQUIRE(U(InternetReadFile)); mislabel_case(GZ_FOX, CE_DEFL, "gzip data, CE deflate"); }
-TEST(bio_d2_zlib_body_labelled_gzip) { REQUIRE(U(InternetReadFile)); mislabel_case(ZL_FOX, CE_GZIP, "zlib data, CE gzip"); }
+/* Win10 VM boot 2: the gzip decoder also accepts zlib-wrapped data (zlib windowBits 47 style auto-detection) */
+TEST(bio_d2_zlib_body_labelled_gzip) { REQUIRE(U(InternetReadFile)); fmt_case(ZL_FOX, CE_GZIP, "zlib data, CE gzip"); }
+TEST(bio_d2_zlib_body_labelled_deflate_fails) { REQUIRE(U(InternetReadFile)); mislabel_case(ZL_FOX, CE_DEFL, "zlib data, CE deflate"); }
 TEST(bio_d2_br_body_labelled_gzip) { REQUIRE(U(InternetReadFile)); mislabel_case(bio_br_fox, bio_br_fox_len, CE_GZIP, "brotli data, CE gzip"); }
 TEST(bio_d2_gzip_body_labelled_br) { REQUIRE(U(InternetReadFile)); mislabel_case(GZ_FOX, CE_BR, "gzip data, CE br"); }
 /* raw deflate under the deflate label decodes through the raw retry */
@@ -368,7 +376,8 @@ TEST(bio_d2_gzip_pat300k) { REQUIRE(U(InternetReadFile)); big_case(bio_gz_pat300
 TEST(bio_d2_gzip_pat300k_by_3) { REQUIRE(U(InternetReadFile)); big_case(bio_gz_pat300k, bio_gz_pat300k_len, CE_GZIP, 300000, 0, 3, 0, "gzip pattern 300000 by 3"); }
 TEST(bio_d2_gzip_pat300k_chunked7) { REQUIRE(U(InternetReadFile)); big_case(bio_gz_pat300k, bio_gz_pat300k_len, CE_GZIP, 300000, 0, 65536, SRV_R_CHUNKED, "gzip pattern, 7-byte chunks"); }
 TEST(bio_d2_gzip_pat300k_closedelim) { REQUIRE(U(InternetReadFile)); big_case(bio_gz_pat300k, bio_gz_pat300k_len, CE_GZIP, 300000, 0, 10000, SRV_R_CLOSE, "gzip pattern close-delimited"); }
-TEST(bio_d2_zlib_pat100k) { REQUIRE(U(InternetReadFile)); big_case(bio_zl_pat100k, bio_zl_pat100k_len, CE_DEFL, 100000, 0, 4096, 0, "zlib pattern 100000"); }
+TEST(bio_d2_zlib_pat100k_under_gzip) { REQUIRE(U(InternetReadFile)); big_case(bio_zl_pat100k, bio_zl_pat100k_len, CE_GZIP, 100000, 0, 4096, 0, "zlib pattern 100000 under gzip"); }
+TEST(bio_d2_zlib_pat100k_under_deflate_fails) { REQUIRE(U(InternetReadFile)); mislabel_case(bio_zl_pat100k, bio_zl_pat100k_len, CE_DEFL, "zlib pattern under deflate"); }
 TEST(bio_d2_raw_pat100k) { REQUIRE(U(InternetReadFile)); big_case(bio_raw_pat100k, bio_raw_pat100k_len, CE_DEFL, 100000, 0, 4096, 0, "raw deflate pattern 100000"); }
 TEST(bio_d2_br_pat100k) { REQUIRE(U(InternetReadFile)); big_case(bio_br_pat100k, bio_br_pat100k_len, CE_BR, 100000, 0, 4096, 0, "br pattern 100000"); }
 TEST(bio_d2_br_pat100k_by_1000_chunked) { REQUIRE(U(InternetReadFile)); big_case(bio_br_pat100k, bio_br_pat100k_len, CE_BR, 100000, 0, 1000, SRV_R_CHUNKED, "br pattern chunked"); }
@@ -530,19 +539,32 @@ TEST(bio_d2_openurl_br) {
     CHECK(r.ok); EXPECT_EQ(n, SRV_FOX_LEN); CHECK(n == SRV_FOX_LEN && !memcmp(b, srv_fox_text(), n));
     free(b); bio_h(hu); bio_close(&e);
 }
-TEST(bio_d2_https_gzip_pat300k) {
+/* HTTPS bodies with decoding. Win10 VM boots 1-2: with HTTP_DECODING set on the session before InternetConnect and a
+ * 1590-byte gzip body, HttpSendRequest failed with 12030 (deterministic, not explained yet), so the variants are probed:
+ * where = 0 no decoding, 1 session before connect, 2 request handle. A successful send must deliver the exact bytes. */
+static void https_dec_probe(int where, const void *body, size_t blen, size_t plain_n, const char *tag) {
     REQUIRE(U(InternetReadFile));
-    srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, bio_gz_pat300k, bio_gz_pat300k_len, 0), S_LOOP() };
+    srv_step st[] = { S_HEAD(), S_REPLYN(200, CE_GZIP, body, blen, 0), S_LOOP() };
     srv *s = srv_https(st, 3, SRV_CERT_LOCALHOST);
     if (!s) { t_skip("https server unavailable: %s", srv_strerror(srv_last_error())); return; }
     HINTERNET hi = t_inet_open(NULL);
-    CHECK(bio_set_dword(hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
+    if (where == 1) CHECK(bio_set_dword(hi, INTERNET_OPTION_HTTP_DECODING, TRUE));
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/s", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
+    if (where == 2) CHECK(bio_set_dword(hr, INTERNET_OPTION_HTTP_DECODING, TRUE));
     t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
-    BOOL ok = U(HttpSendRequestA)(hr, AE_GD, (DWORD)-1, NULL, 0);
-    CHECKF(ok, "https send err=%lu", GetLastError());
-    unsigned char *b = malloc(370000); bio_rd r; size_t n = ok ? bio_read(hr, b, 370000, 7000, &r) : 0;
-    if (ok) { CHECK(r.ok); EXPECT_EQ(n, 300000); CHECK(is_pattern(b, n)); }
+    BOOL ok = U(HttpSendRequestA)(hr, AE_GD, (DWORD)-1, NULL, 0); DWORD err = ok ? 0 : GetLastError();
+    size_t cap = plain_n + blen + 70000;
+    unsigned char *b = malloc(cap); bio_rd r; memset(&r, 0, sizeof r); size_t n = ok ? bio_read(hr, b, cap, 7000, &r) : 0;
+    t_note("%s: send ok=%d err=%lu %s; read ok=%d err=%lu n=%u", tag, ok, err, t_inet_errname(err), r.ok, r.err, (unsigned)n);
+    if (ok && r.ok) {
+        if (where) CHECKF(n == plain_n, "%s: n=%u", tag, (unsigned)n);
+        else CHECK(n == blen && !memcmp(b, body, blen));
+    }
+    if (!where) CHECK(ok && r.ok);
     free(b); bio_h(hr); bio_h(hc); t_inet_close(hi); srv_stop(s);
 }
+TEST(bio_d2_https_gzip_pat300k) { https_dec_probe(1, bio_gz_pat300k, bio_gz_pat300k_len, 300000, "https gzip 300000, session decoding"); }
+TEST(bio_d2_https_gzip_pat300k_request) { https_dec_probe(2, bio_gz_pat300k, bio_gz_pat300k_len, 300000, "https gzip 300000, request decoding"); }
+TEST(bio_d2_https_gzip_pat300k_off) { https_dec_probe(0, bio_gz_pat300k, bio_gz_pat300k_len, 300000, "https gzip 300000, no decoding"); }
+TEST(bio_d2_https_gzip_fox_request) { https_dec_probe(2, srv_fox_gzip, srv_fox_gzip_len, SRV_FOX_LEN, "https gzip fox, request decoding"); }

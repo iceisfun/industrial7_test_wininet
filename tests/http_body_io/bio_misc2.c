@@ -165,8 +165,9 @@ static void seek_read_check(HINTERNET hr, LONG to, DWORD method, DWORD want_pos,
     CHECKF(rd == exp, "read after seek to %lu: %lu want %lu", want_pos, rd, exp);
     CHECK(srv_pattern_check(b, rd, want_pos));
 }
-/* Win10 VM boot 1: a cache-backed response is seekable while it is being read (backwards and forwards, also past
- * what has been downloaded), and no longer once the body has been read to its end (12016, like a non-cached one). */
+/* Win10 VM boots 1-2: a cache-backed response is seekable while it is being read (backwards and forwards, also past
+ * what has been downloaded). FILE_END and some FILE_CURRENT moves fail with 131 while reading; seeking after EOF
+ * depends on the handle's history (see the notes), so those are recorded only. */
 TEST(bio_m2_seek_cached_large_body) {
     REQUIRE(U(InternetSetFilePointer)); REQUIRE(U(DeleteUrlCacheEntryA));
     static const srv_step st[] = { S_HEAD(), S_REPLY_PATTERN(200, CACHEABLE, 100000, 0), S_LOOP() };
@@ -180,9 +181,11 @@ TEST(bio_m2_seek_cached_large_body) {
     seek_read_check(hr, 65536, FILE_BEGIN, 65536, 4096, 100000);
     DWORD p = U(InternetSetFilePointer)(hr, 1000, NULL, FILE_BEGIN, 0); EXPECT_EQ(p, 1000);
     seek_read_check(hr, 500, FILE_CURRENT, 1500, 10, 100000);
-    seek_read_check(hr, -1510, FILE_CURRENT, 0, 10, 100000);
     SetLastError(0);
-    p = U(InternetSetFilePointer)(hr, -10, NULL, FILE_END, 0); DWORD err = GetLastError();
+    p = U(InternetSetFilePointer)(hr, -1510, NULL, FILE_CURRENT, 0); DWORD err = GetLastError();
+    t_note("FILE_CURRENT -1510 after seeking to 1500 and reading 10: r=%ld err=%lu", (long)p, err);  /* boot 2: 131 */
+    SetLastError(0);
+    p = U(InternetSetFilePointer)(hr, -10, NULL, FILE_END, 0); err = GetLastError();
     t_note("FILE_END -10 on a 100000-byte cached body being read: r=%lu err=%lu", p, err);
     SetLastError(0);
     p = U(InternetSetFilePointer)(hr, 200000, NULL, FILE_BEGIN, 0); err = GetLastError();
@@ -192,8 +195,9 @@ TEST(bio_m2_seek_cached_large_body) {
     bio_rd r; size_t n = bio_read(hr, b, 100100, 3333, &r);
     CHECK(r.ok); EXPECT_EQ(n, 100000); CHECK(srv_pattern_check(b, n, 0));
     SetLastError(0);
-    p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0);
-    EXPECT_EQ(p, INVALID_SET_FILE_POINTER); EXPECT_ERR(ERROR_INTERNET_INVALID_OPERATION);
+    p = U(InternetSetFilePointer)(hr, 0, NULL, FILE_BEGIN, 0); err = GetLastError();
+    /* boot 1 (no seek before EOF): 12016; boot 2 (after seeks while reading): 0 succeeded */
+    t_note("seek to 0 after reading to EOF (handle seeked before): r=%ld err=%lu", (long)p, err);
     free(b); bio_h(hr); bio_close(&e);
     U(DeleteUrlCacheEntryA)(url);
 }
