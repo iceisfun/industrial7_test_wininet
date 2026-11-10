@@ -6,7 +6,7 @@ no proxy/zone/registry change. The proxy tests use a per-session `INTERNET_OPEN_
 
 Oracle: Windows 10 22H2 VM (10.0.19045.2965, wininet 11.0.19041.2193), boots `auth-20261109-171356`,
 `auth-20261109-173753`, `auth-20261110-050149` (146 tests), `auth-20261110-051840` (207),
-`auth-20261110-065608` (218 tests, 0 failed) and later (`~/w10lab/runs/auth-*`). Tags used below and in source comments:
+`auth-20261110-065608` (218 tests, 0 failed), `auth-20261110-084815` (218 tests, 2020 checks, 0 failed: confirms every promotion of boots 3-4) and later (`~/w10lab/runs/auth-*`). Tags used below and in source comments:
 
 - **[D]** decomp of the Win10 wininet.dll (docker1 corpus API), function named.
 - **[VM]** observed on the Win10 VM and made a hard CHECK (comment `Win10 VM` next to the check).
