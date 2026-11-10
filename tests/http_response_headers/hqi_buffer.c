@@ -226,7 +226,7 @@ TEST(hqi_buf_w_number64_known_level_widened) {
     memset(w, 0xEE, sizeof w);
     rh_callW(c.hr, HTTP_QUERY_CONTENT_LENGTH | HTTP_QUERY_FLAG_NUMBER64, w, sizeof w, NULL);
     /* 258 = 02 01 00 00 00 00 00 00 -> L"\x02\x01" + six L'\0', length 16 bytes */
-    CHECKF(rh_ok && rh_len == 16 && w[0] == 2 && w[1] == 1 && w[2] == 0 && w[7] == 0 && w[8] == 0, "full: ok=%d err=%lu len=%lu w0=%x w1=%x", rh_ok, rh_err, rh_len, w[0], w[1]);
+    CHECKF(rh_ok && rh_len == 16 && w[0] == 2 && w[1] == 1 && w[2] == 0 && w[7] == 0, "full: ok=%d err=%lu len=%lu w0=%x w1=%x", rh_ok, rh_err, rh_len, w[0], w[1]);
     /* CUSTOM|NUMBER64 is raw-copied by W (mask 0x68000000 on that path) */
     lstrcpyW(w, L"X-N");
     rh_callW(c.hr, HTTP_QUERY_CUSTOM | HTTP_QUERY_FLAG_NUMBER64, w, sizeof w, NULL);

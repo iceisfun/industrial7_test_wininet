@@ -62,11 +62,10 @@ TEST(rsp_hdr_space_before_colon) {
     REQUIRE(U(HttpQueryInfoA));
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\r\nX-Sp : sp\r\nX-Tb\t: tb\r\nContent-Type : text/x\r\n" TAIL);
-    note_custom(c.hr, "X-Sp"); note_custom(c.hr, "X-Tb");
-    const char *ct = rh_qa(c.hr, HTTP_QUERY_CONTENT_TYPE, NULL);
-    t_note("\"Content-Type :\" -> level query %s (err %lu)", ct ? ct : "not found", rh_err);
-    const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-    t_note("raw: %s", raw ? rh_esc(raw, strlen(raw)) : "-");
+    /* [W10] whitespace before the colon is dropped from the name */
+    EXPECT_QC(c.hr, "X-Sp", "sp"); EXPECT_QC(c.hr, "X-Tb", "tb");
+    EXPECT_Q(c.hr, HTTP_QUERY_CONTENT_TYPE, "text/x");
+    EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-Sp: sp\r\nX-Tb: tb\r\nContent-Type: text/x\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
     rh_close(&c);
 }
 
@@ -87,7 +86,7 @@ TEST(rsp_hdr_name_charset) {
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\r\nX_Under: u\r\nX.Dot: d\r\nX!#$%&'*+^`|~: t\r\n1234: n\r\nX-\xe9: hi\r\n" TAIL);
     EXPECT_QC(c.hr, "X_Under", "u"); EXPECT_QC(c.hr, "X.Dot", "d"); EXPECT_QC(c.hr, "X!#$%&'*+^`|~", "t"); EXPECT_QC(c.hr, "1234", "n");
-    note_custom(c.hr, "X-\xe9");
+    EXPECT_QC(c.hr, "X-\xe9", "hi");   /* [W10] non-ASCII name bytes are accepted */
     rh_close(&c);
 }
 
@@ -97,7 +96,7 @@ TEST(rsp_hdr_colon_in_value) {
     GO(&c, "HTTP/1.1 200 OK\r\nX-Url: http://a:b@h:80/p?q=1:2\r\nX-Colon:: double\r\nX-Time: 12:34:56\r\n" TAIL);
     EXPECT_QC(c.hr, "X-Url", "http://a:b@h:80/p?q=1:2");
     EXPECT_QC(c.hr, "X-Time", "12:34:56");
-    note_custom(c.hr, "X-Colon");
+    EXPECT_QC(c.hr, "X-Colon", ": double");   /* [W10] split at the first colon only */
     rh_close(&c);
 }
 
@@ -106,10 +105,11 @@ TEST(rsp_hdr_line_without_colon) {
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\r\nX-Before: 1\r\nThis line has no colon\r\nX-After: 2\r\n" TAIL);
     EXPECT_QC(c.hr, "X-Before", "1");
-    note_custom(c.hr, "X-After");
-    note_custom(c.hr, "This line has no colon");
-    const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-    t_note("raw: %s", raw ? rh_esc(raw, strlen(raw)) : "-");
+    /* [W10] a line without a colon is dropped; parsing continues */
+    EXPECT_QC(c.hr, "X-After", "2");
+    EXPECT_QCERR(c.hr, "This line has no colon", 0, ERROR_INVALID_PARAMETER);   /* spaces in a CUSTOM name */
+    EXPECT_QC(c.hr, "This", NULL);
+    EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-Before: 1\r\nX-After: 2\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
     rh_close(&c);
 }
 
@@ -118,9 +118,10 @@ TEST(rsp_hdr_empty_name) {
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\r\nX-Before: 1\r\n: nameless\r\nX-After: 2\r\n" TAIL);
     EXPECT_QC(c.hr, "X-Before", "1");
-    note_custom(c.hr, "X-After");
-    const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-    t_note("raw: %s", raw ? rh_esc(raw, strlen(raw)) : "-");
+    /* [W10] a line with an empty name is dropped */
+    EXPECT_QC(c.hr, "X-After", "2");
+    EXPECT_QC(c.hr, "", NULL);
+    EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-Before: 1\r\nX-After: 2\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
     rh_close(&c);
 }
 
@@ -129,12 +130,11 @@ TEST(rsp_hdr_folded_continuation) {
     REQUIRE(U(HttpQueryInfoA));
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\r\nX-Fold: a\r\n b\r\n\tc\r\nX-Next: n\r\nServer: s1\r\n  s2\r\n" TAIL);
-    note_custom(c.hr, "X-Fold");
-    const char *sv = rh_qa(c.hr, HTTP_QUERY_SERVER, NULL);
-    t_note("folded Server -> %s", sv ? rh_esc(sv, strlen(sv)) : "not found");
+    /* [W10] obs-fold continuation lines are discarded, not joined */
+    EXPECT_QC(c.hr, "X-Fold", "a");
+    EXPECT_Q(c.hr, HTTP_QUERY_SERVER, "s1");
     EXPECT_QC(c.hr, "X-Next", "n");
-    const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-    t_note("raw: %s", raw ? rh_esc(raw, strlen(raw)) : "-");
+    EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-Fold: a\r\nX-Next: n\r\nServer: s1\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
     rh_close(&c);
 }
 
@@ -142,10 +142,10 @@ TEST(rsp_hdr_fold_on_first_header_line) {
     REQUIRE(U(HttpQueryInfoA));
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\r\n X-Lead: indented\r\nX-B: b\r\n" TAIL);
-    note_custom(c.hr, "X-Lead");
+    /* [W10] an indented first header line is an ordinary header (leading LWS skipped), not a status continuation */
+    EXPECT_QC(c.hr, "X-Lead", "indented");
     EXPECT_QC(c.hr, "X-B", "b");
-    const char *t = rh_qa(c.hr, HTTP_QUERY_STATUS_TEXT, NULL);
-    t_note("status text with indented first header: %s", t ? rh_esc(t, strlen(t)) : "-");
+    EXPECT_QA(c.hr, HTTP_QUERY_STATUS_TEXT, "OK");
     rh_close(&c);
 }
 
@@ -159,7 +159,7 @@ TEST(rsp_hdr_lf_only_line_endings) {
     EXPECT_QC(c.hr, "X-A", "1");
     EXPECT_Q(c.hr, HTTP_QUERY_CONTENT_TYPE, "text/lf");
     EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-A: 1\r\nContent-Type: text/lf\r\nContent-Length: 2\r\nConnection: close\r\n\r\n");
-    char b[8]; EXPECT_EQ(rh_body(&c, b, sizeof b), 2); EXPECT_STR(b, "ok");
+    char b[8]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 2); } EXPECT_STR(b, "ok");
     rh_close(&c);
 }
 
@@ -168,7 +168,7 @@ TEST(rsp_hdr_mixed_line_endings) {
     rh_t c;
     GO(&c, "HTTP/1.1 200 OK\nX-A: 1\r\nX-B: 2\nContent-Length: 3\r\nConnection: close\n\r\nabc");
     EXPECT_QC(c.hr, "X-A", "1"); EXPECT_QC(c.hr, "X-B", "2");
-    char b[8]; EXPECT_EQ(rh_body(&c, b, sizeof b), 3); EXPECT_STR(b, "abc");
+    char b[8]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 3); } EXPECT_STR(b, "abc");
     rh_close(&c);
 }
 
@@ -176,7 +176,12 @@ TEST(rsp_hdr_bare_cr_and_nul_in_value) {
     REQUIRE(U(HttpQueryInfoA));
     static const char resp[] = "HTTP/1.1 200 OK\r\nX-Cr: a\rb\r\nX-Nul: a\0b\r\nX-After: z\r\n" TAIL;
     rh_t c; if (!go(&c, resp, sizeof resp - 1)) return;
-    note_custom(c.hr, "X-Cr"); note_custom(c.hr, "X-Nul"); note_custom(c.hr, "X-After");
+    /* [W10] a bare CR ends the line ("b" then is a colon-less line, dropped); a NUL inside a value is kept
+     * (GlobalDisallowNullInResponseHeaders off): the value is "a\0b", length 3 */
+    EXPECT_QC(c.hr, "X-Cr", "a");
+    char nb[16]; strcpy(nb, "X-Nul");
+    CHECK(rh_callA(c.hr, HTTP_QUERY_CUSTOM, nb, sizeof nb, NULL)); EXPECT_EQ(rh_len, 3); CHECK(!memcmp(nb, "a\0b", 4));
+    EXPECT_QC(c.hr, "X-After", "z");
     rh_close(&c);
 }
 
@@ -205,8 +210,8 @@ TEST(rsp_hdr_duplicate_content_length) {
         rh_t c; if (!rh_raw(&c, "GET", raws[i], strlen(raws[i]))) return;
         DWORD n = 0; BOOL ok = c.sent ? rh_qnum(c.hr, HTTP_QUERY_CONTENT_LENGTH, &n) : 0;
         char b[16] = ""; size_t bn = c.sent ? rh_body(&c, b, sizeof b) : 0;
-        t_note("CL variant %d: sent=%d err=%lu CL|NUMBER=%s%lu body=%u \"%s\"", i, c.sent, c.err, ok ? "" : "fail:", ok ? n : rh_err, (unsigned)bn, b);
-        if (i == 0) { CHECK(c.sent && ok && n == 3 && bn == 3); }
+        /* [W10] the first Content-Length wins (a conflicting second one and a list "3, 3" are not errors) */
+        CHECKF(c.sent && ok && n == 3 && bn == 3 && !strcmp(b, "abc"), "CL variant %d: sent=%d err=%lu n=%lu body=%u", i, c.sent, c.err, n, (unsigned)bn);
         rh_close(&c);
     }
 }
@@ -285,7 +290,7 @@ TEST(rsp_hdr_huge_head_sizes) {
         rh_t c; if (!rh_raw(&c, "GET", resp, o)) return;
         const char *v = c.sent ? rh_qac(c.hr, "X-Last", 0, NULL) : NULL;
         t_note("head %d KB (%d lines): sent=%d err=%lu %s X-Last=%s", kb[k], lines, c.sent, c.err, t_inet_errname(c.err), v ? v : "-");
-        if (k == 0) { CHECK(c.sent); EXPECT_STR(v, "last"); }
+        CHECK(c.sent); EXPECT_STR(v, "last");   /* [W10] no head-size limit up to 4 MB */
         rh_close(&c);
     }
 }
@@ -349,8 +354,8 @@ TEST(rsp_hdr_chunked_has_no_content_length) {
     EXPECT_Q(c.hr, HTTP_QUERY_TRANSFER_ENCODING, "chunked");
     EXPECT_QA(c.hr, HTTP_QUERY_CONTENT_LENGTH, NULL);
     DWORD n; CHECK(!rh_qnum(c.hr, HTTP_QUERY_CONTENT_LENGTH, &n)); EXPECT_EQ(rh_err, ERROR_HTTP_HEADER_NOT_FOUND);
-    char b[16]; EXPECT_EQ(rh_body(&c, b, sizeof b), 5); EXPECT_STR(b, "abcde");
-    note_custom(c.hr, "X-Trailer");
+    char b[16]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 5); } EXPECT_STR(b, "abcde");
+    EXPECT_QC(c.hr, "X-Trailer", NULL);   /* [W10] chunked trailers are not merged into the headers */
     rh_close(&c);
 }
 
@@ -373,14 +378,14 @@ TEST(rsp_hdr_content_headers_verbatim) {
     EXPECT_Q(c.hr, HTTP_QUERY_CONTENT_ID, "<id@x>");
     EXPECT_Q(c.hr, HTTP_QUERY_CONTENT_DESCRIPTION, "desc text");
     EXPECT_Q(c.hr, HTTP_QUERY_CONTENT_LENGTH, "4");
-    char b[8]; EXPECT_EQ(rh_body(&c, b, sizeof b), 4); EXPECT_STR(b, "2345");
+    char b[8]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 4); } EXPECT_STR(b, "2345");
     rh_close(&c);
 }
 
 /* Content-Encoding stays visible whether or not WinINet decodes (decoding is off by default) */
 TEST(rsp_hdr_content_encoding_gzip_not_decoded_by_default) {
     REQUIRE(U(HttpQueryInfoA));
-    srv_step st[] = { S_HEAD(), S_REPLYN(200, "Content-Type: text/plain\r\n", srv_fox_gzip, srv_fox_gzip_len, SRV_R_CONN_CLOSE) };
+    srv_step st[] = { S_HEAD(), S_REPLYN(200, "Content-Type: text/plain\r\nContent-Encoding: gzip\r\n", srv_fox_gzip, srv_fox_gzip_len, SRV_R_CONN_CLOSE) };
     rh_t c; if (!rh_start(&c, st, 2)) return;
     if (!rh_open(&c, "GET", "/gz", 0)) { rh_close(&c); return; }
     CHECK(rh_send(&c, NULL, NULL, 0));
@@ -394,7 +399,7 @@ TEST(rsp_hdr_content_encoding_gzip_not_decoded_by_default) {
 
 TEST(rsp_hdr_content_encoding_gzip_decoded) {
     REQUIRE(U(HttpQueryInfoA)); REQUIRE(U(InternetSetOptionA));
-    srv_step st[] = { S_HEAD(), S_REPLYN(200, "Content-Type: text/plain\r\n", srv_fox_gzip, srv_fox_gzip_len, SRV_R_CONN_CLOSE) };
+    srv_step st[] = { S_HEAD(), S_REPLYN(200, "Content-Type: text/plain\r\nContent-Encoding: gzip\r\n", srv_fox_gzip, srv_fox_gzip_len, SRV_R_CONN_CLOSE) };
     rh_t c; if (!rh_start(&c, st, 2)) return;
     if (!rh_open(&c, "GET", "/gz", 0)) { rh_close(&c); return; }
     BOOL on = TRUE; CHECK(U(InternetSetOptionA)(c.hr, INTERNET_OPTION_HTTP_DECODING, &on, sizeof on));
@@ -403,6 +408,7 @@ TEST(rsp_hdr_content_encoding_gzip_decoded) {
     const char *cl = rh_qa(c.hr, HTTP_QUERY_CONTENT_LENGTH, NULL);
     const char *ae = rh_qa(c.hr, HTTP_QUERY_ACCEPT_ENCODING | HTTP_QUERY_FLAG_REQUEST_HEADERS, NULL);
     t_note("decoding on: Content-Encoding=%s Content-Length=%s req Accept-Encoding=%s", ce ? ce : "(gone)", cl ? cl : "(gone)", ae ? ae : "(none)");
+    CHECK(!ae);   /* [W10] enabling decoding on the request handle does not add Accept-Encoding to this request */
     static char b[4096]; size_t bn = rh_body(&c, b, sizeof b);
     EXPECT_EQ(bn, SRV_FOX_LEN);
     CHECK(!memcmp(b, srv_fox_text(), SRV_FOX_LEN));

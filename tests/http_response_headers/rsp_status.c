@@ -77,7 +77,7 @@ TEST(rsp_status_http10) {
     rh_t c; if (!RH_RAW(&c, "GET", resp)) return; RH_SENT_OR_FAIL(&c);
     check_status(&c, 200, "OK", "HTTP/1.0");
     EXPECT_Q(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.0 200 OK\r\nContent-Length: 3\r\n\r\n");
-    char b[16]; EXPECT_EQ(rh_body(&c, b, sizeof b), 3); EXPECT_STR(b, "abc");
+    char b[16]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 3); } EXPECT_STR(b, "abc");
     rh_close(&c);
 }
 
@@ -87,7 +87,7 @@ TEST(rsp_status_http10_close_delimited) {
     rh_t c; if (!RH_RAW(&c, "GET", resp)) return; RH_SENT_OR_FAIL(&c);
     check_status(&c, 200, "OK", "HTTP/1.0");
     EXPECT_QA(c.hr, HTTP_QUERY_CONTENT_LENGTH, NULL);
-    char b[32]; EXPECT_EQ(rh_body(&c, b, sizeof b), 11); EXPECT_STR(b, "until close");
+    char b[32]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 11); } EXPECT_STR(b, "until close");
     rh_close(&c);
 }
 
@@ -104,8 +104,9 @@ TEST(rsp_status_missing_reason) {
             DWORD l = 0; char a[4];
             CHECK(!rh_callA(c.hr, HTTP_QUERY_STATUS_TEXT, a, 0, NULL)); EXPECT_EQ(rh_len, 1);
             CHECK(rh_callA(c.hr, HTTP_QUERY_STATUS_TEXT, a, 1, NULL)); EXPECT_EQ(rh_len, 0);
-            const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-            t_note("\"%s\" -> RAW_HEADERS_CRLF %s", rh_esc(lines[i], strlen(lines[i])), raw ? rh_esc(raw, strlen(raw)) : "(fail)");
+            /* [W10] the status line is rebuilt as "<version> <code> <reason>": an empty reason leaves a trailing space */
+            char want[96]; snprintf(want, sizeof want, "HTTP/1.1 %d \r\nContent-Length: 0\r\nConnection: close\r\n\r\n", codes_[i]);
+            EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, want);
             (void)l;
         }
         rh_close(&c);
@@ -160,44 +161,71 @@ TEST(rsp_status_leading_junk) {
         const char *xj = c.sent ? rh_qac(c.hr, "X-J", 0, NULL) : NULL;
         const char *ver = c.sent ? rh_qa(c.hr, HTTP_QUERY_VERSION, NULL) : NULL;
         char b[128] = ""; size_t bn = c.sent ? rh_body(&c, b, sizeof b) : 0;
-        t_note("junk \"%s\": sent=%d err=%lu code=%s (qerr %lu) ver=%s X-J=%s body=%u \"%s\"", rh_esc(pre[i], strlen(pre[i])), c.sent, c.err,
-               code ? code : "-", qerr, ver ? ver : "-", xj ? xj : "-", (unsigned)bn, rh_esc(b, bn > 60 ? 60 : bn));
+        /* [W10] up to 4 junk bytes (or blank lines) before "HTTP" are skipped; 5 bytes -> treated as HTTP/0.9 */
+        char want_xj[8]; snprintf(want_xj, sizeof want_xj, "%u", (unsigned)i);
+        CHECKF(c.sent && code && !strcmp(code, "200"), "junk %u: sent=%d err=%lu code=%s qerr=%lu", (unsigned)i, c.sent, c.err, code ? code : "-", qerr);
+        if (i == 4) { EXPECT_STR(ver, "HTTP/1.0"); CHECK(!xj); EXPECT_EQ(bn, (size_t)n); }
+        else { EXPECT_STR(ver, "HTTP/1.1"); EXPECT_STR(xj, want_xj); EXPECT_EQ(bn, 2); EXPECT_STR(b, "ok"); }
         rh_close(&c);
     }
 }
 
+/* [W10] status token: the string answer is the token as sent; the number stops at the first non-digit and a value
+ * of 0 (no digits, "0", "-200") reads back as 0xFFFFFFFF; > 0xFFFFFFFF or an empty token -> HttpSendRequest 12152.
+ * A bare "HTTP/1.1" line is treated as a 0.9 response (200 OK synthesised, the line is body). */
 TEST(rsp_status_code_token_variants) {
     REQUIRE(U(HttpQueryInfoA));
-    static const char *lines[] = { "HTTP/1.1 2x0 Odd", "HTTP/1.1 abc Letters", "HTTP/1.1 0200 Zero", "HTTP/1.1 0 Zero",
-                                   "HTTP/1.1 4294967295 Max", "HTTP/1.1 4294967296 Over", "HTTP/1.1 99999999999999999999999 Huge",
-                                   "HTTP/1.1 -200 Neg", "HTTP/1.1 20 Short", "HTTP/1.1 1000 Long", "HTTP/1.1", "HTTP/1.1 ", "HTTP/1.1  \t " };
-    for (size_t i = 0; i < sizeof lines / sizeof lines[0]; i++) {
-        char resp[256]; int n = snprintf(resp, sizeof resp, "%s\r\nX-K: k\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok", lines[i]);
+    static const struct { const char *line; DWORD send_err; DWORD num; const char *code; const char *text; } t[] = {
+        { "HTTP/1.1 2x0 Odd", 0, 2, "2x0", "Odd" },
+        { "HTTP/1.1 abc Letters", 0, 0xFFFFFFFF, "abc", "Letters" },
+        { "HTTP/1.1 0200 Zero", 0, 200, "0200", "Zero" },
+        { "HTTP/1.1 0 Zero", 0, 0xFFFFFFFF, "0", "Zero" },
+        { "HTTP/1.1 4294967295 Max", 0, 0xFFFFFFFF, "4294967295", "Max" },
+        { "HTTP/1.1 4294967296 Over", ERROR_HTTP_INVALID_SERVER_RESPONSE, 0, NULL, NULL },
+        { "HTTP/1.1 99999999999999999999999 Huge", ERROR_HTTP_INVALID_SERVER_RESPONSE, 0, NULL, NULL },
+        { "HTTP/1.1 -200 Neg", 0, 0xFFFFFFFF, "-200", "Neg" },
+        { "HTTP/1.1 20 Short", 0, 20, "20", "Short" },
+        { "HTTP/1.1 1000 Long", 0, 1000, "1000", "Long" },
+        { "HTTP/1.1 ", ERROR_HTTP_INVALID_SERVER_RESPONSE, 0, NULL, NULL },
+        { "HTTP/1.1  \t ", ERROR_HTTP_INVALID_SERVER_RESPONSE, 0, NULL, NULL },
+        { "HTTP/1.1", 0, 200, "200", NULL },
+    };
+    for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
+        char resp[256]; int n = snprintf(resp, sizeof resp, "%s\r\nX-K: k\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok", t[i].line);
         rh_t c; if (!rh_raw(&c, "GET", resp, (size_t)n)) return;
-        DWORD num = 0; BOOL nok = c.sent ? rh_qnum(c.hr, HTTP_QUERY_STATUS_CODE, &num) : 0; DWORD nerr = rh_err;
-        const char *code = c.sent ? rh_qa(c.hr, HTTP_QUERY_STATUS_CODE, NULL) : NULL; DWORD cerr = rh_err;
-        const char *txt = c.sent ? rh_qa(c.hr, HTTP_QUERY_STATUS_TEXT, NULL) : NULL;
-        const char *xk = c.sent ? rh_qac(c.hr, "X-K", 0, NULL) : NULL;
-        t_note("\"%s\": sent=%d err=%lu(%s) num=%s%lu(e%lu) code=\"%s\"(e%lu) text=\"%s\" X-K=%s", lines[i], c.sent, c.err, t_inet_errname(c.err),
-               nok ? "" : "fail:", num, nerr, code ? code : "-", cerr, txt ? txt : "-", xk ? xk : "-");
+        const char *ln = rh_esc(t[i].line, strlen(t[i].line));
+        if (t[i].send_err) { CHECKF(!c.sent && c.err == t[i].send_err, "\"%s\": sent=%d err=%lu", ln, c.sent, c.err); rh_close(&c); continue; }
+        CHECKF(c.sent, "\"%s\": err=%lu", ln, c.err);
+        if (c.sent) {
+            DWORD num = 0; CHECKF(rh_qnum(c.hr, HTTP_QUERY_STATUS_CODE, &num) && num == t[i].num, "\"%s\": num %lu err=%lu", ln, num, rh_err);
+            EXPECT_QA(c.hr, HTTP_QUERY_STATUS_CODE, t[i].code);
+            if (t[i].text) { EXPECT_QA(c.hr, HTTP_QUERY_STATUS_TEXT, t[i].text); EXPECT_QC(c.hr, "X-K", "k"); }
+            else { EXPECT_QC(c.hr, "X-K", NULL); EXPECT_QA(c.hr, HTTP_QUERY_VERSION, "HTTP/1.0"); }
+        }
         rh_close(&c);
     }
 }
 
 /* ------------------------------------------------------------------ HTTP/0.9 (no status line) */
-TEST(rsp_status_http09_downlevel) {
+/* [W10] Win10 does NOT answer 12151 for a status-less (HTTP/0.9) response: it synthesises a status
+ * (VERSION "HTTP/1.0", 200) and keeps no headers; the whole stream is the body. The downlevel flag the decomp
+ * checks (this[0x142c] & 2) is evidently not set on this path. */
+TEST(rsp_status_http09_synthesised) {
     REQUIRE(U(HttpQueryInfoA)); REQUIRE(U(HttpQueryInfoW));
     static const char resp[] = "hello world, no headers here\n";
     rh_t c; if (!RH_RAW(&c, "GET", resp)) return; RH_SENT_OR_FAIL(&c);
-    static const DWORD lv[] = { HTTP_QUERY_STATUS_CODE, HTTP_QUERY_STATUS_TEXT, HTTP_QUERY_VERSION, HTTP_QUERY_RAW_HEADERS,
-                                HTTP_QUERY_RAW_HEADERS_CRLF, HTTP_QUERY_CONTENT_TYPE, HTTP_QUERY_CONTENT_LENGTH, HTTP_QUERY_ECHO_HEADERS };
-    for (size_t i = 0; i < sizeof lv / sizeof lv[0]; i++) EXPECT_QERR2(c.hr, lv[i], ERROR_HTTP_DOWNLEVEL_SERVER);
-    EXPECT_QERR(c.hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, ERROR_HTTP_DOWNLEVEL_SERVER);
-    EXPECT_QCERR(c.hr, "X-Anything", 0, ERROR_HTTP_DOWNLEVEL_SERVER);
-    /* argument errors still win over the downlevel answer */
+    EXPECT_Q(c.hr, HTTP_QUERY_STATUS_CODE, "200");
+    EXPECT_Q(c.hr, HTTP_QUERY_VERSION, "HTTP/1.0");
+    DWORD n32; CHECK(rh_qnum(c.hr, HTTP_QUERY_STATUS_CODE, &n32)); EXPECT_EQ(n32, 200);
+    const char *t = rh_qa(c.hr, HTTP_QUERY_STATUS_TEXT, NULL);
+    const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
+    t_note("HTTP/0.9: STATUS_TEXT=%s (err %lu) RAW_HEADERS_CRLF=%s", t ? rh_esc(t, strlen(t)) : "(fail)", rh_err, raw ? rh_esc(raw, strlen(raw)) : "(fail)");
+    EXPECT_QERR2(c.hr, HTTP_QUERY_CONTENT_TYPE, ERROR_HTTP_HEADER_NOT_FOUND);
+    EXPECT_QERR2(c.hr, HTTP_QUERY_CONTENT_LENGTH, ERROR_HTTP_HEADER_NOT_FOUND);
+    EXPECT_QERR2(c.hr, HTTP_QUERY_ECHO_HEADERS, ERROR_HTTP_INVALID_QUERY_REQUEST);
+    EXPECT_QCERR(c.hr, "X-Anything", 0, ERROR_HTTP_HEADER_NOT_FOUND);
     EXPECT_QERR(c.hr, HTTP_QUERY_EXPIRES | HTTP_QUERY_FLAG_SYSTEMTIME, ERROR_HTTP_INVALID_QUERY_REQUEST);
     EXPECT_QERR(c.hr, 0x60, ERROR_INVALID_PARAMETER);
-    /* REQUEST_METHOD and the request side are unaffected */
     EXPECT_Q(c.hr, HTTP_QUERY_REQUEST_METHOD, "GET");
     EXPECT_QA(c.hr, HTTP_QUERY_USER_AGENT | HTTP_QUERY_FLAG_REQUEST_HEADERS, "rh-agent/1.0");
     char b[64]; size_t n = rh_body(&c, b, sizeof b);
@@ -207,14 +235,17 @@ TEST(rsp_status_http09_downlevel) {
 
 TEST(rsp_status_http09_short_and_binary) {
     REQUIRE(U(HttpQueryInfoA));
-    static const char *bodies[] = { "OK", "HTT", "<html>hi</html>", "FTP/1.0 200 OK\r\n\r\n", "X-Header: looks like one\r\n\r\n" };
+    /* includes truncated status lines followed by close: "HTTP/" and "HTTP/1.1 2" are also treated as 0.9 [W10] */
+    static const char *bodies[] = { "OK", "HTT", "<html>hi</html>", "FTP/1.0 200 OK\r\n\r\n", "X-Header: looks like one\r\n\r\n", "HTTP/", "HTTP/1.1 2" };
     for (size_t i = 0; i < sizeof bodies / sizeof bodies[0]; i++) {
         rh_t c; if (!rh_raw(&c, "GET", bodies[i], strlen(bodies[i]))) return;
         CHECKF(c.sent, "body \"%s\": err=%lu", rh_esc(bodies[i], strlen(bodies[i])), c.err);
         if (c.sent) {
-            EXPECT_QERR(c.hr, HTTP_QUERY_STATUS_CODE, ERROR_HTTP_DOWNLEVEL_SERVER);
+            EXPECT_QA(c.hr, HTTP_QUERY_STATUS_CODE, "200");
+            EXPECT_QA(c.hr, HTTP_QUERY_VERSION, "HTTP/1.0");
             char b[64]; size_t n = rh_body(&c, b, sizeof b);
-            CHECKF(n == strlen(bodies[i]) && !memcmp(b, bodies[i], n), "body %u \"%s\"", (unsigned)n, rh_esc(b, n));
+            if (i < 5) CHECKF(n == strlen(bodies[i]) && !memcmp(b, bodies[i], n), "body %u \"%s\"", (unsigned)n, rh_esc(b, n));
+            else t_note("truncated \"%s\" as 0.9: body %u \"%s\"", bodies[i], (unsigned)n, rh_esc(b, n));
         }
         rh_close(&c);
     }
@@ -228,7 +259,7 @@ TEST(rsp_status_100_continue_consumed) {
     check_status(&c, 200, "Final", "HTTP/1.1");
     EXPECT_QC(c.hr, "X-F", "1");
     EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 Final\r\nX-F: 1\r\nContent-Length: 2\r\nConnection: close\r\n\r\n");
-    char b[8]; EXPECT_EQ(rh_body(&c, b, sizeof b), 2); EXPECT_STR(b, "ok");
+    char b[8]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 2); } EXPECT_STR(b, "ok");
     rh_close(&c);
 }
 
@@ -238,7 +269,7 @@ TEST(rsp_status_several_interim) {
                                "HTTP/1.1 201 Made\r\nContent-Length: 1\r\nConnection: close\r\n\r\nz";
     rh_t c; if (!RH_RAW(&c, "GET", resp)) return; RH_SENT_OR_FAIL(&c);
     check_status(&c, 201, "Made", "HTTP/1.1");
-    char b[8]; EXPECT_EQ(rh_body(&c, b, sizeof b), 1);
+    char b[8]; { size_t bn_ = rh_body(&c, b, sizeof b); EXPECT_EQ(bn_, 1); }
     rh_close(&c);
 }
 
@@ -251,7 +282,8 @@ TEST(rsp_status_interim_headers_dropped) {
     const char *xi = rh_qac(c.hr, "X-Interim", 0, NULL);
     const char *link = rh_qa(c.hr, HTTP_QUERY_LINK, NULL);
     const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-    t_note("103 then 200: code=%s X-Interim=%s Link=%s raw=%s", code ? code : "-", xi ? xi : "(none)", link ? link : "(none)", raw ? rh_esc(raw, strlen(raw)) : "-");
+    CHECK(!xi); CHECK(!link);   /* [W10] interim headers are discarded */
+    EXPECT_STR(raw, "HTTP/1.1 200 OK\r\nX-Final: yes\r\nContent-Length: 0\r\nConnection: close\r\n\r\n");
     EXPECT_STR(code, "200");
     EXPECT_QC(c.hr, "X-Final", "yes");
     rh_close(&c);
@@ -267,7 +299,8 @@ TEST(rsp_status_interim_variants) {
         const char *code = c.sent ? rh_qa(c.hr, HTTP_QUERY_STATUS_CODE, NULL) : NULL;
         const char *xn = c.sent ? rh_qac(c.hr, "X-N", 0, NULL) : NULL;
         t_note("interim \"%s\": sent=%d err=%lu code=%s X-N=%s", rh_esc(pre[i], strlen(pre[i])), c.sent, c.err, code ? code : "-", xn ? xn : "-");
-        if (i < 2) { CHECK(c.sent); EXPECT_STR(code, "200"); }
+        char wn[8]; snprintf(wn, sizeof wn, "%u", (unsigned)i);
+        CHECK(c.sent); EXPECT_STR(code, "200"); EXPECT_STR(xn, wn);   /* [W10] every 1xx (incl. 199, HTTP/1.0 100) skipped */
         rh_close(&c);
     }
 }
@@ -281,8 +314,7 @@ TEST(rsp_status_empty_response) {
     rh_send(&c, NULL, NULL, 0);
     CHECK(!c.sent);
     t_note("empty response: err=%lu %s, connections=%d", c.err, t_inet_errname(c.err), srv_conn_count(c.s));
-    CHECKF(c.err == ERROR_HTTP_INVALID_SERVER_RESPONSE || c.err == ERROR_INTERNET_CONNECTION_RESET || c.err == ERROR_INTERNET_CONNECTION_ABORTED,
-           "err=%lu", c.err);
+    EXPECT_EQ(c.err, ERROR_HTTP_INVALID_SERVER_RESPONSE);   /* [W10] */
     rh_close(&c);
 }
 
@@ -294,6 +326,7 @@ TEST(rsp_status_reset_response) {
     rh_send(&c, NULL, NULL, 0);
     CHECK(!c.sent);
     t_note("RST response: err=%lu %s, connections=%d", c.err, t_inet_errname(c.err), srv_conn_count(c.s));
+    EXPECT_EQ(c.err, ERROR_INTERNET_CONNECTION_RESET);   /* [W10] */
     rh_close(&c);
 }
 
@@ -304,8 +337,9 @@ TEST(rsp_status_truncated_head) {
         rh_t c; if (!rh_raw(&c, "GET", raws[i], strlen(raws[i]))) return;
         const char *code = c.sent ? rh_qa(c.hr, HTTP_QUERY_STATUS_CODE, NULL) : NULL; DWORD qe = rh_err;
         const char *xa = c.sent ? rh_qac(c.hr, "X-A", 0, NULL) : NULL;
-        t_note("truncated \"%s\" then close: sent=%d err=%lu %s code=%s(e%lu) X-A=%s", rh_esc(raws[i], strlen(raws[i])), c.sent, c.err,
-               t_inet_errname(c.err), code ? code : "-", qe, xa ? xa : "-");
+        /* [W10] EOF ends the head: no error, status 200; X-A kept when its line arrived (even without CRLF) */
+        CHECKF(c.sent && code && !strcmp(code, "200"), "truncated \"%s\": sent=%d err=%lu code=%s qe=%lu", rh_esc(raws[i], strlen(raws[i])), c.sent, c.err, code ? code : "-", qe);
+        if (i < 2) EXPECT_STR(xa, "1"); else CHECK(!xa);
         rh_close(&c);
     }
 }

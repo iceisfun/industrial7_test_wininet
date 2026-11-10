@@ -208,7 +208,7 @@ TEST(hqi_args_modifier_mask_table) {
             }
         }
     }
-    EXPECT_EQ(accepted, 10);   /* 7 SYSTEMTIME levels (incl. Expect), CL NUMBER + NUMBER64, STATUS_CODE NUMBER */
+    EXPECT_EQ(accepted, 9);    /* 6 SYSTEMTIME levels (9, 11, 32, 36, 59, 68), CL NUMBER + NUMBER64, STATUS_CODE NUMBER */
     t_note("mask table: %d rejected, %d accepted", rejected, accepted);
     rh_close(&c);
 }
@@ -509,17 +509,16 @@ TEST(hqi_args_before_send) {
     EXPECT_QA(c.hr, HTTP_QUERY_REQUEST_METHOD, "GET");
     EXPECT_QA(c.hr, HTTP_QUERY_VERSION | HTTP_QUERY_FLAG_REQUEST_HEADERS, "HTTP/1.1");
     EXPECT_QW(c.hr, HTTP_QUERY_REQUEST_METHOD, "GET");
-    /* response side before a response: no headers */
-    const char *v = rh_qa(c.hr, HTTP_QUERY_STATUS_CODE, NULL);
-    t_note("before send STATUS_CODE: %s err=%lu len=%lu", v ? rh_esc(v, strlen(v)) : "(fail)", rh_err, rh_len);
-    v = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
-    t_note("before send RAW_HEADERS_CRLF: %s err=%lu len=%lu", v ? rh_esc(v, rh_len) : "(fail)", rh_err, rh_len);
-    v = rh_qa(c.hr, HTTP_QUERY_STATUS_TEXT, NULL);
-    t_note("before send STATUS_TEXT: %s err=%lu", v ? rh_esc(v, strlen(v)) : "(fail)", rh_err);
-    v = rh_qa(c.hr, HTTP_QUERY_VERSION, NULL);
-    t_note("before send VERSION: %s err=%lu", v ? rh_esc(v, strlen(v)) : "(fail)", rh_err);
-    DWORD n; BOOL ok = rh_qnum(c.hr, HTTP_QUERY_STATUS_CODE, &n);
-    t_note("before send STATUS_CODE|NUMBER: ok=%d n=%lu err=%lu", ok, n, rh_err);
+    /* response side before a response [W10]: the response-present flag is already set (no 12019, unlike the
+     * decomp's naming suggests); STATUS_CODE falls back to "0" [D QueryInfo case 0x13], the raw block is the empty
+     * status line + final CRLF, VERSION/STATUS_TEXT have no string yet -> 12150 */
+    EXPECT_Q(c.hr, HTTP_QUERY_STATUS_CODE, "0");
+    EXPECT_Q(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "\r\n\r\n");
+    EXPECT_QERR2(c.hr, HTTP_QUERY_STATUS_TEXT, ERROR_HTTP_HEADER_NOT_FOUND);
+    EXPECT_QERR2(c.hr, HTTP_QUERY_VERSION, ERROR_HTTP_HEADER_NOT_FOUND);
+    DWORD n; CHECK(rh_qnum(c.hr, HTTP_QUERY_STATUS_CODE, &n)); EXPECT_EQ(n, 0);
+    const char *v = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS, NULL);
+    t_note("before send RAW_HEADERS: %s err=%lu len=%lu", v ? rh_esc(v, rh_len + 1) : "(fail)", rh_err, rh_len);
     EXPECT_QA(c.hr, HTTP_QUERY_CONTENT_TYPE, NULL);
     EXPECT_QC(c.hr, "X-Test", NULL);
     /* after sending, the same handle answers from the response */

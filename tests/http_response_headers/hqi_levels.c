@@ -140,13 +140,12 @@ TEST(hqi_lvl_side_effect_headers) {
     static const char resp[] = "HTTP/1.1 200 OK\r\nMs-Echo-Reply: er\r\nMs-Echo-Request: eq\r\nX-P2P-PeerDist: Version=1.0\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok";
     rh_t c; if (!RH_RAW(&c, "GET", resp)) return; RH_SENT_OR_FAIL(&c);
     static const DWORD lv[] = { HTTP_QUERY_ECHO_REPLY, HTTP_QUERY_ECHO_REQUEST, HTTP_QUERY_X_P2P_PEERDIST };
-    for (int i = 0; i < 3; i++) {
-        const char *v = rh_qa(c.hr, lv[i], NULL);
-        t_note("level %lu (%s): %s err=%lu", lv[i], rh_known[lv[i]].name, v ? v : "(fail)", rh_err);
-    }
+    /* [W10] all three are stored and returned like any other header; the body is unaffected */
+    static const char *want[] = { "er", "eq", "Version=1.0" };
+    for (int i = 0; i < 3; i++) EXPECT_Q(c.hr, lv[i], want[i]);
     EXPECT_QC(c.hr, "Ms-Echo-Reply", "er");
     char body[16]; size_t bn = rh_body(&c, body, sizeof body);
-    t_note("body after X-P2P-PeerDist: %u bytes \"%s\"", (unsigned)bn, rh_esc(body, bn));
+    EXPECT_EQ(bn, 2); EXPECT_STR(body, "ok");
     rh_close(&c);
 }
 
@@ -199,7 +198,8 @@ TEST(hqi_lvl_request_raw_headers_match_wire) {
     /* NUL-separated flavour of the same block */
     const char *n0 = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS | HTTP_QUERY_FLAG_REQUEST_HEADERS, NULL);
     CHECK(n0 != NULL);
-    if (n0) { EXPECT_STR(n0, srv_req_line(c.s, 0)); t_note("REQ RAW_HEADERS len=%lu (wire head %u)", rh_len, (unsigned)wn); }
+    /* each CRLF becomes one NUL and the final blank line is dropped: len = wire - (header lines + request line) - 2 */
+    if (n0) { EXPECT_STR(n0, srv_req_line(c.s, 0)); EXPECT_EQ(rh_len, wn - (size_t)(srv_req_header_count(c.s, 0) + 1) - 2); }
     rh_close(&c);
 }
 
@@ -217,17 +217,18 @@ TEST(hqi_lvl_request_method_and_version) {
         if (srv_wait_requests(c.s, 1, 3000)) EXPECT_STR(srv_req_method(c.s, 0), verbs[i]);
         rh_close(&c);
     }
-    /* HttpOpenRequest version string */
+    /* HttpOpenRequest version string: [W10] "HTTP/1.0" is not honoured, the request still goes out as HTTP/1.1
+     * (the session's INTERNET_OPTION_HTTP_VERSION wins) and the request-side VERSION says HTTP/1.1 */
     static const char *vers[] = { "HTTP/1.0", "HTTP/1.1" };
     for (int i = 0; i < 2; i++) {
         rh_t c; srv_step st[] = { S_HEAD(), S_SENDN(resp, sizeof resp - 1), S_CLOSE() };
         if (!rh_start(&c, st, 3)) return;
         if (!rh_open_v(&c, "GET", "/v", vers[i], 0)) { rh_close(&c); return; }
-        EXPECT_QA(c.hr, HTTP_QUERY_VERSION | HTTP_QUERY_FLAG_REQUEST_HEADERS, vers[i]);
+        EXPECT_QA(c.hr, HTTP_QUERY_VERSION | HTTP_QUERY_FLAG_REQUEST_HEADERS, "HTTP/1.1");
         rh_send(&c, NULL, NULL, 0);
-        EXPECT_QA(c.hr, HTTP_QUERY_VERSION | HTTP_QUERY_FLAG_REQUEST_HEADERS, vers[i]);
+        EXPECT_QA(c.hr, HTTP_QUERY_VERSION | HTTP_QUERY_FLAG_REQUEST_HEADERS, "HTTP/1.1");
         EXPECT_QA(c.hr, HTTP_QUERY_VERSION, "HTTP/1.1");   /* response side = the server's version */
-        if (srv_wait_requests(c.s, 1, 3000)) { char want[64]; snprintf(want, sizeof want, "GET /v %s", vers[i]); EXPECT_STR(srv_req_line(c.s, 0), want); }
+        if (srv_wait_requests(c.s, 1, 3000)) { char want[64]; snprintf(want, sizeof want, "GET /v %s", "HTTP/1.1"); EXPECT_STR(srv_req_line(c.s, 0), want); }
         rh_close(&c);
     }
 }

@@ -132,6 +132,9 @@ static const date_case dates[] = {
     { "Tue, 19 Jan 2038 03:14:08 GMT", 0, 2038, 1, 2, 19, 3, 14, 8 },
     { "Fri, 31 Dec 9999 23:59:59 GMT", 0, 9999, 12, 5, 31, 23, 59, 59 },
     { "Mon, 15 Jun 2026 07:08:09 GMT", 0, 2026, 6, 1, 15, 7, 8, 9 },
+    { "tue, 15 nov 1994 12:45:26 gmt", 0, 1994, 11, 2, 15, 12, 45, 26 },     /* names case-insensitive [W10] */
+    { "15 Nov 1994 12:45:26 GMT", ERROR_HTTP_INVALID_QUERY_REQUEST, 0 },      /* no weekday [W10] */
+    { "1994-11-15T12:45:26Z", ERROR_HTTP_INVALID_QUERY_REQUEST, 0 },          /* ISO 8601 [W10] */
     { "not a date", ERROR_HTTP_INVALID_QUERY_REQUEST, 0 },                   /* [W10] 12154 */
     { "Mon, 32 Feb 2024 25:61:61 GMT", ERROR_HTTP_INVALID_QUERY_REQUEST, 0 }, /* [W10] 12154 */
 };
@@ -205,7 +208,7 @@ TEST(hqi_date_long_value) {
     v = rh_qac(c.hr, "X-D128", 0, NULL); CHECK(v && rh_len == 128);
     SYSTEMTIME st;
     BOOL ok = rh_qtimec(c.hr, "X-D127", &st);
-    t_note("127-byte date value (trailing padding then '.'): ok=%d err=%lu y=%u", ok, rh_err, ok ? st.wYear : 0);
+    CHECKF(ok && st.wYear == 1994, "127-byte value: ok=%d err=%lu", ok, rh_err);   /* [W10] parsed: trailing junk after the time ignored */
     CHECK(!rh_qtimec(c.hr, "X-D128", &st)); EXPECT_EQ(rh_err, ERROR_INTERNET_INTERNAL_ERROR);
     CHECK(!rh_qtimec(c.hr, "X-D500", &st)); EXPECT_EQ(rh_err, ERROR_INTERNET_INTERNAL_ERROR);
     rh_close(&c);
