@@ -114,7 +114,7 @@ static srv *sh_ftp_start(void) {
 /* Status-callback recorder (thread-safe, bounded). */
 typedef struct { HINTERNET h; DWORD_PTR ctx; DWORD status; DWORD infolen; ULONG_PTR info0; DWORD tid; } sh_cb_ev;
 typedef struct {
-    CRITICAL_SECTION cs; int n; sh_cb_ev ev[512];
+    CRITICAL_SECTION cs; LONG cs_init; int n; sh_cb_ev ev[512];
     HINTERNET close_on_status_h; DWORD close_on_status; int closed_ok; DWORD closed_err; int close_done;
 } sh_cb_rec;
 extern sh_cb_rec *sh_cb_cur;

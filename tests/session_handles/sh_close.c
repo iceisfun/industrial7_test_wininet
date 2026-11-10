@@ -7,8 +7,7 @@
 /* ------------------------------------------------------------------ callback recorder */
 sh_cb_rec *sh_cb_cur;
 void sh_cb_reset(sh_cb_rec *r) {
-    static int init;
-    if (!init) { InitializeCriticalSection(&r->cs); init = 1; }
+    if (!r->cs_init) { InitializeCriticalSection(&r->cs); r->cs_init = 1; }   /* per recorder (zero-initialised statics) */
     EnterCriticalSection(&r->cs);
     r->n = 0; r->close_on_status_h = NULL; r->close_on_status = 0; r->closed_ok = -1; r->closed_err = 0; r->close_done = 0;
     LeaveCriticalSection(&r->cs);
