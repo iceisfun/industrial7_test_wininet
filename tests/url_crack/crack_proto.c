@@ -298,8 +298,12 @@ TEST(url_crack_A_explicit_length) {
     EXPECT_STR(h, "host.example");
     EXPECT_STR(p, "/path");
     zc(&c); c.lpszHostName = h; c.dwHostNameLength = 64; c.lpszUrlPath = p; c.dwUrlPathLength = 64;
-    CHECK(U(InternetCrackUrlA)(U1, 1000, 0, &c));         /* longer than the string: stops at the NUL */
-    EXPECT_STR(p, "/path/x?q=1#f");
+    {   /* longer than the string: outside the documented contract (review pass 3) -> recorded only. Win10 22H2 stops
+         * at the NUL ("/path/x?q=1#f"). The URL is copied into a larger zeroed buffer so no read runs past it. */
+        static char ub[1100]; memset(ub, 0, sizeof ub); strcpy(ub, U1); p[0] = 0;
+        BOOL r = U(InternetCrackUrlA)(ub, 1000, 0, &c);
+        t_note("dwUrlLength 1000 > strlen: r=%d err=%lu path \"%s\"", r, r ? 0 : GetLastError(), p);
+    }
     zc(&c); c.lpszHostName = h; c.dwHostNameLength = 64;
     SET_ERR(0xdead);
     CHECK(!U(InternetCrackUrlA)(U1, 4, 0, &c));           /* "http": no ':' inside the count */

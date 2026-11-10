@@ -300,13 +300,21 @@ TEST(url_crack_wrap_A_pointer_mode_escaped_host) {
 /* ---- dwUrlLength ---------------------------------------------------------------------------------------------- */
 TEST(url_crack_wrap_url_length_extremes) {
     /* [D] W: dwUrlLength >= 0x80000000 is kept as is and the (len+1)*3 allocation overflows -> ERROR_NOT_ENOUGH_MEMORY.
-     * A stops at the NUL. Both: a count that cuts "http://" short -> 12006. */
+     * A stops at the NUL. Both: a count that cuts "http://" short -> 12006.
+     * Review pass 3: a dwUrlLength larger than the string is outside the documented contract ("length of lpszUrl, or
+     * 0"), and the W 0x80000000 result is an allocation-overflow artefact; those rows (big = 1) are no longer
+     * called (the Win10 results stay in the table and EVIDENCE.md). The in-range rows stay hard checks. */
     REQUIRE(U(InternetCrackUrlA)); REQUIRE(U(InternetCrackUrlW));
-    static const struct { DWORD len; int wr; DWORD werr; int ar; DWORD aerr; } v[] = {
-        { 0x7fffffff, 1, 0, 1, 0 }, { 0x80000000, 0, ERROR_NOT_ENOUGH_MEMORY, 1, 0 }, { 0xffffffff, 0, ERROR_NOT_ENOUGH_MEMORY, 1, 0 },
-        { 3, 0, 12006, 0, 12006 }, { 5, 0, 12006, 0, 12006 }, { 7, 0, 12006, 0, 12006 }, { 8, 1, 0, 1, 0 },
+    static const struct { DWORD len; int wr; DWORD werr; int ar; DWORD aerr; int big; } v[] = {
+        { 0x7fffffff, 1, 0, 1, 0, 1 }, { 0x80000000, 0, ERROR_NOT_ENOUGH_MEMORY, 1, 0, 1 }, { 0xffffffff, 0, ERROR_NOT_ENOUGH_MEMORY, 1, 0, 1 },
+        { 3, 0, 12006, 0, 12006, 0 }, { 5, 0, 12006, 0, 12006, 0 }, { 7, 0, 12006, 0, 12006, 0 }, { 8, 1, 0, 1, 0, 0 },
     };
     for (unsigned i = 0; i < sizeof v / sizeof *v; i++) {
+        if (v[i].big) {
+            /* not called: a reimplementation that honours the count would read past the 11-WCHAR literal */
+            t_note("dwUrlLength 0x%lx > string: not run (Win10 22H2 observed W r=%d err=%lu, A r=%d)", v[i].len, v[i].wr, v[i].werr, v[i].ar);
+            continue;
+        }
         URL_COMPONENTSW c; WCHAR h[64]; h[0] = 0;
         zcw(&c); c.lpszHostName = h; c.dwHostNameLength = 64;
         SET_ERR(0xdead);
