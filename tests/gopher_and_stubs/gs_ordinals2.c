@@ -51,6 +51,12 @@ static GROUPID gs_group_with(int n, char urls[][200]) {
     if (!U(CreateUrlCacheGroup) || !U(SetUrlCacheEntryGroupA)) return 0;
     GROUPID g = U(CreateUrlCacheGroup)(0, NULL);
     if (!g) { t_note("CreateUrlCacheGroup failed: %lu", GetLastError()); return 0; }
+    /* [VM boot 3] with the new group's quota of 0 KB, SetUrlCacheEntryGroupA(ADD) failed with 1816
+     * (ERROR_NOT_ENOUGH_QUOTA): give the private group 1 MB first */
+    if (U(SetUrlCacheGroupAttributeA)) {
+        INTERNET_CACHE_GROUP_INFOA gi; memset(&gi, 0, sizeof gi); gi.dwGroupSize = sizeof gi; gi.dwDiskQuota = 1024;
+        if (!U(SetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_QUOTA, &gi, NULL)) t_note("set group quota: %lu", GetLastError());
+    }
     for (int i = 0; i < n; i++) {
         char tag[32]; snprintf(tag, sizeof tag, "gs_ord103_%d", i);
         lstrcpynA(urls[i], t_uniq_cache_url(tag), 200);

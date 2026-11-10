@@ -84,7 +84,7 @@ TEST(gs_exports_wininet_ordinal_bounds) {
     for (size_t i = 0; i < sizeof out / sizeof out[0]; i++) {
         SET_ERR(0);
         CHECKF(GetProcAddress(h, MAKEINTRESOURCEA(out[i])) == NULL, "ordinal %u resolves", out[i]);
-        EXPECT_ERR(ERROR_PROC_NOT_FOUND);
+        EXPECT_ERR(ERROR_INVALID_ORDINAL);   /* [VM boot 3] 182 for ordinals, 127 only for names */
     }
     for (unsigned o = 101; o <= 427; o++) CHECKF(GetProcAddress(h, MAKEINTRESOURCEA(o)) != NULL, "ordinal %u missing", o);
 }

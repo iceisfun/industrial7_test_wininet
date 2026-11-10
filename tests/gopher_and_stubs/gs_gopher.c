@@ -574,9 +574,11 @@ TEST(gs_gopher_open_url_w) {
 TEST(gs_gopher_crack_url_a) {
     REQUIRE(U(InternetCrackUrlA));
     static const struct { const char *url; WORD port; const char *path; } t[] = {
-        { "gopher://gopher.example/1/dir", 70, "/1/dir" },
+        /* [VM boot 3] no default port is filled in for gopher: nPort stays 0 when the URL has none */
+        { "gopher://gopher.example/1/dir", 0, "/1/dir" },
         { "gopher://gopher.example:7070/0/f.txt", 7070, "/0/f.txt" },
-        { "gopher://gopher.example/", 70, "/" },
+        { "gopher://gopher.example:70/", 70, "/" },
+        { "gopher://gopher.example/", 0, "/" },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) {
         char host[64], path[64], scheme[16];
@@ -607,7 +609,7 @@ TEST(gs_gopher_crack_url_w) {
     uc.dwSchemeLength = 1;
     CHECK(U(InternetCrackUrlW)(L"gopher://h.example/1x", 0, 0, &uc));
     EXPECT_EQ(uc.nScheme, INTERNET_SCHEME_GOPHER);
-    EXPECT_EQ(uc.nPort, INTERNET_DEFAULT_GOPHER_PORT);
+    EXPECT_EQ(uc.nPort, 0);   /* [VM] not defaulted to 70 */
     EXPECT_EQ(uc.dwSchemeLength, 6);
     EXPECT_WSTR(host, L"h.example");
     EXPECT_WSTR(path, L"/1x");
@@ -625,7 +627,12 @@ TEST(gs_gopher_create_url_a) {
     SET_ERR(0);
     BOOL r = U(InternetCreateUrlA)(&uc, 0, out, &len);
     CHECKF(r, "e=%lu", GetLastError());
-    if (r) { EXPECT_STR(out, "gopher://h.example/1/dir"); EXPECT_EQ(len, strlen("gopher://h.example/1/dir")); }
+    /* [VM boot 3] gopher has no default port in the URL builder either: 70 is printed explicitly */
+    if (r) { EXPECT_STR(out, "gopher://h.example:70/1/dir"); EXPECT_EQ(len, strlen("gopher://h.example:70/1/dir")); }
+    uc.nPort = 0; len = sizeof out;
+    r = U(InternetCreateUrlA)(&uc, 0, out, &len);
+    CHECK(r);
+    if (r) t_note("CreateUrl gopher port 0: %s", out);
     uc.nPort = 7070; len = sizeof out;
     r = U(InternetCreateUrlA)(&uc, 0, out, &len);
     CHECK(r);

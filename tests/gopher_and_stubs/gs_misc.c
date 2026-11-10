@@ -175,13 +175,21 @@ TEST(gs_hsts_local_hosts_false) {
     REQUIRE(UN(HttpIsHostHstsEnabled));
     char uniq[96]; snprintf(uniq, sizeof uniq, "gs-hsts-%lu.invalid", GetCurrentProcessId());
     WCHAR uw[96]; MultiByteToWideChar(CP_ACP, 0, uniq, -1, uw, 96);
-    const WCHAR *hosts[] = { L"127.0.0.1", L"localhost", L"[::1]", L"::1", L"", L"a", uw, L"example.invalid",
+    const WCHAR *hosts[] = { L"127.0.0.1", L"localhost", L"[::1]", L"a", uw, L"example.invalid",
                              L"127.0.0.1:443", L"LOCALHOST" };
     for (size_t i = 0; i < sizeof hosts / sizeof hosts[0]; i++) {
         BOOL f = 0x5A5A;
         DWORD r = UN(HttpIsHostHstsEnabled)(hosts[i], &f);
         CHECKF(r == 0, "host %zu r=%lu", i, r);
         CHECKF(f == 0, "host %zu enabled=%d", i, f);
+    }
+    /* [VM boot 3] host names the HSTS parser rejects: unbracketed IPv6 -> 12005 (INVALID_URL), empty -> 87;
+     * the out flag is still cleared first */
+    static const struct { const WCHAR *h; DWORD r; } bad[] = { { L"::1", ERROR_INTERNET_INVALID_URL }, { L"", ERROR_INVALID_PARAMETER } };
+    for (size_t i = 0; i < 2; i++) {
+        BOOL f = 0x5A5A;
+        EXPECT_EQ(UN(HttpIsHostHstsEnabled)(bad[i].h, &f), bad[i].r);
+        EXPECT_EQ(f, 0);
     }
 }
 
