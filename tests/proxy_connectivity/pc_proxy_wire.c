@@ -259,9 +259,14 @@ TEST(pc_wire_origin_401_through_proxy) {
 /* Win10: Basic credentials that succeeded for host X are cached process-wide and sent pre-emptively by a NEW session
  * to the same host (observed through a proxy: later requests to that origin carried Authorization without a 401). */
 TEST(pc_wire_origin_basic_creds_cached_across_sessions) {
-    static const srv_step st[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"c\"\r\n", "no"),
+    /* connection 0: 401 then 200s; any later connection: 200s. The second session may or may not reuse the pooled
+     * proxy connection (VM boot 3: it did not), so the status must not depend on the script position. */
+    static const srv_step c0[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"c\"\r\n", "no"),
                                    S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP_TO(2) };
-    HTTP_OR_SKIP(p, st);
+    static const srv_step c1[] = { S_HEAD(), S_REPLY(200, NULL, "yes"), S_LOOP() };
+    static const srv_script sc[] = { SRV_SCRIPT(c0), SRV_SCRIPT(c1) };
+    srv_config cfg = { SRV_HTTP, sc, 2 }; srv *p;
+    START_OR_SKIP(&cfg, &p);
     const char *host = t_uniq_host("cc");
     HINTERNET h = pc_open_proxy(srv_hostport(p), NULL);
     HINTERNET hc = U(InternetConnectA)(h, host, 80, "cuser", "cpass", INTERNET_SERVICE_HTTP, 0, 0);
