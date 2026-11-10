@@ -32,6 +32,10 @@ void t_check(int ok, const char *file, int line, const char *expr, const char *f
     if (fmt) { va_list a; va_start(a, fmt); printf(" ("); vprintf(fmt, a); printf(")"); va_end(a); }
     printf("\n");
 }
+void t_check_str(const char *a, const char *b, const char *file, int line, const char *expr) {
+    int ok = (a && b) ? !strcmp(a, b) : a == b;
+    t_check(ok, file, line, expr, "got \"%s\" want \"%s\"", a ? a : "(null)", b ? b : "(null)");
+}
 void t_note(const char *fmt, ...) { va_list a; va_start(a, fmt); printf("  NOTE "); vprintf(fmt, a); printf("\n"); va_end(a); }
 void t_skip(const char *fmt, ...) { va_list a; va_start(a, fmt); printf("  SKIP "); vprintf(fmt, a); printf("\n"); va_end(a); g_cur_skip = 1; }
 
