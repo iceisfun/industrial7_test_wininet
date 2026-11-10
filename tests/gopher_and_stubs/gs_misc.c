@@ -626,6 +626,9 @@ TEST(gs_group_attr_roundtrip) {
     INTERNET_CACHE_GROUP_INFOA back; memset(&back, 0, sizeof back); len = sizeof back;
     CHECK(UN(GetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_GET_ALL, &back, &len, NULL));
     EXPECT_STR(back.szGroupName, name);
+    /* [D GetUrlCacheGroupAttributeA@0x1a1080] dwGroupSize is never written; *len is set to 156 */
+    EXPECT_EQ(back.dwGroupSize, 0);
+    EXPECT_EQ(len, sizeof back);
     EXPECT_EQ(back.dwOwnerStorage[0], 0x11);
     EXPECT_EQ(back.dwOwnerStorage[3], 0x44);
     CHECK(U(DeleteUrlCacheGroup)(g, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, NULL));
