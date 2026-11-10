@@ -19,6 +19,8 @@ TEST(hci_misc_post_not_cached_under_url) {
     EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "posted");
     CHECK(!hci_exists(url));
     t_note("POST without secondary key: datafile=%s err=%lu reqflags=0x%lx", r.datafile, r.datafile_err, r.reqflags);
+    EXPECT_EQ(r.datafile_err, ERROR_INTERNET_ITEM_NOT_FOUND);   /* VM */
+    EXPECT_EQ(r.reqflags, INTERNET_REQFLAG_CACHE_WRITE_DISABLED);
     srv_stop(s);
 }
 
@@ -70,6 +72,8 @@ TEST(hci_misc_post_with_secondary_key_cached) {
     t_note("POST + secondary key: url option=%s datafile=%s exists(url)=%d exists(url+key)=%d", r.url_opt, r.datafile, hci_exists(url), hci_exists(keyed));
     CHECK(!hci_exists(url));
     CHECK(hci_exists(keyed));
+    EXPECT_STR(r.url_opt, url);                       /* VM: INTERNET_OPTION_URL is the plain URL after the send */
+    CHECK(strstr(r.datafile, "postkeyKEY123[1]") != NULL);   /* VM: the key is part of the file name */
     srv_stop(s);
 }
 
@@ -88,6 +92,8 @@ TEST(hci_misc_get_with_secondary_key) {
     EXPECT_STR(srv_req_target(s, 0), strchr(url + 7, '/'));   /* the key never reaches the wire */
     t_note("GET + secondary key: url option=%s exists(url)=%d exists(url+key)=%d", r.url_opt, hci_exists(url), hci_exists(keyed));
     CHECK(hci_exists(keyed));
+    CHECK(!hci_exists(url));
+    EXPECT_STR(r.url_opt, url);
     srv_stop(s);
 }
 
@@ -119,16 +125,21 @@ TEST(hci_misc_secondary_key_query_before_set) {
     char q[64] = "unchanged"; DWORD l = sizeof q; SetLastError(0);
     BOOL ok = U(InternetQueryOptionA)(hr, INTERNET_OPTION_SECONDARY_CACHE_KEY, q, &l);
     t_note("SECONDARY_CACHE_KEY query before set: ok=%d err=%lu len=%lu val=%s", ok, GetLastError(), l, ok ? q : "");
+    CHECK(ok); EXPECT_EQ(l, 0); EXPECT_STR(q, "");      /* VM: an empty string */
     /* set then query: A answers bytes incl. NUL? (02 7: W counts chars) */
     CHECK(U(InternetSetOptionA)(hr, INTERNET_OPTION_SECONDARY_CACHE_KEY, "abc", 3));
     l = sizeof q; CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_SECONDARY_CACHE_KEY, q, &l));
     EXPECT_STR(q, "abc");
     t_note("SECONDARY_CACHE_KEY query after set: len=%lu", l);
+    EXPECT_EQ(l, 3);
     CHECK(U(InternetSetOptionA)(hr, INTERNET_OPTION_SECONDARY_CACHE_KEY, "defg", 4));
     l = sizeof q; CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_SECONDARY_CACHE_KEY, q, &l));
     EXPECT_STR(q, "defg");
     char url[512]; l = sizeof url; CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_URL, url, &l));
     t_note("URL option after two keys: %s", url);
+    l = sizeof q; CHECK(U(InternetQueryOptionA)(hr, INTERNET_OPTION_SECONDARY_CACHE_KEY, q, &l)); EXPECT_EQ(l, 4);
+    /* VM: before the send INTERNET_OPTION_URL is URL + the FIRST key; the default port is not spelled out */
+    EXPECT_STR(url, "http://127.0.0.1/xabc");
     t_inet_close(hr); t_inet_close(hc); t_inet_close(hi);
 }
 
@@ -193,6 +204,8 @@ TEST(hci_misc_put_invalidates_entry) {
     hci_req(hi, s, "PUT", url, 0, NULL, "new", 3, NULL, NULL, &b);
     t_inet_close(hi);
     t_note("GET entry after PUT to the same URL: exists=%d", hci_exists(url));
+    CHECK(hci_exists(url));                           /* VM: a PUT does not invalidate the GET entry */
+    EXPECT_EQ(hci_reqs(s, 2), 2);
     srv_stop(s);
 }
 
@@ -220,6 +233,10 @@ TEST(hci_misc_redirect_301_cached) {
     hci_get(hi, src, NULL, 0, &b);
     t_inet_close(hi);
     t_note("second GET of 301 source: requests=%d body=%s url=%s", hci_reqs(s, 0), b.body, b.url_opt);
+    /* VM: a cached redirect is only followed from the cache with ENABLE_REDIRECT_CACHE_READ; the source goes to the net */
+    EXPECT_EQ(hci_reqs(s, 0), 3);
+    EXPECT_STR(b.body, "again");
+    EXPECT_STR(b.url_opt, src);
     free(es); free(ed);
     srv_stop(s);
 }
@@ -261,6 +278,8 @@ TEST(hci_misc_redirect_no_auto_redirect_not_followed_entry) {
     EXPECT_EQ(hci_reqs(s, 0), 1);
     CHECK(!hci_exists(dst));
     t_note("301 with NO_AUTO_REDIRECT: source cached=%d body=%s", hci_exists(src), r.body);
+    CHECK(!hci_exists(src));                          /* VM: an unfollowed redirect is not cached */
+    EXPECT_STR(r.body, "moved");
     srv_stop(s);
 }
 
@@ -287,9 +306,13 @@ TEST(hci_misc_redirect_cache_read_option_validation) {
     v = 0; CHECK(U(InternetSetOptionA)(hr, INTERNET_OPTION_ENABLE_REDIRECT_CACHE_READ, &v, 4));
     DWORD q = 0x55, l = sizeof q; SetLastError(0);
     BOOL ok = U(InternetQueryOptionA)(hr, INTERNET_OPTION_ENABLE_REDIRECT_CACHE_READ, &q, &l);
-    t_note("ENABLE_REDIRECT_CACHE_READ query: ok=%d err=%lu val=%lu", ok, GetLastError(), q);
+    DWORD qe = GetLastError();
+    t_note("ENABLE_REDIRECT_CACHE_READ query: ok=%d err=%lu val=%lu", ok, qe, q);
+    CHECK(!ok); EXPECT_EQ(qe, ERROR_INVALID_PARAMETER); EXPECT_EQ(q, 0x55);   /* VM: set-only option */
     SetLastError(0); ok = U(InternetSetOptionA)(NULL, INTERNET_OPTION_ENABLE_REDIRECT_CACHE_READ, &v, 4);
-    t_note("ENABLE_REDIRECT_CACHE_READ on NULL handle: ok=%d err=%lu", ok, GetLastError());
+    DWORD ne = GetLastError();
+    t_note("ENABLE_REDIRECT_CACHE_READ on NULL handle: ok=%d err=%lu", ok, ne);
+    CHECK(!ok); EXPECT_EQ(ne, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     t_inet_close(hr); t_inet_close(hc); t_inet_close(hi);
 }
 
@@ -313,6 +336,12 @@ TEST(hci_misc_redirect_cache_read_follow) {
         t_note("ENABLE_REDIRECT_CACHE_READ=%lu: first=%d/%s second=%d/%s from_cache=%d requests=%d url=%s", vals[k], a.status, a.body, b.status, b.body,
                hci_from_cache(&b), hci_reqs(s, 0), b.url_opt);
         EXPECT_STR(a.body, "target");
+        CHECK(c2.ok);
+        /* VM: 0 -> the source is asked again and its answer (reply 2) is used; 1 -> the redirect entry is followed */
+        CHECKF(hci_reqs(s, 0) == (vals[k] ? 2 : 3), "v=%lu requests %d", vals[k], srv_req_count(s));
+        EXPECT_STR(b.body, vals[k] ? "target" : "network-again");
+        CHECK(hci_from_cache(&b) == (vals[k] != 0));
+        EXPECT_STR(b.url_opt, vals[k] ? dst : src);
         srv_stop(s);
     }
 }
@@ -372,12 +401,19 @@ TEST(hci_misc_https_cache_hit) {
     const char *url = hci_url(s, "httpshit");
     HINTERNET hi = hci_open(); hci_resp a, b;
     hci_req(hi, s, "GET", url, 0, NULL, NULL, 0, NULL, NULL, &a);
+    DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
+    hci_note_entry("https entry", e);
+    CHECK(e != NULL);
+    free(e);
     hci_req(hi, s, "GET", url, 0, NULL, NULL, 0, NULL, NULL, &b);
+    int n2 = hci_reqs(s, 0);
+    hci_resp c; hci_req(hi, s, "GET", url, INTERNET_FLAG_FROM_CACHE, NULL, NULL, 0, NULL, NULL, &c);
+    int n3 = hci_reqs(s, 0);
     t_inet_close(hi);
     EXPECT_STR(b.body, "tls-cached");
-    EXPECT_EQ(hci_reqs(s, 0), 1);
-    CHECK(hci_from_cache(&b));
-    t_note("HTTPS cache hit: TLS handshakes=%d", srv_count_events(s, SRV_EV_TLS_DONE));
+    /* VM boot 1: the second HTTPS GET (ignore-unknown-CA request) went to the network: 2 requests, 2 handshakes */
+    t_note("HTTPS second GET: requests=%d from_cache=%d reqflags=0x%lx handshakes=%d; FROM_CACHE: ok=%d err=%lu body=%s requests=%d",
+           n2, hci_from_cache(&b), b.reqflags, srv_count_events(s, SRV_EV_TLS_DONE), c.ok, c.err, c.body, n3);
     srv_stop(s);
 }
 
@@ -396,7 +432,11 @@ TEST(hci_misc_vary_table) {
         hci_get(hi, url, NULL, 0, &b);
         t_inet_close(hi);
         t_note("Vary: %-28s stored=%d requests=%d second=%s", vary[k], stored, hci_reqs(s, 0), b.body);
-        if (!strcmp(vary[k], "Accept-Encoding")) { CHECK(stored); EXPECT_EQ(hci_reqs(s, 0), 1); }
+        /* VM: Vary: * and Vary: Cookie are never stored; any other Vary is stored and served */
+        int want = strcmp(vary[k], "*") && strcmp(vary[k], "Cookie");
+        CHECKF(stored == want, "Vary %s stored %d", vary[k], stored);
+        CHECKF(hci_reqs(s, 0) == (want ? 1 : 2), "Vary %s requests %d", vary[k], srv_req_count(s));
+        CHECKF(!strcmp(b.body, want ? "vary1" : "vary2"), "Vary %s body %s", vary[k], b.body);
         srv_stop(s);
     }
 }
@@ -442,10 +482,14 @@ TEST(hci_misc_gzip_stored_form_with_decoding) {
     CHECK(e != NULL);
     if (e) {
         char buf[2048]; size_t n; hci_file_read(e->lpszLocalFileName, buf, sizeof buf, &n);
-        t_note("decoding on: cached size=%lu file=%zu (gzip %zu, plain %d) first bytes %02x %02x", e->dwSizeLow, n, srv_fox_gzip_len, SRV_FOX_LEN, (unsigned char)buf[0], (unsigned char)buf[1]);
-        CHECK(n == srv_fox_gzip_len && !memcmp(buf, srv_fox_gzip, n));
+        t_note("decoding on: cached size=%lu file=%zu (gzip %zu, plain %d) first bytes %02x %02x; blob keeps Content-Encoding=%d", e->dwSizeLow, n, srv_fox_gzip_len, SRV_FOX_LEN,
+               (unsigned char)buf[0], (unsigned char)buf[1], hci_hdr_has(e, "Content-Encoding"));
+        /* VM: with HTTP_DECODING on, the cache file holds the DECODED body */
+        EXPECT_EQ(e->dwSizeLow, SRV_FOX_LEN);
+        CHECK(hci_file_eq(e->lpszLocalFileName, srv_fox_text(), SRV_FOX_LEN));
     }
     t_note("decoding on, second GET: requests=%d len=%zu", hci_reqs(s, 0), b.len);
+    EXPECT_EQ(hci_reqs(s, 0), 1);
     EXPECT_EQ(b.len, SRV_FOX_LEN);
     CHECK(b.len == SRV_FOX_LEN && !memcmp(b.body, srv_fox_text(), SRV_FOX_LEN));
     free(e);
@@ -507,6 +551,7 @@ TEST(hci_misc_datafile_name_buffer_too_small) {
         WCHAR w[MAX_PATH + 1]; DWORD lw = sizeof w;
         CHECK(U(InternetQueryOptionW)(h, INTERNET_OPTION_DATAFILE_NAME, w, &lw));
         t_note("DATAFILE_NAME W len=%lu (wcslen %zu)", lw, wcslen(w));
+        EXPECT_EQ(lw, wcslen(w));
         char buf[64]; DWORD rd; while (U(InternetReadFile)(h, buf, sizeof buf, &rd) && rd) ;
         U(InternetCloseHandle)(h);
     }
@@ -540,11 +585,14 @@ TEST(hci_misc_entry_locked_while_handle_open) {
         BOOL del = U(DeleteUrlCacheEntryA)(url);
         DWORD derr = GetLastError();
         t_note("DeleteUrlCacheEntry while a cache-read handle is open: ok=%d err=%lu; file exists=%d entry exists=%d", del, derr, hci_file_exists(df), hci_exists(url));
+        CHECK(!del); EXPECT_EQ(derr, ERROR_SHARING_VIOLATION);    /* VM: refused, but the delete is remembered */
+        CHECK(hci_file_exists(df));
         char buf[64]; DWORD rd = 0; BOOL rok = U(InternetReadFile)(h, buf, sizeof buf - 1, &rd); buf[rd] = 0;
         t_note("  read after delete: ok=%d %s", rok, buf);
         CHECK(rok); EXPECT_STR(buf, "lock-me");
         U(InternetCloseHandle)(h);
         t_note("  after close: file exists=%d entry exists=%d", hci_file_exists(df), hci_exists(url));
+        CHECK(!hci_exists(url));                      /* VM: the pending delete happens on the last unlock */
     }
     t_inet_close(hi);
     srv_stop(s);
@@ -567,6 +615,7 @@ TEST(hci_misc_datafile_share_mode_while_open) {
         DWORD e2 = GetLastError();
         t_note("cache file during download: open(share all)=%d err=%lu open(share read only)=%d err=%lu", f1 != INVALID_HANDLE_VALUE, e1, f2 != INVALID_HANDLE_VALUE, e2);
         CHECK(f1 != INVALID_HANDLE_VALUE);
+        CHECK(f2 == INVALID_HANDLE_VALUE); EXPECT_EQ(e2, ERROR_SHARING_VIOLATION);   /* VM: wininet holds it open for writing */
         if (f1 != INVALID_HANDLE_VALUE) CloseHandle(f1);
         if (f2 != INVALID_HANDLE_VALUE) CloseHandle(f2);
         char buf[64]; DWORD rd; while (U(InternetReadFile)(h, buf, sizeof buf, &rd) && rd) ;
@@ -629,6 +678,7 @@ TEST(hci_misc_deleted_file_behind_wininet) {
     hci_get(hi, url, NULL, 0, &b);
     t_inet_close(hi);
     t_note("cache file deleted behind wininet: second body=%s requests=%d", b.body, hci_reqs(s, 0));
+    EXPECT_EQ(hci_reqs(s, 0), 2);
     EXPECT_STR(b.body, "refetched");
     free(e);
     srv_stop(s);
@@ -668,6 +718,7 @@ TEST(hci_misc_use_count_while_reading) {
     HINTERNET h = U(InternetOpenUrlA)(hi, url, NULL, 0, 0, 0);
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
     if (e) t_note("use count with an open cache-read handle: %lu", e->dwUseCount);
+    CHECK(e && e->dwUseCount == 1);
     if (h) U(InternetCloseHandle)(h);
     INTERNET_CACHE_ENTRY_INFOA *e2 = hci_info(url, &err);
     if (e2) t_note("use count after close: %lu", e2->dwUseCount);

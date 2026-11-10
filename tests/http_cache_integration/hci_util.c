@@ -205,3 +205,56 @@ void hci_note_entry(const char *what, const INTERNET_CACHE_ENTRY_INFOA *e) {
 }
 BOOL hci_delete(const char *url) { return U(DeleteUrlCacheEntryA)(url); }
 int hci_reqs(srv *s, int n) { if (n > 0) srv_wait_requests(s, n, 1500); return srv_req_count(s); }
+
+/* ---------------------------------------------------------------- pass-2 helpers */
+INTERNET_CACHE_ENTRY_INFOA *hci_fetch(const char *url, const char *hdrs, DWORD flags, hci_resp *r) {
+    HINTERNET hi = hci_open();
+    hci_get(hi, url, hdrs, flags, r);
+    t_inet_close(hi);
+    DWORD e; return hci_info(url, &e);
+}
+int hci_near(LONGLONG v, LONGLONG want, LONGLONG tol) { LONGLONG d = v - want; if (d < 0) d = -d; return d <= tol * HCI_SEC; }
+FILETIME hci_ft_make(LONGLONG t) { FILETIME f; f.dwLowDateTime = (DWORD)t; f.dwHighDateTime = (DWORD)((ULONGLONG)t >> 32); return f; }
+FILETIME hci_ft_off(LONGLONG off) { return hci_ft_make(hci_ft_now() + off * HCI_SEC); }
+BOOL hci_set_times(const char *url, LONGLONG exp_off, LONGLONG lm_off, LONGLONG sync_off) {
+    INTERNET_CACHE_ENTRY_INFOA ci; memset(&ci, 0, sizeof ci); ci.dwStructSize = sizeof ci;
+    DWORD fc = 0;
+    if (exp_off != HCI_KEEP) { ci.ExpireTime = hci_ft_off(exp_off); fc |= CACHE_ENTRY_EXPTIME_FC; }
+    if (lm_off != HCI_KEEP) { ci.LastModifiedTime = hci_ft_off(lm_off); fc |= CACHE_ENTRY_MODTIME_FC; }
+    if (sync_off != HCI_KEEP) { ci.LastSyncTime = hci_ft_off(sync_off); fc |= CACHE_ENTRY_SYNCTIME_FC; }
+    return U(SetUrlCacheEntryInfoA)(url, &ci, fc);
+}
+BOOL hci_set_type(const char *url, DWORD type) {
+    INTERNET_CACHE_ENTRY_INFOA ci; memset(&ci, 0, sizeof ci); ci.dwStructSize = sizeof ci; ci.CacheEntryType = type;
+    return U(SetUrlCacheEntryInfoA)(url, &ci, CACHE_ENTRY_ATTRIBUTE_FC);
+}
+int hci_file_eq(const char *path, const void *p, size_t n) {
+    if (!path || !path[0]) return 0;
+    HANDLE f = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, 0, NULL);
+    if (f == INVALID_HANDLE_VALUE) return 0;
+    char *b = malloc(n + 2); DWORD rd = 0, tot = 0; int ok = 1;
+    while (tot < n + 1 && ReadFile(f, b + tot, (DWORD)(n + 1 - tot), &rd, NULL) && rd) tot += rd;
+    CloseHandle(f);
+    ok = tot == n && !memcmp(b, p, n);
+    free(b);
+    return ok;
+}
+LONGLONG hci_ft_utc(int y, int mo, int d, int h, int mi, int s) {
+    SYSTEMTIME st; memset(&st, 0, sizeof st);
+    st.wYear = (WORD)y; st.wMonth = (WORD)mo; st.wDay = (WORD)d; st.wHour = (WORD)h; st.wMinute = (WORD)mi; st.wSecond = (WORD)s;
+    FILETIME f; if (!SystemTimeToFileTime(&st, &f)) return -1;
+    return hci_ft(f);
+}
+const char *hci_rh(srv *s, int i, const char *name) { return i < srv_req_count(s) ? srv_req_header(s, i, name) : NULL; }
+int hci_seed(const char *url, const char *body, const char *hdrs, DWORD type, LONGLONG exp_sec, LONGLONG lm_sec) {
+    char path[MAX_PATH + 1];
+    if (!U(CreateUrlCacheEntryA)(url, 0, "txt", path, 0)) return 0;
+    HANDLE f = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
+    if (f == INVALID_HANDLE_VALUE) return 0;
+    DWORD w; WriteFile(f, body, (DWORD)strlen(body), &w, NULL); CloseHandle(f);
+    FILETIME ex = {0}, lm = {0};
+    if (exp_sec) ex = hci_ft_off(exp_sec);
+    if (lm_sec) lm = hci_ft_off(lm_sec);
+    t_cache_track(url);
+    return U(CommitUrlCacheEntryA)(url, path, ex, lm, type, (BYTE *)hdrs, hdrs ? (DWORD)strlen(hdrs) : 0, "txt", NULL);
+}

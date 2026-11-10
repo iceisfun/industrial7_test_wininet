@@ -89,4 +89,35 @@ void hci_note_entry(const char *what, const INTERNET_CACHE_ENTRY_INFOA *e);
 BOOL hci_delete(const char *url);
 /* wait until the server saw n requests (short, bounded) then return the count */
 int  hci_reqs(srv *s, int n);
+
+/* ---------------------------------------------------------------- pass-2 helpers */
+/* one GET on a fresh session (flags, optional request headers), then the entry info (malloc'd or NULL) */
+INTERNET_CACHE_ENTRY_INFOA *hci_fetch(const char *url, const char *hdrs, DWORD flags, hci_resp *r);
+/* |v - want| <= tol seconds */
+int  hci_near(LONGLONG v, LONGLONG want, LONGLONG tol_sec);
+/* FILETIME for now + off seconds */
+FILETIME hci_ft_off(LONGLONG off_sec);
+FILETIME hci_ft_make(LONGLONG ticks);
+/* SetUrlCacheEntryInfoA with only the given time field(s): pass HCI_KEEP to leave a field alone */
+#define HCI_KEEP 0x7fffffffffffffffLL
+BOOL hci_set_times(const char *url, LONGLONG exp_off, LONGLONG lm_off, LONGLONG sync_off);
+BOOL hci_set_type(const char *url, DWORD type);
+/* local file content equals p[0..n) */
+int  hci_file_eq(const char *path, const void *p, size_t n);
+/* FILETIME of a fixed UTC date */
+LONGLONG hci_ft_utc(int y, int mo, int d, int h, int mi, int s);
+/* expected headers on request i (NULL = must be absent) */
+const char *hci_rh(srv *s, int i, const char *name);
+/* create + commit an entry through the cache API (type, header blob, expire/lm offsets in seconds, 0 = none) */
+int  hci_seed(const char *url, const char *body, const char *hdrs, DWORD type, LONGLONG exp_sec, LONGLONG lm_sec);
+#ifndef INTERNET_FLAG_FWD_BACK
+#define INTERNET_FLAG_FWD_BACK 0x00000020
+#endif
+#ifndef INTERNET_REQFLAG_NET_TIMEOUT
+#define INTERNET_REQFLAG_NET_TIMEOUT 0x00000080
+#endif
+#ifndef INTERNET_REQFLAG_NO_HEADERS
+#define INTERNET_REQFLAG_NO_HEADERS 0x00000008
+#endif
+#define HCI_HTTP_ENTRY 0x41    /* NORMAL_CACHE_ENTRY | 0x40: what an HTTP download commits (VM) */
 #endif

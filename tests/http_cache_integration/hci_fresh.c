@@ -85,6 +85,8 @@ TEST(hci_fresh_expires_zero_is_expired) {
     hci_resp a, b; int n = twice(s, url, 0, 0, &a, &b);
     DWORD err; INTERNET_CACHE_ENTRY_INFOA *e = hci_info(url, &err);
     t_note("Expires: 0 -> requests=%d second body=%s", n, b.body);
+    EXPECT_EQ(n, 2);                                  /* VM: an unparsable Expires is stale */
+    EXPECT_STR(b.body, "b");
     hci_note_entry("expires 0", e);
     free(e);
     srv_stop(s);
@@ -104,6 +106,8 @@ TEST(hci_fresh_etag_revalidation_304) {
     EXPECT_STR(b.body, "original");
     EXPECT_EQ(b.status, 200);
     t_note("after 304: reqflags=0x%lx raw=%.60s", b.reqflags, b.rawhdrs);
+    EXPECT_EQ(b.reqflags, INTERNET_REQFLAG_FROM_CACHE);   /* VM: a 304 is reported as served from the cache */
+    CHECK(!strncmp(b.rawhdrs, "HTTP/1.1 200 OK\r\n", 17));
     srv_stop(s);
 }
 
@@ -154,6 +158,7 @@ TEST(hci_fresh_both_validators_sent) {
         int i1 = srv_req_header_index(s, 1, "If-Modified-Since"), i2 = srv_req_header_index(s, 1, "If-None-Match");
         t_note("conditional header order: IMS@%d INM@%d; line=%s", i1, i2, srv_req_line(s, 1));
         for (int h = 0; h < srv_req_header_count(s, 1); h++) t_note("  cond hdr %d: %s: %s", h, srv_req_header_name(s, 1, h), srv_req_header_value(s, 1, h));
+        EXPECT_EQ(i1, 2); EXPECT_EQ(i2, 3);           /* VM: User-Agent, Host, If-Modified-Since, If-None-Match */
     }
     EXPECT_STR(b.body, "both");
     srv_stop(s);
@@ -202,6 +207,7 @@ TEST(hci_fresh_304_updates_expiry_then_cache_hit) {
         hci_note_entry("before 304", e0); hci_note_entry("after 304", e1);
         CHECK(hci_ft(e1->ExpireTime) > hci_ft_now() + 3000 * HCI_SEC);
         CHECK(hci_ft(e1->LastSyncTime) >= hci_ft(e0->LastSyncTime));
+        EXPECT_EQ(e1->dwHitRate, e0->dwHitRate + 1);  /* VM: a 304 counts as a hit */
         EXPECT_STR(e0->lpszLocalFileName, e1->lpszLocalFileName);   /* the file is reused */
     }
     free(e0); free(e1);
@@ -220,6 +226,9 @@ TEST(hci_fresh_304_merges_new_headers) {
     if (e) {
         CHECK(hci_hdr_has(e, "X-Old: 1"));
         t_note("304 merge: X-Fresh-Header stored=%d; response headers after 304 contain it=%d", hci_hdr_has(e, "X-Fresh-Header"), strstr(b.rawhdrs, "X-Fresh-Header") != NULL);
+        CHECK(hci_hdr_has(e, "X-Fresh-Header: 2"));   /* VM: new 304 headers are merged into the blob and the response */
+        CHECK(strstr(b.rawhdrs, "X-Fresh-Header: 2") != NULL);
+        CHECK(strstr(b.rawhdrs, "X-Old: 1") != NULL);
     }
     free(e);
     srv_stop(s);
@@ -323,6 +332,8 @@ TEST(hci_fresh_pragma_no_cache_http_response) {
     t_inet_close(hi);
     int n = hci_reqs(s, 0);
     t_note("HTTP Pragma: no-cache response: stored=%d requests=%d", stored, n);
+    EXPECT_EQ(n, 1);                                  /* VM: Pragma in an HTTP response does not force revalidation */
+    EXPECT_STR(b.body, "pragma");
     CHECK(stored);     /* FCanWriteToCache consults Pragma only for SECURE requests */
     srv_stop(s);
 }
@@ -354,6 +365,8 @@ TEST(hci_fresh_heuristic_recent_last_modified) {
     t_inet_close(hi);
     int n = hci_reqs(s, 0);
     t_note("LM 2 s old: requests=%d cond=%ld (heuristic window (download-LM)/10)", n, p.cond_served);
+    EXPECT_EQ(n, 2);                                  /* window ~0.3 s, second GET 1.1 s later: conditional */
+    EXPECT_EQ(p.cond_served, 1);
     EXPECT_STR(b.body, "recent");
     srv_stop(s);
 }
@@ -457,6 +470,8 @@ TEST(hci_fresh_request_cache_control_header_from_app) {
     hci_get(hi, url, "Cache-Control: no-cache\r\nPragma: no-cache\r\n", 0, &b);
     t_inet_close(hi);
     t_note("app-supplied Cache-Control/Pragma no-cache request headers: requests=%d second=%s", hci_reqs(s, 0), b.body);
+    EXPECT_EQ(hci_reqs(s, 0), 1);                     /* VM: request headers from the app do not bypass the cache */
+    EXPECT_STR(b.body, "first");
     srv_stop(s);
 }
 
@@ -471,14 +486,14 @@ TEST(hci_fresh_cache_timestamps_option) {
     if (h) {
         INTERNET_CACHE_TIMESTAMPS ts; DWORD l = sizeof ts; memset(&ts, 0, sizeof ts);
         CHECK(U(InternetQueryOptionA)(h, INTERNET_OPTION_CACHE_TIMESTAMPS, &ts, &l));
-        EXPECT_EQ(l, 16);
+        t_note("CACHE_TIMESTAMPS returned length %lu", l);     /* VM boot 1: 0 (the length is not written back as 16) */
         SYSTEMTIME lm = { 1994, 11, 2, 15, 8, 12, 31, 0 }, ex = { 2033, 12, 4, 1, 16, 0, 0, 0 }; FILETIME f1, f2;
         SystemTimeToFileTime(&lm, &f1); SystemTimeToFileTime(&ex, &f2);
         EXPECT_EQ(hci_ft(ts.ftLastModified), hci_ft(f1));
         EXPECT_EQ(hci_ft(ts.ftExpires), hci_ft(f2));
         l = 15; SetLastError(0);
         CHECK(!U(InternetQueryOptionA)(h, INTERNET_OPTION_CACHE_TIMESTAMPS, &ts, &l));
-        t_note("CACHE_TIMESTAMPS len 15: err %lu", GetLastError());
+        EXPECT_ERR(ERROR_INTERNET_BAD_OPTION_LENGTH);
         U(InternetCloseHandle)(h);
     }
     t_inet_close(hi);

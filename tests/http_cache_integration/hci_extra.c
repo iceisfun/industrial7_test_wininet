@@ -12,6 +12,9 @@ TEST(hci_extra_http09_response_not_cached) {
     const char *url = hci_url(s, "http09");
     HINTERNET hi = hci_open(); hci_resp r; hci_get(hi, url, NULL, 0, &r); t_inet_close(hi);
     t_note("HTTP/0.9: ok=%d err=%lu status=%d body=%s", r.ok, r.err, r.status, r.body);
+    CHECK(r.ok);
+    EXPECT_EQ(r.status, 200);
+    EXPECT_STR(r.body, "raw http/0.9 bytes");
     CHECK(!hci_exists(url));
     srv_stop(s);
 }
@@ -44,7 +47,10 @@ TEST(hci_extra_cache_stream_handle_option) {
     if (h) {
         HANDLE hs = NULL; DWORD l = sizeof hs; SetLastError(0);
         BOOL ok = U(InternetQueryOptionA)(h, INTERNET_OPTION_CACHE_STREAM_HANDLE, &hs, &l);
-        t_note("CACHE_STREAM_HANDLE on cache-served handle: ok=%d err=%lu h=%p len=%lu", ok, GetLastError(), hs, l);
+        DWORD e = GetLastError();
+        t_note("CACHE_STREAM_HANDLE on cache-served handle: ok=%d err=%lu h=%p len=%lu", ok, e, hs, l);
+        CHECK(!ok);
+        EXPECT_EQ(e, ERROR_INSUFFICIENT_BUFFER);      /* VM */
         U(InternetCloseHandle)(h);
     }
     h = U(InternetOpenUrlA)(hi, url2, NULL, 0, INTERNET_FLAG_RELOAD | INTERNET_FLAG_NO_CACHE_WRITE, 0);
@@ -52,8 +58,10 @@ TEST(hci_extra_cache_stream_handle_option) {
     if (h) {
         HANDLE hs = NULL; DWORD l = sizeof hs; SetLastError(0);
         BOOL ok = U(InternetQueryOptionA)(h, INTERNET_OPTION_CACHE_STREAM_HANDLE, &hs, &l);
-        t_note("CACHE_STREAM_HANDLE on NO_CACHE_WRITE handle: ok=%d err=%lu", ok, GetLastError());
+        DWORD e = GetLastError();
+        t_note("CACHE_STREAM_HANDLE on NO_CACHE_WRITE handle: ok=%d err=%lu", ok, e);
         CHECK(!ok);
+        EXPECT_EQ(e, ERROR_INVALID_FUNCTION);         /* VM */
         char b[64]; DWORD rd; while (U(InternetReadFile)(h, b, sizeof b, &rd) && rd) ;
         U(InternetCloseHandle)(h);
     }
@@ -78,6 +86,11 @@ TEST(hci_extra_secondary_key_post_reuse) {
     t_inet_close(hi);
     t_note("POST key reuse: bodies %s/%s/%s requests=%d existsA=%d existsB=%d", r1.body, r2.body, r3.body, hci_reqs(s, 0), hci_exists(ka), hci_exists(kb));
     EXPECT_STR(r1.body, "k1");
+    EXPECT_STR(r2.body, "k1");                        /* VM: the same key serves the second POST from the cache */
+    EXPECT_STR(r3.body, "k2");
+    EXPECT_EQ(hci_reqs(s, 0), 2);
+    CHECK(hci_from_cache(&r2));
+    CHECK(!hci_from_cache(&r3));
     CHECK(hci_exists(ka));
     CHECK(hci_exists(kb));
     srv_stop(s);
@@ -94,6 +107,10 @@ TEST(hci_extra_secondary_key_post_from_cache) {
     hci_req(hi, s, "POST", url, INTERNET_FLAG_FROM_CACHE, NULL, "x=1", 3, set_key_k, "OFF", &r2);
     t_inet_close(hi);
     t_note("POST FROM_CACHE with key: ok=%d err=%lu body=%s requests=%d", r2.ok, r2.err, r2.body, hci_reqs(s, 0));
+    CHECK(r2.ok);                                     /* VM: a keyed POST entry is readable offline */
+    EXPECT_STR(r2.body, "post-resp");
+    EXPECT_EQ(hci_reqs(s, 0), 1);
+    CHECK(hci_from_cache(&r2));
     srv_stop(s);
 }
 
@@ -110,10 +127,11 @@ TEST(hci_extra_request_flags_before_send) {
         DWORD v = 0, l = sizeof v; SetLastError(0);
         BOOL ok = U(InternetQueryOptionA)(hr, INTERNET_OPTION_REQUEST_FLAGS, &v, &l);
         t_note("before send %s flags 0x%lx: REQUEST_FLAGS ok=%d err=%lu val=0x%lx", rows[k].verb, rows[k].f, ok, GetLastError(), v);
-        if (ok && (!strcmp(rows[k].verb, "HEAD") || !strcmp(rows[k].verb, "PUT") || rows[k].f == INTERNET_FLAG_NO_CACHE_WRITE))
-            CHECKF(v & INTERNET_REQFLAG_CACHE_WRITE_DISABLED, "%s 0x%lx reqflags 0x%lx", rows[k].verb, rows[k].f, v);
-        if (ok && rows[k].f == 0 && (!strcmp(rows[k].verb, "GET") || !strcmp(rows[k].verb, "POST")))
-            CHECKF(!(v & INTERNET_REQFLAG_CACHE_WRITE_DISABLED), "%s reqflags 0x%lx", rows[k].verb, v);
+        /* VM: before HttpSendRequest the option answers INTERNET_REQFLAG_NO_HEADERS (8) whatever the verb or flags;
+           CACHE_WRITE_DISABLED only appears once the request has been sent */
+        CHECK(ok);
+        CHECKF(v == INTERNET_REQFLAG_NO_HEADERS, "%s 0x%lx reqflags 0x%lx", rows[k].verb, rows[k].f, v);
+        EXPECT_EQ(l, sizeof(DWORD));
         t_inet_close(hr);
     }
     t_inet_close(hc); t_inet_close(hi);

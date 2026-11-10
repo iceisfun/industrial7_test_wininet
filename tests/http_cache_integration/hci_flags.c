@@ -27,6 +27,8 @@ TEST(hci_flags_reload_bypasses_fresh_entry) {
         CHECK(srv_req_header(s, 1, "If-Modified-Since") == NULL);
         const char *cc = srv_req_header(s, 1, "Cache-Control"), *pr = srv_req_header(s, 1, "Pragma");
         t_note("RELOAD request: Cache-Control=%s Pragma=%s", cc ? cc : "(none)", pr ? pr : "(none)");
+        EXPECT_STR(cc, "no-cache");                   /* VM: RELOAD adds Cache-Control: no-cache, never Pragma */
+        CHECK(pr == NULL);
     }
     EXPECT_EQ(p.cond_served, 0);
     srv_stop(s);
@@ -54,6 +56,8 @@ TEST(hci_flags_no_cache_write_no_entry) {
     CHECK(r.reqflags_ok && (r.reqflags & INTERNET_REQFLAG_CACHE_WRITE_DISABLED));
     CHECK(r.datafile[0] == 0);
     EXPECT_EQ(r.datafile_err, ERROR_INTERNET_ITEM_NOT_FOUND);
+    EXPECT_EQ(r.datafile_early_err, ERROR_INTERNET_ITEM_NOT_FOUND);
+    EXPECT_EQ(r.reqflags, INTERNET_REQFLAG_CACHE_WRITE_DISABLED);
     srv_stop(s);
 }
 
@@ -68,6 +72,7 @@ TEST(hci_flags_no_cache_write_reads_existing_entry) {
     t_note("NO_CACHE_WRITE with fresh entry: requests=%d body=%s from_cache=%d", hci_reqs(s, 0), b.body, hci_from_cache(&b));
     EXPECT_STR(b.body, "primed");
     EXPECT_EQ(hci_reqs(s, 0), 1);
+    CHECK(hci_from_cache(&b));
     srv_stop(s);
 }
 
@@ -120,7 +125,12 @@ TEST(hci_flags_nocache_request_header_table) {
         CHECK(srv_wait_requests(s, 1, 1000));
         const char *cc = srv_req_header(s, 0, "Cache-Control"), *pr = srv_req_header(s, 0, "Pragma");
         t_note("flags %-16s -> Cache-Control=%s Pragma=%s nhdrs=%d", rows[k].name, cc ? cc : "-", pr ? pr : "-", srv_req_header_count(s, 0));
-        if (rows[k].f == 0) CHECK(cc == NULL);
+        /* VM: only RELOAD and PRAGMA_NOCACHE add Cache-Control: no-cache; no flag adds Pragma */
+        int want_cc = (rows[k].f & (INTERNET_FLAG_RELOAD | INTERNET_FLAG_PRAGMA_NOCACHE)) != 0;
+        CHECKF((cc != NULL) == want_cc, "%s Cache-Control %s", rows[k].name, cc ? cc : "-");
+        if (cc) CHECKF(!strcmp(cc, "no-cache"), "%s Cache-Control %s", rows[k].name, cc);
+        CHECKF(pr == NULL, "%s Pragma %s", rows[k].name, pr ? pr : "-");
+        CHECKF(srv_req_header_count(s, 0) == 2 + want_cc, "%s nhdrs %d", rows[k].name, srv_req_header_count(s, 0));
         srv_stop(s);
     }
 }
@@ -134,6 +144,9 @@ TEST(hci_flags_pragma_nocache_reads_cache) {
     hci_resp a, b; prime(s, url, &a);
     HINTERNET hi = hci_open(); hci_get(hi, url, NULL, INTERNET_FLAG_PRAGMA_NOCACHE, &b); t_inet_close(hi);
     t_note("PRAGMA_NOCACHE with fresh entry: requests=%d body=%s", hci_reqs(s, 0), b.body);
+    EXPECT_EQ(hci_reqs(s, 0), 1);                     /* VM: PRAGMA_NOCACHE does not bypass a fresh entry */
+    EXPECT_STR(b.body, "cached");
+    CHECK(hci_from_cache(&b));
     srv_stop(s);
 }
 
@@ -218,6 +231,9 @@ TEST(hci_flags_from_cache_head_request) {
     hci_req(hi, s, "HEAD", url, INTERNET_FLAG_FROM_CACHE, NULL, NULL, 0, NULL, NULL, &b);
     t_inet_close(hi);
     t_note("HEAD + FROM_CACHE with entry: ok=%d err=%lu status=%d len=%zu requests=%d", b.ok, b.err, b.status, b.len, hci_reqs(s, 0));
+    CHECK(!b.ok);                                     /* VM: HEAD never reads the GET entry (RELOAD folded in) */
+    EXPECT_EQ(b.err, ERROR_FILE_NOT_FOUND);
+    EXPECT_EQ(hci_reqs(s, 0), 1);
     srv_stop(s);
 }
 
@@ -238,6 +254,7 @@ TEST(hci_flags_cache_if_net_fail_serves_entry) {
     EXPECT_EQ(b.status, 200);
     EXPECT_STR(b.body, "net-fail-copy");
     t_note("CACHE_IF_NET_FAIL: reqflags=0x%lx", b.reqflags);
+    EXPECT_EQ(b.reqflags, INTERNET_REQFLAG_FROM_CACHE | INTERNET_REQFLAG_NET_TIMEOUT);   /* VM: 0x81 */
     CHECK(!c.ok);
     EXPECT_EQ(c.err, ERROR_INTERNET_CANNOT_CONNECT);
 }
@@ -250,7 +267,8 @@ TEST(hci_flags_cache_if_net_fail_no_entry) {
     srv_stop(s);
     HINTERNET hi = hci_open(); hci_resp r; hci_get(hi, url, NULL, INTERNET_FLAG_CACHE_IF_NET_FAIL, &r); t_inet_close(hi);
     CHECK(!r.ok);
-    EXPECT_EQ(r.err, ERROR_INTERNET_CANNOT_CONNECT);
+    /* VM: with CACHE_IF_NET_FAIL and no entry the connect failure is reported as the cache miss */
+    EXPECT_EQ(r.err, ERROR_FILE_NOT_FOUND);
 }
 
 TEST(hci_flags_hyperlink_no_validators_reloads) {
@@ -293,6 +311,7 @@ TEST(hci_flags_hyperlink_with_old_last_modified) {
     HINTERNET hi = hci_open(); hci_get(hi, url, NULL, INTERNET_FLAG_HYPERLINK, &b); t_inet_close(hi);
     t_note("HYPERLINK with old LM: requests=%d body=%s", hci_reqs(s, 0), b.body);
     EXPECT_STR(b.body, "hl1");
+    EXPECT_EQ(hci_reqs(s, 0), 1);
     srv_stop(s);
 }
 
@@ -309,6 +328,9 @@ TEST(hci_flags_forms_submit_get) {
     t_inet_close(hi);
     t_note("FORMS_SUBMIT GET with query: stored=%d requests=%d second=%s", stored, hci_reqs(s, 0), b.body);
     EXPECT_STR(a.body, "f1");
+    CHECK(stored);                                    /* VM: FORMS_SUBMIT changes nothing for a fresh GET entry */
+    EXPECT_EQ(hci_reqs(s, 0), 1);
+    EXPECT_STR(b.body, "f1");
     srv_stop(s);
 }
 
@@ -355,6 +377,9 @@ TEST(hci_flags_from_cache_and_reload_together) {
     hci_resp a, b; prime(s, url, &a);
     HINTERNET hi = hci_open(); hci_get(hi, url, NULL, INTERNET_FLAG_FROM_CACHE | INTERNET_FLAG_RELOAD, &b); t_inet_close(hi);
     t_note("FROM_CACHE|RELOAD with entry: ok=%d err=%lu body=%s requests=%d", b.ok, b.err, b.body, hci_reqs(s, 0));
+    CHECK(b.ok);                                      /* VM: FROM_CACHE wins over RELOAD */
+    EXPECT_STR(b.body, "both");
+    EXPECT_EQ(hci_reqs(s, 0), 1);
     srv_stop(s);
 }
 

@@ -120,6 +120,10 @@ TEST(hci_seed_no_headers_entry) {
     CHECK(seed(url, "headerless", NULL, 86400, 0));
     HINTERNET hi = hci_open(); hci_resp r; hci_get(hi, url, NULL, 0, &r); t_inet_close(hi);
     t_note("seeded entry without headers: ok=%d err=%lu status=%d body=%s requests=%d", r.ok, r.err, r.status, r.body, hci_reqs(s, 0));
+    CHECK(r.ok);                                      /* VM: served, but no status line to query */
+    EXPECT_EQ(r.status, 0);
+    EXPECT_STR(r.body, "headerless");
+    EXPECT_EQ(hci_reqs(s, 0), 0);
     srv_stop(s);
 }
 
@@ -155,7 +159,7 @@ TEST(hci_seed_cached_handle_query_info) {
         l = sizeof v; CHECK(U(HttpQueryInfoA)(h, HTTP_QUERY_VERSION, v, &l, NULL)); EXPECT_STR(v, "HTTP/1.1");
         DWORD avail = 0; CHECK(U(InternetQueryDataAvailable)(h, &avail, 0, 0));
         t_note("cache-served QueryDataAvailable=%lu", avail);
-        CHECK(avail > 0 && avail <= 15);
+        EXPECT_EQ(avail, 15);
         char buf[64]; DWORD rd = 0; CHECK(U(InternetReadFile)(h, buf, sizeof buf, &rd)); EXPECT_EQ(rd, 15);
         U(InternetCloseHandle)(h);
     }
@@ -179,6 +183,8 @@ TEST(hci_seed_cached_handle_set_file_pointer) {
         SetLastError(0); DWORD rc = U(InternetSetFilePointer)(h, -5, NULL, FILE_CURRENT, 0); DWORD ec = GetLastError();
         SetLastError(0); DWORD re = U(InternetSetFilePointer)(h, -2, NULL, FILE_END, 0); DWORD ee = GetLastError();
         t_note("cache handle: FILE_CURRENT -5 -> %ld err %lu; FILE_END -2 -> %ld err %lu", (long)rc, ec, (long)re, ee);
+        EXPECT_EQ(rc, (DWORD)-1); EXPECT_EQ(ec, ERROR_NEGATIVE_SEEK);   /* VM: negative distances are refused */
+        EXPECT_EQ(re, (DWORD)-1); EXPECT_EQ(ee, ERROR_NEGATIVE_SEEK);
         EXPECT_EQ(U(InternetSetFilePointer)(h, 8, NULL, FILE_BEGIN, 0), 8);
         CHECK(U(InternetReadFile)(h, buf, 2, &rd)); buf[rd] = 0; EXPECT_STR(buf, "89");
         EXPECT_EQ(U(InternetSetFilePointer)(h, 14, NULL, FILE_BEGIN, 0), 14);
@@ -212,7 +218,9 @@ TEST(hci_seed_network_handle_set_file_pointer) {
         CHECK(U(InternetReadFile)(h, buf, 16, &rd));
         SetLastError(0);
         DWORD r = U(InternetSetFilePointer)(h, 4, NULL, FILE_BEGIN, 0);
-        t_note("SetFilePointer on NO_CACHE_WRITE handle after full read: %ld err=%lu", (long)r, GetLastError());
+        DWORD e = GetLastError();
+        t_note("SetFilePointer on NO_CACHE_WRITE handle after full read: %ld err=%lu", (long)r, e);
+        EXPECT_EQ(r, (DWORD)-1); EXPECT_EQ(e, ERROR_INTERNET_INVALID_OPERATION);
         U(InternetCloseHandle)(h);
     }
     t_inet_close(hi);
