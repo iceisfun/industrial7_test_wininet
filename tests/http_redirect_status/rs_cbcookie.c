@@ -22,7 +22,8 @@ static void cb_redirect(int wide) {
     if (i >= 0) {
         t_note("REDIRECT info='%s' len=%lu ctx=%llu", g_rs_cb.str[i], g_rs_cb.len[i], (unsigned long long)g_rs_cb.ctx[i]);
         EXPECT_STR(g_rs_cb.str[i], srv_url(s, "/dst"));
-        EXPECT_EQ(g_rs_cb.len[i], (DWORD)strlen(srv_url(s, "/dst")) + 1);
+        /* [W10, async_callbacks] narrow: length counts the NUL; W callback: UTF-16, length in characters without NUL */
+        EXPECT_EQ(g_rs_cb.len[i], (DWORD)strlen(srv_url(s, "/dst")) + (wide ? 0 : 1));
         EXPECT_EQ(g_rs_cb.ctx[i], 2);   /* the request handle's context */
         /* ordering: after the first response, before the second request is sent */
         int resp0 = rs_cb_index(INTERNET_STATUS_RESPONSE_RECEIVED, 0);

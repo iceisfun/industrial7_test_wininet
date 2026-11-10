@@ -156,7 +156,8 @@ static void record(DWORD_PTR ctx, DWORD st, LPVOID info, DWORD len, int wide) {
         g_rs_cb.st[i] = st; g_rs_cb.len[i] = len; g_rs_cb.ctx[i] = ctx; g_rs_cb.str[i][0] = 0; g_rs_cb.dw[i] = 0;
         if (info && len >= 4 && !is_string_status(st)) memcpy(&g_rs_cb.dw[i], info, 4);
         if (info && is_string_status(st)) {
-            if (wide) {
+            if (wide && (st == INTERNET_STATUS_REDIRECT || st == INTERNET_STATUS_RESOLVING_NAME)) {
+                /* the W wrapper converts only RESOLVING_NAME and REDIRECT (async_callbacks EVIDENCE, W10) */
                 WideCharToMultiByte(CP_ACP, 0, (const WCHAR *)info, -1, g_rs_cb.str[i], 299, NULL, NULL);
             } else {
                 size_t k = 0; const char *p = (const char *)info;
