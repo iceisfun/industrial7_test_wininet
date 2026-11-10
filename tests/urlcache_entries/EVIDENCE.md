@@ -53,7 +53,7 @@ Anything still variable is a `t_note`.
   Retrieve as well (2). Committing a file directly in the container root gives 87, while an upper-case spelling of a valid path is accepted.
 - Container: `%LOCALAPPDATA%\Microsoft\Windows\INetCache\IE\<8 chars>\`.
 
-## Pass 3 additions (boots uce5/uce6, 2026-11-10)
+## Pass 3 additions (boots uce5, uce6, uce7; uce7 = PASS 282/282, 2026-11-10)
 Decomp-grounded and VM-confirmed:
 - Layout tables over 18 (url, file, ext, header) shapes for A and W: strings in the order url, file, ext, header at the slot offsets of
   ConvertCacheEntryInfoA/W; a NULL ext or file gets no slot; every buffer size in [1, need) -> 122, `*size = need`, buffer untouched.
@@ -82,7 +82,7 @@ VM-observed:
 - `Visited:` keys go to the history container and `Cookie:` keys to `...\INetCookies\`; their CacheEntryType is exactly the committed
   type (no NORMAL bit ORed in, unlike the content container). Delete removes the cookie file.
 - Stream on a file whose size changed -> 13 (ERROR_INVALID_DATA); a same-size rewrite streams the new bytes. A W commit with a malformed
-  original URL -> 12005. GetUrlCacheEntryInfoEx ignores unknown flags (0x800 left `*size` untouched in one boot: note), never locks or counts.
+  original URL -> 12005. GetUrlCacheEntryInfoEx ignores unknown flags (0x800 left `*size` as passed in two boots: still a note), never locks or counts.
   A 122 stream retrieve counts a hit. Cookie: entries can be retrieved.
 - CreateUrlCacheEntryExW: the extension argument wins (`hint.dat` + `bin` -> `hint[1].bin`), fPreserveIncomingFileName made no difference for
   these names; NULL ext cuts the last dotted part (`a.b.c` -> `a.b[1]`). URL leaves up to 150 chars keep the stem; 300+ chars get a random
