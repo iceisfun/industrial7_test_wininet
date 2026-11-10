@@ -1,7 +1,7 @@
 # Resuming the wininet (industrial7_test_wininet) workflow(s)
 
 Suspended on 2026-11-10 when the weekly Claude usage budget ran out. This branch (`workflow`) holds the repo **as-is at suspension** plus
-the Workflow scripts that were driving it. master on GitHub is NOT updated by this branch.
+the Workflow scripts that were driving it. (Update 2026-11-10: master now equals this snapshot and the `workflow` branch was deleted; see docs/EVALUATION.md before resuming.)
 
 Research and Foundation done (loopback HTTP/FTP/HTTPS server library, VM runner, net_loopback proven on Win10). The 18 areas were in the Write+Review+Win10 pipeline; many have tests, some without EVIDENCE.md yet.
 
