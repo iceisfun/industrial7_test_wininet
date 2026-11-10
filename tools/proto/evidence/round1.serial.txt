@@ -1,0 +1,203 @@
+I7VM: logon Mon 11/09/2026 15:22:07.50 
+I7VM: payload D:\i7run 
+@@T boot_hook Mon 11/09/2026 15:22:07.53 
+Domain Profile Settings: 
+----------------------------------------------------------------------
+State                                 ON
+Private Profile Settings: 
+----------------------------------------------------------------------
+State                                 ON
+Public Profile Settings: 
+----------------------------------------------------------------------
+State                                 ON
+Ok.
+SERVICE_NAME: WinDefend 
+        TYPE               : 10  WIN32_OWN_PROCESS  
+        STATE              : 4  RUNNING 
+                                (STOPPABLE, NOT_PAUSABLE, ACCEPTS_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+SERVICE_NAME: WinHttpAutoProxySvc 
+        TYPE               : 30  WIN32  
+        STATE              : 4  RUNNING 
+                                (NOT_STOPPABLE, NOT_PAUSABLE, ACCEPTS_SHUTDOWN)
+        WIN32_EXIT_CODE    : 0  (0x0)
+        SERVICE_EXIT_CODE  : 0  (0x0)
+        CHECKPOINT         : 0x0
+        WAIT_HINT          : 0x0
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings
+    CertificateRevocation    REG_DWORD    0x1
+    DisableCachingOfSSLPages    REG_DWORD    0x0
+    IE5_UA_Backup_Flag    REG_SZ    5.0
+    PrivacyAdvanced    REG_DWORD    0x1
+    SecureProtocols    REG_DWORD    0x800
+    User Agent    REG_SZ    Mozilla/4.0 (compatible; MSIE 8.0; Win32)
+    ZonesSecurityUpgrade    REG_BINARY    C15931E60E51DD01
+    WarnonZoneCrossing    REG_DWORD    0x0
+    SecureProtocolsUpdated    REG_DWORD    0x1
+    LockDatabase    REG_QWORD    0x1dd510f06dd7c6b
+    EnableNegotiate    REG_DWORD    0x1
+    ProxyEnable    REG_DWORD    0x0
+    MigrateProxy    REG_DWORD    0x1
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\5.0
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Cache
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Http Filters
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Lockdown_Zones
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\P3P
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Passport
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Wpad
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\ZoneMap
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Zones
+HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\Connections
+    SavedLegacySettings    REG_BINARY    4600000002000000090000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+    DefaultConnectionSettings    REG_BINARY    4600000002000000090000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+Windows IP Configuration
+   Host Name . . . . . . . . . . . . : I7-WIN10
+   Primary Dns Suffix  . . . . . . . : 
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+Ethernet adapter Ethernet:
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : Intel(R) PRO/1000 MT Network Connection
+   Physical Address. . . . . . . . . : 52-54-00-12-34-56
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   Site-local IPv6 Address . . . . . : fec0::3f85:1ebb:48e7:2636%1(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::79ab:b80:ff6c:4651%4(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.0.2.15(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : Monday, November 9, 2026 3:21:38 PM
+   Lease Expires . . . . . . . . . . : Tuesday, November 10, 2026 3:21:37 PM
+   Default Gateway . . . . . . . . . : fe80::2%4
+   DHCP Server . . . . . . . . . . . : 10.0.2.2
+   DHCPv6 IAID . . . . . . . . . . . : 106058752
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-32-4F-15-D9-52-54-00-12-34-56
+   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+@@T probes_start 15:22:07.97 
+@@I7 BEGIN proto "proto.exe"
+P os 10.0.19045 uptime_ms=33640
+P wininet_version 11.0.19041.2193
+P loop4 port=49670 connect=0 accept=yes echo=ok ms=1.0
+P loop6 port=49672 connect=0 accept=yes echo=ok ms=0.3
+P resolve localhost rc=0 ms=3.7 addrs=::1,127.0.0.1,
+P resolve 127.0.0.1 rc=0 ms=0.0 addrs=127.0.0.1,
+P resolve i7-nonexistent-host.invalid rc=11001 ms=0.3 addrs=
+P perconn flags=0x9 bypass=[] autoconfig=[]
+P ieproxy autodetect=1 autoconfig=0 proxy=0
+P svc WinHttpAutoProxySvc state=4
+P svc mpssvc state=4
+P svc WinDefend state=4
+P svc Dnscache state=4
+P svc iphlpsvc state=4
+P http_direct_1 open_ms=0.0 openurl_ms=19.1 err=0 body=[hello]
+P http_direct_1_wire GET /direct HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49674|Cache-Control: no-cache||#
+P http_direct_2 open_ms=0.0 openurl_ms=1.2 err=0 body=[hello]
+P http_direct_2_wire GET /direct HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49674|Cache-Control: no-cache||#
+P http_direct_localhost open_ms=0.0 openurl_ms=2043.9 err=0 body=[hello]
+P http_direct_localhost_wire GET /lh HTTP/1.1|User-Agent: i7proto/1.0|Host: localhost:49674|Cache-Control: no-cache||#
+P http_preconfig_1 open_ms=0.0 openurl_ms=1.3 err=0 body=[hello]
+P http_preconfig_2 open_ms=0.0 openurl_ms=0.8 err=0 body=[hello]
+P http_preconfig_localhost open_ms=0.0 openurl_ms=1.1 err=0 body=[hello]
+P http_preconfig_wire GET /pre HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49674|Cache-Control: no-cache||#GET /pre HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49674|Cache-Control: no-cache||#GET /prelh HTTP/1.1|User-Agent: i7proto/1.0|Host: localhost:49674|Cache-Control: no-cache||#
+P http_direct_nxdomain open_ms=0.0 openurl_ms=0.5 err=12007 body=[]
+P http_preconfig_nxdomain open_ms=0.0 openurl_ms=2.4 err=12007 body=[]
+P http_server conns=6 stop_ms=100.3
+P wpad_detect ok=0 err=12180 ms=0.4
+P selfsign cng=0 san=0 cn=localhost ok=1 err=0x0 ms=18.0
+P acquire_inbound schcreds=0 st=0x0 ms=17.3
+P https_cng0_san0_ip attempt=0 send=0 err=12045 ms=30.3 secflags=0x0 open_ms=0.2
+P https_cng0_san0_ip conninfo err=122
+P https_cng0_san0_ip certinfo subject=[localhost] keysize=0
+P https_cng0_san0_ip set_secflags 0x100 ok=1 err=0
+P https_cng0_san0_ip attempt=1 send=0 err=12038 ms=3.5 secflags=0x100 open_ms=0.2
+P https_cng0_san0_ip conninfo err=122
+P https_cng0_san0_ip certinfo subject=[localhost] keysize=0
+P https_cng0_san0_ip set_secflags 0x1100 ok=1 err=0
+P https_cng0_san0_ip attempt=2 send=1 err=0 ms=12.0 secflags=0x20001101 open_ms=0.2
+P https_cng0_san0_ip conninfo err=122
+P https_cng0_san0_ip certinfo subject=[localhost] keysize=256
+P https_cng0_san0_ip status=200 body=[hello] total_ms=46.6
+P https_cng0_san0_ip_srv GET /p HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49685|Cache-Control: no-cache|Connection: Keep-Alive||#
+P https_cng0_san0_ip_srv_tls hs_recv=0;hs_recv=0;proto=0x400 cipher=0x6610;
+P https_cng0_san0_lh attempt=0 send=0 err=12045 ms=3.8 secflags=0x0 open_ms=0.0
+P https_cng0_san0_lh conninfo err=122
+P https_cng0_san0_lh certinfo subject=[localhost] keysize=0
+P https_cng0_san0_lh set_secflags 0x100 ok=1 err=0
+P https_cng0_san0_lh attempt=1 send=1 err=0 ms=3.8 secflags=0x20000101 open_ms=0.0
+P https_cng0_san0_lh conninfo err=122
+P https_cng0_san0_lh certinfo subject=[localhost] keysize=256
+P https_cng0_san0_lh status=200 body=[hello] total_ms=7.8
+P https_cng0_san0_lh_srv GET /p HTTP/1.1|User-Agent: i7proto/1.0|Host: localhost:49685|Cache-Control: no-cache|Connection: Keep-Alive||#
+P https_cng0_san0_lh_srv_tls hs_recv=0;proto=0x400 cipher=0x6610;
+P https_cng0_san0 conns=5 stop_ms=105.1
+P key_delete capi ok=1
+P selfsign cng=1 san=1 cn=localhost ok=1 err=0x0 ms=0.6
+P acquire_inbound schcreds=0 st=0x0 ms=0.5
+P https_cng1_san1_ip attempt=0 send=0 err=12045 ms=3.8 secflags=0x0 open_ms=0.0
+P https_cng1_san1_ip conninfo err=122
+P https_cng1_san1_ip certinfo subject=[localhost] keysize=0
+P https_cng1_san1_ip set_secflags 0x100 ok=1 err=0
+P https_cng1_san1_ip attempt=1 send=1 err=0 ms=2.9 secflags=0x20000101 open_ms=0.0
+P https_cng1_san1_ip conninfo err=122
+P https_cng1_san1_ip certinfo subject=[localhost] keysize=256
+P https_cng1_san1_ip status=200 body=[hello] total_ms=7.0
+P https_cng1_san1_ip_srv GET /p HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49691|Cache-Control: no-cache|Connection: Keep-Alive||#
+P https_cng1_san1_ip_srv_tls hs_recv=0;proto=0x400 cipher=0x6610;
+P https_cng1_san1_lh attempt=0 send=0 err=12045 ms=2.2 secflags=0x0 open_ms=0.0
+P https_cng1_san1_lh conninfo err=122
+P https_cng1_san1_lh certinfo subject=[localhost] keysize=0
+P https_cng1_san1_lh set_secflags 0x100 ok=1 err=0
+P https_cng1_san1_lh attempt=1 send=1 err=0 ms=2.7 secflags=0x20000101 open_ms=0.0
+P https_cng1_san1_lh conninfo err=122
+P https_cng1_san1_lh certinfo subject=[localhost] keysize=256
+P https_cng1_san1_lh status=200 body=[hello] total_ms=5.8
+P https_cng1_san1_lh_srv GET /p HTTP/1.1|User-Agent: i7proto/1.0|Host: localhost:49691|Cache-Control: no-cache|Connection: Keep-Alive||#
+P https_cng1_san1_lh_srv_tls hs_recv=0;proto=0x400 cipher=0x6610;
+P https_cng1_san1 conns=4 stop_ms=98.6
+P acquire_inbound schcreds=1 st=0x0 ms=0.7
+P https_schcred_ip attempt=0 send=0 err=12045 ms=3.6 secflags=0x0 open_ms=0.0
+P https_schcred_ip conninfo err=122
+P https_schcred_ip certinfo subject=[localhost] keysize=0
+P https_schcred_ip set_secflags 0x1100 ok=1 err=0
+P https_schcred_ip attempt=1 send=1 err=0 ms=3.2 secflags=0x20001101 open_ms=0.0
+P https_schcred_ip conninfo err=122
+P https_schcred_ip certinfo subject=[localhost] keysize=256
+P https_schcred_ip status=200 body=[hello] total_ms=7.0
+P https_schcred_srv GET /p HTTP/1.1|User-Agent: i7proto/1.0|Host: 127.0.0.1:49696|Cache-Control: no-cache|Connection: Keep-Alive||#
+P https_schcred_srv_tls hs_recv=0;proto=0x400 cipher=0x6610;
+P https_schcred stop_ms=101.1
+P key_delete cng rc=0x0
+P total_ms 2706.2
+@@I7 END proto exit=0x0 ms=2748 timeout=0 bytes=5903
+@@T probes_end 15:22:10.77 
+@@T ser0 15:22:10.78 
+P spew bytes=131105 lines=2017 buffered=0 ms=3436.8 kBps=38.1
+@@T ser1 15:22:14.25 
+P spew bytes=131105 lines=2017 buffered=1 ms=542.6 kBps=241.6
+@@T ser2 15:22:14.83 
+P com1_direct bytes=131072 ms=533.6 kBps=245.6 oldbaud=115200 setstate=1
+@@T ser3 15:22:15.39 
+@@I7 BEGIN spew_vmrun "proto.exe" --spew 131072
+P spew bytes=131105 lines=2017 buffered=0 ms=353.4 kBps=370.9
+@@I7 END spew_vmrun exit=0x0 ms=570 timeout=0 bytes=133185
+@@T ser4 15:22:16.00 
+@@I7 BEGIN hang "proto.exe" --hang
+P hang start
+@@I7 END hang exit=0xdead0001 ms=4995 timeout=1 bytes=14
+@@T hang_rc -559087615 
+@@I7 BEGIN crash "proto.exe" --crash
+P crash start
+@@I7 END crash exit=0xc0000005 ms=18 timeout=0 bytes=15
+@@T crash_rc -1073741819 
+@@I7 BEGIN contend "cmd" /c "echo inner > COM1 & echo inner_rc=%errorlevel%"
+Access is denied.
+@@I7 END contend exit=0x0 ms=14 timeout=0 bytes=31
+@@T done 15:22:21.12 
+I7VM: payload exit 0 

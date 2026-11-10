@@ -1,0 +1,48 @@
+I7VM: logon Mon 11/09/2026 15:25:00.36 
+I7VM: payload D:\i7run 
+@@T r2_start 15:25:00.39 
+@@I7 BEGIN r2 "proto.exe" --r2
+P clock utc=2026-11-09T23:25:00 local=15:25 tzbias=480 tzid=1
+P refused_raw4 rc=-1 wsa=10061 ms=2035.8
+P refused_raw6 rc=-1 wsa=10061 ms=2062.0
+P refused_wininet_ip open_ms=5.4 openurl_ms=2010.2 err=12029 body=[]
+P refused_wininet_localhost open_ms=0.0 openurl_ms=4093.1 err=12029 body=[]
+P localhost_v4only open_ms=0.0 openurl_ms=2031.4 err=0 body=[hello]
+P v4only stop_ms=108.5
+P localhost_dualstack open_ms=0.0 openurl_ms=0.7 err=0 body=[hello]
+P v6_literal open_ms=0.0 openurl_ms=0.5 err=0 body=[hello]
+P dualstack v4conns=1 v6conns=1
+P dualstack stop_ms=109.4
+P selfsign cng=1 san=1 cn=localhost ok=1 err=0x0 ms=2.3
+P acquire_inbound schcreds=0 st=0x0 ms=19.6
+P cache_s1_noflags flags_before=0x0 send=0 err=12045 secflags_after=0x0 ms=31.8 body=[] conninfo=1/0 size=716 l=716 secure=1 proto=0x0 cipher=0x0 suite=0x0
+P cache_s1_ignoreca flags_before=0x0 send=1 err=0 secflags_after=0x20000101 ms=11.1 body=[hello] conninfo=1/0 size=716 l=716 secure=1 proto=0x800 cipher=0x6610 suite=0xc030
+P cache_s1_again_noflags flags_before=0x0 send=0 err=12045 secflags_after=0x0 ms=1.0 body=[] conninfo=1/0 size=716 l=716 secure=1 proto=0x0 cipher=0x0 suite=0x0
+P cache_s2_noflags_samehost flags_before=0x0 send=0 err=12045 secflags_after=0x0 ms=0.9 body=[] conninfo=1/0 size=716 l=716 secure=1 proto=0x0 cipher=0x0 suite=0x0
+P cache_s2_noflags_localhost flags_before=0x0 send=0 err=12045 secflags_after=0x0 ms=2.1 body=[] conninfo=1/0 size=716 l=716 secure=1 proto=0x0 cipher=0x0 suite=0x0
+P cache_srv GET /q HTTP/1.1|User-Agent: i7proto/2|Host: 127.0.0.1:49685|Cache-Control: no-cache||#
+P cache_srv_tls hs_recv=0;proto=0x400 cipher=0x6610;proto=0x400 cipher=0x6610;app_recv=0;proto=0x400 cipher=0x6610;app_recv=0;hs_recv=0;
+P cache conns=5 stop_ms=104.4
+P acquire_inbound schcreds=0 st=0x0 ms=1.2
+P openflag_cn_only flags_before=0x0 send=0 err=12045 secflags_after=0x1000 ms=4.1 body=[] conninfo=1/0 size=716 l=716 secure=1 proto=0x0 cipher=0x0 suite=0x0
+P openflag_cn_plus_setopt_ca flags_before=0x0 send=1 err=0 secflags_after=0x20001101 ms=2.9 body=[hello] conninfo=1/0 size=716 l=716 secure=1 proto=0x800 cipher=0x6610 suite=0xc030
+P openflag_srv GET /q HTTP/1.1|User-Agent: i7proto/2|Host: localhost:49691|Cache-Control: no-cache||#
+P openflag_srv_tls hs_recv=0;proto=0x400 cipher=0x6610;
+P openflag conns=2 stop_ms=99.8
+P acquire_inbound schcreds=0 st=0x0 ms=1.1
+P sessionflags set ok=0 err=12018
+P sessionflags_req flags_before=0x0 send=0 err=12045 secflags_after=0x0 ms=4.6 body=[] conninfo=1/0 size=716 l=716 secure=1 proto=0x0 cipher=0x0 suite=0x0
+P sessionflags conns=1 stop_ms=103.4
+P key_delete cng rc=0x0
+P ftp connect=1 err=0 ms=1.9
+P ftp pwd ok=1 err=0 cwd=[/]
+P ftp find=1 err=0 name=[hello.txt] size=5
+P ftp cmds USER anonymous|PASS ***|PWD|TYPE A|PASV|LIST| total_ms=8.5
+P r2_total_ms 13048.2
+@@I7 END r2 exit=0x0 ms=13089 timeout=0 bytes=2845
+@@T big0 15:25:13.53 
+@@I7 BEGIN big "proto.exe" --spew 2097152
+P spew bytes=2097160 lines=32264 buffered=0 ms=8527.0 kBps=245.9
+@@I7 END big exit=0x0 ms=8858 timeout=0 bytes=2129490
+@@T big1 15:25:22.42 
+I7VM: payload exit 0 
