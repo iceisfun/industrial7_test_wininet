@@ -182,9 +182,10 @@ TEST(ot_val_request_flags_and_priority) {
     /* case 0x17: only request/file handles */
     l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_S], INTERNET_OPTION_REQUEST_FLAGS, &v, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
     l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(fx->h[OT_C], INTERNET_OPTION_REQUEST_FLAGS, &v, &l), ERROR_INTERNET_INCORRECT_HANDLE_TYPE);
-    /* unsent T_INET_FRESH request: INTERNET_REQFLAG_CACHE_WRITE_DISABLED (8) from INTERNET_FLAG_NO_CACHE_WRITE (VM) */
-    CHECK(ot_qdw(fx->h[OT_R], INTERNET_OPTION_REQUEST_FLAGS, &v)); EXPECT_EQ(v, INTERNET_REQFLAG_CACHE_WRITE_DISABLED);
-    if (fx->h[OT_X]) { CHECK(ot_qdw(fx->h[OT_X], INTERNET_OPTION_REQUEST_FLAGS, &v)); t_note("REQUEST_FLAGS after a fresh GET: 0x%lx", v); }
+    /* unsent request: INTERNET_REQFLAG_NO_HEADERS (8); once sent, the T_INET_FRESH request reads
+     * INTERNET_REQFLAG_CACHE_WRITE_DISABLED (0x40) (VM, qtab rows 23 R/X) */
+    CHECK(ot_qdw(fx->h[OT_R], INTERNET_OPTION_REQUEST_FLAGS, &v)); EXPECT_EQ(v, INTERNET_REQFLAG_NO_HEADERS);
+    if (fx->h[OT_X]) { CHECK(ot_qdw(fx->h[OT_X], INTERNET_OPTION_REQUEST_FLAGS, &v)); EXPECT_EQ(v, INTERNET_REQFLAG_CACHE_WRITE_DISABLED); }
     /* REQUEST_PRIORITY (58): requests only, any value */
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
     CHECK(ot_qdw(t.r, INTERNET_OPTION_REQUEST_PRIORITY, &v)); EXPECT_EQ(v, 0);
@@ -251,13 +252,17 @@ TEST(ot_val_max_conns_defaults_global) {
     CHECK(ot_qdw(NULL, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &b));
     t_note("MAX_CONNS_PER_SERVER %lu, PER_1_0_SERVER %lu (registry-configurable; IE11 defaults 10/10 on Win10)", a, b);
     CHECK(a >= 2 && a <= 128); CHECK(b >= 2 && b <= 128);
-    /* a connect handle that never connected answers 128 (the upper clamp), not the global value (VM) */
+    /* connect: PER_SERVER reads the limit of the connect's CServerInfo when it has one, else 12016 (case 0x49).
+     * Whether an unused connect already has one varied between VM boots (see EVIDENCE.md), so either is accepted;
+     * when it answers, the value is the global limit. PER_1_0_SERVER on any real handle is 12016 (case 0x4a). */
     ot_trio t; if (!ot_trio_open(&t, 0)) { ot_trio_close(&t); t_skip("handles"); return; }
-    DWORD v;
-    CHECK(ot_qdw(t.c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v)); EXPECT_EQ(v, 128);
-    CHECK(ot_qdw(t.c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &v)); EXPECT_EQ(v, 128);
+    DWORD v = 0xdeadbeef, l = sizeof v;
+    SET_ERR(0); BOOL r = U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l);
+    CHECKF(r ? (l == 4 && v == a) : GetLastError() == ERROR_INTERNET_INVALID_OPERATION, "connect PER_SERVER r=%d err=%lu v=%lu global %lu", r, GetLastError(), v, a);
+    t_note("unused connect MAX_CONNS_PER_SERVER: r=%d v=%lu", r, r ? v : 0);
+    l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     /* session / request: 12016 */
-    DWORD l = sizeof v;
+    l = sizeof v;
     SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.s, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     l = sizeof v; SET_ERR(0); EXPECT_FAIL(!U(InternetQueryOptionA)(t.r, INTERNET_OPTION_MAX_CONNS_PER_SERVER, &v, &l), ERROR_INTERNET_INVALID_OPERATION);
     ot_trio_close(&t);
