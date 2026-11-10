@@ -88,7 +88,7 @@ TEST(ac_x_endreq_a_null_handle) {
     DWORD e = GetLastError();
     t_note("HttpEndRequestA(NULL): ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
     EXPECT_EQ(ok, FALSE);
-    CHECKF(e == ERROR_INVALID_HANDLE || e == ERROR_INTERNET_INVALID_OPERATION, "err %lu", e);
+    EXPECT_EQ(e, ERROR_INVALID_HANDLE);   /* [W10 round 5] */
     /* A checks lpBuffersOut first: a non-NULL out pointer gives 87 even with a NULL handle [D] */
     static INTERNET_BUFFERSA out; memset(&out, 0, sizeof out); out.dwStructSize = sizeof out;
     SetLastError(0xdeadbeef);
@@ -142,13 +142,17 @@ TEST(ac_x_endreq_without_sendex) {
     BOOL ok = U(HttpEndRequestA)(f.hr, NULL, 0, 0);
     DWORD e = GetLastError();
     t_note("HttpEndRequest without SendRequestEx: ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
+    /* [W10 round 5] accepted (997), then one completion FALSE/12017; no other status, nothing sent */
     EXPECT_EQ(ok, FALSE);
-    if (e == ERROR_IO_PENDING) {
-        INTERNET_ASYNC_RESULT r; CHECK(ac_wait_complete(CTX_REQ, 1, 5000, &r));
-        t_note("  completion dwResult=%llu dwError=%lu (%s)", (unsigned long long)r.dwResult, r.dwError, t_inet_errname(r.dwError));
-    }
+    EXPECT_EQ(e, ERROR_IO_PENDING);
+    INTERNET_ASYNC_RESULT r; CHECK(ac_wait_complete(CTX_REQ, 1, 5000, &r));
+    t_note("  completion dwResult=%llu dwError=%lu (%s)", (unsigned long long)r.dwResult, r.dwError, t_inet_errname(r.dwError));
+    EXPECT_EQ(r.dwResult, FALSE);
+    EXPECT_EQ(r.dwError, ERROR_INTERNET_OPERATION_CANCELLED);
     ac_quiesce(100, 500);
     t_note("  statuses: %s, requests at server %d", ac_seq_range(0, n0, -1, NULL), srv_req_count(f.s));
+    EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "100");
+    EXPECT_EQ(srv_req_count(f.s), 0);
     ac_flow_close(&f);
 }
 /* InternetQueryDataAvailable@0x76b20: valid handle, lpdwNumberOfBytesAvailable == NULL -> 87 */
@@ -174,7 +178,8 @@ TEST(ac_x_qda_null_handle) {
     DWORD e = GetLastError();
     t_note("QDA(NULL handle): ok=%d err=%lu av=0x%lx", ok, e, av);
     EXPECT_EQ(ok, FALSE);
-    CHECKF(e == ERROR_INVALID_HANDLE || e == ERROR_INTERNET_INVALID_OPERATION, "err %lu", e);
+    EXPECT_EQ(e, ERROR_INVALID_HANDLE);   /* [W10 round 5] */
+    EXPECT_EQ(av, 0xdeadbeef);
 }
 /* QDA on a connect handle (not a request) */
 TEST(ac_x_qda_on_connect_handle) {
@@ -187,11 +192,15 @@ TEST(ac_x_qda_on_connect_handle) {
     BOOL ok = U(InternetQueryDataAvailable)(f.hc, &av, 0, 0);
     DWORD e = GetLastError();
     t_note("QDA(connect handle): ok=%d err=%lu (%s) av=0x%lx", ok, e, t_inet_errname(e), av);
+    /* [W10 round 5] not rejected up front: the call goes pending (997) and one REQUEST_COMPLETE follows */
     EXPECT_EQ(ok, FALSE);
-    CHECK(e != ERROR_IO_PENDING);
+    EXPECT_EQ(e, ERROR_IO_PENDING);
+    CHECK(ac_wait_st(INTERNET_STATUS_REQUEST_COMPLETE, 0, 1, 3000));
     ac_quiesce(100, 300);
-    EXPECT_EQ(ac_count_st(INTERNET_STATUS_REQUEST_COMPLETE), 0);
-    t_note("  events: %s", ac_seq_range(0, n0, -1, NULL));
+    EXPECT_EQ(ac_count_st(INTERNET_STATUS_REQUEST_COMPLETE), 1);
+    INTERNET_ASYNC_RESULT r; ac_wait_complete(0, 1, 0, &r);
+    t_note("  events: %s; completion dwResult=%llu dwError=%lu (%s)", ac_seq_range(0, n0, -1, NULL), (unsigned long long)r.dwResult, r.dwError, t_inet_errname(r.dwError));
+    EXPECT_EQ(srv_req_count(f.s), 0);
     ac_flow_close(&f);
 }
 /* InternetReadFile on a connect handle in an async session */
@@ -205,7 +214,7 @@ TEST(ac_x_read_on_connect_handle) {
     DWORD e = GetLastError();
     t_note("InternetReadFile(connect handle): ok=%d err=%lu (%s) rd=0x%lx", ok, e, t_inet_errname(e), rd);
     EXPECT_EQ(ok, FALSE);
-    CHECK(e != ERROR_IO_PENDING);
+    EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);   /* [W10 round 5] */
     ac_quiesce(100, 300);
     EXPECT_EQ(ac_count_st(INTERNET_STATUS_REQUEST_COMPLETE), 0);
     ac_flow_close(&f);
@@ -221,7 +230,7 @@ TEST(ac_x_send_on_connect_handle) {
     DWORD e = GetLastError();
     t_note("HttpSendRequest(connect handle): ok=%d err=%lu (%s)", ok, e, t_inet_errname(e));
     EXPECT_EQ(ok, FALSE);
-    CHECK(e != ERROR_IO_PENDING);
+    EXPECT_EQ(e, ERROR_INTERNET_INCORRECT_HANDLE_TYPE);   /* [W10 round 5] */
     ac_quiesce(100, 300);
     EXPECT_EQ(ac_count_st(INTERNET_STATUS_REQUEST_COMPLETE), 0);
     t_note("  events: %s", ac_seq_range(0, n0, -1, NULL));
@@ -753,9 +762,9 @@ TEST(ac_x_requests_on_two_servers) {
 }
 
 /* ================================================================== REQUEST_SENT payload tables */
-/* [W10 rounds 2,4] REQUEST_SENT carries the bytes of one send. A small optional body (<= 100 bytes observed) goes out
- * in the same send as the head: one 30/31 pair, REQUEST_SENT = head + body. A large one (>= 1000 observed) is sent
- * separately: two 30/31 pairs, the first REQUEST_SENT = head only. Sizes in between are recorded only. */
+/* [W10 rounds 2,4,5] REQUEST_SENT carries the bytes of one send. A small optional body (<= 512 bytes observed) goes out
+ * in the same send as the head: one 30/31 pair, REQUEST_SENT = head + body. A large one (>= 999 observed) is sent
+ * separately: two 30/31 pairs, REQUEST_SENT = head, then = body. The exact threshold (513..998) is not asserted. */
 TEST(ac_x_post_size_table_request_sent) {
     REQ_ASYNC_API();
     static const DWORD sizes[] = { 0, 1, 2, 17, 100, 200, 500, 512, 999, 1000, 4096, 5000 };
@@ -778,13 +787,14 @@ TEST(ac_x_post_size_table_request_sent) {
         DWORD v[2] = { 0, 0 }; int from = n0;
         for (int j = 0; j < 2; j++) { int i = ac_find(INTERNET_STATUS_REQUEST_SENT, CTX_REQ, from); ac_ev ev; if (i < 0 || !ac_get(i, &ev)) break; EXPECT_EQ(ev.len, 4); v[j] = ac_info_dword(&ev); from = i + 1; }
         t_note("POST %lu: sends=%d REQUEST_SENT=%lu,%lu head=%zu body=%zu seq=%s", sz, nsent, v[0], v[1], hn, bn, ac_seq_range(0, n0, -1, SKIP_X));
-        if (sz <= 100) {
+        if (sz <= 512) {
             EXPECT_EQ(nsent, 1);
             CHECKF(v[0] == hn + bn, "size %lu: REQUEST_SENT %lu head %zu body %zu", sz, v[0], hn, bn);
             EXPECT_STR(ac_seq_range(0, n0, -1, SKIP_X), "20,21,30,31,40,41,100");
-        } else if (sz >= 1000) {
+        } else if (sz >= 999) {
             EXPECT_EQ(nsent, 2);
             CHECKF(v[0] == hn, "size %lu: first REQUEST_SENT %lu head %zu", sz, v[0], hn);
+            CHECKF(v[1] == bn, "size %lu: second REQUEST_SENT %lu body %zu", sz, v[1], bn);
             EXPECT_STR(ac_seq_range(0, n0, -1, SKIP_X), "20,21,30,31,30,31,40,41,100");
         }
         ac_flow_close(&f);
