@@ -18,3 +18,10 @@ Tests that need a second process re-launch the exe (`--child <name>`). Scratch f
 `%TEMP%\wininet_<pid>\` and are removed on exit. `tools/*_exports.txt` list the named exports.
 
 See `HANDOFF.md` (when present) for how to run and triage the Windows passes.
+
+## Network tests and the Windows 10 VM
+- `common/srv.h` (+ `common/SRV.md`): in-process loopback HTTP/HTTPS(schannel)/FTP servers with a wire recorder;
+  `common/tnet.h`: DIRECT sessions with timeouts, unique cache/cookie names, cleanup registries. No test uses the internet.
+- `tools/vm_run.sh AREA[,AREA]` / `tools/vm_run.sh --all` / `tools/vm_matrix.sh [--twice]`: run on the local Win10 22H2
+  VM, results in `results/win10/<area>.txt` (see `docs/VM_RUN.md`). The VM is the oracle; Wine is plumbing only.
+- `tests/net_loopback`: proof area for the chain (HTTP, HTTPS, FTP, auth, decoding) validated on the VM.

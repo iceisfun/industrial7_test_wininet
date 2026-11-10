@@ -205,7 +205,9 @@ TEST(netlb_redirect_302_relative) {
     t_inet_close(hi); srv_stop(s);
 }
 
-TEST(netlb_gzip_decoding) {
+/* Win10 VM (boot wininet-20261109-164926): HTTP_DECODING set on the session but no Accept-Encoding in the request:
+ * wininet sends no Accept-Encoding itself and hands the gzip bytes through undecoded. */
+TEST(netlb_gzip_no_accept_encoding_passthrough) {
     REQUIRE(U(InternetOpenUrlA));
     srv_step st[] = { S_HEAD(), S_REPLYN(200, "Content-Encoding: gzip\r\n", srv_fox_gzip, srv_fox_gzip_len, 0), S_LOOP() };
     srv *s = srv_http(st, 3); if (!s) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; }
@@ -214,24 +216,36 @@ TEST(netlb_gzip_decoding) {
     CHECK(U(InternetSetOptionA)(hi, INTERNET_OPTION_HTTP_DECODING, &on, sizeof on));
     char body[2048]; size_t n; DWORD err;
     int code = t_http_get(hi, srv_url(s, "/gz"), NULL, T_INET_FRESH, body, sizeof body, &n, &err);
-    EXPECT_EQ(code, 200); EXPECT_EQ(n, SRV_FOX_LEN); CHECK(n == SRV_FOX_LEN && !memcmp(body, srv_fox_text(), n));
+    EXPECT_EQ(code, 200);
+    EXPECT_EQ(n, srv_fox_gzip_len); CHECK(n == srv_fox_gzip_len && !memcmp(body, srv_fox_gzip, n));
     CHECK(srv_wait_requests(s, 1, 2000));
-    const char *ae = srv_req_header(s, 0, "Accept-Encoding");
-    t_note("Accept-Encoding with HTTP_DECODING: %s", ae ? ae : "(absent)");
+    CHECK(srv_req_header(s, 0, "Accept-Encoding") == NULL);
     t_inet_close(hi); srv_stop(s);
 }
 
-/* stored-deflate gzip built at run time (SRV_R_GZIP) decodes the same way */
-TEST(netlb_gzip_stored_decoding) {
-    REQUIRE(U(InternetOpenUrlA));
-    static const srv_step st[] = { S_HEAD(), S_REPLYF(200, NULL, "stored gzip body", SRV_R_GZIP), S_LOOP() };
+/* App adds Accept-Encoding: gzip, deflate (the decomp has CheckDecompression / _CheckDecompressionRequestHeaders on the
+ * request handle). Expected: decoded body. Measured on the VM: see results/win10/net_loopback.txt. */
+static void gzip_decode_case(const unsigned char *p, size_t len, unsigned flags, const char *ce, const char *want, size_t wantn) {
+    srv_step st[] = { S_HEAD(), { SRV_REPLY, (const char *)p, len, 200, ce, flags }, S_LOOP() };
     srv *s = srv_http(st, 3); if (!s) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; }
     HINTERNET hi = t_inet_open(NULL);
     BOOL on = TRUE; U(InternetSetOptionA)(hi, INTERNET_OPTION_HTTP_DECODING, &on, sizeof on);
-    char body[64]; size_t n; DWORD err;
-    int code = t_http_get(hi, srv_url(s, "/gz"), NULL, T_INET_FRESH, body, sizeof body, &n, &err);
-    EXPECT_EQ(code, 200); EXPECT_STR(body, "stored gzip body");
+    char body[2048]; size_t n; DWORD err;
+    int code = t_http_get(hi, srv_url(s, "/gz"), "Accept-Encoding: gzip, deflate\r\n", T_INET_FRESH, body, sizeof body, &n, &err);
+    EXPECT_EQ(code, 200);
+    CHECKF(n == wantn && !memcmp(body, want, wantn), "got %u bytes", (unsigned)n);
+    CHECK(srv_wait_requests(s, 1, 2000));
+    EXPECT_STR(srv_req_header(s, 0, "Accept-Encoding"), "gzip, deflate");
     t_inet_close(hi); srv_stop(s);
+}
+TEST(netlb_gzip_decoding) {
+    REQUIRE(U(InternetOpenUrlA));
+    gzip_decode_case(srv_fox_gzip, srv_fox_gzip_len, 0, "Content-Encoding: gzip\r\n", srv_fox_text(), SRV_FOX_LEN);
+}
+/* stored-deflate gzip built at run time (SRV_R_GZIP) */
+TEST(netlb_gzip_stored_decoding) {
+    REQUIRE(U(InternetOpenUrlA));
+    gzip_decode_case((const unsigned char *)"stored gzip body", 16, SRV_R_GZIP, NULL, "stored gzip body", 16);
 }
 
 TEST(netlb_localhost_dualstack) {
@@ -341,4 +355,141 @@ TEST(netlb_ftp_stor_passive) {
     CHECK(d && n == 9 && !memcmp(d, "uploaded!", 9));
     CHECK(srv_ftp_cmd_count(s) > 1 && !strcmp(srv_ftp_cmd(s, 0), "USER tester") && !strcmp(srv_ftp_cmd(s, 1), "PASS ***"));
     srv_stop(s);
+}
+
+TEST(netlb_ftp_findfirst_list) {
+    REQUIRE(U(FtpFindFirstFileA)); REQUIRE(U(InternetFindNextFileA));
+    static const srv_ftp_file files[] = { { "/hello.txt", "hello", 5, "20200102030405" } };
+    srv_ftp_config fc = { files, 1 };
+    srv_config cfg = { SRV_FTP }; cfg.ftp = &fc; srv *s;
+    START_OR_SKIP(&cfg, &s);
+    HINTERNET hi = t_inet_open(NULL);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_FTP, INTERNET_FLAG_PASSIVE, 0);
+    WIN32_FIND_DATAA fd; memset(&fd, 0, sizeof fd);
+    HINTERNET hf = hc ? U(FtpFindFirstFileA)(hc, NULL, &fd, INTERNET_FLAG_RELOAD, 0) : NULL;
+    CHECKF(hf != NULL, "err=%lu", GetLastError());
+    if (hf) {
+        EXPECT_STR(fd.cFileName, "hello.txt"); EXPECT_EQ(fd.nFileSizeLow, 5);   /* 04 F13 */
+        SET_ERR(0);
+        CHECK(!U(InternetFindNextFileA)(hf, &fd)); EXPECT_ERR(ERROR_NO_MORE_FILES);
+        U(InternetCloseHandle)(hf);
+    }
+    if (hc) U(InternetCloseHandle)(hc);
+    t_inet_close(hi);
+    int n = srv_ftp_cmd_count(s);
+    for (int i = 0; i < n; i++) t_note("ftp cmd[%d] %s", i, srv_ftp_cmd(s, i));
+    srv_stop(s);
+}
+
+TEST(netlb_auth_basic_retry) {
+    REQUIRE(U(HttpSendRequestA));
+    static const srv_step st[] = { S_HEAD(), S_REPLY(401, "WWW-Authenticate: Basic realm=\"r\"\r\n", "denied"),
+                                   S_HEAD(), S_REPLY(200, NULL, "granted"), S_LOOP_TO(2) };
+    srv *s = srv_http(st, 5); if (!s) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; }
+    HINTERNET hi = t_inet_open(NULL);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), "user", "pass", INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/auth", NULL, NULL, NULL, T_INET_FRESH, 0);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    CHECKF(ok, "err=%lu", GetLastError());
+    DWORD code = 0, l = sizeof code; U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &code, &l, NULL);
+    char body[32]; t_inet_read_all(hr, body, sizeof body, NULL);
+    t_note("basic: status=%lu body=%s requests=%d", code, body, srv_req_count(s));
+    for (int i = 0; i < srv_req_count(s); i++) { const char *a = srv_req_header(s, i, "Authorization"); t_note("req %d auth=%s", i, a ? a : "(none)"); }
+    EXPECT_EQ(code, 200);
+    const char *a1 = srv_req_header(s, 1, "Authorization");
+    EXPECT_STR(a1, "Basic dXNlcjpwYXNz");
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
+}
+
+/* SSPI server side: NTLM handshake with a non-existent account. Note only (outcome depends on local policy). */
+TEST(netlb_auth_ntlm_server_probe) {
+    REQUIRE(U(HttpSendRequestA));
+    static const srv_step st[] = { S_AUTH("NTLM"), S_REPLY(200, NULL, "ntlm-ok"), S_LOOP() };
+    srv *s = srv_http(st, 3); if (!s) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; }
+    HINTERNET hi = t_inet_open(NULL);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), "i7nouser", "i7-not-a-password", INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/ntlm", NULL, NULL, NULL, T_INET_FRESH, 0);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    DWORD err = ok ? 0 : GetLastError(), code = 0, l = sizeof code;
+    U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &code, &l, NULL);
+    t_note("ntlm: send=%d err=%lu status=%lu requests=%d", ok, err, code, srv_req_count(s));
+    const srv_event *ev; int ne = srv_events(s, &ev);
+    for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_AUTH) t_note("ntlm srv: %s", ev[i].data);
+    for (int i = 0; i < srv_req_count(s); i++) { const char *a = srv_req_header(s, i, "Authorization"); t_note("req %d auth=%.24s", i, a ? a : "(none)"); }
+    /* Win10 VM: anonymous request, then NTLM Type 1, then Type 3; the server rejects the unknown account -> 401 */
+    EXPECT_EQ(srv_req_count(s), 3);
+    CHECK(srv_req_header(s, 0, "Authorization") == NULL);
+    const char *a1 = srv_req_header(s, 1, "Authorization"), *a2 = srv_req_header(s, 2, "Authorization");
+    CHECK(a1 && !strncmp(a1, "NTLM TlRMTVNTUAAB", 17));
+    CHECK(a2 && !strncmp(a2, "NTLM TlRMTVNTUAAD", 17));
+    CHECK(ok); EXPECT_EQ(code, 401);
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
+}
+
+static DWORD https_once(srv *s, DWORD secflags, DWORD *code) {
+    HINTERNET hi = t_inet_open(NULL);
+    HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/x", NULL, NULL, NULL, T_INET_FRESH | INTERNET_FLAG_SECURE, 0);
+    if (secflags) t_https_secflags(hr, secflags);
+    BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
+    DWORD err = ok ? 0 : GetLastError(), l = sizeof *code; *code = 0;
+    if (ok) U(HttpQueryInfoA)(hr, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, code, &l, NULL);
+    U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi);
+    return err;
+}
+
+/* 04 1.3: expected 12037 ERROR_INTERNET_SEC_CERT_DATE_INVALID after 0x100 (decomp/doc-derived, measured here) */
+TEST(netlb_https_expired_cert) {
+    REQUIRE(U(HttpSendRequestA));
+    srv *s = srv_https(NULL, 0, SRV_CERT_EXPIRED); if (!s) { t_skip("HTTPS server unavailable: %s", srv_strerror(srv_last_error())); return; }
+    DWORD code, e1 = https_once(s, SECURITY_FLAG_IGNORE_UNKNOWN_CA, &code);
+    t_note("expired: flags 0x100 -> err=%lu %s", e1, t_inet_errname(e1));
+    DWORD e2 = https_once(s, SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID, &code);
+    t_note("expired: flags 0x2100 -> err=%lu status=%lu", e2, code);
+    EXPECT_EQ(e1, ERROR_INTERNET_SEC_CERT_DATE_INVALID);   /* Win10 VM */
+    EXPECT_EQ(e2, 0); EXPECT_EQ(code, 200);
+    srv_stop(s);
+}
+
+TEST(netlb_https_client_cert_requested) {
+    REQUIRE(U(HttpSendRequestA));
+    srv_config cfg = { SRV_HTTPS }; cfg.tls_client_cert = 1; srv *s;
+    START_OR_SKIP(&cfg, &s);
+    DWORD code, e = https_once(s, SECURITY_FLAG_IGNORE_UNKNOWN_CA, &code);
+    t_note("client cert requested, none configured: err=%lu %s status=%lu", e, t_inet_errname(e), code);
+    EXPECT_EQ(e, ERROR_INTERNET_CLIENT_AUTH_CERT_NEEDED);   /* Win10 VM */
+    const srv_event *ev; int ne = srv_events(s, &ev);
+    for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_TLS_DONE || ev[i].kind == SRV_EV_TLS_ABORT) t_note("tls: %s %s", srv_event_kind_name(ev[i].kind), ev[i].data ? ev[i].data : "");
+    srv_stop(s);
+}
+
+TEST(netlb_https_tls12_only_server) {
+    REQUIRE(U(HttpSendRequestA));
+    srv_config cfg = { SRV_HTTPS }; cfg.tls_protocols = 0x400 /* SP_PROT_TLS1_2_SERVER */; srv *s;
+    START_OR_SKIP(&cfg, &s);
+    DWORD code, e = https_once(s, SECURITY_FLAG_IGNORE_UNKNOWN_CA, &code);
+    CHECKF(e == 0 && code == 200, "err=%lu code=%lu", e, code);
+    const srv_event *ev; int ne = srv_events(s, &ev);
+    for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_TLS_DONE) { t_note("tls: %s", ev[i].data); CHECK(strstr(ev[i].data, "proto=0x400") != NULL); }
+    srv_stop(s);
+}
+
+TEST(netlb_srv_stop_is_bounded) {
+    /* a connection parked in a long sleep must not hold srv_stop beyond ~3 s */
+    static const srv_step st[] = { S_HEAD(), S_SLEEP(5000), S_REPLY(200, NULL, "late") };
+    srv *s = srv_http(st, 3); if (!s) { t_skip("server unavailable: %s", srv_strerror(srv_last_error())); return; }
+    char resp[64];
+    /* connect + send a head, do not wait for the answer: raw_exchange would block 3 s on recv; use a short one */
+    __typeof__(&socket) p_socket = UIN("ws2_32.dll", socket); __typeof__(&connect) p_connect = UIN("ws2_32.dll", connect);
+    __typeof__(&send) p_send = UIN("ws2_32.dll", send); __typeof__(&closesocket) p_close = UIN("ws2_32.dll", closesocket);
+    if (!p_socket) { srv_stop(s); t_skip("ws2_32"); return; }
+    SOCKET so = p_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    unsigned short port = srv_port(s);
+    struct sockaddr_in a; memset(&a, 0, sizeof a); a.sin_family = AF_INET; a.sin_port = (unsigned short)((port >> 8) | (port << 8)); a.sin_addr.s_addr = 0x0100007f;
+    CHECK(!p_connect(so, (struct sockaddr *)&a, sizeof a));
+    p_send(so, "GET / HTTP/1.1\r\n\r\n", 18, 0);
+    CHECK(srv_wait_requests(s, 1, 2000));
+    DWORD t0 = GetTickCount(); srv_stop(s); DWORD dt = GetTickCount() - t0;
+    CHECKF(dt < 3500, "srv_stop took %lu ms", dt);
+    p_close(so); (void)resp;
 }
