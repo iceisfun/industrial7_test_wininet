@@ -7,7 +7,8 @@ entries are registered with `t_cache_track`.
 
 Oracle: Windows 10 22H2 VM (10.0.19045.2965, wininet 11.0.19041.2193), boots `~/w10lab/runs/rs2-20261110-050626-b1`
 (first 145 tests, then the area timed out: see "Server teardown" below), `rs3-20261110-061948-b1` (all 318 tests,
-2534 checks passed, 15 tests failed and were triaged) and `rs4-*` (after the fixes). Tags:
+2534 checks passed, 15 tests failed and were triaged) and `rs4-20261110-075642-b1` (after the fixes: **PASS, 319 tests,
+2627 checks, 0 failures**, 315 s). Tags:
 
 - **[D]** decomp of the Win10 wininet.dll (docker1 corpus API), function named.
 - **[VM]** observed on the Win10 VM and made a hard CHECK (comment `Win10 VM` / `boot rsN` next to the check).
@@ -87,11 +88,13 @@ Oracle: Windows 10 22H2 VM (10.0.19045.2965, wininet 11.0.19041.2193), boots `~/
 - **Server teardown.** wininet keeps idle keep-alive sockets pooled after the handles close and `shutdown()` does not
   wake a blocked `recv`, so with the default 5 s io timeout every `srv_stop` waited out its 3 s join (boot rs2: only 145
   tests in 400 s). The router and `rs_plain()` servers use a 1 s (HTTP) / 2 s (HTTPS) idle timeout.
-- **First HTTPS handshake.** In boot rs3 the first HTTPS test of the process (`rs_scheme_https_same_server`) got 12030
-  before any request reached the server; every later HTTPS test worked. The test retries once in that exact case and
-  notes it.
-- Recorded only (`t_note`): the request count of the 304 revalidation and cacheable-301 cases (3 requests where 2 were
-  expected; the request lines are logged), odd status lines, Authorization/Cookie supplied by the caller on a hop,
+- **First HTTPS handshake.** In boots rs3 and rs4 the first HTTPS request of the process (`rs_scheme_https_same_server`,
+  which runs first) got 12030 before any request reached the server; every later HTTPS test worked. It is reproducible,
+  so it belongs to the loopback schannel server's first handshake (or wininet's first TLS setup in the process), not to
+  redirects. The test retries once in exactly that case and notes it; worth a look by the `https_tls`/foundation owners.
+- Recorded only (`t_note`): the request count of the 304 revalidation and cacheable-301 cases. Boot rs4 logged
+  `GET src, GET dst, GET src` for the cacheable 301 (the 301 is fetched again, the target comes from the cache) and two
+  conditional requests carrying `If-None-Match: "rs-v1"` for the RESYNCHRONIZE revalidation; odd status lines, Authorization/Cookie supplied by the caller on a hop,
   `INTERNET_OPTION_SECURITY_FLAGS` behaviour on http.
 - Knowledge-only and not asserted: zone-crossing warnings 12039/12040/12052 (`GlobalWarnOnZoneCrossing`,
   `GlobalWarnOnHTTPSToHTTPRedirect`) are registry-driven; the lab image does not raise them (https->http is followed).
