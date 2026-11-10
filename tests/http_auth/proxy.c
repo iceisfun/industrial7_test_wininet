@@ -241,12 +241,13 @@ TEST(auth_proxy_then_origin_auth) {
     a_dump(s);
     int n = srv_req_count(s);
     t_note("proxy then origin with one pair: status=%lu requests=%d", r.status, n);
-    EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "both");
-    EXPECT_EQ(n, 3);
-    if (n >= 3) {
+    /* Win10 VM boot 3 (and the 2-request count in boots 1-2): the InternetConnect pair answers the 407, and the
+     * origin's 401 that follows on the same HttpSendRequest is handed back without an origin retry. */
+    EXPECT_EQ(r.status, 401); EXPECT_STR(r.body, "O");
+    EXPECT_EQ(n, 2);
+    if (n >= 2) {
         CHECK(REQ_PAUTH(s, 0) == NULL); CHECK(REQ_AUTH(s, 0) == NULL);
         EXPECT_STR(REQ_PAUTH(s, 1), a_basic("both", "pw")); CHECK(REQ_AUTH(s, 1) == NULL);
-        EXPECT_STR(REQ_PAUTH(s, 2), a_basic("both", "pw")); EXPECT_STR(REQ_AUTH(s, 2), a_basic("both", "pw"));
     }
     srv_stop(s);
 }

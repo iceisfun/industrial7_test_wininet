@@ -75,6 +75,24 @@ TEST(auth_https_ntlm_custom_gate) {
     srv_stop(s);
 }
 
+/* Registered after auth_https_ntlm_custom_gate, so it runs before it (the harness runs tests in reverse order):
+ * one plain HTTPS request first, then NTLM on the same server. Discriminates "first TLS handshake of the process
+ * is slow on the VM" from "NTLM over HTTPS fails" (boots 2-3: the NTLM test saw no ClientHello for 5 s, 12030). */
+TEST(auth_https_ntlm_after_warmup) {
+    REQUIRE(U(HttpSendRequestA));
+    gate g = {0}; g.challenge = "WWW-Authenticate: NTLM\r\n"; g.ntlm_mode = 1; g.pass = "tlsntlm2";
+    srv *s = gate_start_kind(&g, SRV_HTTPS); SRV_OR_SKIP(s);
+    ares w; DWORD t0 = GetTickCount(); tls_send(s, NULL, NULL, "/warm", &w);
+    t_note("https warm-up: ok=%d err=%lu status=%lu %lu ms", w.ok, w.err, w.status, GetTickCount() - t0);
+    ares r; t0 = GetTickCount(); tls_send(s, "i7tlsuser2", "tlsntlm2", "/tlsntlm2", &r);
+    a_dump(s);
+    t_note("https ntlm after warm-up: ok=%d err=%lu %s status=%lu v2ok=%d %lu ms", r.ok, r.err, t_inet_errname(r.err), r.status, g.ntlm_v2_ok, GetTickCount() - t0);
+    EXPECT_EQ(w.status, 401);
+    EXPECT_EQ(r.status, 200);
+    EXPECT_EQ(g.ntlm_v2_ok, 1);
+    srv_stop(s);
+}
+
 /* ------------------------------------------------------------------ status callbacks */
 #define MAXCB 128
 static DWORD g_cb[MAXCB]; static volatile LONG g_ncb;

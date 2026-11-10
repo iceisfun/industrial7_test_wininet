@@ -7,7 +7,7 @@
 #define D_OPAQUE "5ccc069c403ebaf9f0171e9517f40e41"
 
 /* verify callback: accept a Digest header whose response matches g->pass for the current nonce */
-static int digest_verify(gate *g, srv *s, int ri, const char *hv) {
+int digest_verify(gate *g, srv *s, int ri, const char *hv) {
     if (_strnicmp(hv, "Digest ", 7)) return 0;
     char user[128], realm[128], nonce[128], uri[512], resp[64], qop[32] = "", nc[32] = "", cnonce[128] = "", alg[32] = "";
     if (!a_param(hv, "username", user, sizeof user) || !a_param(hv, "realm", realm, sizeof realm) || !a_param(hv, "nonce", nonce, sizeof nonce) ||
@@ -19,7 +19,7 @@ static int digest_verify(gate *g, srv *s, int ri, const char *hv) {
 }
 
 /* check the recorded header of request i: recompute the response with method/uri as sent */
-static int digest_check_recorded(srv *s, int i, const char *user, const char *realm, const char *pass, int sess, const char *want_qop) {
+int digest_check_recorded(srv *s, int i, const char *user, const char *realm, const char *pass, int sess, const char *want_qop) {
     const char *hv = REQ_AUTH(s, i);
     if (!hv) { CHECKF(0, "req %d: no Authorization", i); return 0; }
     CHECKF(!strncmp(hv, "Digest ", 7), "req %d: scheme %.20s", i, hv);
@@ -37,7 +37,7 @@ static int digest_check_recorded(srv *s, int i, const char *user, const char *re
     return !strcmp(resp, want);
 }
 
-static void dgate(gate *g, const char *challenge, const char *user, const char *pass) {
+void dgate(gate *g, const char *challenge, const char *user, const char *pass) {
     memset(g, 0, sizeof *g); g->challenge = challenge; g->verify = digest_verify; g->user = user; g->pass = pass; g->realm = "i7digest"; g->nonce = D_NONCE;
 }
 

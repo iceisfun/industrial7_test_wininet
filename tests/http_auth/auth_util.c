@@ -209,6 +209,10 @@ srv *gate_start_kind(gate *g, int kind) {
     static const srv_step st[] = { S_CALL(gate_fn) };
     static const srv_script sc[] = { SRV_SCRIPT(st) };
     srv_config cfg = { (srv_kind)kind, sc, 1 }; cfg.user = g; cfg.lifetime_ms = 30000;
+    /* wininet keeps idle keep-alive sockets pooled after the handles are closed, and srv_stop's shutdown() does not
+     * wake a blocked recv on Windows, so every stop used to wait out its 3 s join (Win10 VM boot 3: 150 x 3 s).
+     * Plain-HTTP gate threads give up after 1 s without a request instead; every leg of a test is ms apart. */
+    if (kind == SRV_HTTP) cfg.io_timeout_ms = 1000;
     srv *s = NULL; if (srv_start(&cfg, &s)) return NULL; return s;
 }
 

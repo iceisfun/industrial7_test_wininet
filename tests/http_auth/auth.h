@@ -64,6 +64,12 @@ int gate_fn(srv_conn *c, const srv_step *st, void *user);
 srv *gate_start(gate *g);
 srv *gate_start_kind(gate *g, int kind);   /* SRV_HTTP or SRV_HTTPS (SRV_CERT_LOCALHOST) */
 
+/* Digest helpers (digest.c): verify callback (accepts a response computed with g->user/pass/realm/nonce/sess),
+ * recomputation of the recorded header of request i, and a gate preset (realm "i7digest", fixed nonce). */
+int digest_verify(gate *g, srv *s, int ri, const char *hv);
+int digest_check_recorded(srv *s, int i, const char *user, const char *realm, const char *pass, int sess, const char *want_qop);
+void dgate(gate *g, const char *challenge, const char *user, const char *pass);
+
 /* ------------------------------------------------------------------ client helper */
 typedef struct {
     const char *verb, *path, *hdrs;
