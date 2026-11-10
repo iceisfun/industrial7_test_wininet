@@ -346,7 +346,10 @@ TEST(ac_intermediate_response_100) {
     ac_quiesce(100, 300);
     t_note("100-continue statuses: %s", ac_seq_range(0, n0, -1, NULL));
     EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_INTERMEDIATE_RESPONSE, CTX_REQ), 1);
-    EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "80,20,21,30,31,40,41,120,40,41,100");
+    /* [W10] rounds 1-3: a second 40,41 pair after 120; round 4: none, the final response was already in the
+     * buffer that carried the 100 (segmentation dependent). Either form is accepted. */
+    const char *sq = ac_seq_range(0, n0, -1, NULL);
+    CHECKF(!strcmp(sq, "80,20,21,30,31,40,41,120,40,41,100") || !strcmp(sq, "80,20,21,30,31,40,41,120,100"), "seq %s", sq);
     int i = ac_find(INTERNET_STATUS_INTERMEDIATE_RESPONSE, CTX_REQ, 0); ac_ev ev;
     if (i >= 0 && ac_get(i, &ev)) { t_note("INTERMEDIATE len=%lu dword=%lu", ev.len, ac_info_dword(&ev)); EXPECT_EQ(ac_info_dword(&ev), 100); }
     ac_flow_close(&f);

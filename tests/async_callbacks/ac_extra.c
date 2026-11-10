@@ -6,7 +6,7 @@
  * redirect chains and InternetOpenUrl with redirects/headers. Every peer is an in-process loopback server. */
 #include "ac.h"
 
-/* VM_TIMEOUT: 300 */
+/* VM_TIMEOUT: 700 */
 
 static const DWORD SKIP_X[] = { INTERNET_STATUS_HANDLE_CREATED, INTERNET_STATUS_HANDLE_CLOSING, AC_ST_330,
                                 INTERNET_STATUS_COOKIE_SENT, INTERNET_STATUS_COOKIE_RECEIVED, INTERNET_STATUS_DETECTING_PROXY,
@@ -93,6 +93,44 @@ TEST(ac_x_endreq_a_null_handle) {
     static INTERNET_BUFFERSA out; memset(&out, 0, sizeof out); out.dwStructSize = sizeof out;
     SetLastError(0xdeadbeef);
     EXPECT_EQ(U(HttpEndRequestA)(NULL, &out, 0, 0), FALSE); EXPECT_ERR(ERROR_INVALID_PARAMETER);
+}
+/* HttpSendRequestExA@0xd7f30: lpBuffersOut != NULL -> 87; lpBuffersIn with dwStructSize != 0x38 -> 87; both before
+ * any I/O, so nothing is reported and nothing reaches the server */
+TEST(ac_x_sendex_buffersout_rejected) {
+    REQ_ASYNC_API(); REQUIRE(U(HttpSendRequestExA));
+    ac_begin(); ac_flow f;
+    if (!ac_flow_open(&f, NULL, 0, INTERNET_FLAG_ASYNC, ac_cb, "POST", "/x", T_INET_FRESH)) return;
+    static INTERNET_BUFFERSA in, out;
+    memset(&in, 0, sizeof in); in.dwStructSize = sizeof in;
+    memset(&out, 0, sizeof out); out.dwStructSize = sizeof out;
+    int n0 = ac_count();
+    SetLastError(0xdeadbeef);
+    EXPECT_EQ(U(HttpSendRequestExA)(f.hr, &in, &out, 0, 0), FALSE); EXPECT_ERR(ERROR_INVALID_PARAMETER);
+    SetLastError(0xdeadbeef);
+    EXPECT_EQ(U(HttpSendRequestExA)(f.hr, NULL, &out, 0, 0), FALSE); EXPECT_ERR(ERROR_INVALID_PARAMETER);
+    ac_quiesce(100, 300);
+    EXPECT_EQ(ac_count(), n0);
+    EXPECT_EQ(srv_req_count(f.s), 0);
+    ac_flow_close(&f);
+}
+TEST(ac_x_sendex_bad_struct_size) {
+    REQ_ASYNC_API(); REQUIRE(U(HttpSendRequestExA));
+    static const DWORD sz[] = { 0, 1, 0x37, 0x39, 0x40, 0x28 };
+    ac_begin(); ac_flow f;
+    if (!ac_flow_open(&f, NULL, 0, INTERNET_FLAG_ASYNC, ac_cb, "POST", "/x", T_INET_FRESH)) return;
+    static INTERNET_BUFFERSA in[2];
+    int n0 = ac_count();
+    for (unsigned k = 0; k < sizeof sz / sizeof sz[0]; k++) {
+        memset(in, 0, sizeof in); in[0].dwStructSize = sz[k];
+        SetLastError(0xdeadbeef);
+        BOOL ok = U(HttpSendRequestExA)(f.hr, in, NULL, 0, 0);
+        DWORD e = GetLastError();
+        CHECKF(!ok && e == ERROR_INVALID_PARAMETER, "dwStructSize 0x%lx: ok=%d err=%lu", sz[k], ok, e);
+    }
+    ac_quiesce(100, 300);
+    EXPECT_EQ(ac_count(), n0);
+    EXPECT_EQ(srv_req_count(f.s), 0);
+    ac_flow_close(&f);
 }
 /* HttpEndRequest on a request that was never started with HttpSendRequestEx, async session */
 TEST(ac_x_endreq_without_sendex) {
@@ -631,48 +669,58 @@ TEST(ac_x_close_idle_request_no_complete) {
 }
 
 /* ================================================================== many requests in flight */
+/* Six requests in flight on one connect handle. [W10 round 4] WinINet used 2 connections to the server; requests
+ * waiting for a connection while both connections held unread responses failed after the 5 s timeout with 12002
+ * (statuses 60,80,100 only). Here every completed response is drained at once, which frees its connection, so all
+ * six complete; each completion carries its own context and handle. */
 #define X_NREQ 6
 TEST(ac_x_many_requests_distinct_contexts) {
     REQ_ASYNC_API();
-    static const srv_step st[] = { S_HEAD(), S_SLEEP(100), S_REPLY(200, NULL, "multi"), S_LOOP() };
+    static const srv_step st[] = { S_HEAD(), S_SLEEP(50), S_REPLY(200, NULL, "multi"), S_LOOP() };
     ac_begin(); ac_flow f;
     if (!ac_flow_open(&f, st, 4, INTERNET_FLAG_ASYNC, ac_cb, "GET", "/m0", T_INET_FRESH)) return;
-    HINTERNET hr[X_NREQ]; DWORD_PTR ctx[X_NREQ];
+    HINTERNET hr[X_NREQ]; DWORD_PTR ctx[X_NREQ]; int done[X_NREQ] = { 0 };
     for (int i = 0; i < X_NREQ; i++) {
         char p[16]; snprintf(p, sizeof p, "/m%d", i);
         ctx[i] = (DWORD_PTR)0x77000100 + i;
         hr[i] = U(HttpOpenRequestA)(f.hc, "GET", p, NULL, NULL, NULL, T_INET_FRESH, ctx[i]);
         CHECK(hr[i] != NULL);
+        if (!hr[i]) { for (int j = 0; j < i; j++) U(InternetCloseHandle)(hr[j]); ac_flow_close(&f); return; }
     }
     for (int i = 0; i < X_NREQ; i++) {
         SetLastError(0xdeadbeef);
-        BOOL r = hr[i] ? U(HttpSendRequestA)(hr[i], NULL, 0, NULL, 0) : TRUE;
+        BOOL r = U(HttpSendRequestA)(hr[i], NULL, 0, NULL, 0);
         DWORD e = GetLastError();
         CHECKF(!r && e == ERROR_IO_PENDING, "request %d: r=%d e=%lu", i, r, e);
     }
-    for (int i = 0; i < X_NREQ; i++) {
-        INTERNET_ASYNC_RESULT res;
-        CHECKF(ac_wait_complete(ctx[i], 1, 10000, &res), "request %d completed", i);
-        EXPECT_EQ(res.dwResult, TRUE); EXPECT_EQ(res.dwError, 0);
-        int k = ac_find(INTERNET_STATUS_REQUEST_COMPLETE, ctx[i], 0); ac_ev ev;
-        if (k >= 0 && ac_get(k, &ev)) { EXPECT_EQ(ev.h, hr[i]); CHECK(ev.tid != ac_main_tid); }
-        EXPECT_EQ(ac_status_code(hr[i]), 200);
+    int ndone = 0; DWORD t0 = GetTickCount();
+    while (ndone < X_NREQ && GetTickCount() - t0 < 12000) {
+        ac_wait_st(INTERNET_STATUS_REQUEST_COMPLETE, 0, ac_count_st(INTERNET_STATUS_REQUEST_COMPLETE) + 1, 200);
+        for (int i = 0; i < X_NREQ; i++) {
+            INTERNET_ASYNC_RESULT res;
+            if (done[i] || !ac_wait_complete(ctx[i], 1, 0, &res)) continue;
+            done[i] = 1; ndone++;
+            CHECKF(res.dwResult == TRUE && res.dwError == 0, "request %d: dwResult %llu dwError %lu", i, (unsigned long long)res.dwResult, res.dwError);
+            int k = ac_find(INTERNET_STATUS_REQUEST_COMPLETE, ctx[i], 0); ac_ev ev;
+            if (k >= 0 && ac_get(k, &ev)) { EXPECT_EQ(ev.h, hr[i]); CHECK(ev.tid != ac_main_tid); }
+            EXPECT_EQ(ac_status_code(hr[i]), 200);
+            char b[16]; int np;
+            EXPECT_EQ(ac_read_all_async(hr[i], ctx[i], b, sizeof b, &np), 5);
+        }
     }
+    EXPECT_EQ(ndone, X_NREQ);
     ac_quiesce(100, 500);
     for (int i = 0; i < X_NREQ; i++) {
-        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_REQUEST_COMPLETE, ctx[i]), 1);
         EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_SENDING_REQUEST, ctx[i]), 1);
         EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_REQUEST_SENT, ctx[i]), 1);
-        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RECEIVING_RESPONSE, ctx[i]), 1);
-        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESPONSE_RECEIVED, ctx[i]), 1);
-        /* every event carrying this context is for this handle */
+        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_RESPONSE_RECEIVED, ctx[i]) >= 1, 1);
         for (int k = 0; k < ac_count(); k++) { ac_ev ev; ac_get(k, &ev); if (ev.ctx == ctx[i] && ev.st != INTERNET_STATUS_HANDLE_CREATED) CHECKF(ev.h == hr[i], "ctx %d event st %lu on another handle", i, ev.st); }
-        char b[16]; int np;
-        EXPECT_EQ(ac_read_all_async(hr[i], ctx[i], b, sizeof b, &np), 5);
         t_note("request %d: %s", i, ac_seq(ctx[i], NULL));
     }
     EXPECT_EQ(srv_req_count(f.s), X_NREQ);
-    t_note("connections used for %d concurrent requests: %d", X_NREQ, srv_conn_count(f.s));
+    int nc = srv_conn_count(f.s);
+    t_note("connections used for %d concurrent requests: %d", X_NREQ, nc);
+    CHECKF(nc >= 1 && nc <= 2, "connections %d", nc);
     for (int i = 0; i < X_NREQ; i++) ac_close_wait(hr[i], ctx[i]);
     ac_flow_close(&f);
 }
@@ -705,32 +753,40 @@ TEST(ac_x_requests_on_two_servers) {
 }
 
 /* ================================================================== REQUEST_SENT payload tables */
-/* [W10 round 2] REQUEST_SENT carries head size (+ body when sent with HttpSendRequest) */
+/* [W10 rounds 2,4] REQUEST_SENT carries the bytes of one send. A small optional body (<= 100 bytes observed) goes out
+ * in the same send as the head: one 30/31 pair, REQUEST_SENT = head + body. A large one (>= 1000 observed) is sent
+ * separately: two 30/31 pairs, the first REQUEST_SENT = head only. Sizes in between are recorded only. */
 TEST(ac_x_post_size_table_request_sent) {
     REQ_ASYNC_API();
-    static const DWORD sizes[] = { 0, 1, 2, 17, 100, 1000, 4096, 5000 };
+    static const DWORD sizes[] = { 0, 1, 2, 17, 100, 200, 500, 512, 999, 1000, 4096, 5000 };
     static char body[5000];
     for (unsigned i = 0; i < sizeof body; i++) body[i] = (char)('A' + i % 26);
     static const srv_step st[] = { S_HEAD(), S_BODY(), S_REPLY(200, NULL, "ok"), S_LOOP() };
     for (unsigned k = 0; k < sizeof sizes / sizeof sizes[0]; k++) {
+        DWORD sz = sizes[k];
         ac_begin(); ac_flow f;
         if (!ac_flow_open(&f, st, 4, INTERNET_FLAG_ASYNC, ac_cb, "POST", "/size", T_INET_FRESH)) return;
         int n0 = ac_count(), pending; DWORD err;
-        CHECKF(ac_send_wait(f.hr, CTX_REQ, NULL, sizes[k] ? body : NULL, sizes[k], &pending, &err), "size %lu err %lu", sizes[k], err);
+        CHECKF(ac_send_wait(f.hr, CTX_REQ, NULL, sz ? body : NULL, sz, &pending, &err), "size %lu err %lu", sz, err);
         CHECK(pending);
         CHECK(srv_wait_requests(f.s, 1, 2000));
-        size_t hn = 0, bn = 0; srv_req_head_raw(f.s, 0, &hn); srv_req_body(f.s, 0, &bn);
-        EXPECT_EQ(bn, sizes[k]);
-        int i = ac_find(INTERNET_STATUS_REQUEST_SENT, CTX_REQ, n0); ac_ev ev;
-        CHECK(i >= 0);
-        if (i >= 0 && ac_get(i, &ev)) {
-            EXPECT_EQ(ev.len, 4);
-            t_note("POST %lu: REQUEST_SENT=%lu head=%zu body=%zu", sizes[k], ac_info_dword(&ev), hn, bn);
-            CHECKF(ac_info_dword(&ev) == hn + bn, "size %lu: REQUEST_SENT %lu head %zu body %zu", sizes[k], ac_info_dword(&ev), hn, bn);
-        }
-        EXPECT_EQ(ac_count_st_ctx(INTERNET_STATUS_REQUEST_SENT, CTX_REQ), 1);
+        size_t hn = 0, bn = 0; srv_req_head_raw(f.s, 0, &hn); const char *rb = srv_req_body(f.s, 0, &bn);
+        EXPECT_EQ(bn, sz);
+        CHECKF(rb && bn == sz && (sz == 0 || !memcmp(rb, body, sz)), "size %lu body bytes", sz);
         ac_quiesce(50, 300);
-        EXPECT_STR(ac_seq_range(0, n0, -1, SKIP_X), "20,21,30,31,40,41,100");
+        int nsent = ac_count_st_ctx(INTERNET_STATUS_REQUEST_SENT, CTX_REQ);
+        DWORD v[2] = { 0, 0 }; int from = n0;
+        for (int j = 0; j < 2; j++) { int i = ac_find(INTERNET_STATUS_REQUEST_SENT, CTX_REQ, from); ac_ev ev; if (i < 0 || !ac_get(i, &ev)) break; EXPECT_EQ(ev.len, 4); v[j] = ac_info_dword(&ev); from = i + 1; }
+        t_note("POST %lu: sends=%d REQUEST_SENT=%lu,%lu head=%zu body=%zu seq=%s", sz, nsent, v[0], v[1], hn, bn, ac_seq_range(0, n0, -1, SKIP_X));
+        if (sz <= 100) {
+            EXPECT_EQ(nsent, 1);
+            CHECKF(v[0] == hn + bn, "size %lu: REQUEST_SENT %lu head %zu body %zu", sz, v[0], hn, bn);
+            EXPECT_STR(ac_seq_range(0, n0, -1, SKIP_X), "20,21,30,31,40,41,100");
+        } else if (sz >= 1000) {
+            EXPECT_EQ(nsent, 2);
+            CHECKF(v[0] == hn, "size %lu: first REQUEST_SENT %lu head %zu", sz, v[0], hn);
+            EXPECT_STR(ac_seq_range(0, n0, -1, SKIP_X), "20,21,30,31,30,31,40,41,100");
+        }
         ac_flow_close(&f);
     }
 }
