@@ -141,8 +141,11 @@ TEST(ueg_x_header_w_enum) {
         CHECK(e->lpszSourceUrlName && !lstrcmpW(e->lpszSourceUrlName, ueg_w(url)));
         CHECK(e->lpHeaderInfo != NULL);
         CHECK(e->dwHeaderInfoSize != 0);
-        int is_wide = e->lpHeaderInfo && e->dwHeaderInfoSize >= 4 && ((char *)e->lpHeaderInfo)[1] == 0;
-        t_note("W enum header: size %lu (A len %u) wide=%d total %lu", e->dwHeaderInfoSize, (unsigned)strlen(hdr), is_wide, sz);
+        /* ConvertCacheEntryInfoW widens the stored header back to UTF-16; dwHeaderInfoSize counts characters
+         * [D, VM-confirmed for GetUrlCacheEntryInfoW in urlcache_entries; the enumeration uses the same converter] */
+        EXPECT_EQ(e->dwHeaderInfoSize, (DWORD)strlen(hdr));
+        if (e->lpHeaderInfo) CHECK(!memcmp(e->lpHeaderInfo, ueg_w(hdr), 2 * strlen(hdr)));
+        t_note("W enum header: size %lu (A len %u) total %lu", e->dwHeaderInfoSize, (unsigned)strlen(hdr), sz);
         sz = cap; SET_ERR(0xdead);
         EXPECT_FAIL(!U(FindNextUrlCacheEntryExW)(h, e, &sz, NULL, NULL, NULL), ERROR_NO_MORE_ITEMS);
         U(FindCloseUrlCache)(h);

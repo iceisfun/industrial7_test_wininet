@@ -243,7 +243,8 @@ TEST(ueg_filter_matrix_a) {
         if (!ueg_make_entry(urls[i], k_types[i], ueg_days(30), ueg_days(-1), NULL, "txt", "f")) { t_skip("commit type 0x%lx failed %lu", k_types[i], GetLastError()); return; }
         CHECK(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
         INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(urls[i], NULL);
-        stored[i] = e ? e->CacheEntryType : 0; free(e);
+        /* SPARSE entries are invisible to GetUrlCacheEntryInfo (2) [VM, urlcache_entries]: use the committed type */
+        stored[i] = e ? e->CacheEntryType : k_types[i]; free(e);
         if (stored[i] != k_types[i]) t_note("committed type 0x%lx stored as 0x%lx", k_types[i], stored[i]);
     }
     for (size_t f = 0; f < NF; f++) {
@@ -271,7 +272,7 @@ TEST(ueg_filter_matrix_w) {
         if (!ueg_make_entry(urls[i], k_types[i], ueg_days(30), ueg_days(-1), NULL, "txt", "f")) { t_skip("commit failed"); return; }
         CHECK(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
         INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(urls[i], NULL);
-        stored[i] = e ? e->CacheEntryType : 0; free(e);
+        stored[i] = e ? e->CacheEntryType : k_types[i]; free(e);
     }
     DWORD cap = 4096; INTERNET_CACHE_ENTRY_INFOW *e = malloc(cap);
     for (size_t f = 0; f < NF; f++) {
@@ -306,6 +307,10 @@ TEST(ueg_commit_type_roundtrip) {
         const char *url = ueg_url(t);
         if (!ueg_make_entry(url, k_types[i], ueg_days(30), ueg_days(-1), NULL, "txt", "t")) { CHECKF(0, "commit type 0x%lx failed %lu", k_types[i], GetLastError()); continue; }
         INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(url, NULL);
+        if (k_types[i] & SPARSE_CACHE_ENTRY) {   /* hidden from GetUrlCacheEntryInfo [VM, urlcache_entries] */
+            if (e) t_note("SPARSE entry visible to GetUrlCacheEntryInfoA, type 0x%lx", e->CacheEntryType);
+            free(e); continue;
+        }
         CHECK(e != NULL);
         if (e) { CHECKF(e->CacheEntryType == k_types[i], "type 0x%lx stored 0x%lx", k_types[i], e->CacheEntryType); free(e); }
     }
