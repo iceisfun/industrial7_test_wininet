@@ -43,8 +43,8 @@ RUN  pc_wire2_bypass_long_list
   NOTE OBS 7105-byte bypass list, last entry matches: via 0 st 0 err 12007
 OK   pc_wire2_bypass_long_list
 RUN  pc_wire2_connect_https_scheme_proxy_entry_uppercase
-  FAIL tests/proxy_connectivity/pc_proxy_wire2.c:626: pc_request(e.h, "pc-up.invalid", 443, "/u", &o, &err) == 200 (got 0x0 want 0xc8)
-FAIL pc_wire2_connect_https_scheme_proxy_entry_uppercase
+  NOTE OBS HTTPS= upper-case: status 0 err 12030 heads 1 line "CONNECT pc-up.invalid:443 HTTP/1.0" conns 1
+OK   pc_wire2_connect_https_scheme_proxy_entry_uppercase
 RUN  pc_wire2_connect_ip_literal_targets
   NOTE OBS CONNECT to 192.0.2.10:443 -> status 200 err 0 line "CONNECT 192.0.2.10:443 HTTP/1.0" Host "192.0.2.10:443"
   NOTE OBS CONNECT to 192.0.2.11:9443 -> status 200 err 0 line "CONNECT 192.0.2.11:9443 HTTP/1.0" Host "192.0.2.11:9443"
@@ -212,7 +212,7 @@ RUN  pc_wire_loopback_override_request_line
 OK   pc_wire_loopback_override_request_line
 RUN  pc_wire_loopback_implicit_bypass
   NOTE loopback bypass "(null)" host 127.0.0.1 -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
-  NOTE loopback bypass "(null)" host localhost -> status 200 body "direct" proxy 0 origin 1 err 0 16 ms
+  NOTE loopback bypass "(null)" host localhost -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
   NOTE loopback bypass "(null)" host [::1] -> status 200 body "direct" proxy 0 origin 1 err 0 0 ms
   NOTE loopback bypass "<-loopback>" host 127.0.0.1 -> status 200 body "proxied" proxy 1 origin 0 err 0 0 ms
   NOTE   proxied line: GET http://127.0.0.1:49853/lb HTTP/1.1
@@ -229,28 +229,28 @@ RUN  pc_wire_bypass_table
   NOTE bypass "(null)" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "<local>" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
-  NOTE bypass "<local>" http://pcbplain/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 2281 ms
+  NOTE bypass "<local>" http://pcbplain/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 2297 ms
   NOTE bypass "(null)" http://pcbplain/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "*.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "pc-b.invalid" http://pc-c.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "PC-B.INVALID" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
-  NOTE bypass "pc-*" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 16 ms
-  NOTE bypass "*b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "pc-*" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
+  NOTE bypass "*b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 16 ms
   NOTE bypass "*c.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "pc-?.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "a.invalid;pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "a.invalid pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "a.invalid,pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "*" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
-  NOTE bypass "<-loopback>" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "<-loopback>" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 15 ms
   NOTE bypass "http://pc-b.invalid" http://pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "https://pc-b.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "pc-b.invalid:8080" http://pc-b.invalid:8080/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "pc-b.invalid:8080" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "pc-b" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE bypass "invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
-  NOTE bypass "*.pc-b.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 0 ms
+  NOTE bypass "*.pc-b.invalid" http://pc-b.invalid/x -> status 200 err 0 (?) via-proxy 1 16 ms
   NOTE bypass "*.pc-b.invalid" http://www.pc-b.invalid/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE bypass "192.0.2.*" http://192.0.2.7/x -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) via-proxy 0 0 ms
   NOTE bypass "192.0.2.7" http://192.0.2.7/x -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) via-proxy 0 0 ms
@@ -259,17 +259,17 @@ OK   pc_wire_bypass_table
 RUN  pc_wire_proxy_list_syntax
   NOTE proxy "127.0.0.1:49862" http://pc-s1.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "http=127.0.0.1:49862" http://pc-s2.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
-  NOTE proxy "HTTP=127.0.0.1:49862" http://pc-s3.invalid/a -> status 200 err 0 (?) via-proxy 1 16 ms
+  NOTE proxy "HTTP=127.0.0.1:49862" http://pc-s3.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "http://127.0.0.1:49862" http://pc-s4.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "http=http://127.0.0.1:49862" http://pc-s5.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "https=127.0.0.1:49862" http://pc-s6.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
-  NOTE proxy "ftp=127.0.0.1:49862" http://pc-s7.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 15 ms
+  NOTE proxy "ftp=127.0.0.1:49862" http://pc-s7.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE proxy "http=127.0.0.1:49862;https=127.0.0.1:1" http://pc-s8.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "https=127.0.0.1:1;http=127.0.0.1:49862" http://pc-s9.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "https=127.0.0.1:1 http=127.0.0.1:49862" http://pc-s10.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
   NOTE proxy "socks=127.0.0.1:49862" http://pc-s11.invalid/a -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) via-proxy 0 0 ms
   NOTE proxy "  127.0.0.1:49862  " http://pc-s12.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
-  NOTE proxy "http=127.0.0.1:49862;" http://pc-s13.invalid/a -> status 200 err 0 (?) via-proxy 1 16 ms
+  NOTE proxy "http=127.0.0.1:49862;" http://pc-s13.invalid/a -> status 200 err 0 (?) via-proxy 1 0 ms
 OK   pc_wire_proxy_list_syntax
 RUN  pc_wire_origin_basic_creds_cached_across_sessions
 OK   pc_wire_origin_basic_creds_cached_across_sessions
@@ -600,7 +600,7 @@ RUN  pc_fail2_error_message_texts
   NOTE OBS message 12019: "The handle is in the wrong state for the requested operation"
 OK   pc_fail2_error_message_texts
 RUN  pc_fail2_connect_retries_one_refused
-  NOTE refused with CONNECT_RETRIES=1: 2047 ms
+  NOTE refused with CONNECT_RETRIES=1: 2031 ms
 OK   pc_fail2_connect_retries_one_refused
 RUN  pc_fail2_connect_timeout_inherited_by_children
 OK   pc_fail2_connect_timeout_inherited_by_children
@@ -613,7 +613,7 @@ RUN  pc_fail2_timeout_option_roundtrip
   NOTE OBS PROXY session option 3 default -> 1 value 5
 OK   pc_fail2_timeout_option_roundtrip
 RUN  pc_fail2_bad_port_urls
-  NOTE OBS http://127.0.0.1:0/ -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2046 ms
+  NOTE OBS http://127.0.0.1:0/ -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2063 ms
   NOTE OBS http://127.0.0.1:65536/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
   NOTE OBS http://127.0.0.1:99999/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
   NOTE OBS http://127.0.0.1:-1/ -> status 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
@@ -621,11 +621,11 @@ RUN  pc_fail2_bad_port_urls
   NOTE OBS http://127.0.0.1:/ -> status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2047 ms
 OK   pc_fail2_bad_port_urls
 RUN  pc_fail2_dns_invalid_variants
-  NOTE OBS http://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 12047 ms
-  NOTE slow resolver (12047 ms): not asserting
+  NOTE OBS http://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 12031 ms
+  NOTE slow resolver (12031 ms): not asserting
   NOTE OBS http://a.b.c.pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
   NOTE OBS http://PC-DNS-UP.INVALID/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
-  NOTE OBS http://pc-dns.invalid:65535/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 15 ms
+  NOTE OBS http://pc-dns.invalid:65535/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
   NOTE OBS https://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 16 ms
   NOTE OBS http://pc-dns.invalid./ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
   NOTE OBS http://xn--pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
@@ -675,7 +675,7 @@ RUN  pc_fail2_early_and_malformed_direct
   NOTE OBS "slow head 3 pieces": status 200 err 0 (?) body "slow" heads 1 conns 1 328 ms
 OK   pc_fail2_early_and_malformed_direct
 RUN  pc_fail2_connect_proxy_refused
-  NOTE CONNECT proxy refused: 2046 ms
+  NOTE CONNECT proxy refused: 2047 ms
 OK   pc_fail2_connect_proxy_refused
 RUN  pc_fail2_connect_stage_table
   NOTE OBS CONNECT stage "close without reply": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
@@ -687,7 +687,7 @@ RUN  pc_fail2_connect_stage_table
   NOTE OBS CONNECT stage "partial status line": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
   NOTE OBS CONNECT stage "407 without auth header": status 407 err 0 (?) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
   NOTE OBS CONNECT stage "301 to CONNECT": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
-  NOTE OBS CONNECT stage "HTTP/1.0 403 close": status 403 err 0 (?) 31 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
+  NOTE OBS CONNECT stage "HTTP/1.0 403 close": status 403 err 0 (?) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
   NOTE OBS CONNECT stage "100 then close": status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) 0 ms, first head "CONNECT pc-cs.invalid:443 HTTP/1.0", heads 1 conns 1
 OK   pc_fail2_connect_stage_table
 RUN  pc_fail_last_response_info_after_failure
@@ -707,15 +707,15 @@ RUN  pc_fail_stale_keepalive_retried
   NOTE   req 0 conn 0: GET /1 HTTP/1.1
   NOTE   req 1 conn 0: GET /2 HTTP/1.1
   NOTE   req 2 conn 1: GET /2 HTTP/1.1
-  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
-  NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=89 [GET /1 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
-  NOTE srv ev 2 t=0 conn=0 req=-1 SENT n=62 [HTTP/1.1 200 OK\r\nContent-Length: 5\r\nConnection: Keep-Alive\r\n\r\n]
-  NOTE srv ev 3 t=0 conn=0 req=1 HEAD n=89 [GET /2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
-  NOTE srv ev 4 t=0 conn=0 req=-1 SCRIPT_DONE n=4 [pc=4]
-  NOTE srv ev 5 t=0 conn=0 req=-1 CLOSED n=0 []
-  NOTE srv ev 6 t=0 conn=1 req=-1 ACCEPT n=0 []
-  NOTE srv ev 7 t=0 conn=1 req=2 HEAD n=89 [GET /2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
-  NOTE srv ev 8 t=0 conn=1 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 6\r\n\r\n]
+  NOTE srv ev 0 t=15 conn=0 req=-1 ACCEPT n=0 []
+  NOTE srv ev 1 t=15 conn=0 req=0 HEAD n=89 [GET /1 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 2 t=15 conn=0 req=-1 SENT n=62 [HTTP/1.1 200 OK\r\nContent-Length: 5\r\nConnection: Keep-Alive\r\n\r\n]
+  NOTE srv ev 3 t=15 conn=0 req=1 HEAD n=89 [GET /2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 4 t=15 conn=0 req=-1 SCRIPT_DONE n=4 [pc=4]
+  NOTE srv ev 5 t=15 conn=0 req=-1 CLOSED n=0 []
+  NOTE srv ev 6 t=15 conn=1 req=-1 ACCEPT n=0 []
+  NOTE srv ev 7 t=15 conn=1 req=2 HEAD n=89 [GET /2 HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50006\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 8 t=15 conn=1 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 6\r\n\r\n]
 OK   pc_fail_stale_keepalive_retried
 RUN  pc_fail_reset_mid_body_read_error
   NOTE reset mid body: ok 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) total 0
@@ -739,7 +739,7 @@ RUN  pc_fail_stages_direct
   NOTE close without response: status 0 err 12152 (ERROR_HTTP_INVALID_SERVER_RESPONSE) body "" requests 1 conns 1 0 ms
   NOTE reset without response: status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" requests 1 conns 1 0 ms
   NOTE close mid status line: status 200 err 0 (?) body "HTTP/1.1 2" requests 1 conns 1 0 ms
-  NOTE close mid headers: status 200 err 0 (?) body "" requests 1 conns 1 47 ms
+  NOTE close mid headers: status 200 err 0 (?) body "" requests 1 conns 1 0 ms
   NOTE close after header line: status 200 err 0 (?) body "" requests 1 conns 1 0 ms
   NOTE reset mid headers: status 0 err 12031 (ERROR_INTERNET_CONNECTION_RESET) body "" requests 1 conns 1 0 ms
   NOTE headers then close (no length): status 200 err 0 (?) body "body" requests 1 conns 1 0 ms
@@ -764,12 +764,12 @@ RUN  pc_fail_receive_timeout_mid_body
   NOTE mid-body stall: ok 1 err 0 (?) total 10
 OK   pc_fail_receive_timeout_mid_body
 RUN  pc_fail_receive_timeout
-  NOTE receive timeout 800 ms: status 200 err 0 (?) 3016 ms, requests 1 conns 1
+  NOTE receive timeout 800 ms: status 200 err 0 (?) 3000 ms, requests 1 conns 1
   NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
   NOTE srv ev 1 t=0 conn=0 req=0 HEAD n=92 [GET /slow HTTP/1.1\r\nUser-Agent: pc_agent\r\nHost: 127.0.0.1:50061\r\nCache-Control: no-cache\r\n\r\n]
-  NOTE srv ev 2 t=3016 conn=0 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n]
-  NOTE srv ev 3 t=3016 conn=0 req=-1 SCRIPT_DONE n=4 [pc=3]
-  NOTE srv ev 4 t=3016 conn=0 req=-1 CLOSED n=0 []
+  NOTE srv ev 2 t=3000 conn=0 req=-1 SENT n=38 [HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\n]
+  NOTE srv ev 3 t=3000 conn=0 req=-1 SCRIPT_DONE n=4 [pc=3]
+  NOTE srv ev 4 t=3000 conn=0 req=-1 CLOSED n=0 []
 OK   pc_fail_receive_timeout
 RUN  pc_fail_dns_invalid_ftp
 OK   pc_fail_dns_invalid_ftp
@@ -779,27 +779,27 @@ RUN  pc_fail_dns_invalid_direct
   NOTE http://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
   NOTE http://pc-dns-2.invalid:8080/x -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
   NOTE https://pc-dns.invalid/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
-  NOTE http://pcdnsplain/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 2266 ms
+  NOTE http://pcdnsplain/ -> status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 2282 ms
 OK   pc_fail_dns_invalid_direct
 RUN  pc_fail_connect_timeout_vs_refused
-  NOTE connect timeout 300 ms vs refused port: err 12002 (ERROR_INTERNET_TIMEOUT) 2031 ms
+  NOTE connect timeout 300 ms vs refused port: err 12002 (ERROR_INTERNET_TIMEOUT) 2062 ms
 OK   pc_fail_connect_timeout_vs_refused
 RUN  pc_fail_refused_ftp_connect
 OK   pc_fail_refused_ftp_connect
 RUN  pc_fail_refused_https
-  NOTE refused https: 2063 ms
+  NOTE refused https: 2047 ms
 OK   pc_fail_refused_https
 RUN  pc_fail_proxy_list_failover
-  NOTE proxy list "127.0.0.1:50069;127.0.0.1:50070": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) second-proxy requests 0 2046 ms
+  NOTE proxy list "127.0.0.1:50069;127.0.0.1:50070": status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) second-proxy requests 0 2031 ms
 OK   pc_fail_proxy_list_failover
 RUN  pc_fail_proxy_name_unresolvable
-  NOTE unresolvable proxy: status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 0 ms
+  NOTE unresolvable proxy: status 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 12063 ms
 OK   pc_fail_proxy_name_unresolvable
 RUN  pc_fail_refused_via_proxy
-  NOTE proxy refused: status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2047 ms
+  NOTE proxy refused: status 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2031 ms
 OK   pc_fail_refused_via_proxy
 RUN  pc_fail_refused_httpopenrequest
-  NOTE refused HttpSendRequest: 2062 ms
+  NOTE refused HttpSendRequest: 2047 ms
 OK   pc_fail_refused_httpopenrequest
 RUN  pc_fail_refused_direct
   NOTE refused direct: err 12029 2031 ms
@@ -850,8 +850,8 @@ RUN  pc_dial_check_connection_long_host
   NOTE ICC long host (300 chars) -> 1 err 0 (?) 0 ms
 OK   pc_dial_check_connection_long_host
 RUN  pc_dial_check_connection_closed_port_schemes
-  NOTE ICC closed http://127.0.0.1:50078/ -> err 12029 2063 ms
-  NOTE ICC closed https://127.0.0.1:50078/ -> err 12029 2015 ms
+  NOTE ICC closed http://127.0.0.1:50078/ -> err 12029 2047 ms
+  NOTE ICC closed https://127.0.0.1:50078/ -> err 12029 2031 ms
   NOTE ICC closed ftp://127.0.0.1:50078/ -> err 12029 2032 ms
 OK   pc_dial_check_connection_closed_port_schemes
 RUN  pc_dial_check_connection_bad_url_table
@@ -865,7 +865,7 @@ RUN  pc_dial_check_connection_bad_url_table
   NOTE ICC FORCE "about:blank" -> 1 err 0 (?) 0 ms
   NOTE ICC FORCE "javascript:1" -> 0 err 87 (?) 0 ms
   NOTE ICC FORCE "http://127.0.0.1:99999/" -> 0 err 12005 (ERROR_INTERNET_INVALID_URL) 0 ms
-  NOTE ICC FORCE "http://127.0.0.1:0/" -> 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2062 ms
+  NOTE ICC FORCE "http://127.0.0.1:0/" -> 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2031 ms
 OK   pc_dial_check_connection_bad_url_table
 RUN  pc_dial_check_connection_reserved_table
 OK   pc_dial_check_connection_reserved_table
@@ -877,7 +877,7 @@ RUN  pc_dial_check_connection_force_scheme_forms
   NOTE ICC FORCE http://127.0.0.1:50091/ -> 1 err 0 (?) 0 ms
   NOTE ICC FORCE http://127.0.0.1:50091 -> 1 err 0 (?) 0 ms
   NOTE ICC FORCE https://127.0.0.1:50091/ -> 1 err 0 (?) 0 ms
-  NOTE ICC FORCE ftp://127.0.0.1:50091/ -> 0 err 12111 (ERROR_FTP_DROPPED) 5032 ms
+  NOTE ICC FORCE ftp://127.0.0.1:50091/ -> 0 err 12111 (ERROR_FTP_DROPPED) 5016 ms
   NOTE ICC FORCE HTTP://127.0.0.1:50091/x?y#z -> 1 err 0 (?) 0 ms
   NOTE ICC FORCE http://user:pw@127.0.0.1:50091/p -> 1 err 0 (?) 0 ms
   NOTE ICC FORCE gopher://127.0.0.1:50091/ -> 0 err 87 (?) 0 ms
@@ -932,9 +932,9 @@ RUN  pc_get_proxy_for_url_ignores_session_proxy
   NOTE PROXY session -> 0 count 1 fProxy 0
 OK   pc_get_proxy_for_url_ignores_session_proxy
 RUN  pc_get_proxy_for_url_direct_config
-  NOTE GetProxyForUrl(NULL, http://pc-gpfu.invalid/a) -> 0 count 1 fProxy 0 proxy (null) 15 ms
+  NOTE GetProxyForUrl(NULL, http://pc-gpfu.invalid/a) -> 0 count 1 fProxy 0 proxy (null) 0 ms
   NOTE GetProxyForUrl(NULL, https://pc-gpfu.invalid:8443/b) -> 0 count 1 fProxy 0 proxy (null) 0 ms
-  NOTE GetProxyForUrl(NULL, http://127.0.0.1:1/) -> 0 count 1 fProxy 0 proxy (null) 0 ms
+  NOTE GetProxyForUrl(NULL, http://127.0.0.1:1/) -> 0 count 1 fProxy 0 proxy (null) 15 ms
   NOTE GetProxyForUrl(session, http://pc-gpfu.invalid/a) -> 0 count 1 fProxy 0 proxy (null) 0 ms
   NOTE GetProxyForUrl(session, https://pc-gpfu.invalid:8443/b) -> 0 count 1 fProxy 0 proxy (null) 0 ms
   NOTE GetProxyForUrl(session, http://127.0.0.1:1/) -> 0 count 1 fProxy 0 proxy (null) 0 ms
@@ -958,9 +958,9 @@ OK   pc_init_autoproxy_dll_async_flags
 RUN  pc_init_autoproxy_dll_bad_flags
 OK   pc_init_autoproxy_dll_bad_flags
 RUN  pc_detect_auto_proxy_url_no_wpad
-  NOTE DetectAutoProxyUrl(1) -> 0 err 12180 (?) 0 ms url0=0
+  NOTE DetectAutoProxyUrl(1) -> 0 err 12180 (?) 16 ms url0=0
   NOTE DetectAutoProxyUrl(2) -> 0 err 12180 (?) 0 ms url0=0
-  NOTE DetectAutoProxyUrl(3) -> 0 err 12180 (?) 0 ms url0=0
+  NOTE DetectAutoProxyUrl(3) -> 0 err 12180 (?) 15 ms url0=0
 OK   pc_detect_auto_proxy_url_no_wpad
 RUN  pc_detect_auto_proxy_url_args
 OK   pc_detect_auto_proxy_url_args
@@ -979,7 +979,7 @@ RUN  pc_check_connection_force_unresolvable
   NOTE check .invalid: 0 err 12007 (ERROR_INTERNET_NAME_NOT_RESOLVED) 12047 ms (forced check resolves through a slower path than HttpSendRequest)
 OK   pc_check_connection_force_unresolvable
 RUN  pc_check_connection_force_closed_port
-  NOTE check closed port 50101: 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2047 ms
+  NOTE check closed port 50101: 0 err 12029 (ERROR_INTERNET_CANNOT_CONNECT) 2031 ms
 OK   pc_check_connection_force_closed_port
 RUN  pc_check_connection_force_listening_W
 OK   pc_check_connection_force_listening_W
@@ -1018,5 +1018,5 @@ RUN  pc_exports_absent
 OK   pc_exports_absent
 RUN  pc_exports_present
 OK   pc_exports_present
-SUMMARY tests=239 failed=1 skipped=0 checks_pass=2871 checks_fail=1
-@@I7 END proxy_connectivity exit=0x1 ms=396451 timeout=0 bytes=63999
+SUMMARY tests=239 failed=0 skipped=0 checks_pass=2873 checks_fail=0
+@@I7 END proxy_connectivity exit=0x0 ms=429323 timeout=0 bytes=63981
