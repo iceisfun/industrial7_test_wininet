@@ -15,6 +15,7 @@ static int wsrv_start_kind(wsrv *w, const char *set_hdrs, int code, srv_kind kin
     srv_step a[5] = { S_HEAD(), S_REPLY(200, NULL, "ok"), S_HEAD(), S_REPLY(200, NULL, "ok"), S_LOOP_TO(2) };
     srv_step b[3] = { S_HEAD(), S_REPLY(200, NULL, "ok"), S_LOOP() };
     a[1].hdrs = set_hdrs; a[1].arg = code;
+    if (kind == SRV_HTTPS) { b[1].hdrs = set_hdrs; b[1].arg = code; } /* an aborted first TLS handshake burns connection 0 */
     memcpy(w->s0, a, sizeof a); memcpy(w->s1, b, sizeof b);
     w->sc[0].steps = w->s0; w->sc[0].nsteps = 5; w->sc[1].steps = w->s1; w->sc[1].nsteps = 3;
     srv_config cfg; memset(&cfg, 0, sizeof cfg);
@@ -533,10 +534,10 @@ TEST(ck_wire_status_callbacks) {
 }
 
 /* ------------------------------------------------------------------------------------------ HTTPS */
-static int https_get(HINTERNET hi, srv *s, const char *path) {
+static int https_get_f(HINTERNET hi, srv *s, const char *path, DWORD fl) {
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
     if (!hc) return 0;
-    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", path, NULL, NULL, NULL, CK_WIRE_BASE | INTERNET_FLAG_SECURE, 0);
+    HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", path, NULL, NULL, NULL, fl | INTERNET_FLAG_SECURE, 0);
     int code = 0;
     if (hr) {
         t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA);
@@ -550,6 +551,7 @@ static int https_get(HINTERNET hi, srv *s, const char *path) {
     t_inet_close(hc);
     return code;
 }
+static int https_get(HINTERNET hi, srv *s, const char *path) { return https_get_f(hi, s, path, CK_WIRE_BASE); }
 TEST(ck_wire_https_secure_cookie_sent) {
     REQUIRE(U(HttpOpenRequestA));
     wsrv w; int rc = wsrv_start_kind(&w, "Set-Cookie: tls=1; path=%R; secure\r\n", 200, SRV_HTTPS);
@@ -558,7 +560,9 @@ TEST(ck_wire_https_secure_cookie_sent) {
     char d[600]; snprintf(d, sizeof d, "plainck=1; path=%s", w.path);
     ck_set(w.api_url, NULL, d);
     HINTERNET hi = t_inet_open("ck-wire");
-    EXPECT_EQ(https_get(hi, w.s, w.path), 200);
+    int g1 = https_get(hi, w.s, w.path);
+    if (g1 != 200) { t_note("first https GET failed (%d); retrying once", g1); g1 = https_get(hi, w.s, w.path); }
+    EXPECT_EQ(g1, 200);
     EXPECT_EQ(https_get(hi, w.s, w.path), 200);
     CHECK(srv_wait_requests(w.s, 2, 5000));
     EXPECT_STR(cookie_hdr(w.s, 0), "plainck=1");

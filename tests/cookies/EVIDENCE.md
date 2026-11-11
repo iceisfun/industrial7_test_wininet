@@ -133,3 +133,14 @@ re-ran `HttpSendRequest`, sized `InternetGetCookie` calls and `HttpQueryInfo(ind
 Every cookie goes through `ck_set`/`ck_setx`/`ck_track` and is expired again by `ck_cleanup()` (end of each test
 and at exit) with the same path/domain and INTERNET_COOKIE_HTTPONLY. Hosts are `wininet<pid>n<seq><tag>.i7test.example`;
 wire cookies use 127.0.0.1 with a unique path. Exported files live in `t_tmpdir()`.
+
+## Triage 2026-11-11 (Win10 VM, tri-cookies-1..5)
+
+- `ck_wire_https_secure_cookie_sent` (ck_wire.c:561-566): cause = env flake / harness fragility, not a cookie behaviour.
+  The first HTTPS GET to the loopback schannel server intermittently fails on Win10 with
+  `ERROR_INTERNET_CONNECTION_ABORTED` (12030) during the handshake (seen in ~3 of 8 first-GETs across runs; stable
+  fails in runs 1-3, passes in run 4, fail-then-retry in run 5). The aborted attempt still consumes server
+  connection 0 (the only script carrying Set-Cookie), so the retry's 200 had no `tls=1` and the 4 downstream checks fell over.
+  Change: for SRV_HTTPS both connection scripts now send the Set-Cookie; the test retries the first GET once (with a t_note)
+  before asserting 200. The cookie-behaviour assertions (secure cookie sent over https, not over http) are unchanged.
+  Root cause of the handshake abort is not identified (not flags: tried CK_WIRE_BASE, T_INET_FRESH, 0, RELOAD).

@@ -4,7 +4,7 @@ OK   ck_wire2_httponly_and_plain_both_sent
 RUN  ck_wire2_cookie_visible_to_new_session_after_close
 OK   ck_wire2_cookie_visible_to_new_session_after_close
 RUN  ck_wire2_redirect_target_path_scoped_cookie
-  NOTE redirect target: /wininet_1052_3_rd/x/to/
+  NOTE redirect target: /wininet_7344_3_rd/x/to/
 OK   ck_wire2_redirect_target_path_scoped_cookie
 RUN  ck_wire2_add_request_headers_cookie_with_jar
   NOTE HttpAddRequestHeaders Cookie + jar: 'jar=1' (occurrences 1)
@@ -52,11 +52,8 @@ RUN  ck_wire2_get_via_open_request_sends_cookie
 OK   ck_wire2_get_via_open_request_sends_cookie
 RUN  ck_wire_https_secure_cookie_sent
   NOTE https send failed: 12030 ERROR_INTERNET_CONNECTION_ABORTED
-  FAIL tests/cookies/ck_wire.c:561: https_get(hi, w.s, w.path) == 200 (got 0x0 want 0xc8)
-  FAIL tests/cookies/ck_wire.c:563: srv_wait_requests(w.s, 2, 5000)
-  FAIL tests/cookies/ck_wire.c:565: cookie_hdr(w.s, 1) == "plainck=1; tls=1" (got "(null)" want "plainck=1; tls=1")
-  FAIL tests/cookies/ck_wire.c:566: ck_gets(w.api_url, NULL, 0) == "plainck=1; tls=1" (got "plainck=1" want "plainck=1; tls=1")
-FAIL ck_wire_https_secure_cookie_sent
+  NOTE first https GET failed (0); retrying once
+OK   ck_wire_https_secure_cookie_sent
 RUN  ck_wire_status_callbacks
   NOTE callbacks: first request recv=1 sent=0 (len 32); after second recv=1 sent=1
 OK   ck_wire_status_callbacks
@@ -229,7 +226,7 @@ OK   ck_ex2_none_is_success_zero
 RUN  ck_ex2_name_filter_and_counts
 OK   ck_ex2_name_filter_and_counts
 RUN  ck_ex2_domain_attr_view
-  NOTE ex2 domain attr: domain='wininet1052n132ex2dom.i7test.example' path='/' flags=0x202
+  NOTE ex2 domain attr: domain='wininet7344n132ex2dom.i7test.example' path='/' flags=0x202
 OK   ck_ex2_domain_attr_view
 RUN  ck_ex2_host_only_flag
   NOTE ex2 host-only flags=0x84202
@@ -249,7 +246,7 @@ RUN  ck_ex2_persistent_cookie_fields
   NOTE ex2 persistent: flags=0x200 expset=1
 OK   ck_ex2_persistent_cookie_fields
 RUN  ck_ex2_session_cookie_fields
-  NOTE ex2 session: domain='wininet1052n145ex2s.i7test.example' flags=0x202 expset=0 exp=0000000000000000
+  NOTE ex2 session: domain='wininet7344n145ex2s.i7test.example' flags=0x202 expset=0 exp=0000000000000000
 OK   ck_ex2_session_cookie_fields
 RUN  ck_attr_max_age_garbage_ignored
 OK   ck_attr_max_age_garbage_ignored
@@ -302,10 +299,10 @@ OK   ck_parse_name_param_table
 RUN  ck_parse_name_value_table
 OK   ck_parse_name_value_table
 RUN  ck_more_export_expiry_skew
-  NOTE export +1d: line=1 value=1791245063 delta=449943 s
-  NOTE export +2d: line=1 value=1791331463 delta=536343 s
-  NOTE export +30d: line=1 value=1793750663 delta=2955543 s
-  NOTE export max-age 3600: line=1 value=1791162263 delta=367143 s
+  NOTE export +1d: line=1 value=1791245057 delta=449942 s
+  NOTE export +2d: line=1 value=1791331457 delta=536342 s
+  NOTE export +30d: line=1 value=1793750657 delta=2955542 s
+  NOTE export max-age 3600: line=1 value=1791162257 delta=367142 s
 OK   ck_more_export_expiry_skew
 RUN  ck_more_import_expiry_skew
   NOTE import +1d: r=1 get='' httponly-get='' ex2 n=0 flags=0x0 expset=0
@@ -633,7 +630,7 @@ OK   ck_ex2set_past_expiry_unknown_name_ok
 RUN  ck_ex2set_past_expiry_deletes
 OK   ck_ex2set_past_expiry_deletes
 RUN  ck_ex2set_persistent_expiry_roundtrip
-  NOTE Ex2-set persistent: flags=0x200 set=01dd536a23d38807 got=01dd536a23d38807
+  NOTE Ex2-set persistent: flags=0x200 set=01dd536a20727225 got=01dd536a20727225
 OK   ck_ex2set_persistent_expiry_roundtrip
 RUN  ck_ex2set_expires_ignored_without_expset
 OK   ck_ex2set_expires_ignored_without_expset
@@ -803,5 +800,5 @@ RUN  ck_set_a_null_data
 OK   ck_set_a_null_data
 RUN  ck_set_a_null_url
 OK   ck_set_a_null_url
-SUMMARY tests=359 failed=1 skipped=0 checks_pass=1601 checks_fail=4
-@@I7 END cookies exit=0x1 ms=217011 timeout=0 bytes=32678
+SUMMARY tests=359 failed=0 skipped=0 checks_pass=1605 checks_fail=0
+@@I7 END cookies exit=0x0 ms=213487 timeout=0 bytes=32322
