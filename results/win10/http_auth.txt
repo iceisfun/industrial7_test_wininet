@@ -9,200 +9,200 @@ RUN  auth_vec_digest_qop_auth_int_only
   NOTE req 0 conn 0 [GET /dv/authint HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /dv/authint HTTP/1.1] auth=(none) pauth=(none)
   NOTE qop=auth-int only: status=401 requests=2 qop sent=[]
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_vec_digest_qop_auth_int_only
 RUN  auth_vec_digest_cnonce_and_nc_shape
   NOTE req 0 conn 0 [GET /dvs/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /dvs/a HTTP/1.1] auth=Digest username="cn",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093"... pauth=(none)
   NOTE req 2 conn 0 [GET /dvs/b HTTP/1.1] auth=Digest username="cn",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093"... pauth=(none)
   NOTE req 3 conn 0 [GET /dvs/c HTTP/1.1] auth=Digest username="cn",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093"... pauth=(none)
-  NOTE req 1 cnonce=[a63e4bd2ad79799d126c3c60fed8509c] len=32 hex=1 same_as_prev=0
-  NOTE req 2 cnonce=[a63e4bd2ad79799d126c3c60fed8509c] len=32 hex=1 same_as_prev=1
-  NOTE req 3 cnonce=[a63e4bd2ad79799d126c3c60fed8509c] len=32 hex=1 same_as_prev=1
-  NOTE slow srv_stop: 1016 ms
+  NOTE req 1 cnonce=[afc8d395212776ab22365253971b9e42] len=32 hex=1 same_as_prev=0
+  NOTE req 2 cnonce=[afc8d395212776ab22365253971b9e42] len=32 hex=1 same_as_prev=1
+  NOTE req 3 cnonce=[afc8d395212776ab22365253971b9e42] len=32 hex=1 same_as_prev=1
+  NOTE slow srv_stop: 1015 ms
 OK   auth_vec_digest_cnonce_and_nc_shape
 RUN  auth_vec_digest_algorithm_echo
   NOTE challenge 0: response algorithm present=0 value=[]
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE challenge 1: response algorithm present=1 value=[MD5]
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE challenge 2: response algorithm present=1 value=[MD5]
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_vec_digest_algorithm_echo
 RUN  auth_vec_digest_no_opaque_not_sent
-  NOTE digest without opaque: Digest username="nu",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/dv/noopaque",cnonce="e4ac2d83f9a4de39842d6227f97fb36b",nc=00000001,response="b28fc9d0d2d7594f1dcb5e239ff5aa21",qop="auth"
-  NOTE slow srv_stop: 1016 ms
+  NOTE digest without opaque: Digest username="nu",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/dv/noopaque",cnonce="2bd12e21fd8defcb5408e5f6e3e1a5b2",nc=00000001,response="aca776b9cf2db2fcbdcbc55360af174e",qop="auth"
+  NOTE slow srv_stop: 1000 ms
 OK   auth_vec_digest_no_opaque_not_sent
 RUN  auth_vec_digest_challenge_variants
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
 OK   auth_vec_digest_challenge_variants
 RUN  auth_vec_open_url_userinfo_table_w
+  NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_vec_open_url_userinfo_table_w
 RUN  auth_vec_open_url_userinfo_table_a
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
 OK   auth_vec_open_url_userinfo_table_a
 RUN  auth_vec_basic_ansi_high_bytes_a
   NOTE ACP=1252: A high bytes sent as Basic Y2Fm6Tr8YmVy (raw=Basic Y2Fm6Tr8YmVy utf8=Basic Y2Fmw6k6w7xiZXI=)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_vec_basic_ansi_high_bytes_a
 RUN  auth_vec_basic_known_base64_strings
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_vec_basic_known_base64_strings
 RUN  auth_vec_basic_punctuation_table
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_vec_basic_punctuation_table
 RUN  auth_vec_basic_length_sweep_option_w
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
 OK   auth_vec_basic_length_sweep_option_w
 RUN  auth_vec_basic_length_sweep_connect_w
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_vec_basic_length_sweep_connect_w
 RUN  auth_vec_basic_length_sweep_option_a
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 734 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 875 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
 OK   auth_vec_basic_length_sweep_option_a
 RUN  auth_vec_basic_length_sweep_connect_a
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
 OK   auth_vec_basic_length_sweep_connect_a
 RUN  auth_suppress_proxy_then_origin_challenge
   NOTE req 0 conn 0 [GET http://i7origin.invalid/sup/origin HTTP/1.1] auth=(none) pauth=(none)
   NOTE SUPPRESS via proxy, origin 401 with connect creds: status=401 requests=1
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_suppress_proxy_then_origin_challenge
 RUN  auth_suppress_proxy_basic_still_answered
   NOTE req 0 conn 0 [GET http://i7origin.invalid/sup/proxy HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/sup/proxy HTTP/1.1] auth=(none) pauth=Basic c3B4OnNwcA==
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_suppress_proxy_basic_still_answered
 RUN  auth_suppress_cached_credentials_preemptive
   NOTE req 0 conn 0 [GET /sup/c/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /sup/c/a HTTP/1.1] auth=Basic Y3U6Y3A= pauth=(none)
   NOTE req 2 conn 1 [GET /sup/c/b HTTP/1.1] auth=(none) pauth=(none)
   NOTE SUPPRESS after a cached Basic success: status=401 legs=1 first-leg auth=(none)
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_suppress_cached_credentials_preemptive
 RUN  auth_suppress_zero_value_still_suppresses_automatic_logon
   NOTE req 0 conn 0 [GET /sup/zero HTTP/1.1] auth=(none) pauth=(none)
@@ -213,7 +213,7 @@ RUN  auth_suppress_wide_set_and_zero_value
 OK   auth_suppress_wide_set_and_zero_value
 RUN  auth_suppress_set_after_send
   NOTE SUPPRESS_SERVER_AUTH after HttpSendRequest: ok=0 err=12019 (ERROR_INTERNET_INCORRECT_HANDLE_STATE)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_suppress_set_after_send
 RUN  auth_suppress_no_creds_basic_401
   NOTE slow srv_stop: 1000 ms
@@ -221,12 +221,12 @@ OK   auth_suppress_no_creds_basic_401
 RUN  auth_suppress_explicit_digest_creds
   NOTE req 0 conn 0 [GET /sup/digest HTTP/1.1] auth=(none) pauth=(none)
   NOTE SUPPRESS_SERVER_AUTH + explicit Digest creds: status=401 requests=1
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_suppress_explicit_digest_creds
 RUN  auth_suppress_explicit_ntlm_creds
   NOTE req 0 conn 0 [GET /sup/ntlm HTTP/1.1] auth=(none) pauth=(none)
   NOTE SUPPRESS_SERVER_AUTH + explicit NTLM creds: status=401 requests=1 v2ok=0
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_suppress_explicit_ntlm_creds
 RUN  auth_suppress_explicit_basic_creds
   NOTE req 0 conn 0 [GET /sup/basic HTTP/1.1] auth=(none) pauth=(none)
@@ -252,19 +252,19 @@ OK   auth_ex_proxy_407_no_creds_normal_completion
 RUN  auth_ex_proxy_407_force_retry
   NOTE req 0 conn 0 [POST http://i7origin.invalid/ex/proxy HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST http://i7origin.invalid/ex/proxy HTTP/1.1] auth=(none) pauth=Basic cHh1OnB4cA==
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_ex_proxy_407_force_retry
 RUN  auth_ex_ntlm_custom_gate_rounds
   NOTE req 0 conn 0 [POST /ex/ntlm HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST /ex/ntlm HTTP/1.1] auth=NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAKAGFKAAAADw== pauth=(none)
   NOTE req 2 conn 0 [POST /ex/ntlm HTTP/1.1] auth=NTLM TlRMTVNTUAADAAAAGAAYAIQAAAAIAQgBnAAAABAAEABYAAAADAAMAGgAAAAQABAAdAAAAAAAAAC... pauth=(none)
   NOTE NTLM via Ex: rounds=3 force_retries=2 status=200 requests=3 v2ok=1
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_ex_ntlm_custom_gate_rounds
 RUN  auth_ex_resend_with_plain_httpsendrequest
   NOTE req 0 conn 0 [POST /ex/mixed HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST /ex/mixed HTTP/1.1] auth=Basic bXU6bXA= pauth=(none)
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ex_resend_with_plain_httpsendrequest
 RUN  auth_ex_status_and_headers_after_force_retry
   NOTE after FORCE_RETRY: status=401 www-auth query=1 [Basic realm="i7ex"] err=0
@@ -274,34 +274,34 @@ RUN  auth_ex_preemptive_after_success_no_force_retry
   NOTE req 0 conn 0 [POST /ex/pre/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST /ex/pre/a HTTP/1.1] auth=Basic cHU6cHA= pauth=(none)
   NOTE req 2 conn 0 [POST /ex/pre/b HTTP/1.1] auth=Basic cHU6cHA= pauth=(none)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ex_preemptive_after_success_no_force_retry
 RUN  auth_ex_get_without_body
   NOTE req 0 conn 0 [GET /ex/get HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /ex/get HTTP/1.1] auth=Basic Z3U6Z3A= pauth=(none)
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ex_get_without_body
 RUN  auth_ex_digest_force_retry
   NOTE req 0 conn 0 [POST /ex/digest?a=1 HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST /ex/digest?a=1 HTTP/1.1] auth=Digest username="dxu",realm="i7digest",nonce="e7a1f3b6c9d24e58a0b1c2d3e4f50617",... pauth=(none)
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ex_digest_force_retry
 RUN  auth_ex_wrong_creds_bounded
   NOTE req 0 conn 0 [POST /ex/wrong HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST /ex/wrong HTTP/1.1] auth=Basic d3Jvbmc6d3Jvbmc= pauth=(none)
   NOTE wrong creds via Ex: rounds=2 force_retries=1 end_ok=1 err=0 status=401 requests=2
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_ex_wrong_creds_bounded
 RUN  auth_ex_wide_apis_force_retry
   NOTE req 0 conn 0 [PUT /ex/wide HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [PUT /ex/wide HTTP/1.1] auth=Basic d3U6d3A= pauth=(none)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ex_wide_apis_force_retry
 RUN  auth_ex_no_auth_flag_no_force_retry
   NOTE slow srv_stop: 1000 ms
 OK   auth_ex_no_auth_flag_no_force_retry
 RUN  auth_ex_no_creds_401_is_normal_completion
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_ex_no_creds_401_is_normal_completion
 RUN  auth_ex_basic_request_option_creds_force_retry
   NOTE req 0 conn 0 [POST /ex/opt HTTP/1.1] auth=(none) pauth=(none)
@@ -312,27 +312,27 @@ RUN  auth_ex_basic_connect_creds_force_retry
   NOTE req 0 conn 0 [POST /ex/one HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 0 conn 0 [POST /ex/one HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [POST /ex/one HTTP/1.1] auth=Basic ZXh1OmV4cA== pauth=(none)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ex_basic_connect_creds_force_retry
 RUN  auth_retry_keepalive_connection_count
   NOTE req 0 conn 0 [GET /rt/ka/0 HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /rt/ka/0 HTTP/1.1] auth=Basic azph pauth=(none)
   NOTE req 2 conn 0 [GET /rt/ka/1 HTTP/1.1] auth=Basic azph pauth=(none)
   NOTE req 3 conn 0 [GET /rt/ka/2 HTTP/1.1] auth=Basic azph pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_retry_keepalive_connection_count
 RUN  auth_retry_many_requests_same_connect_wrong_creds
   NOTE request 0 used 2 legs
   NOTE request 1 used 2 legs
   NOTE request 2 used 2 legs
   NOTE request 3 used 2 legs
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_retry_many_requests_same_connect_wrong_creds
 RUN  auth_retry_wrong_then_right_on_same_handle
   NOTE req 0 conn 0 [GET /rt/wr HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /rt/wr HTTP/1.1] auth=Basic d3Jvbmc6cHc= pauth=(none)
   NOTE req 2 conn 0 [GET /rt/wr HTTP/1.1] auth=Basic cmlnaHQ6cHc= pauth=(none)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_retry_wrong_then_right_on_same_handle
 RUN  auth_retry_407_from_direct_origin
   NOTE req 0 conn 0 [GET /rt/407direct HTTP/1.1] auth=(none) pauth=(none)
@@ -340,12 +340,12 @@ RUN  auth_retry_407_from_direct_origin
   NOTE slow srv_stop: 1000 ms
 OK   auth_retry_407_from_direct_origin
 RUN  auth_retry_200_with_challenge_header_not_retried
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_retry_200_with_challenge_header_not_retried
 RUN  auth_retry_server_needs_two_credentialed_legs
   NOTE req 0 conn 0 [GET /rt/two HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /rt/two HTTP/1.1] auth=Basic dHU6dHA= pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_retry_server_needs_two_credentialed_legs
 RUN  auth_retry_digest_stale_once_new_nonce_used
   NOTE req 0 conn 0 [GET /rt/staleonce HTTP/1.1] auth=(none) pauth=(none)
@@ -356,51 +356,51 @@ RUN  auth_retry_digest_stale_once_new_nonce_used
 OK   auth_retry_digest_stale_once_new_nonce_used
 RUN  auth_retry_digest_stale_forever_not_bounded_by_client
   NOTE req 0 conn 0 [GET /rt/stale HTTP/1.1] auth=(none) pauth=(none)
-  NOTE req 1 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000000",uri="/rt/stale",cnonce="42b014... pauth=(none)
-  NOTE req 2 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000001",uri="/rt/stale",cnonce="cfbd2c... pauth=(none)
-  NOTE req 3 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000002",uri="/rt/stale",cnonce="d0bc34... pauth=(none)
-  NOTE req 4 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000003",uri="/rt/stale",cnonce="483046... pauth=(none)
-  NOTE req 5 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000004",uri="/rt/stale",cnonce="cbcc61... pauth=(none)
-  NOTE req 6 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000005",uri="/rt/stale",cnonce="d9daba... pauth=(none)
-  NOTE req 7 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000006",uri="/rt/stale",cnonce="27f2b0... pauth=(none)
-  NOTE req 8 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000007",uri="/rt/stale",cnonce="06bd10... pauth=(none)
-  NOTE req 9 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000008",uri="/rt/stale",cnonce="d026cf... pauth=(none)
-  NOTE req 10 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000009",uri="/rt/stale",cnonce="640ad5... pauth=(none)
+  NOTE req 1 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000000",uri="/rt/stale",cnonce="368a54... pauth=(none)
+  NOTE req 2 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000001",uri="/rt/stale",cnonce="b7ce8b... pauth=(none)
+  NOTE req 3 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000002",uri="/rt/stale",cnonce="c9b407... pauth=(none)
+  NOTE req 4 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000003",uri="/rt/stale",cnonce="e9b070... pauth=(none)
+  NOTE req 5 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000004",uri="/rt/stale",cnonce="3b5a31... pauth=(none)
+  NOTE req 6 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000005",uri="/rt/stale",cnonce="69c888... pauth=(none)
+  NOTE req 7 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000006",uri="/rt/stale",cnonce="da64f2... pauth=(none)
+  NOTE req 8 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000007",uri="/rt/stale",cnonce="ea02de... pauth=(none)
+  NOTE req 9 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000008",uri="/rt/stale",cnonce="1c2e68... pauth=(none)
+  NOTE req 10 conn 0 [GET /rt/stale HTTP/1.1] auth=Digest username="su",realm="st",nonce="n00000009",uri="/rt/stale",cnonce="48823a... pauth=(none)
   NOTE stale=true forever: status=403 requests=11
-  NOTE slow srv_stop: 938 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_retry_digest_stale_forever_not_bounded_by_client
 RUN  auth_retry_scheme_switch_basic_to_digest
   NOTE req 0 conn 0 [GET /rt/switch HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /rt/switch HTTP/1.1] auth=Basic c3U6c3A= pauth=(none)
   NOTE Basic then Digest challenge: status=401 requests=2
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_retry_scheme_switch_basic_to_digest
 RUN  auth_retry_403_after_credentials
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_retry_403_after_credentials
 RUN  auth_retry_401_without_challenge_after_credentials
   NOTE req 0 conn 0 [GET /rt/noch HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /rt/noch HTTP/1.1] auth=Basic bnU6bnA= pauth=(none)
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_retry_401_without_challenge_after_credentials
 RUN  auth_retry_rotating_realm_bounded
   NOTE req 0 conn 0 [GET /rt/rot HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /rt/rot HTTP/1.1] auth=Basic cnU6cnA= pauth=(none)
   NOTE rotating realm: status=401 requests=2
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_retry_rotating_realm_bounded
 RUN  auth_proxy_ntlm_custom_gate
   NOTE req 0 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAKAGFKAAAADw=
   NOTE req 2 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=NTLM TlRMTVNTUAADAAAAGAAYAI4AAAAIAQgBpgAAABAAEABYAAAAFgAWAGg
   NOTE proxy NTLM: status=200 requests=3 user=[i7proxyuser] v2ok=1
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_proxy_ntlm_custom_gate
 RUN  auth_proxy_then_origin_auth
   NOTE req 0 conn 0 [GET http://i7origin.invalid/chain2 HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/chain2 HTTP/1.1] auth=(none) pauth=Basic Ym90aDpwdw==
   NOTE proxy then origin with one pair: status=401 requests=2
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_proxy_then_origin_auth
 RUN  auth_proxy_request_server_creds_shadow_proxy_creds
   NOTE req 0 conn 0 [GET http://i7origin.invalid/chain HTTP/1.1] auth=(none) pauth=(none)
@@ -425,33 +425,33 @@ RUN  auth_proxy_resend_after_setting_proxy_creds
   NOTE slow srv_stop: 1000 ms
 OK   auth_proxy_resend_after_setting_proxy_creds
 RUN  auth_proxy_no_auth_flag
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_proxy_no_auth_flag
 RUN  auth_proxy_wrong_creds_final_407
   NOTE req 0 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=Basic cHVzZXI6d3Jvbmc=
   NOTE proxy wrong creds: status=407 requests=2
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_proxy_wrong_creds_final_407
 RUN  auth_proxy_connect_creds_win_over_request_proxy_creds
   NOTE req 0 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=Basic Y3VzZXI6Y3Bhc3M=
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_proxy_connect_creds_win_over_request_proxy_creds
 RUN  auth_proxy_request_server_creds_used_for_proxy
   NOTE req 0 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=Basic cnVzZXI6cnBhc3M=
   NOTE 407 with only request USERNAME/PASSWORD: status=200 requests=2
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_proxy_request_server_creds_used_for_proxy
 RUN  auth_proxy_connect_creds_used_for_proxy
   NOTE req 0 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/ HTTP/1.1] auth=(none) pauth=Basic Y3VzZXI6Y3Bhc3M=
   NOTE 407 with only InternetConnect creds: status=200 requests=2
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_proxy_connect_creds_used_for_proxy
 RUN  auth_proxy_no_creds_returns_407
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_proxy_no_creds_returns_407
 RUN  auth_proxy_basic_request_option_creds
   NOTE req 0 conn 0 [GET http://i7origin.invalid/p HTTP/1.1] auth=(none) pauth=(none)
@@ -462,7 +462,7 @@ RUN  auth_proxy_407_queryable
 OK   auth_proxy_407_queryable
 RUN  auth_proxy_request_line_absolute_form
   NOTE req 0 conn 0 [GET http://i7origin.invalid/abs?x=1 HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_proxy_request_line_absolute_form
 RUN  auth_opt_request_handle_after_connect_closed
 OK   auth_opt_request_handle_after_connect_closed
@@ -554,7 +554,7 @@ RUN  auth_ntlm_second_request_same_connection
   NOTE req 4 conn 0 [GET /n2 HTTP/1.1] auth=NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAKAGFKAAAADw== pauth=(none)
   NOTE req 5 conn 0 [GET /n2 HTTP/1.1] auth=NTLM TlRMTVNTUAADAAAAGAAYAIQAAAAIAQgBnAAAABAAEABYAAAADAAMAGgAAAAQABAAdAAAAAAAAAC... pauth=(none)
   NOTE second NTLM request: status=200, 3 more requests, first auth=(none)
-  NOTE slow srv_stop: 969 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_ntlm_second_request_same_connection
 RUN  auth_ntlm_post_body
   NOTE req 0 conn 0 [POST / HTTP/1.1] auth=(none) pauth=(none)
@@ -563,13 +563,13 @@ RUN  auth_ntlm_post_body
   NOTE ntlm POST leg 0: Content-Length=10 body=10
   NOTE ntlm POST leg 1: Content-Length=0 body=0
   NOTE ntlm POST leg 2: Content-Length=10 body=10
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ntlm_post_body
 RUN  auth_ntlm_no_auth_flag
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ntlm_no_auth_flag
 RUN  auth_ntlm_request_option_creds
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_ntlm_request_option_creds
 RUN  auth_ntlm_wrong_password_final_401
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
@@ -583,23 +583,23 @@ RUN  auth_ntlm_upn_user
 OK   auth_ntlm_upn_user
 RUN  auth_ntlm_domain_backslash_user
   NOTE DOMAIN\user: status=200 user=[i7user] domain=[I7DOMAIN] v2ok=1
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_ntlm_domain_backslash_user
 RUN  auth_ntlm_type3_structure
   NOTE type3: 420 bytes lm=24 nt=264 flags=0xa2888205 domain=[I7-WIN10] ws=[I7-WIN10]
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_ntlm_type3_structure
 RUN  auth_ntlm_type1_structure
   NOTE type1: 40 bytes flags=0xa2088207
   NOTE type1 version 10.0 build 19041 rev 15
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_ntlm_type1_structure
 RUN  auth_ntlm_explicit_creds_v2_verified
   NOTE req 0 conn 0 [GET /ntlm HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /ntlm HTTP/1.1] auth=NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAKAGFKAAAADw== pauth=(none)
   NOTE req 2 conn 0 [GET /ntlm HTTP/1.1] auth=NTLM TlRMTVNTUAADAAAAGAAYAIQAAAAIAQgBnAAAABAAEABYAAAADAAMAGgAAAAQABAAdAAAAAAAAAC... pauth=(none)
   NOTE ntlm: status=200 requests=3 user=[i7user] domain=[I7-WIN10] ws=[I7-WIN10] v2ok=1 type1 flags=0xa2088207
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_ntlm_explicit_creds_v2_verified
 RUN  auth_x_request_option_creds_cleared_with_empty_string
   NOTE req 0 conn 0 [GET /keep HTTP/1.1] auth=(none) pauth=(none)
@@ -608,14 +608,14 @@ RUN  auth_x_request_option_creds_cleared_with_empty_string
 OK   auth_x_request_option_creds_cleared_with_empty_string
 RUN  auth_x_open_url_userinfo_option_view
   NOTE InternetOpenUrl userinfo -> USERNAME ok=1 [ouv] len 3, PASSWORD ok=1 [<set>] len 3
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_x_open_url_userinfo_option_view
 RUN  auth_x_proxy_then_origin_creds_second_round
   NOTE req 0 conn 0 [GET http://i7origin.invalid/two HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/two HTTP/1.1] auth=(none) pauth=Basic cHUyOnBwMg==
   NOTE req 2 conn 0 [GET http://i7origin.invalid/two HTTP/1.1] auth=Basic b3UyOm9wMg== pauth=Basic cHUyOnBwMg==
   NOTE proxy+origin in two rounds: round1 401 (2 reqs), round2 200 (3 reqs total) body=both
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_x_proxy_then_origin_creds_second_round
 RUN  auth_x_ntlm_server_never_sends_type2
   NOTE req 0 conn 0 [GET /not2 HTTP/1.1] auth=(none) pauth=(none)
@@ -625,42 +625,37 @@ OK   auth_x_ntlm_server_never_sends_type2
 RUN  auth_x_http10_request_version_retry
   NOTE req 0 conn 0 [GET /v10 HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /v10 HTTP/1.1] auth=Basic djEwOnAxMA== pauth=(none)
-  FAIL tests/http_auth/more.c:336: srv_req_line(s, i) == "GET /v10 HTTP/1.0" (got "GET /v10 HTTP/1.1" want "GET /v10 HTTP/1.0")
-  FAIL tests/http_auth/more.c:336: srv_req_line(s, i) == "GET /v10 HTTP/1.0" (got "GET /v10 HTTP/1.1" want "GET /v10 HTTP/1.0")
   NOTE HTTP/1.0 legs: conn 0 / 0, Connection=(none)
-  NOTE slow srv_stop: 734 ms
-FAIL auth_x_http10_request_version_retry
+  NOTE slow srv_stop: 1000 ms
+OK   auth_x_http10_request_version_retry
 RUN  auth_x_async_wrong_creds_final_401
   NOTE req 0 conn 0 [GET /async/wrong HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /async/wrong HTTP/1.1] auth=Basic YXc6d3Jvbmc= pauth=(none)
-  NOTE slow srv_stop: 984 ms
 OK   auth_x_async_wrong_creds_final_401
 RUN  auth_x_async_ntlm_custom_gate
   NOTE req 0 conn 0 [GET /async/ntlm HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /async/ntlm HTTP/1.1] auth=NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAKAGFKAAAADw== pauth=(none)
   NOTE req 2 conn 0 [GET /async/ntlm HTTP/1.1] auth=NTLM TlRMTVNTUAADAAAAGAAYAIYAAAAIAQgBngAAABAAEABYAAAADgAOAGgAAAAQABAAdgAAAAAAAAC... pauth=(none)
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_x_async_ntlm_custom_gate
 RUN  auth_x_async_digest
   NOTE req 0 conn 0 [GET /async/digest HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /async/digest HTTP/1.1] auth=Digest username="adu",realm="i7digest",nonce="asyncnonce01",uri="/async/digest",... pauth=(none)
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_x_async_digest
 RUN  auth_x_digest_cache_new_session
   NOTE req 0 conn 0 [GET /dc/a HTTP/1.1] auth=(none) pauth=(none)
-  NOTE req 1 conn 0 [GET /dc/a HTTP/1.1] auth=Digest username="dcu",realm="i7digest",nonce="dcnonce0001",uri="/dc/a",cnonce="d... pauth=(none)
-  NOTE req 2 conn 0 [GET /dc/a HTTP/1.1] auth=Digest username="dcu",realm="i7digest",nonce="dcnonce0001",uri="/dc/a",cnonce="d... pauth=(none)
+  NOTE req 1 conn 0 [GET /dc/a HTTP/1.1] auth=Digest username="dcu",realm="i7digest",nonce="dcnonce0001",uri="/dc/a",cnonce="9... pauth=(none)
+  NOTE req 2 conn 0 [GET /dc/a HTTP/1.1] auth=Digest username="dcu",realm="i7digest",nonce="dcnonce0001",uri="/dc/a",cnonce="9... pauth=(none)
   NOTE digest, new session without creds: status=200 requests=1 auth0=Digest username="dcu",realm="i7digest",n nc=00000002
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_x_digest_cache_new_session
 RUN  auth_x_end_browser_session_keeps_handle_creds
   NOTE req 0 conn 0 [GET /kh/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /kh/a HTTP/1.1] auth=Basic a2g6a3A= pauth=(none)
   NOTE req 2 conn 1 [GET /kh/a HTTP/1.1] auth=(none) pauth=(none)
-  FAIL tests/http_auth/more.c:221: r.status == 200 (got 0x191 want 0xc8)
-  FAIL tests/http_auth/more.c:222: srv_req_count(s) - b == 2 (got 0x1 want 0x2)
   NOTE slow srv_stop: 1000 ms
-FAIL auth_x_end_browser_session_keeps_handle_creds
+OK   auth_x_end_browser_session_keeps_handle_creds
 RUN  auth_x_end_browser_session_flushes_proxy_cache
   NOTE req 0 conn 0 [GET http://i7origin.invalid/ebp/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/ebp/a HTTP/1.1] auth=(none) pauth=Basic ZWJwOmVwcA==
@@ -687,49 +682,49 @@ RUN  auth_x_cache_scoped_to_host_name
   NOTE req 1 conn 0 [GET /hn/a HTTP/1.1] auth=Basic aG46aHA= pauth=(none)
   NOTE req 2 conn 1 [GET /hn/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE cached 127.0.0.1 creds, request to localhost: status=401 requests=1 auth0=(none)
-  NOTE slow srv_stop: 969 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_x_cache_scoped_to_host_name
 RUN  auth_x_proxy_digest_wrong_creds_final_407
   NOTE req 0 conn 0 [GET http://i7origin.invalid/pdw HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/pdw HTTP/1.1] auth=(none) pauth=Digest username="pdu",realm="i7digest",nonce="pxnonce0123456
   NOTE proxy digest wrong creds: status=407 requests=2
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_x_proxy_digest_wrong_creds_final_407
 RUN  auth_x_proxy_digest_proxy_creds
   NOTE req 0 conn 0 [GET http://i7origin.invalid/pd/x?y=1 HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/pd/x?y=1 HTTP/1.1] auth=(none) pauth=Digest username="pdu",realm="i7digest",nonce="pxnonce0123456
   NOTE proxy digest: status=200 requests=2 uri=[http://i7origin.invalid/pd/x?y=1]
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_x_proxy_digest_proxy_creds
 RUN  auth_x_connect_setoption_proxy_creds_answer_407
   NOTE req 0 conn 0 [GET http://i7origin.invalid/xp/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET http://i7origin.invalid/xp/a HTTP/1.1] auth=(none) pauth=Basic Y3B1OmNwcA==
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_x_connect_setoption_proxy_creds_answer_407
 RUN  auth_x_connect_setoption_after_open_request
   NOTE req 0 conn 0 [GET /xc/late HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /xc/late HTTP/1.1] auth=Basic bGF0ZXU6bGF0ZXA= pauth=(none)
   NOTE connect creds set after HttpOpenRequest: status=200 requests=2
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_x_connect_setoption_after_open_request
 RUN  auth_x_connect_setoption_creds_answer_challenge
   NOTE req 0 conn 0 [GET /xc/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /xc/a HTTP/1.1] auth=Basic Y3NvOmNzcA== pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_x_connect_setoption_creds_answer_challenge
 RUN  auth_async_basic_retry
   NOTE slow srv_stop: 1000 ms
 OK   auth_async_basic_retry
 RUN  auth_callback_sequence_basic_retry
   NOTE callbacks: 60 80 20 21 30 31 40 41 80 30 31 40 41  (+0 resolve callbacks)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_callback_sequence_basic_retry
 RUN  auth_https_ntlm_after_warmup
-  NOTE https warm-up: ok=0 err=12030 status=0 12204 ms
+  NOTE https warm-up: ok=0 err=12030 status=0 12203 ms
   NOTE req 0 conn 1 [GET /tlsntlm2 HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 1 [GET /tlsntlm2 HTTP/1.1] auth=NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAKAGFKAAAADw== pauth=(none)
   NOTE req 2 conn 1 [GET /tlsntlm2 HTTP/1.1] auth=NTLM TlRMTVNTUAADAAAAGAAYAIwAAAAIAQgBpAAAABAAEABYAAAAFAAUAGgAAAAQABAAfAAAAAAAAAC... pauth=(none)
-  NOTE https ntlm after warm-up: ok=1 err=0 ? status=200 v2ok=1 78 ms
+  NOTE https ntlm after warm-up: ok=1 err=0 ? status=200 v2ok=1 63 ms
   NOTE environment: first HTTPS request of the process failed (12030 ERROR_INTERNET_CONNECTION_ABORTED)
   NOTE slow srv_stop: 3015 ms
 OK   auth_https_ntlm_after_warmup
@@ -739,20 +734,20 @@ RUN  auth_https_ntlm_custom_gate
   NOTE req 2 conn 0 [GET /tlsntlm HTTP/1.1] auth=NTLM TlRMTVNTUAADAAAAGAAYAIoAAAAIAQgBogAAABAAEABYAAAAEgASAGgAAAAQABAAegAAAAAAAAC... pauth=(none)
   NOTE https ntlm: ok=1 err=0 ? status=200 v2ok=1 user=[i7tlsuser] conns=1
   NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
-  NOTE srv ev 1 t=32 conn=0 req=-1 TLS_DONE n=52 [proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0]
-  NOTE srv ev 2 t=32 conn=0 req=0 HEAD n=99 [GET /tlsntlm HTTP/1.1\r\nUser-Agent: wininet_test\r\nHost: 127.0.0.1:50140\r\nCache-Control: no-cache\r\n\r\n]
-  NOTE srv ev 3 t=32 conn=0 req=0 BODY n=0 []
-  NOTE srv ev 4 t=32 conn=0 req=1 HEAD n=201 [GET /tlsntlm HTTP/1.1\r\nUser-Agent: wininet_test\r\nHost: 127.0.0.1:50140\r\nCache-Control: no-cache\r\nConnection: Keep-Alive\r\nAuthorization: NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAK]
-  NOTE srv ev 5 t=32 conn=0 req=1 BODY n=0 []
-  NOTE srv ev 6 t=32 conn=0 req=2 HEAD n=713 [GET /tlsntlm HTTP/1.1\r\nUser-Agent: wininet_test\r\nHost: 127.0.0.1:50140\r\nCache-Control: no-cache\r\nConnection: Keep-Alive\r\nAuthorization: NTLM TlRMTVNTUAADAAAAGAAYAIoAAAAIAQgBogAAABAAEABY]
-  NOTE srv ev 7 t=32 conn=0 req=2 BODY n=0 []
+  NOTE srv ev 1 t=31 conn=0 req=-1 TLS_DONE n=52 [proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0]
+  NOTE srv ev 2 t=31 conn=0 req=0 HEAD n=99 [GET /tlsntlm HTTP/1.1\r\nUser-Agent: wininet_test\r\nHost: 127.0.0.1:50140\r\nCache-Control: no-cache\r\n\r\n]
+  NOTE srv ev 3 t=31 conn=0 req=0 BODY n=0 []
+  NOTE srv ev 4 t=31 conn=0 req=1 HEAD n=201 [GET /tlsntlm HTTP/1.1\r\nUser-Agent: wininet_test\r\nHost: 127.0.0.1:50140\r\nCache-Control: no-cache\r\nConnection: Keep-Alive\r\nAuthorization: NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAK]
+  NOTE srv ev 5 t=31 conn=0 req=1 BODY n=0 []
+  NOTE srv ev 6 t=31 conn=0 req=2 HEAD n=713 [GET /tlsntlm HTTP/1.1\r\nUser-Agent: wininet_test\r\nHost: 127.0.0.1:50140\r\nCache-Control: no-cache\r\nConnection: Keep-Alive\r\nAuthorization: NTLM TlRMTVNTUAADAAAAGAAYAIoAAAAIAQgBogAAABAAEABY]
+  NOTE srv ev 7 t=31 conn=0 req=2 BODY n=0 []
   NOTE slow srv_stop: 3000 ms
 OK   auth_https_ntlm_custom_gate
 RUN  auth_https_digest
   NOTE req 0 conn 0 [GET /tlsdigest HTTP/1.1] auth=(none) pauth=(none)
-  NOTE req 1 conn 0 [GET /tlsdigest HTTP/1.1] auth=Digest username="du",realm="i7tls",nonce="tlsnonce01",uri="/tlsdigest",cnonce="8... pauth=(none)
+  NOTE req 1 conn 0 [GET /tlsdigest HTTP/1.1] auth=Digest username="du",realm="i7tls",nonce="tlsnonce01",uri="/tlsdigest",cnonce="a... pauth=(none)
   NOTE https digest: ok=1 err=0 status=200
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_https_digest
 RUN  auth_https_basic_no_creds_401
   NOTE slow srv_stop: 3015 ms
@@ -761,15 +756,15 @@ RUN  auth_https_basic_retry
   NOTE req 0 conn 0 [GET /tls HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /tls HTTP/1.1] auth=Basic dGxzdXNlcjp0bHNwYXNz pauth=(none)
   NOTE https basic: ok=1 err=0 status=200
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3016 ms
 OK   auth_https_basic_retry
 RUN  auth_hq_status_code_flag_number_after_retry
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_hq_status_code_flag_number_after_retry
 RUN  auth_hq_proxy_authorization_caller_header
   NOTE req 0 conn 0 [GET /hq/pauth HTTP/1.1] auth=(none) pauth=Basic eHg6eXk=
   NOTE req 1 conn 0 [GET /hq/pauth HTTP/1.1] auth=Basic dTpw pauth=Basic eHg6eXk=
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_hq_proxy_authorization_caller_header
 RUN  auth_hq_add_request_headers_replace_authorization
   NOTE slow srv_stop: 1000 ms
@@ -788,22 +783,22 @@ RUN  auth_hq_authentication_info_after_digest
   NOTE slow srv_stop: 1000 ms
 OK   auth_hq_authentication_info_after_digest
 RUN  auth_hq_no_authorization_in_request_view_without_header
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_hq_no_authorization_in_request_view_without_header
 RUN  auth_hq_caller_authorization_w_dropped_from_request_view
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_hq_caller_authorization_w_dropped_from_request_view
 RUN  auth_hq_caller_authorization_dropped_from_request_view
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_hq_caller_authorization_dropped_from_request_view
 RUN  auth_hq_proxy_authenticate_absent_on_401
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_hq_proxy_authenticate_absent_on_401
 RUN  auth_hq_raw_headers_contain_challenge
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_hq_raw_headers_contain_challenge
 RUN  auth_hq_custom_name_lookup
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_hq_custom_name_lookup
 RUN  auth_hq_comma_list_is_one_header
   NOTE slow srv_stop: 1016 ms
@@ -815,13 +810,13 @@ RUN  auth_hq_www_authenticate_w_sizes
   NOTE slow srv_stop: 1015 ms
 OK   auth_hq_www_authenticate_w_sizes
 RUN  auth_hq_www_authenticate_a_sizes
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_hq_www_authenticate_a_sizes
 RUN  auth_dlg_flow_retry_after_setting_creds
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_dlg_flow_retry_after_setting_creds
 RUN  auth_dlg_filter_on_200_passes_error_through
-  NOTE slow srv_stop: 3016 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_dlg_filter_on_200_passes_error_through
 RUN  auth_dlg_no_ui_after_407
   NOTE 407 + filter + NO_UI -> 0; filter without NO_UI/hwnd -> 87
@@ -832,14 +827,14 @@ OK   auth_dlg_connect_handle
 RUN  auth_dlg_session_handle
 OK   auth_dlg_session_handle
 RUN  auth_dlg_no_ui_on_200_request
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_dlg_no_ui_on_200_request
 RUN  auth_dlg_no_ui_after_401_without_cached_creds
   NOTE NO_UI on 401 without cached creds: 12014 -> 0, filter -> 0, filter+gen+chg -> 0
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_dlg_no_ui_after_401_without_cached_creds
 RUN  auth_dlg_no_hwnd_no_noui_flag_rejected
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_dlg_no_hwnd_no_noui_flag_rejected
 RUN  auth_dlg_insert_cdrom_not_supported
 OK   auth_dlg_insert_cdrom_not_supported
@@ -849,11 +844,11 @@ RUN  auth_dlg_null_request_incorrect_password
 OK   auth_dlg_null_request_incorrect_password
 RUN  auth_edge_authorization_header_position
   NOTE first header order: User-Agent|Host|Cache-Control| retry: User-Agent|Host|Cache-Control|Connection|Authorization|
-  NOTE slow srv_stop: 3016 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_edge_authorization_header_position
 RUN  auth_edge_open_url_userinfo_no_auth_flag
   NOTE req 0 conn 0 [GET /nf HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 3015 ms
+  NOTE slow srv_stop: 3000 ms
 OK   auth_edge_open_url_userinfo_no_auth_flag
 RUN  auth_edge_server_revokes_after_success
   NOTE req 0 conn 0 [GET /rv/a HTTP/1.1] auth=(none) pauth=(none)
@@ -867,13 +862,13 @@ RUN  auth_edge_redirect_cross_host_after_auth
   NOTE req 0 conn 0 [GET /x HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /x HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
   NOTE req 2 conn 1 [GET /elsewhere HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 3016 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_edge_redirect_cross_host_after_auth
 RUN  auth_edge_401_then_redirect_keeps_auth_same_host
   NOTE req 0 conn 0 [GET /orig/x HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /orig/x HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
   NOTE req 2 conn 0 [GET /moved/x HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 3015 ms
+  NOTE slow srv_stop: 3000 ms
 OK   auth_edge_401_then_redirect_keeps_auth_same_host
 RUN  auth_edge_redirect_then_401
   NOTE req 0 conn 0 [GET /start HTTP/1.1] auth=(none) pauth=(none)
@@ -882,13 +877,13 @@ RUN  auth_edge_redirect_then_401
   NOTE slow srv_stop: 3000 ms
 OK   auth_edge_redirect_then_401
 RUN  auth_edge_401_no_body_no_length
-  NOTE slow srv_stop: 3015 ms
+  NOTE slow srv_stop: 3000 ms
 OK   auth_edge_401_no_body_no_length
 RUN  auth_edge_http10_401
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3016 ms
 OK   auth_edge_http10_401
 RUN  auth_edge_close_delimited_401
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3015 ms
 OK   auth_edge_close_delimited_401
 RUN  auth_edge_large_401_body_drained
   NOTE slow srv_stop: 3000 ms
@@ -897,13 +892,13 @@ RUN  auth_edge_chunked_401_body
   NOTE slow srv_stop: 3000 ms
 OK   auth_edge_chunked_401_body
 RUN  auth_digest_cred_table
-  NOTE row 0 username param=[u] header=Digest username="u",realm="r",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="f5d3b241af502c95a3d4d7a6a939ade
-  NOTE slow srv_stop: 1000 ms
-  NOTE row 1 username param=[user name] header=Digest username="user name",realm="realm with spaces",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="6a8dcac
-  NOTE slow srv_stop: 1000 ms
-  NOTE row 2 username param=[user@host] header=Digest username="user@host",realm="testrealm@host.com",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="e3e940
-  NOTE slow srv_stop: 1000 ms
-  NOTE row 3 username param=[DOM\user] header=Digest username="DOM\\user",realm="i7",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="a79a9cd1184c87788041a0
+  NOTE row 0 username param=[u] header=Digest username="u",realm="r",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="99b38b956cf107fa8bc0b9b1c7a6ddc
+  NOTE slow srv_stop: 1016 ms
+  NOTE row 1 username param=[user name] header=Digest username="user name",realm="realm with spaces",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="139c79b
+  NOTE slow srv_stop: 1015 ms
+  NOTE row 2 username param=[user@host] header=Digest username="user@host",realm="testrealm@host.com",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="f262f3
+  NOTE slow srv_stop: 1016 ms
+  NOTE row 3 username param=[DOM\user] header=Digest username="DOM\\user",realm="i7",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/",cnonce="e2f1a5007dfbfca57abe8b
   NOTE slow srv_stop: 1016 ms
   NOTE row 4 username param=[0123456789abcdef0123456789abcdef] header=Digest username="0123456789abcdef0123456789abcdef",realm="long-realm-0123456789",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c0
   NOTE slow srv_stop: 1000 ms
@@ -918,50 +913,50 @@ RUN  auth_digest_unsupported_algorithm
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE unsupported digest algorithm: ok=1 err=0 status=401 requests=2
+  NOTE slow srv_stop: 1000 ms
 OK   auth_digest_unsupported_algorithm
 RUN  auth_digest_then_basic_offered
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET / HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c09... pauth=(none)
   NOTE Digest listed first, Basic second -> client chose Digest use
-  NOTE slow srv_stop: 1000 ms
 OK   auth_digest_then_basic_offered
 RUN  auth_digest_and_basic_offered
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET / HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c09... pauth=(none)
   NOTE Basic listed first, Digest second -> client chose Digest use
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_digest_and_basic_offered
 RUN  auth_digest_stale_nonce_retry
   NOTE req 0 conn 0 [GET /stale HTTP/1.1] auth=(none) pauth=(none)
-  NOTE req 1 conn 0 [GET /stale HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="nonce1",uri="/stale",cnonce="a350... pauth=(none)
-  NOTE req 2 conn 0 [GET /stale HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="nonce2",uri="/stale",cnonce="4e97... pauth=(none)
+  NOTE req 1 conn 0 [GET /stale HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="nonce1",uri="/stale",cnonce="8529... pauth=(none)
+  NOTE req 2 conn 0 [GET /stale HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="nonce2",uri="/stale",cnonce="074f... pauth=(none)
   NOTE stale nonce: status=200 requests=3
-  NOTE slow srv_stop: 3000 ms
+  NOTE slow srv_stop: 3016 ms
 OK   auth_digest_stale_nonce_retry
 RUN  auth_digest_second_request_nonce_count
   NOTE req 0 conn 0 [GET /nc/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /nc/a HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c09... pauth=(none)
   NOTE req 2 conn 0 [GET /nc/b HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c09... pauth=(none)
-  NOTE second digest request: 1 more requests; first carries Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/nc/b",cnonce="80a09713e30b5d4a18aef4f8cdb17e90",nc=00000002,response="3548bafa9dd4460e23f33587f91b4ea2",qop="auth",opaque="5ccc069c403ebaf9f0171e9517f40e41"
-  NOTE slow srv_stop: 968 ms
+  NOTE second digest request: 1 more requests; first carries Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/nc/b",cnonce="253373e849b29d80cc0ce1438f5aca3c",nc=00000002,response="5cd3235fabc2f1076586dbe8c86fe33d",qop="auth",opaque="5ccc069c403ebaf9f0171e9517f40e41"
+  NOTE slow srv_stop: 1000 ms
 OK   auth_digest_second_request_nonce_count
 RUN  auth_digest_no_auth_flag
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_digest_no_auth_flag
 RUN  auth_digest_wrong_password_final_401
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET / HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c09... pauth=(none)
   NOTE digest wrong password: 2 requests
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_digest_wrong_password_final_401
 RUN  auth_digest_no_creds_returns_401
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_digest_no_creds_returns_401
 RUN  auth_digest_request_option_creds
   NOTE slow srv_stop: 1016 ms
 OK   auth_digest_request_option_creds
 RUN  auth_digest_post_method_in_ha2
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_digest_post_method_in_ha2
 RUN  auth_digest_uri_with_query
   NOTE slow srv_stop: 1000 ms
@@ -969,7 +964,7 @@ OK   auth_digest_uri_with_query
 RUN  auth_digest_qop_list_picks_auth
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET / HTTP/1.1] auth=Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c09... pauth=(none)
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_digest_qop_list_picks_auth
 RUN  auth_digest_algorithm_md5_explicit
   NOTE slow srv_stop: 1016 ms
@@ -986,14 +981,14 @@ RUN  auth_digest_rfc2069_no_qop
   NOTE slow srv_stop: 1016 ms
 OK   auth_digest_rfc2069_no_qop
 RUN  auth_digest_header_param_order_and_quoting
-  NOTE digest header: Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/o",cnonce="e75b7f422e8fa58282aeae965e94b495",nc=00000001,response="1e65d62daa7d558de42d7ff462069e45",qop="auth",opaque="5ccc069c403ebaf9f0171e9517f40e41"
+  NOTE digest header: Digest username="user",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/o",cnonce="fb095ebc25823f1b6ec26a7a8503ac1d",nc=00000001,response="a8cfcbee2c057bbbba90407e80653ff4",qop="auth",opaque="5ccc069c403ebaf9f0171e9517f40e41"
   NOTE slow srv_stop: 1000 ms
 OK   auth_digest_header_param_order_and_quoting
 RUN  auth_digest_qop_auth_md5
   NOTE req 0 conn 0 [GET /dir/index.html HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /dir/index.html HTTP/1.1] auth=Digest username="Mufasa",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c... pauth=(none)
   NOTE algorithm not echoed
-  NOTE digest header (9 params): Digest username="Mufasa",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/dir/index.html",cnonce="246e964077f7f452ae9a2e4a046f2792",nc=00000001,response="6ff5905ab707cb5a65bce331daf56347",qop="auth",opaque="5ccc069c403ebaf9f0171e9517f40e41"
+  NOTE digest header (9 params): Digest username="Mufasa",realm="i7digest",nonce="dcd98b7102dd2f0e8b11d0f600bfb0c093",uri="/dir/index.html",cnonce="e31a04eedb493d5c3b70fc15cfa577a9",nc=00000001,response="bb590adf282146dfc475919e893226ca",qop="auth",opaque="5ccc069c403ebaf9f0171e9517f40e41"
   NOTE slow srv_stop: 1000 ms
 OK   auth_digest_qop_auth_md5
 RUN  auth_cache_realm_change_rechallenges
@@ -1006,14 +1001,14 @@ RUN  auth_cache_preemptive_with_no_auth_flag
   NOTE req 0 conn 0 [GET /n/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /n/a HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
   NOTE req 2 conn 0 [GET /n/a HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_cache_preemptive_with_no_auth_flag
 RUN  auth_cache_not_populated_by_failed_creds
   NOTE req 0 conn 0 [GET /f/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /f/a HTTP/1.1] auth=Basic dXNlcjp3cm9uZw== pauth=(none)
   NOTE req 2 conn 0 [GET /f/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 3 conn 0 [GET /f/a HTTP/1.1] auth=Basic dXNlcjp3cm9uZw== pauth=(none)
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_cache_not_populated_by_failed_creds
 RUN  auth_cache_different_creds_on_new_connect
   NOTE req 0 conn 0 [GET /d/a HTTP/1.1] auth=(none) pauth=(none)
@@ -1031,7 +1026,7 @@ RUN  auth_cache_new_connect_handle_no_creds
   NOTE req 0 conn 0 [GET /c/a HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /c/a HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
   NOTE req 2 conn 0 [GET /c/a HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
-  NOTE slow srv_stop: 985 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_cache_new_connect_handle_no_creds
 RUN  auth_cache_parent_directory
   NOTE req 0 conn 0 [GET /p/q/a HTTP/1.1] auth=(none) pauth=(none)
@@ -1052,7 +1047,7 @@ RUN  auth_cache_sibling_path_same_directory
   NOTE req 1 conn 0 [GET /dir/a HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
   NOTE req 2 conn 0 [GET /dir/b HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
   NOTE req 3 conn 0 [GET /dir/sub/c HTTP/1.1] auth=Basic dXNlcjpwYXNz pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_cache_sibling_path_same_directory
 RUN  auth_cache_second_request_same_path_preemptive
   NOTE req 0 conn 0 [GET /dir/a HTTP/1.1] auth=(none) pauth=(none)
@@ -1061,28 +1056,28 @@ RUN  auth_cache_second_request_same_path_preemptive
   NOTE slow srv_stop: 1000 ms
 OK   auth_cache_second_request_same_path_preemptive
 RUN  auth_basic_wide_connect_creds
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_wide_connect_creds
 RUN  auth_basic_wide_request_option_creds
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_basic_wide_request_option_creds
 RUN  auth_basic_response_headers_after_success
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_response_headers_after_success
 RUN  auth_basic_query_request_authorization_header
   NOTE slow srv_stop: 1000 ms
 OK   auth_basic_query_request_authorization_header
 RUN  auth_basic_put_and_delete
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_basic_put_and_delete
 RUN  auth_basic_head_request
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_head_request
 RUN  auth_basic_post_body_resent
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_post_body_resent
 RUN  auth_basic_caller_header_wrong_then_creds
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=Basic Ym9ndXM6Ym9ndXM= pauth=(none)
@@ -1090,19 +1085,19 @@ RUN  auth_basic_caller_header_wrong_then_creds
   NOTE slow srv_stop: 1000 ms
 OK   auth_basic_caller_header_wrong_then_creds
 RUN  auth_basic_caller_supplied_authorization_header
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_caller_supplied_authorization_header
 RUN  auth_basic_no_auth_flag_request_option_creds
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_no_auth_flag_request_option_creds
 RUN  auth_basic_no_auth_flag_returns_401
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_no_auth_flag_returns_401
 RUN  auth_basic_wrong_creds_send_again_on_same_handle
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET / HTTP/1.1] auth=Basic dXNlcjp3cm9uZw== pauth=(none)
   NOTE req 2 conn 0 [GET / HTTP/1.1] auth=Basic dXNlcjpyaWdodA== pauth=(none)
-  NOTE slow srv_stop: 984 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_wrong_creds_send_again_on_same_handle
 RUN  auth_basic_wrong_creds_final_401
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
@@ -1112,35 +1107,35 @@ RUN  auth_basic_wrong_creds_final_401
 OK   auth_basic_wrong_creds_final_401
 RUN  auth_basic_challenge_variants
   NOTE challenge quoted_realm       -> ok=1 status=200 requests=2
-  NOTE slow srv_stop: 1016 ms
-  NOTE challenge lower_scheme       -> ok=1 status=200 requests=2
-  NOTE slow srv_stop: 1000 ms
-  NOTE challenge upper_scheme       -> ok=1 status=200 requests=2
   NOTE slow srv_stop: 1015 ms
-  NOTE challenge no_realm           -> ok=1 status=200 requests=2
+  NOTE challenge lower_scheme       -> ok=1 status=200 requests=2
   NOTE slow srv_stop: 1016 ms
+  NOTE challenge upper_scheme       -> ok=1 status=200 requests=2
+  NOTE slow srv_stop: 1000 ms
+  NOTE challenge no_realm           -> ok=1 status=200 requests=2
+  NOTE slow srv_stop: 1015 ms
   NOTE challenge empty_realm        -> ok=1 status=200 requests=2
   NOTE slow srv_stop: 1000 ms
   NOTE challenge unquoted_realm     -> ok=1 status=200 requests=2
   NOTE slow srv_stop: 1016 ms
   NOTE challenge comma_in_realm     -> ok=1 status=200 requests=2
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE challenge charset_param      -> ok=1 status=200 requests=2
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE challenge lower_header       -> ok=1 status=200 requests=2
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
   NOTE challenge bearer_then_basic  -> ok=1 status=200 requests=2
   NOTE slow srv_stop: 1000 ms
   NOTE challenge unknown_then_basic -> ok=1 status=200 requests=2
   NOTE slow srv_stop: 1016 ms
   NOTE challenge bearer_only        -> ok=1 status=401 requests=1
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE challenge unknown_only       -> ok=1 status=401 requests=1
   NOTE slow srv_stop: 1000 ms
   NOTE challenge no_header          -> ok=1 status=401 requests=1
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
   NOTE challenge empty_header       -> ok=1 status=401 requests=1
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_challenge_variants
 RUN  auth_basic_wide_connect_non_ascii
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
@@ -1150,38 +1145,38 @@ RUN  auth_basic_wide_connect_non_ascii
 OK   auth_basic_wide_connect_non_ascii
 RUN  auth_basic_password_without_user
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_basic_password_without_user
 RUN  auth_basic_empty_password_string
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_empty_password_string
 RUN  auth_basic_user_without_password
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_user_without_password
 RUN  auth_basic_cred_table_via_request_option
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_cred_table_via_request_option
 RUN  auth_basic_cred_table_via_connect
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1000 ms
-  NOTE slow srv_stop: 1015 ms
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1016 ms
   NOTE slow srv_stop: 1015 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1000 ms
   NOTE slow srv_stop: 1015 ms
@@ -1197,12 +1192,12 @@ OK   auth_basic_open_url_userinfo_percent_encoded
 RUN  auth_basic_open_url_userinfo
   NOTE req 0 conn 0 [GET /ui HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /ui HTTP/1.1] auth=Basic dXJsdTp1cmxw pauth=(none)
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_basic_open_url_userinfo
 RUN  auth_basic_resend_same_handle_after_setting_creds
   NOTE req 0 conn 0 [GET /late HTTP/1.1] auth=(none) pauth=(none)
   NOTE req 1 conn 0 [GET /late HTTP/1.1] auth=Basic bGF0ZTpjcmVkcw== pauth=(none)
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_resend_same_handle_after_setting_creds
 RUN  auth_basic_request_username_with_connect_password
   NOTE req 0 conn 0 [GET / HTTP/1.1] auth=(none) pauth=(none)
@@ -1219,24 +1214,24 @@ RUN  auth_basic_request_option_creds
   NOTE slow srv_stop: 1016 ms
 OK   auth_basic_request_option_creds
 RUN  auth_basic_retry_after_server_closes_challenge_connection
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_retry_after_server_closes_challenge_connection
 RUN  auth_basic_retry_reuses_keepalive_connection
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_retry_reuses_keepalive_connection
 RUN  auth_basic_connect_creds_retry
-  NOTE slow srv_stop: 1000 ms
+  NOTE slow srv_stop: 1016 ms
 OK   auth_basic_connect_creds_retry
 RUN  auth_basic_query_multiple_challenges_by_index
   NOTE slow srv_stop: 1000 ms
 OK   auth_basic_query_multiple_challenges_by_index
 RUN  auth_basic_no_creds_www_authenticate_queryable
-  NOTE slow srv_stop: 1016 ms
+  NOTE slow srv_stop: 1015 ms
 OK   auth_basic_no_creds_www_authenticate_queryable
 RUN  auth_basic_no_creds_returns_401_to_caller
-  NOTE slow srv_stop: 1015 ms
+  NOTE slow srv_stop: 1000 ms
 OK   auth_basic_no_creds_returns_401_to_caller
 RUN  auth_selftest_md5_md4_hmac
 OK   auth_selftest_md5_md4_hmac
-SUMMARY tests=237 failed=2 skipped=0 checks_pass=2173 checks_fail=4
-@@I7 END http_auth exit=0x1 ms=430043 timeout=0 bytes=67195
+SUMMARY tests=237 failed=0 skipped=0 checks_pass=2178 checks_fail=0
+@@I7 END http_auth exit=0x0 ms=429029 timeout=0 bytes=66780

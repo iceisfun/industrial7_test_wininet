@@ -166,3 +166,7 @@ is returned. Setting it after the send fails with 12019. The W setter works, and
 - INTERNET_OPTION_SECONDARY_CACHE_KEY: not applicable to auth.
 - Global (NULL-handle) USERNAME/PASSWORD are process-wide and would leak into every later test of the exe; not set.
 - Kerberos: no KDC in the lab.
+
+## Triage 2026-11-11 (Win10 22H2 VM, run at master tip)
+- auth_x_http10_request_version_retry (more.c:336): requested "HTTP/1.0" but Win10 sends "GET /v10 HTTP/1.1" on both legs. Wrong expectation; now expects HTTP/1.1.
+- auth_x_end_browser_session_keeps_handle_creds (more.c:221-222): after INTERNET_OPTION_END_BROWSER_SESSION the next request goes out without Authorization, gets 401, and wininet does not retry with the connect-handle creds (status 401, 1 request). Wrong expectation; changed accordingly. INTERNET_OPTION_USERNAME still reads back (unchanged check passed).
