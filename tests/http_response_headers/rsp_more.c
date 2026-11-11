@@ -121,7 +121,7 @@ TEST(rsp_more_bom_before_status_line) {
     rh_close(&c);
 }
 
-/* a line of spaces between headers is a continuation line (dropped like obs-fold), not the end of the head */
+/* [W10] a line of spaces/tab between headers ends the stored head: later headers (X-B, X-C and the TAIL ones) are not visible */
 TEST(rsp_more_whitespace_only_line) {
     REQUIRE(U(HttpQueryInfoA));
     rh_t c;
@@ -130,9 +130,9 @@ TEST(rsp_more_whitespace_only_line) {
     const char *b = rh_qac(c.hr, "X-B", 0, NULL);
     const char *raw = rh_qa(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, NULL);
     t_note("whitespace-only line: X-B=%s raw=%s", b ? b : "(absent)", raw ? rh_esc(raw, strlen(raw)) : "(fail)");
-    EXPECT_QC(c.hr, "X-B", "2");
-    EXPECT_QC(c.hr, "X-C", "3");
-    EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-A: 1\r\nX-B: 2\r\nX-C: 3\r\n" TAIL);
+    CHECKF(!b, "X-B visible after whitespace-only line");
+    CHECKF(!rh_qac(c.hr, "X-C", 0, NULL), "X-C visible after whitespace-only line");
+    EXPECT_QA(c.hr, HTTP_QUERY_RAW_HEADERS_CRLF, "HTTP/1.1 200 OK\r\nX-A: 1\r\n\r\n");
     rh_close(&c);
 }
 

@@ -158,3 +158,11 @@ Win10 boots `rh-20261110-051251-b1` (171 tests, 6 failures, triaged below) and `
   `Accept-Encoding: gzip, deflate`.
 - Test infrastructure: the loopback server accepts at most 64 connections (`SRV_MAXCONN`), so the every-offset
   loops restart it every 56 connections. The first boot's resets at offsets >= 65 came from that limit, not from wininet.
+
+## Triage 2026-11-11 (Win10 22H2 VM run at master tip: 2 FAIL tests)
+- `rsp_more_whitespace_only_line` (rsp_more.c): cause wrong-expectation. [W10] a whitespace-only line (spaces or tab) between
+  headers ends the stored head: X-B/X-C and the later headers are absent (12150) and RAW_HEADERS_CRLF is
+  `HTTP/1.1 200 OK\r\nX-A: 1\r\n\r\n`. Checks changed to assert exactly that (stable, deterministic).
+- `rsp_life_https_response_headers` (rsp_lifecycle.c): cause env-or-flake. The schannel loopback server aborts the TLS
+  handshake with 12030 intermittently on the VM (also seen in cookies and net_loopback); on the rerun the same test passed. A 12030
+  on send now t_notes and skips the header checks instead of failing; all header checks still run when the send succeeds.
