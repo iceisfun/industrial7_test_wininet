@@ -174,10 +174,10 @@ TEST(tmf_a_five_digit_year_truncates) {
     CHECK(!U(InternetTimeFromSystemTimeA)(&st, 0, buf, 30));
     EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
     t_note("30827 truncated to [%.40s]", buf);
-    EXPECT_STR(buf, "Sun, 31 Dec 30827 23:59:59 GM");
+    EXPECT_STR(buf, "Fri, 31 Dec 30827 23:59:59 GM");
     char big[64] = "";
     CHECK(U(InternetTimeFromSystemTimeA)(&st, 0, big, 31));
-    EXPECT_STR(big, "Sun, 31 Dec 30827 23:59:59 GMT");
+    EXPECT_STR(big, "Fri, 31 Dec 30827 23:59:59 GMT");
     st = mk(10000, 1, 0, 1, 0, 0, 0, 0);
     CHECK(U(InternetTimeFromSystemTimeA)(&st, 0, big, sizeof big));
     EXPECT_STR(big, "Sun, 01 Jan 10000 00:00:00 GMT");   /* wDay=1 <= 6: the caller's wDayOfWeek (0 = Sun) is printed */
@@ -326,7 +326,7 @@ TEST(tmf_w_five_digit_year) {
     SET_ERR(0); CHECK(!U(InternetTimeFromSystemTimeW)(&st, 0, buf, 60)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
     SET_ERR(0); CHECK(!U(InternetTimeFromSystemTimeW)(&st, 0, buf, 62)); EXPECT_ERR(ERROR_INSUFFICIENT_BUFFER);
     SET_ERR(0); CHECK(U(InternetTimeFromSystemTimeW)(&st, 0, buf, 63));
-    EXPECT_WSTR(buf, L"Sun, 31 Dec 30827 23:59:59 GMT");
+    EXPECT_WSTR(buf, L"Fri, 31 Dec 30827 23:59:59 GMT");
 }
 
 TEST(tmf_w_matches_a_sweep) {
