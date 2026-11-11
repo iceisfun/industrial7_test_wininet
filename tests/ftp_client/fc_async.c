@@ -207,7 +207,8 @@ TEST(ftpc_async_open_file_and_read) {
                 acb_reset();
                 SetLastError(0);
                 BOOL ok = U(InternetReadFile)(hf, b + total, sizeof b - 1 - total, &got);
-                if (!ok && GetLastError() == ERROR_IO_PENDING) { if (!acb_wait(5000)) break; ok = (BOOL)A.res; /* got was written on completion */ }
+                if (!ok && GetLastError() == ERROR_IO_PENDING) { if (!acb_wait(5000)) break; ok = (BOOL)A.res; got = A.err; /* Win10 (VM, triage 2026-11): *lpdwNumberOfBytesRead is NOT written on async completion; the byte count arrives in INTERNET_ASYNC_RESULT.dwError */ }
+                t_note("async read[%d]: ok=%d got=%lu lasterr=%lu A.res=%llu A.err=%lu n=%d", i, ok, got, GetLastError(), (unsigned long long)A.res, A.err, A.n);
                 if (!ok || got == 0) break;
                 total += got;
             }

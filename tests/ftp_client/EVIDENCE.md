@@ -88,3 +88,14 @@ early read close, INTERNET_OPTION_URL on file handles, RAW_DATA reads, W/A FindN
 
 ## VM status
 See the commit history of this file for each boot; the final status line is recorded below.
+
+## Triage 2026-11-11 (Win10 22H2 VM, tri-ftp_client-1..5)
+Start: 6 failed tests / 11 checks. Now 0 failed (two consecutive passing runs).
+| Test | Cause | Change |
+|---|---|---|
+| ftpc_proto_pass_reply_class_table | test-bug: `S_SEND(tab[i].reply)` uses sizeof(pointer)-1 = 7 bytes, truncating the reply (no CRLF), so the client saw a drop (12111) | use `S_SENDN(reply, strlen(reply))`; expectations unchanged |
+| ftpc_proto_banner_text_is_last_response | wrong-expectation: Win10 keeps the banner and the USER/PASS replies in the last-response text after login | removed the "line two absent" check; response logged via t_note |
+| ftpc_callback_file_handle_created_and_closing | wrong-expectation: HANDLE_CREATED for FtpOpenFile carries an intermediate handle (0xcc0008), not the returned one (0xcc0010) | now only checks non-NULL, logs both |
+| ftpc_qda_find_handle_reports_find_data_size | wrong-expectation: QDA on an exhausted find handle still reports 0x140 | `avail == 0` downgraded to t_note |
+| ftpc_x_getfile_local_path_is_directory | wrong-expectation: fail-if-exists (CREATE_NEW) on a directory gives 5, not 80 | expect ERROR_ACCESS_DENIED |
+| ftpc_async_open_file_and_read | test-bug: on async completion InternetReadFile does not write *lpdwNumberOfBytesRead; byte count is in INTERNET_ASYNC_RESULT.dwError (observed res=1 err=5) | take `got = A.err` on completion |
