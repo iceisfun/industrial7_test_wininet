@@ -179,7 +179,7 @@ TEST(sh_rv_ftp_connect_async_session_context_rule) {
     srv_stop(f);
 }
 
-/* InternetOpenUrl on an async session with dwContext 0 is synchronous: the request handle comes back directly. */
+/* InternetOpenUrl on an async session, dwContext 0: Win10 still goes asynchronous (NULL / 997), no handle comes back directly. */
 TEST(sh_rv_openurl_async_session_zero_context_sync) {
     REQUIRE(U(InternetOpenUrlA));
     srv *sv = srv_http(NULL, 0);
@@ -190,15 +190,11 @@ TEST(sh_rv_openurl_async_session_zero_context_sync) {
         SetLastError(0xdeadbeef);
         HINTERNET r = U(InternetOpenUrlA)(s, srv_url(sv, "/async0"), NULL, 0, T_INET_FRESH, 0);
         DWORD e = GetLastError();
-        CHECKF(r != NULL, "async session, InternetOpenUrl context 0: err %lu", e);
-        if (r) {
-            EXPECT_EQ(sh_htype(r, NULL), INTERNET_HANDLE_TYPE_HTTP_REQUEST);
-            DWORD code = 0, cl = sizeof code;
-            CHECK(U(HttpQueryInfoA)(r, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &code, &cl, NULL));
-            EXPECT_EQ(code, 200);
-            sh_close(r);
-        }
+        t_note("async session, InternetOpenUrl context 0: h=%p err %lu", r, r ? 0 : e);
+        CHECKF(r == NULL && e == ERROR_IO_PENDING, "async session, InternetOpenUrl context 0: h=%p err %lu want NULL/997", r, e);
+        if (r) sh_close(r);
         sh_close(s);
+        Sleep(200);
     }
     srv_stop(sv);
 }
