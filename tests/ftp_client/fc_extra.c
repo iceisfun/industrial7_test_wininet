@@ -126,8 +126,8 @@ TEST(ftpc_x_getfile_local_path_is_directory) {
     DWORD a = GetFileAttributesA(dir);
     CHECK(a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY));   /* not deleted */
     SetLastError(0);
-    /* fail-if-exists on a directory: CREATE_NEW -> 80 */
-    EXPECT_FAIL(!U(FtpGetFileA)(x.hc, "hello.txt", dir, TRUE, FILE_ATTRIBUTE_NORMAL, FC_BIN, 0), ERROR_FILE_EXISTS);
+    /* fail-if-exists on a directory: Win10 (VM, triage 2026-11) reports 5, not 80 (CREATE_NEW on a directory) */
+    EXPECT_FAIL(!U(FtpGetFileA)(x.hc, "hello.txt", dir, TRUE, FILE_ATTRIBUTE_NORMAL, FC_BIN, 0), ERROR_ACCESS_DENIED);
     RemoveDirectoryA(dir);
     fc_end(&x);
 }
