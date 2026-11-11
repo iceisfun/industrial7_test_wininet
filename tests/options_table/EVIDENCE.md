@@ -152,3 +152,10 @@ session, CONTEXT_VALUE round trip; FTP connect copies session timeouts and keeps
 (0, 1, 2, 4 TRUE; 5, 6, 0x10, 0x7fffffff, 0xffffffff 87; length 3/8 12010; query 87; value 3 is never sent because it
 purges the in-memory cookie jar); CONNECTED_STATE set in a child (8 bytes TRUE and ignored: the state still reads 1
 after an offline request; 4 or 12 bytes 12010).
+
+## Triage 2026-11-11 (Win10 22H2 VM, oracle)
+- ot_mc_fresh_connect_has_no_record (ot_conns_child.c sc_fresh): wrong expectation. On Win10 a record-less connect handle answers MAX_CONNS_PER_SERVER with the global value (2, success), and a set of 4 on it succeeds (0). Changed to expect the global value / 0.
+- ot_mc_record_shared_per_host_name (sc_after): wrong expectation. A connect to another host name ("localhost") also answers r=1 with the global value (2); changed to expect the global value.
+- ot_live_user_agent_on_wire: wrong expectation. Requests opened after InternetSetOption(USER_AGENT) on the session still send the InternetOpen agent ('ot-ua-initial', both A and W sets); expectation changed to that.
+- ot_live_socket_info_mid_body_https: test bug. First HttpSendRequest to the self-signed localhost cert fails (12030 observed); needs the IGNORE_UNKNOWN_CA retry like ot_fixture.c send_get. Added the retry loop.
+- ot_inh_0_99 (option 62 ERROR_MASK child): intermittent (2 of 3 runs) Win10 child crash on handle close after the set (0xc0000374 / 0xc0000005), after the observation line was printed. Harness fix: the child terminates without closing handles for row 62. Not a conformance check weakened (the INH expectation string is still compared).

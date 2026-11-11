@@ -33,8 +33,8 @@ RUN  ot_tls_certificate_string
 localhost
 Issuer:
 localhost
-Effective Date:	9/29/2026 7:01:53 PM
-Expiration Date:	9/30/2027 7:01:53 PM
+Effective Date:	9/29/2026 7:01:45 PM
+Expiration Date:	9/30/2027 7:01:45 PM
 Security Protocol:	(null)
 Signature Type:	(null)
 Encryption Type:	(null)
@@ -615,23 +615,23 @@ RUN  ot_qm_out_of_range
   QM [201,100000] rows=96 mismatches=0
 OK   ot_qm_out_of_range
 RUN  ot_qm_190_200
-  NOTE opt 192 S A len=8 value 00002b07f77f0000
-  NOTE opt 192 S W len=8 value 00002b07f77f0000cccccccccccccccc
-  NOTE opt 192 C A len=8 value 00002b07f77f0000
-  NOTE opt 192 C W len=8 value 00002b07f77f0000cccccccccccccccc
-  NOTE opt 192 R A len=8 value 00002b07f77f0000
-  NOTE opt 192 R W len=8 value 00002b07f77f0000cccccccccccccccc
-  NOTE opt 192 X A len=8 value 00002b07f77f0000
-  NOTE opt 192 X W len=8 value 00002b07f77f0000cccccccccccccccc
-  NOTE opt 192 T A len=8 value 00002b07f77f0000
-  NOTE opt 192 T W len=8 value 00002b07f77f0000cccccccccccccccc
+  NOTE opt 192 S A len=8 value 0000aa93f67f0000
+  NOTE opt 192 S W len=8 value 0000aa93f67f0000cccccccccccccccc
+  NOTE opt 192 C A len=8 value 0000aa93f67f0000
+  NOTE opt 192 C W len=8 value 0000aa93f67f0000cccccccccccccccc
+  NOTE opt 192 R A len=8 value 0000aa93f67f0000
+  NOTE opt 192 R W len=8 value 0000aa93f67f0000cccccccccccccccc
+  NOTE opt 192 X A len=8 value 0000aa93f67f0000
+  NOTE opt 192 X W len=8 value 0000aa93f67f0000cccccccccccccccc
+  NOTE opt 192 T A len=8 value 0000aa93f67f0000
+  NOTE opt 192 T W len=8 value 0000aa93f67f0000cccccccccccccccc
   QM [190,200] rows=176 mismatches=0
 OK   ot_qm_190_200
 RUN  ot_qm_180_189
-  NOTE opt 186 X A len=4096 value 06000000ccccccccee076650000000007d12665000000000756266500000000010736650000000000000000000000000
-  NOTE opt 186 X W len=4096 value 06000000ccccccccee076650000000007d12665000000000756266500000000010736650000000000000000000000000
-  NOTE opt 186 T A len=4096 value 06000000ccccccccee076650000000007d126650000000009b7a815000000000da84815000000000ed84815000000000
-  NOTE opt 186 T W len=4096 value 06000000ccccccccee076650000000007d126650000000009b7a815000000000da84815000000000ed84815000000000
+  NOTE opt 186 X A len=4096 value 06000000cccccccccf7d7554000000005f8575540000000050c975540000000045d77554000000000000000000000000
+  NOTE opt 186 X W len=4096 value 06000000cccccccccf7d7554000000005f8575540000000050c975540000000045d77554000000000000000000000000
+  NOTE opt 186 T A len=4096 value 06000000cccccccccf7d7554000000005f857554000000003f73995400000000c67e995400000000f47e995400000000
+  NOTE opt 186 T W len=4096 value 06000000cccccccccf7d7554000000005f857554000000003f73995400000000c67e995400000000f47e995400000000
   QM [180,189] rows=160 mismatches=0
 OK   ot_qm_180_189
 RUN  ot_qm_170_179
@@ -660,8 +660,8 @@ RUN  ot_qm_110_119
   QM [110,119] rows=160 mismatches=0
 OK   ot_qm_110_119
 RUN  ot_qm_100_109
-  NOTE opt 105 T A len=8 value 009f3599fc010000
-  NOTE opt 105 T W len=8 value 009f3599fc010000cccccccccccccccc
+  NOTE opt 105 T A len=8 value 904bd9e411020000
+  NOTE opt 105 T W len=8 value 904bd9e411020000cccccccccccccccc
   QM [100,109] rows=160 mismatches=0
 OK   ot_qm_100_109
 RUN  ot_qm_90_99
@@ -695,9 +695,9 @@ RUN  ot_qm_40_49
   QM [40,49] rows=160 mismatches=0
 OK   ot_qm_40_49
 RUN  ot_qm_30_39
-  NOTE opt 32 T A len=64 value 806a69b8df6fde0180ea38154550dd012002911bac010000c003911bac01000000000000000000000000000000000000
-  NOTE opt 32 T W len=64 value 806a69b8df6fde0180ea38154550dd01e003911bac010000e001911bac01000000000000000000000000000000000000
-  NOTE opt 33 L A len=61 value 433a5c55736572735c41444d494e497e315c417070446174615c4c6f63616c5c54656d705c77696e696e65745f323839
+  NOTE opt 32 T A len=64 value 80979ab9df6fde0180176a164550dd0180911849a201000080921849a201000000000000000000000000000000000000
+  NOTE opt 32 T W len=64 value 80979ab9df6fde0180176a164550dd0160911849a201000020961849a201000000000000000000000000000000000000
+  NOTE opt 33 L A len=61 value 433a5c55736572735c41444d494e497e315c417070446174615c4c6f63616c5c54656d705c77696e696e65745f373532
   NOTE opt 33 L W len=61 value 43003a005c00550073006500720073005c00410044004d0049004e0049007e0031005c00410070007000440061007400
   NOTE opt 34 R A len=24 value 687474703a2f2f3132372e302e302e313a35303231362f70
   NOTE opt 34 R W len=24 value 68007400740070003a002f002f003100320037002e0030002e0030002e0031003a00350030003200310036002f007000
@@ -770,7 +770,7 @@ RUN  ot_misc_request_flags_from_cache
   NOTE cache read REQUEST_FLAGS 0x1
 OK   ot_misc_request_flags_from_cache
 RUN  ot_misc_datafile_name_cached_download
-  NOTE DATAFILE_NAME 'C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\G720FYMI\wininet_2052_2_dfn[1].txt'
+  NOTE DATAFILE_NAME 'C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\1B0SQUZC\wininet_7376_2_dfn[1].txt'
 OK   ot_misc_datafile_name_cached_download
 RUN  ot_misc_per_connection_option_session
   NOTE DIRECT session PER_CONN_FLAGS 0x9
@@ -802,22 +802,21 @@ OK   ot_live_parent_context_ftp_and_file
 RUN  ot_live_open_url_hidden_connect
 OK   ot_live_open_url_hidden_connect
 RUN  ot_live_receive_timeout_effect
-  NOTE request with RECEIVE_TIMEOUT 500 failed after 4016 ms (server answers after 4000 ms)
+  NOTE request with RECEIVE_TIMEOUT 500 failed after 4000 ms (server answers after 4000 ms)
 OK   ot_live_receive_timeout_effect
 RUN  ot_live_user_agent_on_wire
-  FAIL tests/options_table/ot_live.c:145: srv_req_header(sv, before, "User-Agent") == i ? "ot-ua-W/2.0" : "ot-ua-A/1.0" (got "ot-ua-initial" want "ot-ua-A/1.0")
-  FAIL tests/options_table/ot_live.c:145: srv_req_header(sv, before, "User-Agent") == i ? "ot-ua-W/2.0" : "ot-ua-A/1.0" (got "ot-ua-initial" want "ot-ua-W/2.0")
   NOTE request opened before the USER_AGENT change sends User-Agent 'ot-ua-initial'
-FAIL ot_live_user_agent_on_wire
+OK   ot_live_user_agent_on_wire
 RUN  ot_live_url_after_redirect
 OK   ot_live_url_after_redirect
 RUN  ot_live_socket_info_handle_gates
 OK   ot_live_socket_info_handle_gates
 RUN  ot_live_socket_info_mid_body_https
-  FAIL tests/options_table/ot_live.c:28: ok (send err 12030)
-FAIL ot_live_socket_info_mid_body_https
+  NOTE first send err 12030, retry with ignore flags
+  NOTE HTTPS mid-body socket info: src 50262 dst 50260 flags 0x2
+OK   ot_live_socket_info_mid_body_https
 RUN  ot_live_socket_info_mid_body_http
-  NOTE HTTP mid-body socket info: src 50263 dst 50262 flags 0x0
+  NOTE HTTP mid-body socket info: src 50264 dst 50263 flags 0x0
 OK   ot_live_socket_info_mid_body_http
 RUN  ot_inh_150_200
   INH { 155, 0x1, "4=00000000|4=00000000|4=00000000|ok|4=01000000|4=00000000|4=00000000|4=01000000|4=01000000" },
@@ -860,15 +859,10 @@ RUN  ot_mc_connect_set_clamped_shared
 OK   ot_mc_connect_set_clamped_shared
 RUN  ot_mc_record_shared_per_host_name
   MC connect created before the record: r=1 e=0 v=2
-  MC MISMATCH line 82: localhost connect: r=1 e=0 v=2
-  MC after mismatches=1 rc=0x0
-  FAIL tests/options_table/ot_conns_child.c:160: rc == 0 (scenario after: child exit 0x1 (mismatch count, or 0xC0DE/0xDEAD failure))
-FAIL ot_mc_record_shared_per_host_name
+  MC after mismatches=0 rc=0x0
+OK   ot_mc_record_shared_per_host_name
 RUN  ot_mc_fresh_connect_has_no_record
-  MC MISMATCH line 48: PER_SERVER on a record-less connect r=1 e=0 v=2
-  MC MISMATCH line 52: set PER_SERVER 4: 0
-  MC fresh mismatches=2 rc=0x0
-  FAIL tests/options_table/ot_conns_child.c:160: rc == 0 (scenario fresh: child exit 0x2 (mismatch count, or 0xC0DE/0xDEAD failure))
-FAIL ot_mc_fresh_connect_has_no_record
-SUMMARY tests=143 failed=4 skipped=0 checks_pass=5025 checks_fail=5
-@@I7 END options_table exit=0x1 ms=89644 timeout=0 bytes=37475
+  MC fresh mismatches=0 rc=0x0
+OK   ot_mc_fresh_connect_has_no_record
+SUMMARY tests=143 failed=0 skipped=0 checks_pass=5046 checks_fail=0
+@@I7 END options_table exit=0x0 ms=102938 timeout=0 bytes=36770

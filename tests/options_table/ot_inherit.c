@@ -48,6 +48,9 @@ CHILD(ot_inh) {
     int bad = row->exp[0] && strcmp(line, row->exp);
     if (bad) printf("  INH opt=%d MISMATCH want \"%s\"\n", row->opt, row->exp);
     fflush(stdout);
+    /* Win10: after setting ERROR_MASK (62) closing the handles intermittently crashes the child (0xc0000374 heap
+     * corruption / 0xc0000005 seen in different runs); the observation is already printed, so skip the teardown. */
+    if (row->opt == 62) TerminateProcess(GetCurrentProcess(), bad);
     U(InternetCloseHandle)(r1); U(InternetCloseHandle)(c1); U(InternetCloseHandle)(r0); U(InternetCloseHandle)(c0); U(InternetCloseHandle)(s);
     return bad;
 }
