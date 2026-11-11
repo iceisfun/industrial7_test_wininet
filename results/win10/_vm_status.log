@@ -40,3 +40,9 @@ urlcache_enum_groups                     FAIL      tests=183 failed=20 skipped=2
 VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-urlcache_enum_groups/serial.log
 proxy_connectivity                       FAIL      tests=239 failed=1 skipped=0 checks_fail=1 ms=396451
 VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-proxy_connectivity/serial.log
+urlcache_entries                         FAIL      tests=304 failed=1 skipped=0 checks_fail=2 ms=3224
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-urlcache_entries-1-urlcache_entries/serial.log
+urlcache_entries                         PASS      tests=304 failed=0 skipped=0 checks_fail=0 ms=4550
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-urlcache_entries-2-urlcache_entries/serial.log
+urlcache_entries                         PASS      tests=304 failed=0 skipped=0 checks_fail=0 ms=3557
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-urlcache_entries-3-urlcache_entries/serial.log

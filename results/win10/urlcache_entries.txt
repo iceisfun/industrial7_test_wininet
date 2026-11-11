@@ -14,9 +14,7 @@ RUN  uce_rv_create_awkward_leaves
   NOTE leaf UPPER.TXT -> UPPER[1].txt
 OK   uce_rv_create_awkward_leaves
 RUN  uce_rv_large_file_stream_chunks
-  FAIL tests/urlcache_entries/uce_review.c:419: !bad && off == len (read 262144 of 300000)
-  FAIL tests/urlcache_entries/uce_review.c:420: off == len && !memcmp(back, data, len)
-FAIL uce_rv_large_file_stream_chunks
+OK   uce_rv_large_file_stream_chunks
 RUN  uce_rv_hitrate_wrap
   NOTE hit rate after retrieve at 0xFFFFFFFF: 0xffffffff
 OK   uce_rv_hitrate_wrap
@@ -250,9 +248,9 @@ OK   uce_life_stream_122_hit_count
 RUN  uce_life_info_122_counts_no_hit
 OK   uce_life_info_122_counts_no_hit
 RUN  uce_life_create_unique_across_processes
-UCEPATH C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\lcxp[1].txt
-  NOTE parent paths C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\QS51XU72\lcxp[1].txt / C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\QS51XU72\lcxp[2].txt
-  NOTE removed 1 leftover child file(s) from C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\QS51XU72\
+UCEPATH C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\lcxp[1].txt
+  NOTE parent paths C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\RLLGXM8D\lcxp[1].txt / C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\RLLGXM8D\lcxp[2].txt
+  NOTE removed 1 leftover child file(s) from C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\RLLGXM8D\
 OK   uce_life_create_unique_across_processes
 RUN  uce_life_commit_file_of_other_url
 OK   uce_life_commit_file_of_other_url
@@ -285,7 +283,7 @@ OK   uce_life_create_exw_preserve_variants
 RUN  uce_life_prefix_not_confused_with_http
 OK   uce_life_prefix_not_confused_with_http
 RUN  uce_life_cookie_prefix_entry
-  NOTE Cookie: create -> 1 err 0 path C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCookies\ZQSHSDRW.txt
+  NOTE Cookie: create -> 1 err 0 path C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCookies\NIKA420X.txt
   NOTE Cookie: commit -> 1 err 0
 OK   uce_life_cookie_prefix_entry
 RUN  uce_life_visited_prefix_entry
@@ -522,8 +520,8 @@ OK   uce_create_ext_too_long_w
 RUN  uce_create_ext_leading_dot
 OK   uce_create_ext_leading_dot
 RUN  uce_create_ext_null_and_empty
-  NOTE NULL ext -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\extnull[1]
-  NOTE "" ext -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\extempty[1]
+  NOTE NULL ext -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\extnull[1]
+  NOTE "" ext -> C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\extempty[1]
 OK   uce_create_ext_null_and_empty
 RUN  uce_create_ext_percent_decoded
 OK   uce_create_ext_percent_decoded
@@ -540,12 +538,12 @@ OK   uce_create_large_expected_size
 RUN  uce_create_suffix_increments
 OK   uce_create_suffix_increments
 RUN  uce_create_unique_paths
-  NOTE unique[0] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[1].txt
-  NOTE unique[1] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[2].txt
-  NOTE unique[2] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[3].txt
-  NOTE unique[3] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[4].txt
-  NOTE unique[4] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[5].txt
-  NOTE unique[5] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\uniq[6].txt
+  NOTE unique[0] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\uniq[1].txt
+  NOTE unique[1] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\uniq[2].txt
+  NOTE unique[2] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\uniq[3].txt
+  NOTE unique[3] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\uniq[4].txt
+  NOTE unique[4] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\uniq[5].txt
+  NOTE unique[5] C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\uniq[6].txt
 OK   uce_create_unique_paths
 RUN  uce_create_path_in_inetcache
 OK   uce_create_path_in_inetcache
@@ -553,10 +551,10 @@ RUN  uce_create_a_w_same_directory
   NOTE container C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\
 OK   uce_create_a_w_same_directory
 RUN  uce_create_w_basic_file
-  NOTE created C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\cwbasic[1].htm
+  NOTE created C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\cwbasic[1].htm
 OK   uce_create_w_basic_file
 RUN  uce_create_a_basic_file
-  NOTE created C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\LGU9AU30\cbasic[1].txt
+  NOTE created C:\Users\Administrator\AppData\Local\Microsoft\Windows\INetCache\IE\6FT0G5U0\cbasic[1].txt
 OK   uce_create_a_basic_file
 RUN  uce_create_exw_null_args
 OK   uce_create_exw_null_args
@@ -680,5 +678,5 @@ RUN  uce_amx_invalid_url_delete_create_commit
 OK   uce_amx_invalid_url_delete_create_commit
 RUN  uce_amx_invalid_url_every_op
 OK   uce_amx_invalid_url_every_op
-SUMMARY tests=304 failed=1 skipped=0 checks_pass=4799 checks_fail=2
-@@I7 END urlcache_entries exit=0x1 ms=3402 timeout=0 bytes=25470
+SUMMARY tests=304 failed=0 skipped=0 checks_pass=4801 checks_fail=0
+@@I7 END urlcache_entries exit=0x0 ms=3557 timeout=0 bytes=25290

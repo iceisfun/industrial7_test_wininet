@@ -97,3 +97,8 @@ Notes only: empty-URL lookups (2 on a fresh profile, environment-dependent), `*s
 - URL cache enumeration (FindFirstUrlCacheEntry*) and groups/containers belong to other areas.
 - HTTP-driven cache population (InternetOpenUrl with caching) belongs to the HTTP cache areas.
 - InPrivate / impersonation blocks (BlockCallsInPrivateMode, BlockImpersonatingCaller) need a special process state.
+
+## Triage 2026-11-11 (Win10 19041.2788)
+- uce_rv_large_file_stream_chunks: cause test-bug. The scratch buffer was len+4096 but the loop asks ReadUrlCacheEntryStream for 65536 bytes at
+  offset 262144, so the destination ran past the allocation (ReadFile failed with 998 ERROR_NOACCESS; seen via a temporary note). Buffer is now
+  len+65536. The wininet helper is a plain SetFilePointerEx+ReadFile, so no behaviour expectation changed.

@@ -399,7 +399,7 @@ TEST(uce_rv_large_file_stream_chunks) {
     REQUIRE(U(RetrieveUrlCacheEntryStreamA));
     const char *url = uce_url("rvlf"); char p[MAX_PATH] = ""; DWORD err;
     const DWORD len = 300000;
-    unsigned char *data = (unsigned char *)malloc(len), *back = (unsigned char *)malloc(len + 4096);
+    unsigned char *data = (unsigned char *)malloc(len), *back = (unsigned char *)malloc(len + 65536);
     if (!data || !back) { free(data); free(back); CHECK(0); return; }
     for (DWORD k = 0; k < len; k++) data[k] = (unsigned char)((k * 131u + (k >> 9)) & 0xff);
     CHECK(uce_make_ex(url, "bin", data, len, NORMAL_CACHE_ENTRY, NULL, uce_zero_ft, uce_zero_ft, p, &err));
