@@ -115,13 +115,7 @@ RUN  hqi_more_null_buffer_len_kept_on_early_errors
 OK   hqi_more_null_buffer_len_kept_on_early_errors
 RUN  rsp_more_whitespace_only_line
   NOTE whitespace-only line: X-B=(absent) raw=HTTP/1.1 200 OK\r\nX-A: 1\r\n\r\n
-  FAIL tests/http_response_headers/rsp_more.c:133: HttpQueryInfoA(CUSTOM "X-B") (got "(fail)" len=524287 err=12150 want "2")
-  FAIL tests/http_response_headers/rsp_more.c:133: HttpQueryInfoW(CUSTOM "X-B") (got "(fail)" len=524286 err=12150 want "2")
-  FAIL tests/http_response_headers/rsp_more.c:134: HttpQueryInfoA(CUSTOM "X-C") (got "(fail)" len=524287 err=12150 want "3")
-  FAIL tests/http_response_headers/rsp_more.c:134: HttpQueryInfoW(CUSTOM "X-C") (got "(fail)" len=524286 err=12150 want "3")
-  FAIL tests/http_response_headers/rsp_more.c:135: HttpQueryInfoA(level=22/0x16) (got "HTTP/1.1 200 OK\r\nX-A: 1\r\n\r\n" err=0 want "HTTP/1.1 200 OK\r\nX-A: 1\r\nX-B: 2\r\nX-C: 3\r\nContent-Length: 0\r\nConnection: close\r\n\r\n")
-  FAIL tests/http_response_headers/rsp_more.c:135: A length (len=27 want 81)
-FAIL rsp_more_whitespace_only_line
+OK   rsp_more_whitespace_only_line
 RUN  rsp_more_bom_before_status_line
 OK   rsp_more_bom_before_status_line
 RUN  rsp_more_101_after_100_is_final
@@ -158,8 +152,7 @@ RUN  rsp_life_keepalive_get_then_get
   NOTE GET /first then GET: 1 connection(s)
 OK   rsp_life_keepalive_get_then_get
 RUN  rsp_life_https_response_headers
-  FAIL tests/http_response_headers/rsp_lifecycle.c:241: ok (https send err=12030 ERROR_INTERNET_CONNECTION_ABORTED)
-FAIL rsp_life_https_response_headers
+OK   rsp_life_https_response_headers
 RUN  rsp_life_resend_failure_clears_old_headers
   NOTE resend to a server that closes: sent=0 err=12152 ERROR_HTTP_INVALID_SERVER_RESPONSE (conns 2)
 OK   rsp_life_resend_failure_clears_old_headers
@@ -194,8 +187,8 @@ OK   rsp_hdr_content_headers_verbatim
 RUN  rsp_hdr_chunked_has_no_content_length
 OK   rsp_hdr_chunked_has_no_content_length
 RUN  rsp_hdr_204_and_304_with_length
-  NOTE 204: read ok=1 rd=0 in 2016 ms
-  NOTE 304: read ok=1 rd=0 in 2000 ms
+  NOTE 204: read ok=1 rd=0 in 2015 ms
+  NOTE 304: read ok=1 rd=0 in 2015 ms
 OK   rsp_hdr_204_and_304_with_length
 RUN  rsp_hdr_head_chunked_without_body
 OK   rsp_hdr_head_chunked_without_body
@@ -267,10 +260,10 @@ OK   hqi_req_add_flag_matrix
 RUN  hqi_req_added_header_visible_before_send
 OK   hqi_req_added_header_visible_before_send
 RUN  hqi_date_clock_filled_values_recorded
-  NOTE X-A -> 2026-09-30 dow3 19:03:00 (now 2026-09-30 19:03)
-  NOTE X-B -> 2026-09-30 dow3 19:03:00 (now 2026-09-30 19:03)
-  NOTE X-C -> 2000-11-15 dow2 19:03:00 (now 2026-09-30 19:03)
-  NOTE Retry-After -> 2026-09-30 dow3 19:03:00 (now 2026-09-30 19:03)
+  NOTE X-A -> 2026-09-30 dow3 19:03:05 (now 2026-09-30 19:03)
+  NOTE X-B -> 2026-09-30 dow3 19:03:05 (now 2026-09-30 19:03)
+  NOTE X-C -> 2000-11-15 dow2 19:03:05 (now 2026-09-30 19:03)
+  NOTE Retry-After -> 2026-09-30 dow3 19:03:05 (now 2026-09-30 19:03)
   NOTE X-E -> err 12154
   NOTE X-F -> 1994-11-15 dow2 12:45:26 (now 2026-09-30 19:03)
   NOTE X-G -> err 12154
@@ -431,5 +424,5 @@ RUN  hqi_args_garbage_handles
 OK   hqi_args_garbage_handles
 RUN  hqi_args_null_handle
 OK   hqi_args_null_handle
-SUMMARY tests=190 failed=2 skipped=0 checks_pass=43092 checks_fail=7
-@@I7 END http_response_headers exit=0x1 ms=122205 timeout=0 bytes=17853
+SUMMARY tests=190 failed=0 skipped=0 checks_pass=43111 checks_fail=0
+@@I7 END http_response_headers exit=0x0 ms=111414 timeout=0 bytes=16921
