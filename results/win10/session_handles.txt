@@ -54,7 +54,7 @@ OK   sh_thr_shared_session_parallel_gets
 RUN  sh_thr_close_on_other_thread
 OK   sh_thr_close_on_other_thread
 RUN  sh_thr_user_agent_concurrent_set_query
-  NOTE USER_AGENT concurrent reads 3681, torn/mixed values 265 (unsynchronised on Win10)
+  NOTE USER_AGENT concurrent reads 0, torn/mixed values 0 (unsynchronised on Win10)
 OK   sh_thr_user_agent_concurrent_set_query
 RUN  sh_thr_independent_session_trees
 OK   sh_thr_independent_session_trees
@@ -118,10 +118,10 @@ RUN  sh_rv_connected_state_ex_a_rules
   NOTE ExA reserved 3: ret 0 err 87 flags 0x0 name[0] 0
 OK   sh_rv_connected_state_ex_a_rules
 RUN  sh_rv_async_sessions_loop_no_leak
-  NOTE kernel handle count before 243 after 243 (150 async session trees)
+  NOTE kernel handle count before 242 after 242 (150 async session trees)
 OK   sh_rv_async_sessions_loop_no_leak
 RUN  sh_rv_conc_close_connect_while_requests_created
-  NOTE requests created around connect close: made 731 fail6 21 fail18 0 failother 0 (last 0) close_ok 731 close6 0
+  NOTE requests created around connect close: made 1642 fail6 21 fail18 0 failother 1 (last 12017) close_ok 1642 close6 0
 OK   sh_rv_conc_close_connect_while_requests_created
 RUN  sh_rv_proxy_info_readback_forms
   NOTE row 0 proxy [127.0.0.1:9] bypass [(null)]: access 3 lpszProxy [127.0.0.1:9] lpszProxyBypass [127.0.0.1:9] len 48
@@ -162,8 +162,8 @@ OK   sh_rv_callback_args_created_and_closing
 RUN  sh_rv_openurl_handle_checked_before_url
 OK   sh_rv_openurl_handle_checked_before_url
 RUN  sh_rv_openurl_async_session_zero_context_sync
-  FAIL tests/session_handles/sh_rv.c:193: r != NULL (async session, InternetOpenUrl context 0: err 997)
-FAIL sh_rv_openurl_async_session_zero_context_sync
+  NOTE async session, InternetOpenUrl context 0: h=0000000000000000 err 997
+OK   sh_rv_openurl_async_session_zero_context_sync
 RUN  sh_rv_ftp_connect_async_session_context_rule
   NOTE async session, FTP connect with context: h=0000000000000000 err 997
   NOTE async FTP connect completion: result 0000000000cc0008 err 0
@@ -277,10 +277,10 @@ OK   sh_open_version_option
 RUN  sh_open_many_concurrent_sessions
 OK   sh_open_many_concurrent_sessions
 RUN  sh_open_many_sessions_tree_loop
-  NOTE kernel handle count before 243 after 243 (200 session trees)
+  NOTE kernel handle count before 244 after 244 (200 session trees)
 OK   sh_open_many_sessions_tree_loop
 RUN  sh_open_many_sessions_loop
-  NOTE kernel handle count before 243 after 243 open/close x500
+  NOTE kernel handle count before 244 after 244 open/close x500
 OK   sh_open_many_sessions_loop
 RUN  sh_open_named_proxy_bypass_goes_direct
 OK   sh_open_named_proxy_bypass_goes_direct
@@ -288,7 +288,7 @@ RUN  sh_open_named_proxy_sends_absolute_uri
   NOTE proxy request: [GET http://origin.i7test.example/via?x=1 HTTP/1.1] Proxy-Connection=[(none)]
 OK   sh_open_named_proxy_sends_absolute_uri
 RUN  sh_open_proxy_w_query
-  NOTE W PROXY query len 56: proxy as A [127.0.0.1:9] as W [?????9?????�???>???]; bypass as A [127.0.0.1:9 <local>] as W [?????�???>???]
+  NOTE W PROXY query len 56: proxy as A [127.0.0.1:9] as W [?????9?????�???>?R?]; bypass as A [127.0.0.1:9 <local>] as W [?????�???>?R?]
 OK   sh_open_proxy_w_query
 RUN  sh_open_proxy_info_preconfig_note
   NOTE PRECONFIG session PROXY query ok=1 err=0 access=1 len=24
@@ -453,8 +453,8 @@ RUN  sh_conn_ftp_connect_basic
   NOTE FTP connect without credentials: USERNAME=[anonymous]
 OK   sh_conn_ftp_connect_basic
 RUN  sh_conn_openurl_file_handle
-  NOTE InternetOpenUrl(file:///C:/Users/Administrator/AppData/Local/Temp/wininet_3912/sh_file.txt): h=0000000000000000 err=3
-  NOTE InternetOpenUrl(file:///C:\Users\Administrator\AppData\Local\Temp\wininet_3912\sh_file.txt): h=0000000000000000 err=3
+  NOTE InternetOpenUrl(file:///C:/Users/Administrator/AppData/Local/Temp/wininet_548/sh_file.txt): h=0000000000000000 err=3
+  NOTE InternetOpenUrl(file:///C:\Users\Administrator\AppData\Local\Temp\wininet_548\sh_file.txt): h=0000000000000000 err=3
 OK   sh_conn_openurl_file_handle
 RUN  sh_conn_openurl_http_handle_tree
 OK   sh_conn_openurl_http_handle_tree
@@ -535,10 +535,10 @@ RUN  sh_conc_parallel_session_trees_no_leak
   NOTE kernel handle count before 279 after 279 (8 threads x 100 trees)
 OK   sh_conc_parallel_session_trees_no_leak
 RUN  sh_conc_create_children_while_session_closed
-  NOTE children created around session close: made 16587 fail6 21 fail18 0 failother 0 (last other err 0) close_ok 16586 close6 1
+  NOTE children created around session close: made 18142 fail6 21 fail18 0 failother 1 (last other err 12017) close_ok 18142 close6 0
 OK   sh_conc_create_children_while_session_closed
 RUN  sh_conc_query_while_session_closed
-  NOTE queries during session close: ok 70123 invalid 53 other 0
+  NOTE queries during session close: ok 72631 invalid 53 other 0
 OK   sh_conc_query_while_session_closed
 RUN  sh_conc_racing_close_exactly_one_wins
 OK   sh_conc_racing_close_exactly_one_wins
@@ -593,5 +593,5 @@ RUN  sh_close_garbage_6
 OK   sh_close_garbage_6
 RUN  sh_close_null_6
 OK   sh_close_null_6
-SUMMARY tests=222 failed=1 skipped=0 checks_pass=4381 checks_fail=1
-@@I7 END session_handles exit=0x1 ms=69457 timeout=0 bytes=28547
+SUMMARY tests=222 failed=0 skipped=0 checks_pass=4379 checks_fail=0
+@@I7 END session_handles exit=0x0 ms=71971 timeout=0 bytes=28522
