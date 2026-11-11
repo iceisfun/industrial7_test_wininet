@@ -164,3 +164,11 @@ Decomp references are wininet 10.0.19041 RVAs from the corpus API.
 | URL ports: 0 and empty -> tried (12029); 65536, 99999, -1, abc -> 12005 | V |
 | timeouts on a PROXY session: connect 60000, send/receive/data 30000, retries 5; CONNECT_TIMEOUT 0 reads back 0xFFFFFFFF; values copied to children at creation | V |
 | message texts (en-US): 12002, 12007, 12029, 12030, 12031, 12152, 12005, 12006, 12018 "The supplied handle is the wrong type for the requested operation", 12010 "The length is incorrect for the option type", 12009 "The option is invalid" | V |
+
+## Triage 2026-11-11 (Win10 19041.2788 VM, branch triage/proxy_connectivity)
+
+- `pc_wire2_connect_https_scheme_proxy_entry_uppercase` (cause: env-or-flake / wrong-expectation). Proxy list
+  `HTTPS=127.0.0.1:port` is always recognised (relay receives `CONNECT pc-up.invalid:443 HTTP/1.0`, 1 head, 1 conn), but
+  the outcome after the CONNECT varies between VM boots: status 0 / error 12030 in the master run and two triage runs,
+  status 200 in a later triage run with identical code. Hard checks now: CONNECT head count 1 + request line, and the
+  outcome is one of {200, 12030}; status is reported via t_note. Mechanism not determined.
