@@ -20,9 +20,7 @@ RUN  ac_y_reentrant_remove_session_cb_children_keep
 OK   ac_y_reentrant_remove_session_cb_children_keep
 RUN  ac_y_reentrant_read_in_request_sent
   NOTE read inside REQUEST_SENT: ret=1 err=0 (?); send ok=1 err=0
-  FAIL tests/async_callbacks/ac_y.c:456: g_yr.ret == FALSE (got 0x1 want 0x0)
-  FAIL tests/async_callbacks/ac_y.c:457: g_yr.err == ERROR_INTERNET_INCORRECT_HANDLE_STATE (got 0x0 want 0x2ef3)
-FAIL ac_y_reentrant_read_in_request_sent
+OK   ac_y_reentrant_read_in_request_sent
 RUN  ac_y_reentrant_close_connect_in_complete
   NOTE close connect inside REQUEST_COMPLETE: ret=1 err=0 seq=60,60,80,20,21,30,31,40,41,100,50,51,70,70
 OK   ac_y_reentrant_close_connect_in_complete
@@ -124,7 +122,7 @@ OK   ac_created_context_zero_silent
 RUN  ac_created_len_and_handle_arg
   NOTE con: h=0000000000cc000c (hi 0000000000cc000c hc 0000000000cc0010) len=8
   NOTE req: h=0000000000cc0010 (hc 0000000000cc0010 hr 0000000000cc0014) len=8
-  NOTE created: 2 events (main tid 7276, dropped 0)
+  NOTE created: 2 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [10 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0010 len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
 OK   ac_created_len_and_handle_arg
@@ -213,7 +211,7 @@ RUN  ac_sync_localhost_resolution_sequence
 OK   ac_sync_localhost_resolution_sequence
 RUN  ac_async_localhost_resolution_sequence
   NOTE localhost async: 80,20,21,30,31,40,41,100
-  NOTE localhost: 10 events (main tid 7276, dropped 0)
+  NOTE localhost: 10 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [10 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0010 len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
   NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
@@ -223,7 +221,7 @@ RUN  ac_async_localhost_resolution_sequence
   NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [5a 00 00 00 ] 'Z...'
   NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
   NOTE   [8] st=41 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [40 00 00 00 ] '@...'
-  NOTE   [9] st=100 ctx=4e030003 h=0000000000cc0014 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+  NOTE   [9] st=100 ctx=4e030003 h=0000000000cc0014 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fd 7f 00 00 ] '................'
   NOTE localhost already in the resolver cache: no 10/11
 OK   ac_async_localhost_resolution_sequence
 RUN  ac_async_no_callback_still_pending
@@ -268,7 +266,7 @@ RUN  ac_async_send_relative_order
 OK   ac_async_send_relative_order
 RUN  ac_async_send_sequence_fresh_connection
   NOTE full sequence: 60,60,80,20,21,30,31,40,41,100
-  NOTE async fresh send: 10 events (main tid 7276, dropped 0)
+  NOTE async fresh send: 10 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [10 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0010 len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
   NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
@@ -278,7 +276,7 @@ RUN  ac_async_send_sequence_fresh_connection
   NOTE   [6] st=31 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [5b 00 00 00 ] '[...'
   NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0014 len=0 info=0 A tid=other [] ''
   NOTE   [8] st=41 ctx=4e030003 h=0000000000cc0014 len=4 info=1 A tid=other [40 00 00 00 ] '@...'
-  NOTE   [9] st=100 ctx=4e030003 h=0000000000cc0014 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+  NOTE   [9] st=100 ctx=4e030003 h=0000000000cc0014 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fd 7f 00 00 ] '................'
 OK   ac_async_send_sequence_fresh_connection
 RUN  ac_async_send_complete_once
 OK   ac_async_send_complete_once
@@ -341,7 +339,7 @@ RUN  ac_read_chunked_async
   NOTE chunked: 1 pending reads
 OK   ac_read_chunked_async
 RUN  ac_read_whole_body_pattern
-  NOTE 200000 bytes read with 0 pending reads
+  NOTE 200000 bytes read with 1 pending reads
 OK   ac_read_whole_body_pattern
 RUN  ac_read_small_buffer_from_buffered_data
 OK   ac_read_small_buffer_from_buffered_data
@@ -412,8 +410,8 @@ RUN  ac_pending_query_status_during_send
   NOTE STATUS_CODE while send pending: ok=0 err=12019 (ERROR_INTERNET_INCORRECT_HANDLE_STATE) st=0
 OK   ac_pending_query_status_during_send
 RUN  ac_https_async_cert_error_probe
-  NOTE https untrusted cert async: done=1 after 12187 ms dwResult=0 dwError=12045 (ERROR_INTERNET_INVALID_CA) seq=80,20,21,50,51,100
-  NOTE srv ev 0 t=0 conn=0 req=-1 ACCEPT n=0 []
+  NOTE https untrusted cert async: done=1 after 12250 ms dwResult=0 dwError=12045 (ERROR_INTERNET_INVALID_CA) seq=80,20,21,50,51,100
+  NOTE srv ev 0 t=15 conn=0 req=-1 ACCEPT n=0 []
   NOTE srv ev 1 t=5031 conn=0 req=-1 TIMEOUT n=12 [recv timeout]
   NOTE srv ev 2 t=5031 conn=0 req=-1 TLS_ABORT n=25 [handshake recv=-1 round=1]
   NOTE srv ev 3 t=5234 conn=0 req=-1 CLOSED n=0 []
@@ -447,7 +445,7 @@ RUN  ac_close_request_read_pending
 OK   ac_close_request_read_pending
 RUN  ac_close_request_send_pending
   NOTE close with send pending: 50,51,100,70
-  NOTE close-pending: 12 events (main tid 7276, dropped 0)
+  NOTE close-pending: 12 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0014 len=8 info=1 A tid=main [18 00 cc 00 00 00 00 00 ] '........'
   NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
@@ -458,7 +456,7 @@ RUN  ac_close_request_send_pending
   NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [8] st=50 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [9] st=51 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
-  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [00 00 00 00 00 00 00 00 f1 2e 00 00 fa 7f 00 00 ] '................'
+  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [00 00 00 00 00 00 00 00 f1 2e 00 00 fd 7f 00 00 ] '................'
   NOTE   [11] st=70 ctx=4e030003 h=0000000000cc0018 len=8 info=1 A tid=other [18 00 cc 00 00 00 00 00 ] '........'
   NOTE pending send completed: dwResult=0 dwError=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
 OK   ac_close_request_send_pending
@@ -478,7 +476,7 @@ RUN  ac_cookie_no_cookies_flag_silent
 OK   ac_cookie_no_cookies_flag_silent
 RUN  ac_cookie_received_and_sent
   NOTE set-cookie response statuses: 80,20,21,30,31,40,41,321,100
-  NOTE cookie1: 11 events (main tid 7276, dropped 0)
+  NOTE cookie1: 11 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0014 len=8 info=1 A tid=main [18 00 cc 00 00 00 00 00 ] '........'
   NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
@@ -489,7 +487,7 @@ RUN  ac_cookie_received_and_sent
   NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [8] st=41 ctx=4e030003 h=0000000000cc0018 len=4 info=1 A tid=other [54 00 00 00 ] 'T...'
   NOTE   [9] st=321 ctx=4e030003 h=0000000000cc0018 len=32 info=1 A tid=other [01 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ] '................................'
-  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [01 00 00 00 00 00 00 00 00 00 00 00 fd 7f 00 00 ] '................'
   NOTE cookie request statuses: 80,320,30,31,40,41,100
   NOTE COOKIE_SENT len=16 cSent=1 cSuppressed=0
 OK   ac_cookie_received_and_sent
@@ -526,7 +524,7 @@ OK   ac_openurl_async_sequence
 RUN  ac_openurl_async_pending_and_handle
   NOTE openurl REQUEST_COMPLETE h=0000000000cc000c (session 0000000000cc000c, url 0000000000cc0018)
   NOTE openurl sequence: 60,80,20,21,30,31,40,41,100
-  NOTE openurl: 9 events (main tid 7276, dropped 0)
+  NOTE openurl: 9 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=b110004 h=0000000000cc0014 len=8 info=1 A tid=other [18 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=80 ctx=b110004 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [2] st=20 ctx=b110004 h=0000000000cc0018 len=10 info=1 A tid=other [31 32 37 2e 30 2e 30 2e 31 00 ] '127.0.0.1.'
@@ -535,7 +533,7 @@ RUN  ac_openurl_async_pending_and_handle
   NOTE   [5] st=31 ctx=b110004 h=0000000000cc0018 len=4 info=1 A tid=other [5a 00 00 00 ] 'Z...'
   NOTE   [6] st=40 ctx=b110004 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [7] st=41 ctx=b110004 h=0000000000cc0018 len=4 info=1 A tid=other [40 00 00 00 ] '@...'
-  NOTE   [8] st=100 ctx=b110004 h=0000000000cc000c len=16 info=1 A tid=other [18 00 cc 00 00 00 00 00 00 00 00 00 fa 7f 00 00 ] '................'
+  NOTE   [8] st=100 ctx=b110004 h=0000000000cc000c len=16 info=1 A tid=other [18 00 cc 00 00 00 00 00 00 00 00 00 fd 7f 00 00 ] '................'
 OK   ac_openurl_async_pending_and_handle
 RUN  ac_x_status_values_documented
   NOTE statuses with Set-Cookie + redirect, NO_COOKIES: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,100,40,41,70,70
@@ -641,8 +639,8 @@ OK   ac_x_post_size_table_request_sent
 RUN  ac_x_requests_on_two_servers
 OK   ac_x_requests_on_two_servers
 RUN  ac_x_many_requests_distinct_contexts
-  NOTE request 0: 60,80,20,21,30,31,40,41,100,40,41
-  NOTE request 1: 60,80,30,31,40,41,100,40,41
+  NOTE request 0: 60,80,30,31,40,41,100,40,41
+  NOTE request 1: 60,80,20,21,30,31,40,41,100,40,41
   NOTE request 2: 60,80,30,31,40,41,100,40,41
   NOTE request 3: 60,80,20,21,30,31,40,41,100,40,41
   NOTE request 4: 60,80,30,31,40,41,100,40,41
@@ -662,7 +660,7 @@ RUN  ac_x_close_request_qda_pending
 OK   ac_x_close_request_qda_pending
 RUN  ac_x_close_connect_with_send_pending
   NOTE close connect with send pending: 50,51,100,70,70
-  NOTE close connect pending: 13 events (main tid 7276, dropped 0)
+  NOTE close connect pending: 13 events (main tid 4476, dropped 0)
   NOTE   [0] st=60 ctx=c0440002 h=0000000000cc000c len=8 info=1 A tid=main [14 00 cc 00 00 00 00 00 ] '........'
   NOTE   [1] st=60 ctx=4e030003 h=0000000000cc0014 len=8 info=1 A tid=main [18 00 cc 00 00 00 00 00 ] '........'
   NOTE   [2] st=80 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
@@ -673,7 +671,7 @@ RUN  ac_x_close_connect_with_send_pending
   NOTE   [7] st=40 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [8] st=50 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
   NOTE   [9] st=51 ctx=4e030003 h=0000000000cc0018 len=0 info=0 A tid=other [] ''
-  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [00 00 00 00 00 00 00 00 f1 2e 00 00 fa 7f 00 00 ] '................'
+  NOTE   [10] st=100 ctx=4e030003 h=0000000000cc0018 len=16 info=1 A tid=other [00 00 00 00 00 00 00 00 f1 2e 00 00 fd 7f 00 00 ] '................'
   NOTE   [11] st=70 ctx=4e030003 h=0000000000cc0018 len=8 info=1 A tid=other [18 00 cc 00 00 00 00 00 ] '........'
   NOTE   [12] st=70 ctx=c0440002 h=0000000000cc0014 len=8 info=1 A tid=other [14 00 cc 00 00 00 00 00 ] '........'
   NOTE   completion dwResult=0 dwError=12017 (ERROR_INTERNET_OPERATION_CANCELLED)
@@ -753,5 +751,5 @@ RUN  ac_x_endreq_w_buffersout_rejected
 OK   ac_x_endreq_w_buffersout_rejected
 RUN  ac_x_endreq_a_buffersout_rejected
 OK   ac_x_endreq_a_buffersout_rejected
-SUMMARY tests=243 failed=1 skipped=0 checks_pass=2167 checks_fail=2
-@@I7 END async_callbacks exit=0x1 ms=497794 timeout=0 bytes=36624
+SUMMARY tests=243 failed=0 skipped=0 checks_pass=2166 checks_fail=0
+@@I7 END async_callbacks exit=0x0 ms=495212 timeout=0 bytes=36432

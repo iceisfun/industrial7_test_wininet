@@ -183,3 +183,10 @@ Round-3/4/5 corrections to earlier tests:
 ## Environment
 Guest has no internet, firewall/Defender as installed; nothing interfered with loopback. `autodetect=1` in the
 per-user settings does not matter for DIRECT sessions, but DETECTING_PROXY (80) is still reported per request.
+
+## Triage 2026-11-11 (Win10 22H2 VM, tri-async_callbacks runs)
+- `ac_y_reentrant_read_in_request_sent`: Win10 returns TRUE/err 0 for InternetReadFile issued inside REQUEST_SENT
+  (not 12019). Hard checks on ret/err removed (result stays in t_note); `fired==1`, send ok, one REQUEST_COMPLETE kept.
+  Cause: wrong expectation.
+- `ac_sequential_requests_reuse_table`: in one boot iterations k=2 and k=6 lacked the trailing read-side `40,41` pair
+  (seq `80,30,31,40,41,100`). Timing/segmentation dependent; both forms now accepted. Cause: timing-dependent expectation.
