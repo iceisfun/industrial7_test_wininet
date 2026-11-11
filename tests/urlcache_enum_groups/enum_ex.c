@@ -21,7 +21,7 @@ static GROUPID group_with_entries(const char *tag, int n, const char **urls) {
         char t[64]; snprintf(t, sizeof t, "%s%d", tag, i);
         urls[i] = ueg_url(t);
         if (!ueg_make_simple(urls[i])) return 0;
-        if (!U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)) return 0;
+        if (!SEGQ(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL))) return 0;
     }
     return g;
 }
@@ -241,7 +241,7 @@ TEST(ueg_filter_matrix_a) {
         char t[32]; snprintf(t, sizeof t, "fm%u", (unsigned)i);
         urls[i] = ueg_url(t);
         if (!ueg_make_entry(urls[i], k_types[i], ueg_days(30), ueg_days(-1), NULL, "txt", "f")) { t_skip("commit type 0x%lx failed %lu", k_types[i], GetLastError()); return; }
-        CHECK(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
+        CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)));
         INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(urls[i], NULL);
         /* SPARSE entries are invisible to GetUrlCacheEntryInfo (2) [VM, urlcache_entries]: use the committed type */
         stored[i] = e ? e->CacheEntryType : k_types[i]; free(e);
@@ -270,7 +270,7 @@ TEST(ueg_filter_matrix_w) {
         char t[32]; snprintf(t, sizeof t, "fmw%u", (unsigned)i);
         urls[i] = ueg_url(t);
         if (!ueg_make_entry(urls[i], k_types[i], ueg_days(30), ueg_days(-1), NULL, "txt", "f")) { t_skip("commit failed"); return; }
-        CHECK(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
+        CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)));
         INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(urls[i], NULL);
         stored[i] = e ? e->CacheEntryType : k_types[i]; free(e);
     }

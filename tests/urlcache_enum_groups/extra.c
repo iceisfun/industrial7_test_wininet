@@ -19,7 +19,7 @@ static GROUPID xgroup(const char *tag, int n, const char **urls, DWORD gflags) {
         char t[64]; snprintf(t, sizeof t, "%s%d", tag, i);
         urls[i] = ueg_url(t);
         if (!ueg_make_simple(urls[i])) return 0;
-        if (!U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)) return 0;
+        if (!SEGQ(U(SetUrlCacheEntryGroupA)(urls[i], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL))) return 0;
     }
     return g;
 }
@@ -27,7 +27,7 @@ static GROUPID xgroup(const char *tag, int n, const char **urls, DWORD gflags) {
 static int idx_of(const char *u, const char **urls, int n) { for (int i = 0; i < n; i++) if (u && !strcmp(u, urls[i])) return i; return -1; }
 
 /* ------------------------------------------------------------------ deletion while a group enumeration is open */
-/* An entry deleted before the cursor reaches it is never returned; the others still are. */
+/* An entry deleted before the cursor reaches it is still returned (group-scope enumeration is a snapshot on Win10). */
 TEST(ueg_x_delete_ahead_not_returned) {
     const char *urls[4]; GROUPID g; XGROUP_OR_SKIP(g, "dah", 4, urls);
     REQUIRE(U(DeleteUrlCacheEntryA));
@@ -50,8 +50,10 @@ TEST(ueg_x_delete_ahead_not_returned) {
         if (++n > 10) break;
     }
     U(FindCloseUrlCache)(h);
-    EXPECT_EQ(n, 3);
-    for (int i = 0; i < 4; i++) CHECKF(seen[i] == (i == victim ? 0 : 1), "url %d seen %d (victim %d)", i, seen[i], victim);
+    /* Win10 (VM, triage): a group-scoped enumeration is a snapshot taken at FindFirst; an entry deleted ahead of the
+     * cursor is still returned, exactly once. */
+    EXPECT_EQ(n, 4);
+    for (int i = 0; i < 4; i++) CHECKF(seen[i] == 1, "url %d seen %d (victim %d)", i, seen[i], victim);
     free(e);
 }
 /* Deleting a member entry removes it from the group's enumeration. */
@@ -100,7 +102,7 @@ TEST(ueg_x_header_alignment_sizes) {
         char t[16]; snprintf(t, sizeof t, "hal%d", i);
         urls[i] = ueg_url(t);
         if (!ueg_make_entry(urls[i], NORMAL_CACHE_ENTRY, ueg_days(30), ueg_days(-1), hdrs[i], "bin", "h")) { t_skip("commit failed %lu", GetLastError()); return; }
-        CHECK(U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL));
+        CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(urls[i], 0, g, NULL, 0, NULL)));
     }
     DWORD cap = 4096; INTERNET_CACHE_ENTRY_INFOA *e = malloc(cap); DWORD sz = cap;
     HANDLE h = U(FindFirstUrlCacheEntryExA)("", 0, UEG_DEFAULT_FILTER, g, e, &sz, NULL, NULL, NULL);
@@ -133,7 +135,7 @@ TEST(ueg_x_header_w_enum) {
     if (!g) { t_skip("no group"); return; }
     const char *url = ueg_url("hw"); const char *hdr = "HTTP/1.1 200 OK\r\nX-W: 1\r\n\r\n";
     if (!ueg_make_entry(url, NORMAL_CACHE_ENTRY, ueg_days(30), ueg_days(-1), hdr, "txt", "w")) { t_skip("commit failed"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)));
     DWORD cap = 4096; INTERNET_CACHE_ENTRY_INFOW *e = malloc(cap); DWORD sz = cap;
     HANDLE h = U(FindFirstUrlCacheEntryExW)(L"", 0, UEG_DEFAULT_FILTER, g, e, &sz, NULL, NULL, NULL);
     CHECK(h != NULL);
@@ -297,7 +299,7 @@ TEST(ueg_x_seg_readd_after_remove) {
     for (int i = 0; i < 3; i++) {
         CHECK(U(SetUrlCacheEntryGroupA)(urls[0], INTERNET_CACHE_GROUP_REMOVE, g, NULL, 0, NULL));
         EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, urls[0], NULL), 0);
-        CHECK(U(SetUrlCacheEntryGroupA)(urls[0], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
+        CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(urls[0], INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)));
         EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, urls[0], NULL), 1);
     }
 }

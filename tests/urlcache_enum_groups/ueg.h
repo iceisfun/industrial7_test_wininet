@@ -105,4 +105,9 @@ int  ueg_groups_contains(GROUPID g, int *count);   /* FindFirst/NextUrlCacheGrou
 
 /* wide helper: a static rotating copy of an ASCII string */
 const WCHAR *ueg_w(const char *s);
+/* A fresh group has a 0 KB disk quota; on Win10 SetUrlCacheEntryGroup(ADD) then returns FALSE/ERROR_NOT_ENOUGH_QUOTA
+ * (1816) for any non-empty entry although the membership IS recorded (probed on the VM, see EVIDENCE.md triage). */
+static inline BOOL ueg_seg_q(BOOL r) { return r || GetLastError() == ERROR_NOT_ENOUGH_QUOTA; }
+#define SEGQ(call) ueg_seg_q(call)
+
 #endif
