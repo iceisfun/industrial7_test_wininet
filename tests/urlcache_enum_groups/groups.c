@@ -42,6 +42,10 @@ TEST(ueg_create_group_valid_flags) {
     for (DWORD f = 0; f < 8; f++) {
         SET_ERR(0xdead);
         GROUPID g = U(CreateUrlCacheGroup)(f, NULL);
+        if ((f & CACHEGROUP_FLAG_GIDONLY) && (f & CACHEGROUP_FLAG_NONPURGEABLE)) {   /* Win10: GIDONLY|NONPURGEABLE is invalid */
+            CHECKF(g == 0 && GetLastError() == ERROR_INVALID_PARAMETER, "flags %lu gid 0x%llx err %lu", f, (unsigned long long)g, GetLastError());
+            continue;
+        }
         CHECKF(g != 0, "flags %lu err %lu", f, GetLastError());
         if (!g) continue;
         EXPECT_ERR(0);
@@ -79,9 +83,11 @@ TEST(ueg_create_group_gidonly_creates_nothing) {
     GROUPID real = ueg_group_new(0);
     CHECK(real != 0);
     EXPECT_EQ(real, p);
+    /* Win10 (VM, triage): GIDONLY|NONPURGEABLE is rejected with ERROR_INVALID_PARAMETER */
+    SET_ERR(0xdead);
     GROUPID p3 = U(CreateUrlCacheGroup)(CACHEGROUP_FLAG_GIDONLY | CACHEGROUP_FLAG_NONPURGEABLE, NULL);
-    EXPECT_EQ(LOW60(p3), LOW60(real) + 1);
-    EXPECT_EQ((ULONGLONG)p3 & 0xf000000000000000ULL, (ULONGLONG)STICKY_BIT);
+    EXPECT_EQ(p3, 0);
+    EXPECT_ERR(ERROR_INVALID_PARAMETER);
 }
 
 /* ------------------------------------------------------------------ DeleteUrlCacheGroup */
@@ -661,14 +667,14 @@ TEST(ueg_seg_add_remove_membership) {
     int n = 0;
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, &n), 0);
     SET_ERR(0xdead);
-    CHECK(U(SetUrlCacheEntryGroupA)(url, INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
-    EXPECT_ERR(0);
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)));
+    CHECK(GetLastError() == 0 || GetLastError() == ERROR_NOT_ENOUGH_QUOTA);   /* quota-0 group: 1816 yet member added */
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, &n), 1);
     EXPECT_EQ(n, 1);
     /* adding again is a successful no-op */
     SET_ERR(0xdead);
-    CHECK(U(SetUrlCacheEntryGroupA)(url, INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
-    EXPECT_ERR(0);
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)));
+    CHECK(GetLastError() == 0 || GetLastError() == ERROR_NOT_ENOUGH_QUOTA);   /* quota-0 group: 1816 yet member added */
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, &n), 1);
     EXPECT_EQ(n, 1);
     SET_ERR(0xdead);
@@ -685,7 +691,7 @@ TEST(ueg_seg_w_add_remove) {
     GROUPID g; NEW_OR_SKIP(g, 0);
     const char *url = ueg_url("segw");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupW)(ueg_w(url), INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupW)(ueg_w(url), INTERNET_CACHE_GROUP_ADD, g, NULL, 0, NULL)));
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, NULL), 1);
     CHECK(U(SetUrlCacheEntryGroupW)(ueg_w(url), INTERNET_CACHE_GROUP_REMOVE, g, NULL, 0, NULL));
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, NULL), 0);
@@ -696,9 +702,9 @@ TEST(ueg_seg_flag_bits) {
     GROUPID g; NEW_OR_SKIP(g, 0);
     const char *url = ueg_url("segfl");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 2, g, NULL, 0, NULL));                    /* 2 -> add */
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 2, g, NULL, 0, NULL)));                    /* 2 -> add */
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, NULL), 1);
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0xfffffffe, g, NULL, 0, NULL));           /* still add (idempotent) */
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0xfffffffe, g, NULL, 0, NULL)));           /* still add (idempotent) */
     CHECK(U(SetUrlCacheEntryGroupA)(url, 3, g, NULL, 0, NULL));                    /* 3 -> remove */
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g, url, NULL), 0);
 }
@@ -708,9 +714,9 @@ TEST(ueg_seg_entry_in_two_groups) {
     GROUPID g2 = ueg_group_new(0); CHECK(g2 != 0); if (!g2) return;
     const char *u1 = ueg_url("two1"), *u2 = ueg_url("two2");
     if (!ueg_make_simple(u1) || !ueg_make_simple(u2)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(u1, 0, g1, NULL, 0, NULL));
-    CHECK(U(SetUrlCacheEntryGroupA)(u1, 0, g2, NULL, 0, NULL));
-    CHECK(U(SetUrlCacheEntryGroupA)(u2, 0, g2, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(u1, 0, g1, NULL, 0, NULL)));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(u1, 0, g2, NULL, 0, NULL)));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(u2, 0, g2, NULL, 0, NULL)));
     int n1 = 0, n2 = 0;
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, g1, u1, &n1), 1);
     EXPECT_EQ(n1, 1);
@@ -727,7 +733,7 @@ TEST(ueg_seg_entry_in_many_groups) {
     const char *url = ueg_url("manyg");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
     GROUPID gs[12]; int ok = 0;
-    for (int i = 0; i < 12; i++) { gs[i] = ueg_group_new(0); if (gs[i] && U(SetUrlCacheEntryGroupA)(url, 0, gs[i], NULL, 0, NULL)) ok++; }
+    for (int i = 0; i < 12; i++) { gs[i] = ueg_group_new(0); if (gs[i] && SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, gs[i], NULL, 0, NULL))) ok++; }
     EXPECT_EQ(ok, 12);
     int seen = 0;
     for (int i = 0; i < 12; i++) if (gs[i]) seen += ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, gs[i], url, NULL);
@@ -736,7 +742,7 @@ TEST(ueg_seg_entry_in_many_groups) {
     for (int i = 1; i < 12; i += 2) CHECK(U(SetUrlCacheEntryGroupA)(url, 1, gs[i], NULL, 0, NULL));
     for (int i = 0; i < 12; i++) EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, gs[i], url, NULL), (i & 1) ? 0 : 1);
     /* re-adding reuses a freed slot */
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, gs[1], NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, gs[1], NULL, 0, NULL)));
     EXPECT_EQ(ueg_enum_contains_a("", 0, UEG_DEFAULT_FILTER, gs[1], url, NULL), 1);
 }
 
@@ -746,7 +752,7 @@ TEST(ueg_delete_group_keeps_entries) {
     GROUPID g; NEW_OR_SKIP(g, 0);
     const char *url = ueg_url("dgk");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)));
     CHECK(U(DeleteUrlCacheGroup)(g, 0, NULL)); ueg_group_untrack(g);
     CHECK(ueg_exists(url));
     /* the entry is no longer a member of anything: removing g now fails (group gone) */
@@ -758,8 +764,8 @@ TEST(ueg_delete_group_flush_deletes_entries) {
     GROUPID g; NEW_OR_SKIP(g, 0);
     const char *u1 = ueg_url("dgf1"), *u2 = ueg_url("dgf2"), *uo = ueg_url("dgfo");
     if (!ueg_make_simple(u1) || !ueg_make_simple(u2) || !ueg_make_simple(uo)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(u1, 0, g, NULL, 0, NULL));
-    CHECK(U(SetUrlCacheEntryGroupA)(u2, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(u1, 0, g, NULL, 0, NULL)));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(u2, 0, g, NULL, 0, NULL)));
     SET_ERR(0xdead);
     CHECK(U(DeleteUrlCacheGroup)(g, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, NULL));
     EXPECT_ERR(0);
@@ -774,9 +780,9 @@ TEST(ueg_delete_group_flush_keeps_multi_member) {
     GROUPID g2 = ueg_group_new(0); CHECK(g2 != 0); if (!g2) return;
     const char *both = ueg_url("dgmb"), *only = ueg_url("dgmo");
     if (!ueg_make_simple(both) || !ueg_make_simple(only)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(both, 0, g1, NULL, 0, NULL));
-    CHECK(U(SetUrlCacheEntryGroupA)(both, 0, g2, NULL, 0, NULL));
-    CHECK(U(SetUrlCacheEntryGroupA)(only, 0, g1, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(both, 0, g1, NULL, 0, NULL)));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(both, 0, g2, NULL, 0, NULL)));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(only, 0, g1, NULL, 0, NULL)));
     CHECK(U(DeleteUrlCacheGroup)(g1, CACHEGROUP_FLAG_FLUSHURL_ONDELETE, NULL)); ueg_group_untrack(g1);
     CHECK(ueg_exists(both));                      /* still in g2 */
     CHECK(!ueg_exists(only));
@@ -788,7 +794,7 @@ TEST(ueg_delete_group_flag1_no_flush) {
     GROUPID g; NEW_OR_SKIP(g, 0);
     const char *url = ueg_url("dg1");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)));
     CHECK(U(DeleteUrlCacheGroup)(g, 1, NULL)); ueg_group_untrack(g);
     CHECK(ueg_exists(url));
 }
@@ -802,7 +808,7 @@ TEST(ueg_nonpurgeable_group_sets_sticky) {
     INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(url, NULL);
     CHECK(e && !(e->CacheEntryType & STICKY_CACHE_ENTRY));
     free(e);
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)));
     e = ueg_info_a(url, NULL);
     CHECK(e != NULL);
     if (e) CHECKF(e->CacheEntryType & STICKY_CACHE_ENTRY, "type 0x%lx", e->CacheEntryType);
@@ -818,7 +824,7 @@ TEST(ueg_purgeable_group_does_not_set_sticky) {
     GROUPID g; NEW_OR_SKIP(g, 0);
     const char *url = ueg_url("nstk");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)));
     INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(url, NULL);
     CHECK(e != NULL);
     if (e) EXPECT_EQ(e->CacheEntryType, NORMAL_CACHE_ENTRY);
@@ -830,8 +836,8 @@ TEST(ueg_sticky_kept_while_any_nonpurgeable_group) {
     GROUPID s2 = ueg_group_new(CACHEGROUP_FLAG_NONPURGEABLE); CHECK(s2 != 0); if (!s2) return;
     const char *url = ueg_url("stk2");
     if (!ueg_make_simple(url)) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, s1, NULL, 0, NULL));
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, s2, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, s1, NULL, 0, NULL)));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, s2, NULL, 0, NULL)));
     CHECK(U(SetUrlCacheEntryGroupA)(url, 1, s1, NULL, 0, NULL));
     INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(url, NULL);
     CHECK(e && (e->CacheEntryType & STICKY_CACHE_ENTRY));
@@ -847,7 +853,7 @@ TEST(ueg_sticky_commit_and_nonpurgeable_group) {
     GROUPID s; NEW_OR_SKIP(s, CACHEGROUP_FLAG_NONPURGEABLE);
     const char *url = ueg_url("stk3");
     if (!ueg_make_entry(url, NORMAL_CACHE_ENTRY | STICKY_CACHE_ENTRY, ueg_days(30), ueg_days(-1), NULL, "txt", "s")) { t_skip("no entry"); return; }
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, s, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, s, NULL, 0, NULL)));
     CHECK(U(SetUrlCacheEntryGroupA)(url, 1, s, NULL, 0, NULL));
     INTERNET_CACHE_ENTRY_INFOA *e = ueg_info_a(url, NULL);
     CHECK(e != NULL);
@@ -867,7 +873,7 @@ TEST(ueg_group_usage_tracks_members) {
     INTERNET_CACHE_GROUP_INFOA a; DWORD cb = sizeof a;
     CHECK(U(GetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_BASIC, &a, &cb, NULL));
     EXPECT_EQ(a.dwDiskUsage, 0);
-    CHECK(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL));
+    CHECK(SEGQ(U(SetUrlCacheEntryGroupA)(url, 0, g, NULL, 0, NULL)));
     cb = sizeof a;
     CHECK(U(GetUrlCacheGroupAttributeA)(g, 0, CACHEGROUP_ATTRIBUTE_BASIC, &a, &cb, NULL));
     CHECKF(a.dwDiskUsage >= 64, "usage %lu KB", a.dwDiskUsage);
