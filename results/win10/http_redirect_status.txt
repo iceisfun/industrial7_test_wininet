@@ -817,16 +817,14 @@ RUN  rs_x_async_chain_three
   NOTE async chain: done=1 ok=1 err=0 redirects=3 completes=1 reqs=4
 OK   rs_x_async_chain_three
 RUN  rs_x_cb_redirect_after_interim
-  NOTE callbacks: 60,60,80,20,21,30,31,40,41,120,110,80,30,31,40,41,70,70
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,120,110,80,30,31,40,41,40,41,70,70
 OK   rs_x_cb_redirect_after_interim
 RUN  rs_x_cb_sequence_new_connection
   NOTE callbacks: 60,60,80,20,21,30,31,40,41,50,51,110,80,20,21,30,31,40,41,40,41,70,70
-  FAIL tests/http_redirect_status/rs_extra.c:335: seq == "20,21,30,31,40,41,110,20,21,30,31,40,41" (got "20,21,30,31,40,41,110,20,21,30,31,40,41,40,41" want "20,21,30,31,40,41,110,20,21,30,31,40,41")
-FAIL rs_x_cb_sequence_new_connection
+OK   rs_x_cb_sequence_new_connection
 RUN  rs_x_cb_sequence_reused_connection
-  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,40,41,70,70
-  FAIL tests/http_redirect_status/rs_extra.c:320: seq == "20,21,30,31,40,41,110,30,31,40,41" (got "20,21,30,31,40,41,110,30,31,40,41,40,41" want "20,21,30,31,40,41,110,30,31,40,41")
-FAIL rs_x_cb_sequence_reused_connection
+  NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,70,70
+OK   rs_x_cb_sequence_reused_connection
 RUN  rs_x_long_location
 OK   rs_x_long_location
 RUN  rs_x_auth_header_sendreq_other_host
@@ -857,7 +855,7 @@ X-Src: 1
 C
 OK   rs_x_confirm_handle_view
 RUN  rs_x_target_port_closed
-  NOTE closed target: ok=0 err=12029(ERROR_INTERNET_CANNOT_CONNECT) status=0 url=http://127.0.0.1:50348/gone 2031ms
+  NOTE closed target: ok=0 err=12029(ERROR_INTERNET_CANNOT_CONNECT) status=0 url=http://127.0.0.1:50348/gone 2032ms
 OK   rs_x_target_port_closed
 RUN  rs_x_port_993_refused
   NOTE Location port 993: ok=1 err=0(0) status=302 url=http://127.0.0.1:50352/src nbody=0 redirect_cbs=0 connecting_cbs=1 0ms
@@ -899,9 +897,9 @@ RUN  rs_x_300_post_becomes_get
   NOTE 300 POST: ok=1 err=0(0) status=200 reqs=2 line1=GET /dst HTTP/1.1
 OK   rs_x_300_post_becomes_get
 RUN  rs_cache_redirect_301_note
-  NOTE req0: GET /wininet_7456_5_c301.src HTTP/1.1
-  NOTE req1: GET /wininet_7456_5_c301.src.dst HTTP/1.1
-  NOTE req2: GET /wininet_7456_5_c301.src HTTP/1.1
+  NOTE req0: GET /wininet_7372_5_c301.src HTTP/1.1
+  NOTE req1: GET /wininet_7372_5_c301.src.dst HTTP/1.1
+  NOTE req2: GET /wininet_7372_5_c301.src HTTP/1.1
   NOTE cached 301: second fetch status=200 body=cached-target new server requests=2
 OK   rs_cache_redirect_301_note
 RUN  rs_cache_304_without_entry_is_data
@@ -913,9 +911,9 @@ Content-L body=body-q
   NOTE INTERNET_OPTION_REQUEST_FLAGS = 0x1 (FROM_CACHE=0x1)
 OK   rs_cache_304_status_query_detail
 RUN  rs_cache_304_revalidation
-  NOTE req0: GET /wininet_7456_8_c304.txt HTTP/1.1 INM=-
-  NOTE req1: GET /wininet_7456_8_c304.txt HTTP/1.1 INM="rs-v1"
-  NOTE req2: GET /wininet_7456_8_c304.txt HTTP/1.1 INM="rs-v1"
+  NOTE req0: GET /wininet_7372_8_c304.txt HTTP/1.1 INM=-
+  NOTE req1: GET /wininet_7372_8_c304.txt HTTP/1.1 INM="rs-v1"
+  NOTE req2: GET /wininet_7372_8_c304.txt HTTP/1.1 INM="rs-v1"
   NOTE revalidation: err=0 status=200 body=cached-v1 requests=3 INM="rs-v1" IMS=Wed, 21 Oct 2015 07:28:00 GMT
 OK   rs_cache_304_revalidation
 RUN  rs_keep_connection_flag_visible
@@ -977,5 +975,5 @@ RUN  rs_cb_redirect_ansi
   NOTE callbacks: 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,70,70
   NOTE REDIRECT info='http://127.0.0.1:50422/dst' len=27 ctx=2
 OK   rs_cb_redirect_ansi
-SUMMARY tests=358 failed=2 skipped=0 checks_pass=2848 checks_fail=2
-@@I7 END http_redirect_status exit=0x1 ms=344738 timeout=0 bytes=43819
+SUMMARY tests=358 failed=0 skipped=0 checks_pass=2850 checks_fail=0
+@@I7 END http_redirect_status exit=0x0 ms=344658 timeout=0 bytes=43435
