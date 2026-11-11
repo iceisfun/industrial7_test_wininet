@@ -304,6 +304,13 @@ static void filtered_seq(char *out, size_t cap) {
             k += snprintf(out + k, cap - k, "%s%lu", k ? "," : "", st);
     }
 }
+/* Win10 emits a trailing 40,41 pair for the body read depending on how the body arrives; the pair is optional (seen in 1 of 3 runs absent) */
+static int seq_is(const char *seq, const char *want) {
+    char t[300];
+    if (!strcmp(seq, want)) return 1;
+    snprintf(t, sizeof t, "%s,40,41", want);
+    return !strcmp(seq, t);
+}
 /* keep-alive: one connect, REDIRECT between the first RESPONSE_RECEIVED and the second SENDING_REQUEST (Win10 VM rs4:
  * 60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,70,70) */
 TEST(rs_x_cb_sequence_reused_connection) {
@@ -317,7 +324,7 @@ TEST(rs_x_cb_sequence_reused_connection) {
     rs_cb_dump();
     char seq[256]; filtered_seq(seq, sizeof seq);
     CHECK(r.ok);
-    EXPECT_STR(seq, "20,21,30,31,40,41,110,30,31,40,41");
+    CHECKF(seq_is(seq, "20,21,30,31,40,41,110,30,31,40,41"), "seq=%s", seq);
     srv_stop(s);
 }
 /* Connection: close on the 3xx: Redirect() closes the connection before indicating REDIRECT, the hop connects again */
@@ -332,7 +339,7 @@ TEST(rs_x_cb_sequence_new_connection) {
     rs_cb_dump();
     char seq[256]; filtered_seq(seq, sizeof seq);
     CHECK(r.ok); EXPECT_EQ(srv_conn_count(s), 2);
-    EXPECT_STR(seq, "20,21,30,31,40,41,110,20,21,30,31,40,41");
+    CHECKF(seq_is(seq, "20,21,30,31,40,41,110,20,21,30,31,40,41"), "seq=%s", seq);
     srv_stop(s);
 }
 /* REDIRECT is indicated once per followed hop, also when the 3xx came with a 100 Continue first */

@@ -99,3 +99,10 @@ Oracle: Windows 10 22H2 VM (10.0.19045.2965, wininet 11.0.19041.2193), boots `~/
 - Knowledge-only and not asserted: zone-crossing warnings 12039/12040/12052 (`GlobalWarnOnZoneCrossing`,
   `GlobalWarnOnHTTPSToHTTPRedirect`) are registry-driven; the lab image does not raise them (https->http is followed).
   Testing them needs a `dx_` area that changes the setting.
+
+## Triage 2026-11-11 (Win10 22H2 VM)
+
+- rs_x_cb_sequence_reused_connection, rs_x_cb_sequence_new_connection: wrong expectation. Win10 emits a trailing
+  RECEIVING_RESPONSE/RESPONSE_RECEIVED (40,41) pair after the final hop (body read), e.g.
+  `60,60,80,20,21,30,31,40,41,110,80,30,31,40,41,40,41,70,70`. Whether it appears depends on how the body is read, so
+  the pair is optional (absent in a later run, same transcript otherwise), so the test accepts the sequence with or without it; the redirect-hop ordering is still checked exactly.
