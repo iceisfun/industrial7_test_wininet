@@ -218,9 +218,10 @@ TEST(auth_x_end_browser_session_keeps_handle_creds) {
     CHECK(end_browser_session());
     int b = srv_req_count(s); a_send(hc, &q, &r, 0);
     a_dump(s);
-    EXPECT_EQ(r.status, 200);
-    EXPECT_EQ(srv_req_count(s) - b, 2);   /* no pre-emptive header any more, the challenge is answered again */
-    if (srv_req_count(s) - b >= 2) { CHECK(REQ_AUTH(s, b) == NULL); EXPECT_STR(REQ_AUTH(s, b + 1), a_basic("kh", "kp")); }
+    /* Win10 (observed): the flushed request goes out bare and the 401 is returned, no automatic retry */
+    EXPECT_EQ(r.status, 401);
+    EXPECT_EQ(srv_req_count(s) - b, 1);
+    if (srv_req_count(s) - b >= 1) CHECK(REQ_AUTH(s, b) == NULL);
     char buf[64]; CHECK(a_qopt(hc, INTERNET_OPTION_USERNAME, buf, sizeof buf, NULL)); EXPECT_STR(buf, "kh");
     a_close(hc); t_inet_close(hi); srv_stop(s);
 }
@@ -333,7 +334,7 @@ TEST(auth_x_http10_request_version_retry) {
     a_dump(s);
     int n = srv_req_count(s);
     EXPECT_EQ(n, 2);
-    for (int i = 0; i < n && i < 2; i++) EXPECT_STR(srv_req_line(s, i), "GET /v10 HTTP/1.0");
+    for (int i = 0; i < n && i < 2; i++) EXPECT_STR(srv_req_line(s, i), "GET /v10 HTTP/1.1");   /* Win10: the wire version is always 1.1 */
     if (n >= 2) EXPECT_STR(REQ_AUTH(s, 1), a_basic("v10", "p10"));
     if (n >= 2) t_note("HTTP/1.0 legs: conn %d / %d, Connection=%s", srv_req_conn(s, 0), srv_req_conn(s, 1),
                        srv_req_header(s, 0, "Connection") ? srv_req_header(s, 0, "Connection") : "(none)");
