@@ -88,7 +88,7 @@ Pattern across areas: each had one or more Win10-validated boots, and then a lat
 
 The evaluation above was written before a VM was available. The corpus was then run on local Win10 22H2 guests (base `bb depot get m2`, ntdll 10.0.19041.2788, UBR 2965; `win10vm.sh` from industrial7 with `tools/vm_run_local.sh`, one boot per area, 7 in parallel). Transcripts are in `results/win10/`.
 
-Result: 7 of 21 areas PASS, 14 FAIL, none crashed or timed out. Failures are not triaged: each is either a wrong expectation (the unrun post-VM review files predicted in the evaluation) or a real harness issue (several involve HTTPS, e.g. `rsp_life_https_response_headers`, `ck_wire_https_secure_cookie_sent`, `netlb_https_tls12_only_server`).
+Result: 8 of 21 areas PASS, 13 FAIL (an earlier version of this doc said 7 and 14: a miscount), none crashed or timed out. Failures are not triaged: each is either a wrong expectation (the unrun post-VM review files predicted in the evaluation) or a real harness issue (several involve HTTPS, e.g. `rsp_life_https_response_headers`, `ck_wire_https_secure_cookie_sent`, `netlb_https_tls12_only_server`).
 
 | area | result | tests | failed tests | failed checks |
 |---|---|---|---|---|
@@ -115,3 +115,12 @@ Result: 7 of 21 areas PASS, 14 FAIL, none crashed or timed out. Failures are not
 | urlcache_enum_groups | FAIL | 183 | 20 | 48 |
 
 Note `urlcache_enum_groups` (20 failed, 25 skipped) has never passed and is the largest gap; the others are 1-6 failures each. `https_tls`, `http_request_wire`, `http_edge_protocol`, `http_body_io` and `http_cache_integration` pass completely at tip.
+
+## After triage (2026-11-11)
+
+13 Sonnet 5.5 triage agents each fixed one failing area on the local Win10 VM (branches `triage/<area>`, merged here). Causes found: wrong expectations vs Win10 (most), real test bugs (ftp_client: `S_SEND` on a pointer sent 7 bytes, async completion count read from the wrong field), and timing/environment variation. Then the merged tree was run twice on the VM, full corpus, one boot per area:
+
+- run 1: 21 of 21 PASS.
+- run 2: 18 PASS, 3 FAIL (flakes): `async_callbacks` (the optional-trailing-40,41 acceptance added by triage trims 4 characters instead of 6, so it never accepts the shorter sequence), `session_handles` `sh_conc_create_children_while_session_closed` (off-by-one in close accounting), `proxy_connectivity` `pc_wire2_connect_https_scheme_proxy_entry_uppercase`-adjacent reuse test (first HTTPS request fails).
+
+Open and unexplained: the first HTTPS request over the loopback schannel server intermittently fails with 12030 (ERROR_INTERNET_CONNECTION_ABORTED). It showed in cookies, http_response_headers, net_loopback and proxy_connectivity. Triage added per-test retry or downgraded to notes; the root cause (server `srv_tls.c` vs client) is not identified. Treat `https_tls`-dependent areas as flaky until it is.
