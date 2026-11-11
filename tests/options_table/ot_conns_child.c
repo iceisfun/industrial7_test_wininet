@@ -45,11 +45,13 @@ static int sc_fresh(void) {
     HINTERNET c = s ? conn(s, "127.0.0.1", 1) : NULL;
     if (!c) return 0xC0DE0004;
     qres a = q(c, INTERNET_OPTION_MAX_CONNS_PER_SERVER);
-    CK(!a.r && a.e == ERROR_INTERNET_INVALID_OPERATION, "PER_SERVER on a record-less connect r=%d e=%lu v=%lu", a.r, a.e, a.v);
+    /* Win10 22H2 observed: a record-less connect answers with the global value (2), not 12016 */
+    qres gl = q(NULL, INTERNET_OPTION_MAX_CONNS_PER_SERVER);
+    CK(a.r && a.l == 4 && a.v == gl.v, "PER_SERVER on a record-less connect r=%d e=%lu v=%lu global %lu", a.r, a.e, a.v, gl.v);
     a = q(c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER);
     CK(!a.r && a.e == ERROR_INTERNET_INVALID_OPERATION, "PER_1_0 on a connect r=%d e=%lu", a.r, a.e);
     DWORD e;
-    e = s_err(c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, 4);    CK(e == ERROR_INTERNET_INVALID_OPERATION, "set PER_SERVER 4: %lu", e);
+    e = s_err(c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, 4);    CK(e == 0, "set PER_SERVER 4: %lu (Win10 accepts on a record-less connect)", e);
     e = s_err(c, INTERNET_OPTION_MAX_CONNS_PER_SERVER, 0);    CK(e == ERROR_BAD_ARGUMENTS, "set PER_SERVER 0: %lu (0 is rejected first)", e);
     e = s_err(c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, 4); CK(e == ERROR_INTERNET_INVALID_OPERATION, "set PER_1_0 4: %lu", e);
     e = s_err(c, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER, 0); CK(e == ERROR_BAD_ARGUMENTS, "set PER_1_0 0: %lu", e);
@@ -79,7 +81,7 @@ static int sc_after(void) {
     printf("  MC connect created before the record: r=%d e=%lu v=%lu\n", a.r, a.e, a.r ? a.v : 0);
     HINTERNET cl = conn(s, "localhost", srv_port(sv));                  /* another host name: no record */
     a = q(cl, INTERNET_OPTION_MAX_CONNS_PER_SERVER);
-    CK(!a.r && a.e == ERROR_INTERNET_INVALID_OPERATION, "localhost connect: r=%d e=%lu v=%lu", a.r, a.e, a.v);
+    CK(a.r && a.v == g.v, "localhost connect (Win10: answers the global value): r=%d e=%lu v=%lu", a.r, a.e, a.v);
     /* PER_1_0 is never answered by a real handle, record or not */
     a = q(c1, INTERNET_OPTION_MAX_CONNS_PER_1_0_SERVER);
     CK(!a.r && a.e == ERROR_INTERNET_INVALID_OPERATION, "PER_1_0 on the connect: r=%d e=%lu", a.r, a.e);
