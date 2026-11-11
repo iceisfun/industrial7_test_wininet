@@ -465,11 +465,13 @@ TEST(netlb_https_client_cert_requested) {
 
 TEST(netlb_https_tls12_only_server) {
     REQUIRE(U(HttpSendRequestA));
-    srv_config cfg = { SRV_HTTPS }; cfg.tls_protocols = 0x400 /* SP_PROT_TLS1_2_SERVER */; srv *s;
+    srv_config cfg = { SRV_HTTPS }; cfg.tls_protocols = 0x400 /* SP_PROT_TLS1_2_SERVER */; cfg.io_timeout_ms = 30000; /* first TLS use in the process: cold schannel/wininet init can exceed the 5 s default before ClientHello is sent */ srv *s;
     START_OR_SKIP(&cfg, &s);
     DWORD code, e = https_once(s, SECURITY_FLAG_IGNORE_UNKNOWN_CA, &code);
-    CHECKF(e == 0 && code == 200, "err=%lu code=%lu", e, code);
     const srv_event *ev; int ne = srv_events(s, &ev);
+    t_note("tls12: err=%lu %s code=%lu", e, t_inet_errname(e), code);
+    for (int i = 0; i < ne; i++) t_note("tls12 ev %s %s", srv_event_kind_name(ev[i].kind), ev[i].data ? ev[i].data : "");
+    CHECKF(e == 0 && code == 200, "err=%lu code=%lu", e, code);
     for (int i = 0; i < ne; i++) if (ev[i].kind == SRV_EV_TLS_DONE) { t_note("tls: %s", ev[i].data); CHECK(strstr(ev[i].data, "proto=0x400") != NULL); }
     srv_stop(s);
 }

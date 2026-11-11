@@ -40,3 +40,15 @@ urlcache_enum_groups                     FAIL      tests=183 failed=20 skipped=2
 VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-urlcache_enum_groups/serial.log
 proxy_connectivity                       FAIL      tests=239 failed=1 skipped=0 checks_fail=1 ms=396451
 VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/wl1-proxy_connectivity/serial.log
+net_loopback                             PASS      tests=26 failed=0 skipped=0 checks_fail=0 ms=41397
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-net_loopback-1-net_loopback/serial.log
+net_loopback                             FAIL      tests=26 failed=1 skipped=0 checks_fail=1 ms=53496
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-net_loopback-2-net_loopback/serial.log
+net_loopback                             FAIL      tests=26 failed=1 skipped=0 checks_fail=1 ms=50552
+VM_SPLIT areas=1 not_pass=1 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-net_loopback-3-net_loopback/serial.log
+net_loopback                             PASS      tests=26 failed=0 skipped=0 checks_fail=0 ms=53505
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-net_loopback-4-net_loopback/serial.log
+net_loopback                             PASS      tests=26 failed=0 skipped=0 checks_fail=0 ms=56443
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-net_loopback-5-net_loopback/serial.log
+net_loopback                             PASS      tests=26 failed=0 skipped=0 checks_fail=0 ms=44735
+VM_SPLIT areas=1 not_pass=0 log=/data/i7wt/wininet-eval/i7root/target/win10vm/runs/tri-net_loopback-6-net_loopback/serial.log
