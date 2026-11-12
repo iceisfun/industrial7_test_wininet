@@ -124,3 +124,9 @@ Note `urlcache_enum_groups` (20 failed, 25 skipped) has never passed and is the 
 - run 2: 18 PASS, 3 FAIL (flakes): `async_callbacks` (the optional-trailing-40,41 acceptance added by triage trims 4 characters instead of 6, so it never accepts the shorter sequence), `session_handles` `sh_conc_create_children_while_session_closed` (off-by-one in close accounting), `proxy_connectivity` `pc_wire2_connect_https_scheme_proxy_entry_uppercase`-adjacent reuse test (first HTTPS request fails).
 
 Open and unexplained: the first HTTPS request over the loopback schannel server intermittently fails with 12030 (ERROR_INTERNET_CONNECTION_ABORTED). It showed in cookies, http_response_headers, net_loopback and proxy_connectivity. Triage added per-test retry or downgraded to notes; the root cause (server `srv_tls.c` vs client) is not identified. Treat `https_tls`-dependent areas as flaky until it is.
+
+## After flake fixes (2026-11-12)
+
+Merged fix/flakeA and fix/flake12030 plus a session_handles fix (a create racing the session teardown returns 12017, counted as `cancelled`, not an unexpected failure).
+Verification on the local Win10 VM (one boot per area): session_handles 6/6 PASS after the fix; async_callbacks 6/6 PASS; proxy_connectivity 5/6 PASS.
+Open: `pc_wire_connect_407_then_200_with_creds` (tests/proxy_connectivity/pc_proxy_wire.c:617, status 0 instead of 200) failed 1 of 6 reruns and in 1 of 2 earlier full runs: an intermittent not yet root-caused. Also still failing every boot (not flakes, see the 12030 write-up): rsp_more_whitespace_only_line, auth_x_http10_request_version_retry, auth_x_end_browser_session_keeps_handle_creds, rs_x_cb_sequence_new_connection.
