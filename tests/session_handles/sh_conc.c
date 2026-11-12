@@ -80,7 +80,7 @@ TEST(sh_conc_query_while_session_closed) {
 
 /* A thread creating connects in a loop while the session is closed: creation fails with 6 afterwards, every
  * connect it did get is either closed with the session or closable once. */
-typedef struct { HINTERNET s; volatile LONG stop; LONG made, fail6, fail18, failother, close_ok, close6, close_denied, close_other; DWORD other_err, close_other_err; HINTERNET denied[8]; } sh_mk;
+typedef struct { HINTERNET s; volatile LONG stop; LONG made, fail6, fail18, cancelled, failother, close_ok, close6, close_denied, close_other; DWORD other_err, close_other_err; HINTERNET denied[8]; } sh_mk;
 static DWORD WINAPI sh_mk_thread(LPVOID p) {
     sh_mk *m = (sh_mk *)p;
     for (int i = 0; i < 100000 && !m->stop; i++) {
@@ -96,6 +96,7 @@ static DWORD WINAPI sh_mk_thread(LPVOID p) {
                 else { m->close_other++; m->close_other_err = ce; } }
         } else if (e == ERROR_INVALID_HANDLE) { if (++m->fail6 > 20) break; }
         else if (e == ERROR_INTERNET_INCORRECT_HANDLE_TYPE) { if (++m->fail18 > 20) break; }  /* the freed session value was reused by a child created in the race window */
+        else if (e == ERROR_INTERNET_OPERATION_CANCELLED) { m->cancelled++; }  /* create racing the session teardown is cancelled (12017): seen up to 15 per round on Win10 */
         else { m->failother++; m->other_err = e; }
     }
     return 0;
@@ -114,7 +115,7 @@ TEST(sh_conc_create_children_while_session_closed) {
         m.stop = 1;
         if (w != WAIT_OBJECT_0) { CHECK(!"creator thread did not finish"); WaitForSingleObject(th, 5000); }
         CloseHandle(th);
-        tot.made += m.made; tot.fail6 += m.fail6; tot.fail18 += m.fail18; tot.failother += m.failother;
+        tot.made += m.made; tot.fail6 += m.fail6; tot.fail18 += m.fail18; tot.cancelled += m.cancelled; tot.failother += m.failother;
         tot.close_ok += m.close_ok; tot.close6 += m.close6; tot.close_denied += m.close_denied; tot.close_other += m.close_other;
         if (m.failother) tot.other_err = m.other_err;
         if (m.close_other) tot.close_other_err = m.close_other_err;
@@ -129,7 +130,7 @@ TEST(sh_conc_create_children_while_session_closed) {
         }
         CHECKF(m.close_ok + m.close6 + m.close_denied + m.close_other == m.made, "round %d: made %ld close_ok %ld close6 %ld denied %ld close_other %ld (err %lu)", round, m.made, m.close_ok, m.close6, m.close_denied, m.close_other, m.close_other_err);
     }
-    t_note("children created around session close (10 rounds): made %ld fail6 %ld fail18 %ld failother %ld (last other err %lu) close_ok %ld close6 %ld close_denied %ld close_other %ld (err %lu)", tot.made, tot.fail6, tot.fail18, tot.failother, tot.other_err, tot.close_ok, tot.close6, tot.close_denied, tot.close_other, tot.close_other_err);
+    t_note("children created around session close (10 rounds): made %ld fail6 %ld fail18 %ld cancelled %ld failother %ld (last other err %lu) close_ok %ld close6 %ld close_denied %ld close_other %ld (err %lu)", tot.made, tot.fail6, tot.fail18, tot.cancelled, tot.failother, tot.other_err, tot.close_ok, tot.close6, tot.close_denied, tot.close_other, tot.close_other_err);
     CHECK(tot.made > 0);
     CHECK(tot.fail6 + tot.fail18 > 0);
     /* VM boot 1: one creation in the close window failed with another error; at most a handful are tolerated */
