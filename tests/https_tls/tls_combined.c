@@ -88,7 +88,7 @@ static cres comb_shared(int profile, const char *host, int where, DWORD mask, DW
         if (where == 2) CHECK(set_mask(t.hr, mask));
         if (secflags) t_https_secflags(t.hr, secflags);
         r.err = treq_send(&t);
-        if (r.err == ERROR_INTERNET_CONNECTION_ABORTED || r.err == ERROR_INTERNET_CONNECTION_RESET) {
+        if (r.err == ERROR_INTERNET_CONNECTION_RESET) {
             t_note("transient %lu on send, retrying once", r.err); r.err = treq_send(&t);
         }
         r.flags = tls_secflags(t.hr);
@@ -284,7 +284,7 @@ TEST(tls_comb_sendrequestex) {
     SET_ERR(0xDEAD);
     ok = U(HttpSendRequestExA)(t.hr, &ib, NULL, 0, 0);
     e = ok ? 0 : GetLastError();
-    if (e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", e); ok = U(HttpSendRequestExA)(t.hr, &ib, NULL, 0, 0); e = ok ? 0 : GetLastError(); }
+    if (e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", e); ok = U(HttpSendRequestExA)(t.hr, &ib, NULL, 0, 0); e = ok ? 0 : GetLastError(); }
     EXPECT_EQ(e, 0);
     if (ok) {
         DWORD w = 0;

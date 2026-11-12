@@ -530,17 +530,6 @@ TEST(rs_scheme_https_same_server) {
     srv *s; RS_START(&rt, SRV_HTTPS, s);
     rs_opt o = { 0 }; o.flags = RS_FRESH; rs_res r;
     rs_do(s, "GET", "/src", &o, &r);
-    if (!r.ok && r.err == ERROR_INTERNET_CONNECTION_ABORTED && srv_req_count(s) == 0) {
-        /* Win10 VM rs3: the first schannel handshake of the process (this test runs first) once aborted with 12030
-         * before any request: an environment effect of the loopback TLS server, not redirect behaviour. Retry once. */
-        t_note("first HTTPS attempt aborted (12030, no request): retrying once");
-        srv_stop(s);
-        rs_router_init(&rt);
-        rs_add(&rt, "/src", 301, "Location: /secure-dst\r\n", "");
-        rs_add(&rt, "/secure-dst", 200, NULL, "secure-landed");
-        RS_START(&rt, SRV_HTTPS, s);
-        rs_do(s, "GET", "/src", &o, &r);
-    }
     CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err));
     EXPECT_EQ(r.status, 200); EXPECT_STR(r.body, "secure-landed");
     EXPECT_STR(r.url, srv_url(s, "/secure-dst"));

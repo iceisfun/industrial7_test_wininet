@@ -109,7 +109,7 @@ static size_t async_read_all(areq *q, arec *r, char *buf, size_t cap) {
  * per boot on the VM in several areas), noted */
 static DWORD async_send_ok(areq *q, arec *r, int *pend, DWORD_PTR *res) {
     DWORD e = async_send(q, r, pend, res);
-    if (e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on async send, retrying once", e); e = async_send(q, r, pend, res); }
+    if (e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on async send, retrying once", e); e = async_send(q, r, pend, res); }
     return e;
 }
 

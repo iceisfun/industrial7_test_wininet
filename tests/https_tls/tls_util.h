@@ -83,7 +83,7 @@ DWORD tls_ev_field(const char *data, const char *key);
 /* success-path send: one retry on a transient abort/reset of a fresh loopback connection (seen once per boot on the VM,
  * boots tls5/tls6, in different tests), noted; any other result is checked as is */
 #define SEND_OK(tp) do { DWORD se_ = treq_send(tp); \
-    if (se_ == ERROR_INTERNET_CONNECTION_ABORTED || se_ == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", se_); se_ = treq_send(tp); } \
+    if (se_ == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", se_); se_ = treq_send(tp); } \
     EXPECT_EQ(se_, 0); } while (0)
 /* HttpSendRequestA on a success path with the same one-retry rule as SEND_OK; TRUE/FALSE with GetLastError preserved */
 BOOL  tls_send_retry(HINTERNET hr, const char *hdr, DWORD hl, void *opt, DWORD ol);

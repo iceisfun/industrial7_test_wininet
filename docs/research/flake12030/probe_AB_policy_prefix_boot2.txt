@@ -1,0 +1,862 @@
+RUN  fh_probe_first_https_fresh_processes
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE uptime_ms=120218
+  PROBE sh rc=0: wevtutil sl Microsoft-Windows-CAPI2/Operational /e:true
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #0 uptime=121546 exit=0x0 child_wall=656 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       406 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        94 ms server: conn=0 ACCEPT 
+  PROBE        94 ms server: conn=0 HS_BYTES 158
+  PROBE       344 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       344 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49672
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       344 ms server: conn=0 BODY 
+  PROBE       344 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       406 ms server: conn=0 EOF 
+  PROBE       406 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #1 uptime=122031 exit=0x0 child_wall=469 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        31 ms server: conn=0 ACCEPT 
+  PROBE        31 ms server: conn=0 HS_BYTES 158
+  PROBE        94 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        94 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49674
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        94 ms server: conn=0 BODY 
+  PROBE        94 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #2 uptime=122500 exit=0x0 child_wall=454 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE        93 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        93 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49676
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        93 ms server: conn=0 BODY 
+  PROBE        93 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #3 uptime=123000 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE        94 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        94 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49678
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        94 ms server: conn=0 BODY 
+  PROBE        94 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #4 uptime=123437 exit=0x0 child_wall=437 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        32 ms server: conn=0 ACCEPT 
+  PROBE        32 ms server: conn=0 HS_BYTES 158
+  PROBE        94 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        94 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49681
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        94 ms server: conn=0 BODY 
+  PROBE        94 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #5 uptime=123890 exit=0x0 child_wall=437 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        15 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        15 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        15 ms client: HttpSendRequest begin
+  PROBE       140 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        31 ms server: conn=0 ACCEPT 
+  PROBE        31 ms server: conn=0 HS_BYTES 158
+  PROBE        78 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        78 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49683
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        78 ms server: conn=0 BODY 
+  PROBE        78 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       140 ms server: conn=0 EOF 
+  PROBE       140 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #6 uptime=124328 exit=0x0 child_wall=438 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       141 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        31 ms server: conn=0 ACCEPT 
+  PROBE        31 ms server: conn=0 HS_BYTES 158
+  PROBE        78 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        78 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49685
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        78 ms server: conn=0 BODY 
+  PROBE        78 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 EOF 
+  PROBE       141 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #7 uptime=124750 exit=0x0 child_wall=422 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 93 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49687
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #8 uptime=125203 exit=0x0 child_wall=453 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE        94 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        94 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49689
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        94 ms server: conn=0 BODY 
+  PROBE        94 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #9 uptime=125656 exit=0x0 child_wall=453 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 140 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        31 ms server: conn=0 ACCEPT 
+  PROBE        31 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49691
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #10 uptime=126187 exit=0x0 child_wall=531 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 188 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49693
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #11 uptime=126640 exit=0x0 child_wall=437 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 109 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE        94 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49695
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  PROBE sh rc=0: wevtutil qe Microsoft-Windows-CAPI2/Operational /f:text /c:400 /rd:false
+  PROBE | Event[0]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.0750000Z
+  PROBE |   Event ID: 90
+  PROBE |   Task: X509 Objects
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Certificate Details
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[1]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.0750000Z
+  PROBE |   Event ID: 71
+  PROBE |   Task: Sign Certificate
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Private Key
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[2]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.1360000Z
+  PROBE |   Event ID: 10
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[3]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.1390000Z
+  PROBE |   Event ID: 90
+  PROBE |   Task: X509 Objects
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Certificate Details
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[4]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.1400000Z
+  PROBE |   Event ID: 11
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[5]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.1400000Z
+  PROBE |   Event ID: 30
+  PROBE |   Task: Verify Chain Policy
+  PROBE |   Level: Error
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Path Validation
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[6]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.2720000Z
+  PROBE |   Event ID: 10
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-18
+  PROBE |   User Name: NT AUTHORITY\SYSTEM
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[7]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.2730000Z
+  PROBE |   Event ID: 90
+  PROBE |   Task: X509 Objects
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Certificate Details
+  PROBE |   User: S-1-5-18
+  PROBE |   User Name: NT AUTHORITY\SYSTEM
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[8]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.2730000Z
+  PROBE |   Event ID: 11
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-18
+  PROBE |   User Name: NT AUTHORITY\SYSTEM
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[9]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.3820000Z
+  PROBE |   Event ID: 80
+  PROBE |   Task: Verify Trust
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Trust Verification
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[10]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.3820000Z
+  PROBE |   Event ID: 10
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[11]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.3820000Z
+  PROBE |   Event ID: 19
+  PROBE |   Task: Retrieve Third-Party Root Certificate from Network
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Discovery,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[12]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.3820000Z
+  PROBE |   Event ID: 52
+  PROBE |   Task: Retrieve Object from Network
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Discovery,Revocation,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[13]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4180000Z
+  PROBE |   Event ID: 53
+  PROBE |   Task: Retrieve Object from Network
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Discovery,Revocation,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[14]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4180000Z
+  PROBE |   Event ID: 20
+  PROBE |   Task: Retrieve Third-Party Root Certificate from Network
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Discovery,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[15]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4300000Z
+  PROBE |   Event ID: 19
+  PROBE |   Task: Retrieve Third-Party Root Certificate from Network
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Discovery,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[16]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4300000Z
+  PROBE |   Event ID: 52
+  PROBE |   Task: Retrieve Object from Network
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Discovery,Revocation,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[17]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4300000Z
+  PROBE |   Event ID: 53
+  PROBE |   Task: Retrieve Object from Network
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Discovery,Revocation,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[18]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4300000Z
+  PROBE |   Event ID: 20
+  PROBE |   Task: Retrieve Third-Party Root Certificate from Network
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Discovery,Retrieval,Automatic Root Update
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[19]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4460000Z
+  PROBE |   Event ID: 11
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Error
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[20]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4460000Z
+  PROBE |   Event ID: 30
+  PROBE |   Task: Verify Chain Policy
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Path Validation
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[21]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4460000Z
+  PROBE |   Event ID: 90
+  PROBE |   Task: X509 Objects
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Certificate Details
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[22]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.4460000Z
+  PROBE |   Event ID: 81
+  PROBE |   Task: Verify Trust
+  PROBE |   Level: Information
+  PROBE |   Opcode: Stop
+  PROBE |   Keyword: Trust Verification
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[23]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.7930000Z
+  PROBE |   Event ID: 90
+  PROBE |   Task: X509 Objects
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Certificate Details
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[24]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.7940000Z
+  PROBE |   Event ID: 71
+  PROBE |   Task: Sign Certificate
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Private Key
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[25]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.7980000Z
+  PROBE |   Event ID: 10
+  PROBE |   Task: Build Chain
+  PROBE |   Level: Information
+  PROBE |   Opcode: Start
+  PROBE |   Keyword: Path Validation,Path Discovery
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE |   User Name: I7-WIN10\Administrator
+  PROBE |   Computer: I7-WIN10
+  PROBE |   Description: 
+  PROBE | For more details for this event, please refer to the "Details" section
+  PROBE | 
+  PROBE | Event[26]:
+  PROBE |   Log Name: Microsoft-Windows-CAPI2/Operational
+  PROBE |   Source: Microsoft-Windows-CAPI2
+  PROBE |   Date: 2026-09-30T12:02:11.7980000Z
+  PROBE |   Event ID: 90
+  PROBE |   Task: X509 Objects
+  PROBE |   Level: Information
+  PROBE |   Opcode: Info
+  PROBE |   Keyword: Certificate Details
+  PROBE |   User: S-1-5-21-1685583010-1511417694-1084610390-500
+  PROBE sh rc=0: wevtutil sl Microsoft-Windows-CAPI2/Operational /e:false
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #0 uptime=140015 exit=0x1 wall=12422 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #8 uptime=145921 exit=0x0 wall=3312 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #13 uptime=151968 exit=0x0 wall=4828 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #28 uptime=164078 exit=0x1 wall=7219 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE AB A baseline mode=dflt children=40 failed=2 slow(>1.5s)=4
+  PROBE sh rc=0: reg add HKLM\SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot /v DisableRootAutoUpdate /t REG_DWORD /d 1 /f
+  PROBE | The operation completed successfully.
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #32 uptime=181859 exit=0x0 wall=3266 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #33 uptime=185156 exit=0x0 wall=3297 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE AB B DisableRootAutoUpdate=1 mode=dflt children=40 failed=0 slow(>1.5s)=2
+  PROBE sh rc=0: reg delete HKLM\SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot /v DisableRootAutoUpdate /f
+  PROBE | The operation completed successfully.
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #2 uptime=199859 exit=0x1 wall=11609 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #8 uptime=204781 exit=0x0 wall=3281 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #9 uptime=211906 exit=0x1 wall=7125 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #11 uptime=215531 exit=0x0 wall=3281 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #16 uptime=223937 exit=0x1 wall=7297 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #30 uptime=236046 exit=0x1 wall=7140 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE AB C policy removed again mode=dflt children=40 failed=4 slow(>1.5s)=6
+OK   fh_probe_first_https_fresh_processes
+SUMMARY tests=1 failed=0 skipped=0 checks_pass=0 checks_fail=0
+@@I7 END probe_first_https exit=0x0 ms=119352 timeout=0 bytes=48627

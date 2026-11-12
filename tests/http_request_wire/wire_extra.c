@@ -46,15 +46,13 @@ GTEST(hrw_https_ignored_cert_not_reused, 20000) {
     srv *s = https_ok(); if (!s) { t_skip("https server unavailable: %s", srv_strerror(srv_last_error())); return; }
     HINTERNET hi = t_inet_open("tls/3");
     HINTERNET hc = U(InternetConnectA)(hi, "127.0.0.1", srv_port(s), NULL, NULL, INTERNET_SERVICE_HTTP, 0, 0);
-    /* A single loopback TLS handshake occasionally aborts with 12030 on the VM (C1: 2nd attempt, C3: 1st attempt), so
-     * a failed attempt is retried (bounded) and the property is checked on the requests that completed. */
     int okc = 0;
-    for (int i = 0; i < 5 && okc < 2; i++) {
+    for (int i = 0; i < 2; i++) {
         HINTERNET hr = U(HttpOpenRequestA)(hc, "GET", "/k", NULL, NULL, NULL, HRW_F | INTERNET_FLAG_SECURE, 0);
         CHECK(t_https_secflags(hr, SECURITY_FLAG_IGNORE_UNKNOWN_CA));
         BOOL ok = U(HttpSendRequestA)(hr, NULL, 0, NULL, 0);
         DWORD e = ok ? 0 : GetLastError();
-        if (!ok) t_note("TLS attempt %d: err=%lu %s conns=%d (retrying)", i, e, t_inet_errname(e), srv_conn_count(s));
+        if (!ok) t_note("TLS attempt %d: err=%lu %s conns=%d", i, e, t_inet_errname(e), srv_conn_count(s));
         char b[32]; if (ok) { okc++; t_inet_read_all(hr, b, sizeof b, NULL); }
         U(InternetCloseHandle)(hr);
     }
