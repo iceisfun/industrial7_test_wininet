@@ -82,7 +82,9 @@ static void bad_port(unsigned port) {
            rs_err(r.err), r.status, r.url, r.nbody, rs_cb_count(INTERNET_STATUS_REDIRECT), rs_cb_count(INTERNET_STATUS_CONNECTING_TO_SERVER), dt);
     CHECKF(r.ok, "err=%lu %s", r.err, rs_err(r.err));
     EXPECT_EQ(r.status, 302);
-    EXPECT_EQ(r.nbody, 0);
+    /* triage: the 8-byte 3xx body ("bad-port") is read back or not depending on whether it had already arrived (3 of 9 VM
+     * runs gave nbody 8, always 0 or 8); the redirect itself is not followed either way */
+    CHECKF(r.nbody == 0 || r.nbody == 8, "nbody=%zu", r.nbody);
     EXPECT_STR(r.url, srv_url(s, "/src"));
     EXPECT_EQ(rs_cb_count(INTERNET_STATUS_REDIRECT), 0);
     EXPECT_EQ(rs_cb_count(INTERNET_STATUS_CONNECTING_TO_SERVER), 1);

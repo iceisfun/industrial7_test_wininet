@@ -177,7 +177,7 @@ TEST(ac_sequential_requests_reuse_table) {
         /* [W10] send, then the reads add one 40/41 pair */
         const char *want = k == 0 ? "80,20,21,30,31,40,41,100,40,41" : "80,30,31,40,41,100,40,41";
         /* triage: the trailing read-side 40,41 pair is timing dependent (absent on some iterations, k=2,6 in one boot) */
-        char want2[64]; snprintf(want2, sizeof want2, "%s", want); { size_t l = strlen(want2); if (l > 4) want2[l - 4] = 0; }
+        char want2[64]; snprintf(want2, sizeof want2, "%s", want); { size_t l = strlen(want2); if (l > 6 && !strcmp(want2 + l - 6, ",40,41")) want2[l - 6] = 0; }
         const char *got = ac_seq_range(ctx, n0, -1, NULL);
         CHECKF(!strcmp(got, want) || !strcmp(got, want2), "k=%d seq %s want %s (or without trailing 40,41)", k, got, want);
         ac_close_wait(h, ctx);
@@ -361,7 +361,9 @@ TEST(ac_sync_closing_on_calling_thread) {
     CHECK(U(InternetCloseHandle)(f.hr));
     /* synchronous: delivered before InternetCloseHandle returns. The 5-byte body was never read, so the
      * connection is not reusable and is closed first (50, 51) [W10] */
-    EXPECT_STR(ac_seq_range(0, n0, -1, NULL), "50,51,70");
+    /* triage: whether the unread 5-byte body is already buffered (connection kept, so no 50,51) is timing dependent:
+     * seen "70" alone in 1 of 9 VM runs; both outcomes are accepted, the event must still be 70 and last */
+    { const char *sq = ac_seq_range(0, n0, -1, NULL); CHECKF(!strcmp(sq, "50,51,70") || !strcmp(sq, "70"), "seq %s want 50,51,70 (or 70)", sq); }
     EXPECT_EQ(ac_count_not_tid(0, ac_main_tid), 0);
     int i = ac_find(INTERNET_STATUS_HANDLE_CLOSING, CTX_REQ, n0); ac_ev ev;
     if (i >= 0 && ac_get(i, &ev)) EXPECT_EQ(ev.tid, ac_main_tid);

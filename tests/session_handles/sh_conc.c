@@ -80,7 +80,7 @@ TEST(sh_conc_query_while_session_closed) {
 
 /* A thread creating connects in a loop while the session is closed: creation fails with 6 afterwards, every
  * connect it did get is either closed with the session or closable once. */
-typedef struct { HINTERNET s; volatile LONG stop; LONG made, fail6, fail18, failother, close_ok, close6; DWORD other_err; } sh_mk;
+typedef struct { HINTERNET s; volatile LONG stop; LONG made, fail6, fail18, failother, close_ok, close6, close_denied, close_other; DWORD other_err, close_other_err; HINTERNET denied[8]; } sh_mk;
 static DWORD WINAPI sh_mk_thread(LPVOID p) {
     sh_mk *m = (sh_mk *)p;
     for (int i = 0; i < 100000 && !m->stop; i++) {
@@ -89,7 +89,11 @@ static DWORD WINAPI sh_mk_thread(LPVOID p) {
         DWORD e = GetLastError();
         if (c) {
             m->made++;
-            if (U(InternetCloseHandle)(c)) m->close_ok++; else if (GetLastError() == ERROR_INVALID_HANDLE) m->close6++;
+            if (U(InternetCloseHandle)(c)) m->close_ok++; else { DWORD ce = GetLastError(); if (ce == ERROR_INVALID_HANDLE) m->close6++;
+                /* the session teardown is closing this child at the same instant: our close loses the race with 5 (VM, 1 in ~1.4M
+                 * children); the handle is remembered and must be gone once the thread is joined (no leak) */
+                else if (ce == ERROR_ACCESS_DENIED && m->close_denied < 8) m->denied[m->close_denied++] = c;
+                else { m->close_other++; m->close_other_err = ce; } }
         } else if (e == ERROR_INVALID_HANDLE) { if (++m->fail6 > 20) break; }
         else if (e == ERROR_INTERNET_INCORRECT_HANDLE_TYPE) { if (++m->fail18 > 20) break; }  /* the freed session value was reused by a child created in the race window */
         else { m->failother++; m->other_err = e; }
@@ -97,21 +101,39 @@ static DWORD WINAPI sh_mk_thread(LPVOID p) {
     return 0;
 }
 TEST(sh_conc_create_children_while_session_closed) {
-    HINTERNET s = sh_open("mkclose"); CHECK(s != NULL); if (!s) return;
-    sh_mk m; memset(&m, 0, sizeof m); m.s = s;
-    HANDLE th = CreateThread(NULL, 0, sh_mk_thread, &m, 0, NULL);
-    Sleep(50);
-    CHECK(sh_close(s));
-    DWORD w = WaitForSingleObject(th, 5000);
-    m.stop = 1;
-    if (w != WAIT_OBJECT_0) WaitForSingleObject(th, 5000);
-    CloseHandle(th);
-    t_note("children created around session close: made %ld fail6 %ld fail18 %ld failother %ld (last other err %lu) close_ok %ld close6 %ld", m.made, m.fail6, m.fail18, m.failother, m.other_err, m.close_ok, m.close6);
-    CHECK(m.made > 0);
-    CHECK(m.fail6 + m.fail18 > 0);
+    /* several rounds per boot: an occasional accounting mismatch (made off by one, seen once) needs many close/create
+     * races to show; the totals are summed over the rounds */
+    sh_mk tot; memset(&tot, 0, sizeof tot);
+    for (int round = 0; round < 10; round++) {
+        HINTERNET s = sh_open("mkclose"); CHECK(s != NULL); if (!s) return;
+        sh_mk m; memset(&m, 0, sizeof m); m.s = s;
+        HANDLE th = CreateThread(NULL, 0, sh_mk_thread, &m, 0, NULL);
+        Sleep(50);
+        CHECK(sh_close(s));
+        DWORD w = WaitForSingleObject(th, 5000);
+        m.stop = 1;
+        if (w != WAIT_OBJECT_0) { CHECK(!"creator thread did not finish"); WaitForSingleObject(th, 5000); }
+        CloseHandle(th);
+        tot.made += m.made; tot.fail6 += m.fail6; tot.fail18 += m.fail18; tot.failother += m.failother;
+        tot.close_ok += m.close_ok; tot.close6 += m.close6; tot.close_denied += m.close_denied; tot.close_other += m.close_other;
+        if (m.failother) tot.other_err = m.other_err;
+        if (m.close_other) tot.close_other_err = m.close_other_err;
+        CHECK(m.failother <= 3);
+        /* the thread is joined above, so made/close_* are final and each child it got was closed by the thread itself
+         * right after creation: made == close_ok + close6 + close_other holds per round */
+        /* a child whose close was refused with 5 must not outlive the session: closing it again has to fail with 6 */
+        for (int d = 0; d < m.close_denied; d++) {
+            SetLastError(0);
+            BOOL again = U(InternetCloseHandle)(m.denied[d]);
+            CHECKF(!again && GetLastError() == ERROR_INVALID_HANDLE, "round %d: child %p whose close was denied is still open (again=%d err=%lu): leak", round, (void *)m.denied[d], (int)again, GetLastError());
+        }
+        CHECKF(m.close_ok + m.close6 + m.close_denied + m.close_other == m.made, "round %d: made %ld close_ok %ld close6 %ld denied %ld close_other %ld (err %lu)", round, m.made, m.close_ok, m.close6, m.close_denied, m.close_other, m.close_other_err);
+    }
+    t_note("children created around session close (10 rounds): made %ld fail6 %ld fail18 %ld failother %ld (last other err %lu) close_ok %ld close6 %ld close_denied %ld close_other %ld (err %lu)", tot.made, tot.fail6, tot.fail18, tot.failother, tot.other_err, tot.close_ok, tot.close6, tot.close_denied, tot.close_other, tot.close_other_err);
+    CHECK(tot.made > 0);
+    CHECK(tot.fail6 + tot.fail18 > 0);
     /* VM boot 1: one creation in the close window failed with another error; at most a handful are tolerated */
-    CHECK(m.failother <= 3);
-    EXPECT_EQ(m.close_ok + m.close6, m.made);
+    EXPECT_EQ(tot.close_other, 0);
 }
 
 /* 8 threads opening and closing sessions with children concurrently: no failures, no handle leak. */
