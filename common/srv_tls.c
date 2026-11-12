@@ -162,14 +162,30 @@ static int send_all(srv_conn *c, const void *p, size_t n) {
 
 #define ASC_FLAGS (ASC_REQ_SEQUENCE_DETECT | ASC_REQ_REPLAY_DETECT | ASC_REQ_CONFIDENTIALITY | ASC_REQ_EXTENDED_ERROR | ASC_REQ_ALLOCATE_MEMORY | ASC_REQ_STREAM)
 
+/* The client may legitimately pause for many seconds between its flights: wininet validates the server certificate
+ * (WinVerifyTrust -> crypt32 chain build -> cryptnet "Automatic Root Update" fetch of ctldl.windowsupdate.com) after
+ * the ServerHello, and on a guest without network/DNS that waits 7-13 s for the DNS failure (flake12030, EVIDENCE.md).
+ * A 5 s io timeout turned that into a server-side TLS_ABORT and a client 12030. The handshake therefore gets its own,
+ * longer timeout; srv_stop / the lifetime still end it (kill_conns shuts the socket down). */
+#define SRV_HANDSHAKE_TIMEOUT_MS 30000
 int srv_tls_accept(srv_conn *c) {
     srv *s = c->s; SECURITY_STATUS st = SEC_I_CONTINUE_NEEDED; ULONG attr; TimeStamp ts;
+    if (s->cfg.io_timeout_ms < SRV_HANDSHAKE_TIMEOUT_MS) srv_set_timeouts(c->sock, SRV_HANDSHAKE_TIMEOUT_MS);
     ULONG req = ASC_FLAGS | (s->cfg.tls_client_cert ? ASC_REQ_MUTUAL_AUTH : 0);
     for (int rounds = 0; st == SEC_I_CONTINUE_NEEDED || st == SEC_E_INCOMPLETE_MESSAGE; rounds++) {
         if (rounds > 24) { srv_recordf(s, SRV_EV_TLS_ABORT, c->id, "too many rounds"); return -1; }
         if (c->nraw == 0 || st == SEC_E_INCOMPLETE_MESSAGE) {
             int r = raw_more(c);
             if (r <= 0) { srv_recordf(s, SRV_EV_TLS_ABORT, c->id, "handshake recv=%d round=%d", r, rounds); return -1; }
+            if (rounds == 0) {
+                srv_recordf(s, SRV_EV_HS_BYTES, c->id, "%d", r);
+                /* not a TLS handshake record (0x16) or an SSLv2 hello (0x80): plaintext HTTP etc. schannel would call
+                 * the partial record "incomplete" and wait; give up at once instead of sitting out the timeout */
+                if ((unsigned char)c->raw[0] != 0x16 && (unsigned char)c->raw[0] != 0x80) {
+                    srv_recordf(s, SRV_EV_TLS_ABORT, c->id, "not a TLS record (first byte 0x%02x)", (unsigned char)c->raw[0]);
+                    return -1;
+                }
+            }
         }
         SecBuffer ib[2] = { { (ULONG)c->nraw, SECBUFFER_TOKEN, c->raw }, { 0, SECBUFFER_EMPTY, NULL } };
         SecBufferDesc id = { SECBUFFER_VERSION, 2, ib };
@@ -187,6 +203,7 @@ int srv_tls_accept(srv_conn *c) {
         if (FAILED(st)) { srv_recordf(s, SRV_EV_TLS_ABORT, c->id, "ASC=0x%lx round=%d", st, rounds); return -1; }
     }
     if (st != SEC_E_OK) { srv_recordf(s, SRV_EV_TLS_ABORT, c->id, "handshake end 0x%lx", st); return -1; }
+    if (s->cfg.io_timeout_ms < SRV_HANDSHAKE_TIMEOUT_MS) srv_set_timeouts(c->sock, s->cfg.io_timeout_ms);
     SSP->QueryContextAttributesW(&c->ctx, SECPKG_ATTR_STREAM_SIZES, &c->sz);
     SecPkgContext_ConnectionInfo ci; memset(&ci, 0, sizeof ci);
     SSP->QueryContextAttributesW(&c->ctx, SECPKG_ATTR_CONNECTION_INFO, &ci);

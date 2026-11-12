@@ -171,7 +171,7 @@ TEST(tls_retry_wrong_usage_chain) {
     DWORD seq[4]; DWORD add[3] = { 0x100, 0x1000, 0x200 };
     seq[0] = treq_send(&t);
     for (int i = 0; i < 3; i++) { t_https_secflags(t.hr, add[i]); seq[i + 1] = treq_send(&t); }
-    if (seq[3] == ERROR_INTERNET_CONNECTION_ABORTED || seq[3] == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", seq[3]); seq[3] = treq_send(&t); }
+    if (seq[3] == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", seq[3]); seq[3] = treq_send(&t); }
     t_note("wrong-usage chain: %lu -> +0x100 %lu -> +0x1000 %lu -> +0x200 %lu", seq[0], seq[1], seq[2], seq[3]);
     EXPECT_EQ(seq[0], E_CA); EXPECT_EQ(seq[1], E_INV); EXPECT_EQ(seq[2], E_INV); EXPECT_EQ(seq[3], 0);
     EXPECT_EQ(tls_secflags(t.hr), 0x20001301);
@@ -192,7 +192,7 @@ TEST(tls_retry_wide_send) {
     SET_ERR(0);
     BOOL ok = U(HttpSendRequestW)(hr, NULL, 0, NULL, 0);
     DWORD e = ok ? 0 : GetLastError();
-    if (e == ERROR_INTERNET_CONNECTION_ABORTED || e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", e); ok = U(HttpSendRequestW)(hr, NULL, 0, NULL, 0); e = ok ? 0 : GetLastError(); }
+    if (e == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", e); ok = U(HttpSendRequestW)(hr, NULL, 0, NULL, 0); e = ok ? 0 : GetLastError(); }
     CHECKF(ok, "err=%lu", e);
     U(InternetCloseHandle)(hr); U(InternetCloseHandle)(hc); t_inet_close(hi); srv_stop(s);
 }
@@ -238,7 +238,7 @@ TEST(tls_pooled_connection_flags_per_request) {
     SET_ERR(0);
     BOOL ok2 = U(HttpSendRequestA)(h2, NULL, 0, NULL, 0);
     DWORD e2 = ok2 ? 0 : GetLastError();
-    if (e2 == ERROR_INTERNET_CONNECTION_ABORTED || e2 == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", e2); ok2 = U(HttpSendRequestA)(h2, NULL, 0, NULL, 0); e2 = ok2 ? 0 : GetLastError(); }
+    if (e2 == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu, retrying once", e2); ok2 = U(HttpSendRequestA)(h2, NULL, 0, NULL, 0); e2 = ok2 ? 0 : GetLastError(); }
     CHECKF(ok2, "err=%lu", e2);
     t_inet_read_all(h2, b, sizeof b, NULL);
     CHECK(srv_wait_requests(s, 2, 2000));

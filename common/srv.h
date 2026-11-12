@@ -171,6 +171,7 @@ typedef enum {
     SRV_EV_TLS_DONE,     /* data: "proto=0x.. cipher=0x.. suite=0x.. client_cert=0|1" */
     SRV_EV_TLS_ABORT,    /* client gave up during the handshake (normal for cert errors, see 04 F11); data: reason */
     SRV_EV_SCRIPT_DONE, SRV_EV_MISMATCH, SRV_EV_FTP_CMD, SRV_EV_FTP_DATA, SRV_EV_AUTH, SRV_EV_SENT, SRV_EV_CLOSED,
+    SRV_EV_HS_BYTES,     /* first bytes of a TLS handshake read from the client (flake12030 probe); data: byte count */
     SRV_EV_ANY = 0
 } srv_ev_kind;
 typedef struct {

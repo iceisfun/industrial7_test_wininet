@@ -251,7 +251,9 @@ static int mts_send_all(SOCKET s, const void *p, size_t n) {
 static DWORD WINAPI mts_conn_thread(LPVOID p) {
     mts_arg *a = p; mts *m = a->m; int id = a->id; free(a);
     mts_conn *r = &m->rec[id]; SOCKET s = m->csock[id];
-    DWORD to = 5000;
+    /* handshake: 30 s, not 5 s - the client pauses in its chain build / Automatic Root Update DNS lookup (7-13 s on a
+     * guest without network) between the ServerHello and its next flight (flake12030; same as common/srv_tls.c) */
+    DWORD to = 30000;
     SWS.setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char *)&to, sizeof to);
     SWS.setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, (char *)&to, sizeof to);
     size_t cap = 65536, nraw = 0; char *raw = malloc(cap);
@@ -279,6 +281,9 @@ static DWORD WINAPI mts_conn_thread(LPVOID p) {
     }
     r->asc = (long)st;
     if (st == SEC_E_OK) {
+        to = 5000;
+        SWS.setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char *)&to, sizeof to);
+        SWS.setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, (char *)&to, sizeof to);
         r->done = 1;
         SecPkgContext_ConnectionInfo ci; memset(&ci, 0, sizeof ci);
         if (SSP->QueryContextAttributesW(&ctx, SECPKG_ATTR_CONNECTION_INFO, &ci) == SEC_E_OK) r->proto = ci.dwProtocol;
@@ -428,7 +433,7 @@ DWORD pki_get(const char *host, unsigned short port, DWORD secflags, DWORD openf
     }
     if (secflags) t_https_secflags(t.hr, secflags);
     err = treq_send(&t);
-    if (err == ERROR_INTERNET_CONNECTION_ABORTED || err == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", err); err = treq_send(&t); }
+    if (err == ERROR_INTERNET_CONNECTION_RESET) { t_note("transient %lu on send, retrying once", err); err = treq_send(&t); }
     if (!err && status) *status = treq_status(&t);
     if (keep) *keep = t; else { if (!err) { char b[64]; treq_body(&t, b, sizeof b); } treq_close(&t); }
     return err;

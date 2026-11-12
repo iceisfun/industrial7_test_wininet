@@ -1,0 +1,538 @@
+RUN  fh_probe_first_https_fresh_processes
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE uptime_ms=117984
+  PROBE sh rc=0: wevtutil sl Microsoft-Windows-CAPI2/Operational /e:true
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #0 uptime=119578 exit=0x0 child_wall=766 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 235 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       359 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE       140 ms server: conn=0 ACCEPT 
+  PROBE       140 ms server: conn=0 HS_BYTES 158
+  PROBE       343 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       343 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49670
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       343 ms server: conn=0 BODY 
+  PROBE       343 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       359 ms server: conn=0 EOF 
+  PROBE       359 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #1 uptime=120125 exit=0x0 child_wall=547 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49674
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #2 uptime=120640 exit=0x0 child_wall=515 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49676
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #3 uptime=121140 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49678
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #4 uptime=121640 exit=0x0 child_wall=469 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49681
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #5 uptime=122218 exit=0x0 child_wall=578 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 250 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49683
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #6 uptime=122812 exit=0x0 child_wall=594 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 250 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49685
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       171 ms server: conn=0 EOF 
+  PROBE       171 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #7 uptime=123312 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 172 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49687
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #8 uptime=135750 exit=0x0 child_wall=12422 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 109 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE    SLOW request 828 ms
+  PROBE    SAMPLE 800ms tid=7356(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7352 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7440 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7432 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7508 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7512 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7504 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=7496 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=7492 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7488 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7480 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7476 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=860 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b2  PROBE 38 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=7356(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7352 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7440 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7432 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7508 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7512 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7504 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=7496 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=7492 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7488 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7480 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7476 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=860 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE     12219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE     12187 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE     12187 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49689
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE     12187 ms server: conn=0 BODY 
+  PROBE     12187 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE     12219 ms server: conn=0 EOF 
+  PROBE     12219 ms server: conn=0 EOF 
+  PROBE     12219 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #9 uptime=136484 exit=0x0 child_wall=719 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 219 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49691
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #10 uptime=137031 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49693
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #11 uptime=137468 exit=0x0 child_wall=422 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        15 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        15 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        15 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        31 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE        93 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE        93 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49695
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE        93 ms server: conn=0 BODY 
+  PROBE        93 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  PROBE sh rc=0: wevtutil qe Microsoft-Windows-CAPI2/Operational /f:xml /c:600 /rd:false
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:07.5015239Z'/><EventRecordID>13</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-201e-241e8026cce5}'/><Execution ProcessID='7712' ThreadID='7768'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{6762517B-3E9E-426D-9962-376DE880FE9F}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:07.5394816Z'/><EventRecordID>14</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-201e-241e8026cce5}'/><Execution ProcessID='7712' ThreadID='7768'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:07.440Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Acti
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:07.5503089Z'/><EventRecordID>17</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-201e-241e8026cce5}'/><Execution ProcessID='7712' ThreadID='7768'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{6762517B-3E9E-426D-9962-376DE880FE9F}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:07.5505028Z'/><EventRecordID>18</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-201e-241e8026cce5}'/><Execution ProcessID='7712' ThreadID='7768'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:07.440Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></A
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.1205819Z'/><EventRecordID>36</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-8c1e-901ec094b2f3}'/><Execution ProcessID='7820' ThreadID='7876'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{597625B0-BF6E-45BB-B2D3-34BAA0A0E4E0}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.1218068Z'/><EventRecordID>37</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-8c1e-901ec094b2f3}'/><Execution ProcessID='7820' ThreadID='7876'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:08.080Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Acti
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.1342713Z'/><EventRecordID>40</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-8c1e-901ec094b2f3}'/><Execution ProcessID='7820' ThreadID='7876'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{597625B0-BF6E-45BB-B2D3-34BAA0A0E4E0}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.1343711Z'/><EventRecordID>41</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-8c1e-901ec094b2f3}'/><Execution ProcessID='7820' ThreadID='7876'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:08.080Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></A
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.6198360Z'/><EventRecordID>59</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-0c1f-101f905eb83a}'/><Execution ProcessID='7948' ThreadID='8024'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{DC9A403B-1562-4352-8595-3B2CAF7ABC8E}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.6212403Z'/><EventRecordID>60</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-0c1f-101f905eb83a}'/><Execution ProcessID='7948' ThreadID='8024'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:08.580Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Acti
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.6294753Z'/><EventRecordID>63</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-0c1f-101f905eb83a}'/><Execution ProcessID='7948' ThreadID='8024'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{DC9A403B-1562-4352-8595-3B2CAF7ABC8E}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:08.6296373Z'/><EventRecordID>64</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-0c1f-101f905eb83a}'/><Execution ProcessID='7948' ThreadID='8024'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:08.580Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></A
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.1243784Z'/><EventRecordID>82</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-7c1f-801f50bd9ce8}'/><Execution ProcessID='8060' ThreadID='8112'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{70EC526C-66DE-44C7-B4AD-8913DA40B209}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.1258758Z'/><EventRecordID>83</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-7c1f-801f50bd9ce8}'/><Execution ProcessID='8060' ThreadID='8112'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:09.096Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Acti
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.1357444Z'/><EventRecordID>86</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-7c1f-801f50bd9ce8}'/><Execution ProcessID='8060' ThreadID='8112'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{70EC526C-66DE-44C7-B4AD-8913DA40B209}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.1358711Z'/><EventRecordID>87</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-7c1f-801f50bd9ce8}'/><Execution ProcessID='8060' ThreadID='8112'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:09.096Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></A
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.6276548Z'/><EventRecordID>105</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c81f-cc1f8070f470}'/><Execution ProcessID='8136' ThreadID='8172'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{9C26A79D-0B77-4264-8A48-DD4AA35A121D}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.6293505Z'/><EventRecordID>106</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c81f-cc1f8070f470}'/><Execution ProcessID='8136' ThreadID='8172'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:09.596Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Act
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.6394955Z'/><EventRecordID>109</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c81f-cc1f8070f470}'/><Execution ProcessID='8136' ThreadID='8172'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{9C26A79D-0B77-4264-8A48-DD4AA35A121D}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:09.6395978Z'/><EventRecordID>110</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c81f-cc1f8070f470}'/><Execution ProcessID='8136' ThreadID='8172'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:09.596Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.2196015Z'/><EventRecordID>128</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-2c1a-2401d059f43a}'/><Execution ProcessID='6700' ThreadID='288'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{5D07293E-4499-45ED-A4C7-821ED3E4907E}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.2207794Z'/><EventRecordID>129</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-2c1a-2401d059f43a}'/><Execution ProcessID='6700' ThreadID='288'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:10.190Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Acti
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.2327624Z'/><EventRecordID>132</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-2c1a-2401d059f43a}'/><Execution ProcessID='6700' ThreadID='288'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{5D07293E-4499-45ED-A4C7-821ED3E4907E}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.2328903Z'/><EventRecordID>133</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-2c1a-2401d059f43a}'/><Execution ProcessID='6700' ThreadID='288'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:10.190Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></A
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.7919026Z'/><EventRecordID>151</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-801c-841ca051fdbc}'/><Execution ProcessID='7296' ThreadID='7344'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{E2517B61-1EDA-44ED-A302-3BC501A9DD89}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.7932638Z'/><EventRecordID>152</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-801c-841ca051fdbc}'/><Execution ProcessID='7296' ThreadID='7344'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:10.752Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Act
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.8019190Z'/><EventRecordID>155</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-801c-841ca051fdbc}'/><Execution ProcessID='7296' ThreadID='7344'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{E2517B61-1EDA-44ED-A302-3BC501A9DD89}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:10.8020700Z'/><EventRecordID>156</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-801c-841ca051fdbc}'/><Execution ProcessID='7296' ThreadID='7344'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:10.752Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:11.3024113Z'/><EventRecordID>174</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-281c-2c1c90759fad}'/><Execution ProcessID='7208' ThreadID='7216'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{5C3535F8-22F0-49E1-B69B-C7AF57A6633E}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:11.3036499Z'/><EventRecordID>175</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-281c-2c1c90759fad}'/><Execution ProcessID='7208' ThreadID='7216'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:11.268Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Act
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:11.3109233Z'/><EventRecordID>178</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-281c-2c1c90759fad}'/><Execution ProcessID='7208' ThreadID='7216'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{5C3535F8-22F0-49E1-B69B-C7AF57A6633E}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:11.3110390Z'/><EventRecordID>179</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-281c-2c1c90759fad}'/><Execution ProcessID='7208' ThreadID='7216'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:11.268Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:23.8249309Z'/><EventRecordID>261</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c01c-bc1cd07af734}'/><Execution ProcessID='7360' ThreadID='7504'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{23602923-E412-4A09-AAF4-4D7C0F77563E}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:23.8269614Z'/><EventRecordID>262</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c01c-bc1cd07af734}'/><Execution ProcessID='7360' ThreadID='7504'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:11.721Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Act
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:23.8390425Z'/><EventRecordID>265</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c01c-bc1cd07af734}'/><Execution ProcessID='7360' ThreadID='7504'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{23602923-E412-4A09-AAF4-4D7C0F77563E}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:23.8391832Z'/><EventRecordID>266</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-c01c-bc1cd07af734}'/><Execution ProcessID='7360' ThreadID='7504'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:11.721Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:24.4690610Z'/><EventRecordID>284</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-841c-801cd05d5c6a}'/><Execution ProcessID='7300' ThreadID='6460'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{F533D6B6-A772-4C69-9858-3DEA0B124499}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:24.4703359Z'/><EventRecordID>285</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-841c-801cd05d5c6a}'/><Execution ProcessID='7300' ThreadID='6460'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:24.440Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Act
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:24.4782082Z'/><EventRecordID>288</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-841c-801cd05d5c6a}'/><Execution ProcessID='7300' ThreadID='6460'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{F533D6B6-A772-4C69-9858-3DEA0B124499}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:24.4783980Z'/><EventRecordID>289</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-841c-801cd05d5c6a}'/><Execution ProcessID='7300' ThreadID='6460'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:24.440Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:25.0158793Z'/><EventRecordID>307</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-d019-881c30cd6dfd}'/><Execution ProcessID='6608' ThreadID='7208'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{A8F7FD00-47D5-408E-B519-849DC0421175}' SeqNumber='4'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:25.0174489Z'/><EventRecordID>308</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-d019-881c30cd6dfd}'/><Execution ProcessID='6608' ThreadID='7208'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/disallowedcertstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-30T15:02:24.971Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Act
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>52</EventID><Version>0</Version><Level>4</Level><Task>53</Task><Opcode>1</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:25.0269056Z'/><EventRecordID>311</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-d019-881c30cd6dfd}'/><Execution ProcessID='6608' ThreadID='7208'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWireStart><EventAuxInfo ProcessName='PROBE_FIRST_HTTPS.EXE'/><CorrelationAuxInfo TaskId='{A8F7FD00-47D5-408E-B519-849DC0421175}' SeqNumber='8'/></CryptRetrieveObjectByUrlWireStart></UserData></Event>
+  PROBE | <Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-CAPI2' Guid='{5bbca4a8-b209-48dc-a8c7-b23d3e5216fb}'/><EventID>53</EventID><Version>0</Version><Level>2</Level><Task>53</Task><Opcode>2</Opcode><Keywords>0x4000000000000036</Keywords><TimeCreated SystemTime='2026-09-30T19:02:25.0271026Z'/><EventRecordID>312</EventRecordID><Correlation ActivityID='{00cc000c-0006-0000-d019-881c30cd6dfd}'/><Execution ProcessID='6608' ThreadID='7208'/><Channel>Microsoft-Windows-CAPI2/Operational</Channel><Computer>I7-WIN10</Computer><Security UserID='S-1-5-21-1685583010-1511417694-1084610390-500'/></System><UserData><CryptRetrieveObjectByUrlWire><URL scheme='http'>http://ctldl.windowsupdate.com/msdownload/update/v3/static/trustedr/en/authrootstl.cab</URL><Object type='Blob' constant='0'/><Timeout>PT15S</Timeout><Flags value='C205004' CRYPT_WIRE_ONLY_RETRIEVAL='true' CRYPT_STICKY_CACHE_RETRIEVAL='true' CRYPT_OFFLINE_CHECK_RETRIEVAL='true' CRYPT_PROXY_CACHE_RETRIEVAL='true' CRYPT_RANDOM_QUERY_STRING_RETRIEVAL='true' CRYPT_ENABLE_FILE_RETRIEVAL='true'/><AuxInfo cacheResyncTime='2026-09-29T19:02:24.971Z' fProxyCacheRetrieval='true'/><AdditionalInfo><NetworkConnectivityStatus value='1' _SENSAPI_NETWORK_ALIVE_LAN='true'/><Action name='Call_WinHttpSendRequest'><Error value='2EE7'>The server name or address could not be resolved</Error></Action></
+  PROBE sh rc=0: wevtutil sl Microsoft-Windows-CAPI2/Operational /e:false
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #14 uptime=156109 exit=0x0 wall=12453 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #23 uptime=162406 exit=0x0 wall=3313 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #34 uptime=168203 exit=0x0 wall=1985 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #36 uptime=172109 exit=0x0 wall=3469 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE A baseline dflt #39 uptime=180234 exit=0x0 wall=7453 ms
+  PROBE AB A baseline mode=dflt children=40 failed=0 slow(>1.5s)=5
+  PROBE sh rc=0: reg add HKLM\SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot /v DisableRootAutoUpdate /t REG_DWORD /d 1 /f
+  PROBE | The operation completed successfully.
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #13 uptime=188468 exit=0x0 wall=3406 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #17 uptime=192828 exit=0x0 wall=3282 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #18 uptime=196125 exit=0x0 wall=3297 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #31 uptime=203515 exit=0x0 wall=3234 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE B DisableRootAutoUpdate=1 dflt #36 uptime=208312 exit=0x0 wall=3266 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE AB B DisableRootAutoUpdate=1 mode=dflt children=40 failed=0 slow(>1.5s)=5
+  PROBE sh rc=0: reg delete HKLM\SOFTWARE\Policies\Microsoft\SystemCertificates\AuthRoot /v DisableRootAutoUpdate /f
+  PROBE | The operation completed successfully.
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #0 uptime=221859 exit=0x0 wall=12391 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #9 uptime=227703 exit=0x0 wall=3266 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #11 uptime=231421 exit=0x0 wall=3390 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #14 uptime=240156 exit=0x0 wall=7906 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE C policy removed again dflt #34 uptime=252156 exit=0x0 wall=3406 ms
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE AB C policy removed again mode=dflt children=40 failed=0 slow(>1.5s)=5
+OK   fh_probe_first_https_fresh_processes
+SUMMARY tests=1 failed=0 skipped=0 checks_pass=0 checks_fail=0
+@@I7 END probe_first_https exit=0x0 ms=136502 timeout=0 bytes=89509

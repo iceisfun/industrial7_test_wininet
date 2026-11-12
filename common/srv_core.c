@@ -181,7 +181,7 @@ int srv_events(srv *s, const srv_event **ev) {
 }
 const char *srv_event_kind_name(srv_ev_kind k) {
     static const char *n[] = { "ANY", "ACCEPT", "HEAD", "BODY", "BYTES", "EOF", "RESET", "TIMEOUT", "ERROR", "TLS_DONE",
-                               "TLS_ABORT", "SCRIPT_DONE", "MISMATCH", "FTP_CMD", "FTP_DATA", "AUTH", "SENT", "CLOSED" };
+                               "TLS_ABORT", "SCRIPT_DONE", "MISMATCH", "FTP_CMD", "FTP_DATA", "AUTH", "SENT", "CLOSED", "HS_BYTES" };
     return (unsigned)k < sizeof n / sizeof n[0] ? n[k] : "?";
 }
 int srv_conn_count(srv *s) { int n; if (!s) return 0; EnterCriticalSection(&s->cs); n = s->nconn; LeaveCriticalSection(&s->cs); return n; }

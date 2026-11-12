@@ -1,0 +1,2171 @@
+RUN  fh_probe_first_https_fresh_processes
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=0 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE uptime_ms=89656
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #0 uptime=102390 exit=0x1 child_wall=12719 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 250 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE    SLOW request 813 ms
+  PROBE    SAMPLE 800ms tid=7364(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7368 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7372 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7396 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7408 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7416 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7420 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7424 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7432 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=7436 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=7460 rip=ntdll.dll+0x9d0e4 mswsock.dll+0x80fc mswsock.dll+0xc8cb ntdll.dll+0x25ba1 ws2_32.dll+0xefad probe_first_https.exe+0x28060 ws2_32.dll+0x11e51 ntdll.dll+0x247b1 probe_first_https.exe+0x28060 probe_first_https.exe+0x731b probe_first_https.exe+0xa06c sspicli.dll+0x4924 probe_first_https.exe+0xa537 ntdll.dll+0x1791d ntdll.dll+0x1793d ntdll.dll+0x750ad ntdll.dll+0x74c28 ntdll.dll+0x2b44d probe_first_https.exe+0x2f28 msvcrt.dll+0x19d40 msvcrt.dll+0x19dd2 probe_first_https.exe+0x2ee1 p  PROBE robe_first_https.exe+0x301a KERNEL32.DLL+0x17614 ntdll.dll+0x526a1
+  PROBE    SAMPLE 800ms tid=7492 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=7496 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7364(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7368 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7372 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7396 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7408 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7416 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7420 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7424 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7432 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=7436 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=7460 rip=ntdll.dll+0x9d0e4 mswsock.dll+0x80fc mswsock.dll+0xc8cb ntdll.dll+0x25ba1 ws2_32.dll+0xefad probe_first_https.exe+0x28060 ws2_32.dll+0x11e51 ntdll.dll+0x247b1 probe_first_https.exe+0x28060 probe_first_https.exe+0x731b probe_first_https.exe+0xa06c sspicli.dll+0x4924 probe_first_https.exe+0xa537 ntdll.dll+0x1791d ntdll.dll+0x1793d ntdll.dll+0x750ad ntdll.dll+0x74c28 ntdll.dll+0x2b44d probe_first_https.exe+0x2f28 msvcrt.dll+0x19d40 msvcrt.dll+0x19dd2 probe_first_https.exe+0x2ee1   PROBE probe_first_https.exe+0x301a KERNEL32.DLL+0x17614 ntdll.dll+0x526a1
+  PROBE    SAMPLE 2500ms tid=7492 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=7496 rip=ntdll.dll+0xa0ad4
+  PROBE     12391 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE       156 ms server: conn=0 ACCEPT 
+  PROBE       156 ms server: conn=0 HS_BYTES 158
+  PROBE      5172 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5172 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5375 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #0 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #1 uptime=102875 exit=0x0 child_wall=485 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       188 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       188 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49675
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       188 ms server: conn=0 BODY 
+  PROBE       188 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #2 uptime=103406 exit=0x0 child_wall=531 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49677
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #3 uptime=103890 exit=0x0 child_wall=484 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 140 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49679
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #0 uptime=104468 exit=0x0 child_wall=578 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49681
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #1 uptime=104937 exit=0x0 child_wall=469 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 109 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49683
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #2 uptime=105500 exit=0x0 child_wall=547 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49685
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #3 uptime=106187 exit=0x0 child_wall=687 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 266 ms
+  PROBE        78 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        78 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        78 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        78 ms client: HttpSendRequest begin
+  PROBE       234 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE       125 ms server: conn=0 ACCEPT 
+  PROBE       125 ms server: conn=0 HS_BYTES 158
+  PROBE       188 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       188 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49687
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       188 ms server: conn=0 BODY 
+  PROBE       188 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       234 ms server: conn=0 EOF 
+  PROBE       234 ms server: conn=0 EOF 
+  PROBE       234 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #4 uptime=106734 exit=0x0 child_wall=547 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 187 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49689
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #5 uptime=107296 exit=0x0 child_wall=562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49691
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #6 uptime=107875 exit=0x0 child_wall=579 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 187 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49693
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #7 uptime=108390 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 172 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49695
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #8 uptime=108968 exit=0x0 child_wall=562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 218 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49697
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #9 uptime=109437 exit=0x0 child_wall=469 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 140 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49699
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #10 uptime=112890 exit=0x0 child_wall=3453 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       234 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       171 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       171 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49701
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       171 ms server: conn=0 BODY 
+  PROBE       171 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #11 uptime=119765 exit=0x1 child_wall=6844 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 172 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE    SLOW request 813 ms
+  PROBE    SAMPLE 800ms tid=6680(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7684 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7700 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7640 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2272 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7688 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1704 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=5368 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=7160 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5884 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5796 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5880 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=5972 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=5968 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6680(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7684 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7700 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7640 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2272 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7688 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1704 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=5368 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=7160 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5884 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5796 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5880 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=5972 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=5968 rip=ntdll.dll+0xa0ad4
+  PROBE      6594 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE      5078 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5078 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5281 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #11 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #12 uptime=123390 exit=0x0 child_wall=3609 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49705
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #13 uptime=123921 exit=0x0 child_wall=531 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49707
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #14 uptime=124453 exit=0x0 child_wall=532 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49709
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #15 uptime=131921 exit=0x1 child_wall=7468 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        15 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        15 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        15 ms client: HttpSendRequest begin
+  PROBE    SLOW request 828 ms
+  PROBE    SAMPLE 800ms tid=6424(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6416 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6420 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5908 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5676 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5260 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=612 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt3  PROBE 2.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=5292 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=460 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7036 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7032 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2588 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=560 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=5268 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=988 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6424(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6416 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6420 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5908 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5676 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5260 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=612 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=5292 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=460 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7036 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7032 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2588 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=560 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=5268 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=988 rip=ntdll.dll+0xa0ad4
+  PROBE      7171 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE        46 ms server: conn=0 ACCEPT 
+  PROBE        46 ms server: conn=0 HS_BYTES 158
+  PROBE      5062 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5062 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5265 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #15 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #16 uptime=132640 exit=0x0 child_wall=703 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 187 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49713
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #17 uptime=133093 exit=0x0 child_wall=406 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 157 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       171 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49715
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       171 ms server: conn=0 EOF 
+  PROBE       171 ms server: conn=0 EOF 
+  PROBE       171 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #18 uptime=133546 exit=0x0 child_wall=453 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 140 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49717
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #19 uptime=134171 exit=0x0 child_wall=578 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 250 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        46 ms server: conn=0 ACCEPT 
+  PROBE        46 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49719
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #20 uptime=137609 exit=0x0 child_wall=3438 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       234 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        93 ms server: conn=0 ACCEPT 
+  PROBE        93 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49721
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #21 uptime=143906 exit=0x1 child_wall=6297 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE    SLOW request 813 ms
+  PROBE    SAMPLE 800ms tid=6596(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=5668 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6572 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6592 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6588 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6612 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6624 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=6580 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=6728 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5656 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5652 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5640 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=5664 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x2df4c ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b44d cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238 ntdll.dll+0x26491
+  PROBE    SAMPLE 2500ms tid=6596(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=5668 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6572 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6592 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6588 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6612 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6624 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=6580 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=6728 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5656 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5652 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5640 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=5664 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x2df4c ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b44d cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238 ntdll.dll+0x26491
+  PROBE      6031 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE      5078 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5078 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5281 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #21 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #22 uptime=144734 exit=0x0 child_wall=672 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 313 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49725
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #23 uptime=145234 exit=0x0 child_wall=453 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49727
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #24 uptime=145812 exit=0x0 child_wall=562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 219 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49729
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #25 uptime=146281 exit=0x0 child_wall=469 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        46 ms server: conn=0 ACCEPT 
+  PROBE        46 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49731
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #26 uptime=146765 exit=0x0 child_wall=437 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49733
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #27 uptime=147234 exit=0x0 child_wall=422 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 110 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49735
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #28 uptime=147687 exit=0x0 child_wall=437 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 110 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49737
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #29 uptime=148265 exit=0x0 child_wall=562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 218 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       203 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        32 ms server: conn=0 ACCEPT 
+  PROBE        32 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49739
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       203 ms server: conn=0 EOF 
+  PROBE       203 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #30 uptime=148765 exit=0x0 child_wall=469 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       110 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       110 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49741
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       110 ms server: conn=0 BODY 
+  PROBE       110 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #31 uptime=156015 exit=0x1 child_wall=7219 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 172 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE    SLOW request 812 ms
+  PROBE    SAMPLE 800ms tid=1432(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=2428 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2416 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1692 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1696 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=4708 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=1600 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=1464 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=4732 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1460 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1784 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=8060 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=1932 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=4892 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1432(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=2428 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2416 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1692 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1696 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=4708 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=1600 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=1464 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=4732 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1460 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1784 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=8060 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=1932 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=4892 rip=ntdll.dll+0xa0ad4
+  PROBE      6843 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE        46 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE      5062 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5062 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5265 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #31 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #32 uptime=156687 exit=0x0 child_wall=484 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 125 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49745
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #33 uptime=157203 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49747
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #34 uptime=160906 exit=0x0 child_wall=3703 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 266 ms
+  PROBE        78 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        78 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        78 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        78 ms client: HttpSendRequest begin
+  PROBE       328 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE       109 ms server: conn=0 ACCEPT 
+  PROBE       109 ms server: conn=0 HS_BYTES 158
+  PROBE       312 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       312 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49749
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       312 ms server: conn=0 BODY 
+  PROBE       312 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #35 uptime=168015 exit=0x1 child_wall=7094 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 250 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE    SLOW request 812 ms
+  PROBE    SAMPLE 800ms tid=7004(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6980 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6248 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7092 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7000 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7080 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6488 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=6460 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=6244 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6228 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6192 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6184 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6188 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=4368 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7004(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6980 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6248 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7092 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7000 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7080 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6488 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=6460 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=6244 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6228 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6192 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6184 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6188 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=4368 rip=ntdll.dll+0xa0ad4
+  PROBE      6656 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE      5078 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5078 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5281 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #35 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #36 uptime=168796 exit=0x0 child_wall=734 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 218 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       235 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       188 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       188 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49753
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       188 ms server: conn=0 BODY 
+  PROBE       188 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       235 ms server: conn=0 EOF 
+  PROBE       235 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #37 uptime=169390 exit=0x0 child_wall=578 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 187 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       235 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        79 ms server: conn=0 ACCEPT 
+  PROBE        79 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49755
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       235 ms server: conn=0 EOF 
+  PROBE       235 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #38 uptime=170015 exit=0x0 child_wall=594 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 219 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49757
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #39 uptime=170640 exit=0x0 child_wall=578 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 219 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       234 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       203 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       203 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49759
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       203 ms server: conn=0 BODY 
+  PROBE       203 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       234 ms server: conn=0 EOF 
+  PROBE       234 ms server: conn=0 EOF 
+  PROBE       234 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #0 uptime=171250 exit=0x0 child_wall=547 ms
+  PROBE mode=ignrev srv_start rc=0 took 187 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       157 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       157 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49761
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 BODY 
+  PROBE       157 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #1 uptime=171890 exit=0x0 child_wall=609 ms
+  PROBE mode=ignrev srv_start rc=0 took 266 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49763
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #2 uptime=172484 exit=0x0 child_wall=594 ms
+  PROBE mode=ignrev srv_start rc=0 took 203 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49765
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #3 uptime=180000 exit=0x0 child_wall=7500 ms
+  PROBE mode=ignrev srv_start rc=0 took 235 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE    SLOW request 813 ms
+  PROBE    SAMPLE 800ms tid=5716(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=288 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=4376 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1444 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1088 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1320 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=5296 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=4372 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x38fd3 crypt32.dll+0x1ff4b crypt32.dll+0x8ef9 crypt32.dll+0x1e7b3 crypt32.dll+0x18e7f crypt32.dll+0x171f0 crypt32.dll+0x110000 crypt32.dll+0x19416 crypt32.dll+0x2f7d3 crypt32.dll+0x13f15 crypt32.dll+0x14111 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40
+  PROBE    SAMPLE 800ms tid=1940 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5576 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=4380 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1812 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=4728 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=1316 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5716(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=288 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=4376 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1444 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1088 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1320 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=5296 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=4372 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x38fd3 crypt32.dll+0x1ff4b crypt32.dll+0x8ef9 crypt32.dll+0x1e7b3 crypt32.dll+0x18e7f crypt32.dll+0x171f0 crypt32.dll+0x110000 crypt32.dll+0x19416 crypt32.dll+0x2f7d3 crypt32.dll+0x13f15 crypt32.dll+0x14111 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40
+  PROBE    SAMPLE 2500ms tid=1940 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5576 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=4380 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1812 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=4728 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=1316 rip=ntdll.dll+0xa0ad4
+  PROBE      7125 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE      7094 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE      7094 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49767
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE      7094 ms server: conn=0 BODY 
+  PROBE      7094 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE      7125 ms server: conn=0 EOF 
+  PROBE      7125 ms server: conn=0 EOF 
+  PROBE      7125 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #4 uptime=183546 exit=0x0 child_wall=3484 ms
+  PROBE mode=ignrev srv_start rc=0 took 203 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       188 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49769
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #5 uptime=184062 exit=0x0 child_wall=469 ms
+  PROBE mode=ignrev srv_start rc=0 took 218 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49771
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #6 uptime=184546 exit=0x0 child_wall=437 ms
+  PROBE mode=ignrev srv_start rc=0 took 188 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49773
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #7 uptime=192656 exit=0x0 child_wall=8078 ms
+  PROBE mode=ignrev srv_start rc=0 took 172 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE    SLOW request 812 ms
+  PROBE    SAMPLE 800ms tid=4892(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=1432 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2528 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2360 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=4012 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=3928 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=3524 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x38fd3 crypt32.dll+0x1ff4b crypt32.dll+0x8ef9 crypt32.dll+0x1e7b3 crypt32.dll+0x18e7f crypt32.dll+0x171f0 crypt32.dll+0x110000 crypt32.dll+0x19416 crypt32.dll+0x2f7d3 crypt32.dll+0x13f15 crypt32.dll+0x14111 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40
+  PROBE    SAMPLE 800ms tid=6772 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6328 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7756 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7744 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=7736 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=4956 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=2316 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=4892(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=1432 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2528 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2360 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=4012 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=3928 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=3524 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x38fd3 crypt32.dll+0x1ff4b crypt32.dll+0x8ef9 crypt32.dll+0x1e7b3 crypt32.dll+0x18e7f crypt32.dll+0x171f0 crypt32.dll+0x110000 crypt32.dll+0x19416 crypt32.dll+0x2f7d3 crypt32.dll+0x13f15 crypt32.dll+0x14111 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40
+  PROBE    SAMPLE 2500ms tid=6772 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6328 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7756 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7744 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=7736 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=4956 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=2316 rip=ntdll.dll+0xa0ad4
+  PROBE      7828 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE      7765 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE      7765 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49775
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE      7765 ms server: conn=0 BODY 
+  PROBE      7765 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE      7828 ms server: conn=0 EOF 
+  PROBE      7828 ms server: conn=0 EOF 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #8 uptime=193359 exit=0x0 child_wall=688 ms
+  PROBE mode=ignrev srv_start rc=0 took 156 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49777
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE ignrev #9 uptime=193796 exit=0x0 child_wall=390 ms
+  PROBE mode=ignrev srv_start rc=0 took 141 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49779
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=ignrev err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #0 uptime=194406 exit=0x0 child_wall=594 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 218 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49781
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #1 uptime=194984 exit=0x0 child_wall=547 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 188 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       234 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49783
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       234 ms server: conn=0 EOF 
+  PROBE       234 ms server: conn=0 EOF 
+  PROBE       234 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #2 uptime=195531 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        16 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        16 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        16 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        16 ms client: HttpSendRequest begin
+  PROBE       157 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       141 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       141 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49785
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       141 ms server: conn=0 BODY 
+  PROBE       141 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE       157 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #3 uptime=196156 exit=0x0 child_wall=594 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 250 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       235 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49787
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       235 ms server: conn=0 EOF 
+  PROBE       235 ms server: conn=0 EOF 
+  PROBE       235 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #4 uptime=196718 exit=0x0 child_wall=515 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 140 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       188 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       188 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49789
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       188 ms server: conn=0 BODY 
+  PROBE       188 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #5 uptime=200343 exit=0x0 child_wall=3609 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 282 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       234 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       203 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       203 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49791
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       203 ms server: conn=0 BODY 
+  PROBE       203 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #6 uptime=205406 exit=0x0 child_wall=5047 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE    SLOW request 812 ms
+  PROBE    SAMPLE 800ms tid=7080(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6184 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7092 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6248 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6980 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=7000 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6452 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=6244 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=6228 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6460 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=4368 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6192 rip=ntdll.dll+0x9d0e4 mswsock.dll+0x80fc sspicli.dll+0x64c9 mswsock.dll+0xc8cb ntdll.dll+0x25ba1 ws2_32.dll+0xefad probe_first_https.exe+0x28060 ws2_32.dll+0x11e51 ntdll.dll+0x247b1 probe_first_https.exe+0x28060 probe_first_https.exe+0x731b probe_first_https.exe+0xa06c sspicli.dll+0x4924 probe_first_https.exe+0xa537 ntdll.dll+0x1791d ntdll.dll+0x1793d ntdll.dll+0x750ad ntdll.dll+0x74c28 ntdll.dll+0x2b44d probe_first_https.exe+0x2f28 msvcrt.dll+0x19d40 msvcrt.dll+0x19dd2 probe_first  PROBE _https.exe+0x2ee1 probe_first_https.exe+0x301a KERNEL32.DLL+0x17614 ntdll.dll+0x526a1
+  PROBE    SAMPLE 800ms tid=3080 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=7004 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7080(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6184 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7092 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6248 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6980 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=7000 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6452 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=6244 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=6228 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6460 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=4368 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6192 rip=ntdll.dll+0x9d0e4 mswsock.dll+0x80fc sspicli.dll+0x64c9 mswsock.dll+0xc8cb ntdll.dll+0x25ba1 ws2_32.dll+0xefad probe_first_https.exe+0x28060 ws2_32.dll+0x11e51 ntdll.dll+0x247b1 probe_first_https.exe+0x28060 probe_first_https.exe+0x731b probe_first_https.exe+0xa06c sspicli.dll+0x4924 probe_first_https.exe+0xa537 ntdll.dll+0x1791d ntdll.dll+0x1793d ntdll.dll+0x750ad ntdll.dll+0x74c28 ntdll.dll+0x2b44d probe_first_https.exe+0x2f28 msvcrt.dll+0x19d40 msvcrt.dll+0x19dd2 probe_firs  PROBE t_https.exe+0x2ee1 probe_first_https.exe+0x301a KERNEL32.DLL+0x17614 ntdll.dll+0x526a1
+  PROBE    SAMPLE 2500ms tid=3080 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=7004 rip=ntdll.dll+0xa0ad4
+  PROBE      4703 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE      4672 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE      4672 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49793
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE      4672 ms server: conn=0 BODY 
+  PROBE      4672 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE      4703 ms server: conn=0 EOF 
+  PROBE      4703 ms server: conn=0 EOF 
+  PROBE      4703 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #7 uptime=206156 exit=0x0 child_wall=719 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 157 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        46 ms server: conn=0 ACCEPT 
+  PROBE        46 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49795
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #8 uptime=206578 exit=0x0 child_wall=375 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 157 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49797
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #9 uptime=207109 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 141 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       187 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49799
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       187 ms server: conn=0 EOF 
+  PROBE       187 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #10 uptime=207671 exit=0x0 child_wall=562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 172 ms
+  PROBE        32 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        32 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        32 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        32 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        63 ms server: conn=0 ACCEPT 
+  PROBE        63 ms server: conn=0 HS_BYTES 158
+  PROBE       172 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       172 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49801
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 BODY 
+  PROBE       172 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #11 uptime=208265 exit=0x0 child_wall=562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 187 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       172 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        78 ms server: conn=0 ACCEPT 
+  PROBE        78 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49803
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 EOF 
+  PROBE       172 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #12 uptime=208796 exit=0x0 child_wall=531 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 156 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       219 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        62 ms server: conn=0 ACCEPT 
+  PROBE        62 ms server: conn=0 HS_BYTES 158
+  PROBE       156 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       156 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49805
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 BODY 
+  PROBE       156 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 EOF 
+  PROBE       219 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #13 uptime=209312 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 188 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        15 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        15 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        15 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49807
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #14 uptime=209859 exit=0x0 child_wall=500 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE       109 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       109 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49809
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       109 ms server: conn=0 BODY 
+  PROBE       109 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE       156 ms server: conn=0 EOF 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #15 uptime=217437 exit=0x1 child_wall=7562 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 235 ms
+  PROBE        15 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        15 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        15 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        15 ms client: HttpSendRequest begin
+  PROBE    SLOW request 829 ms
+  PROBE    SAMPLE 800ms tid=3172(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=2792 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=616 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=1084 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7848 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2112 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6636 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7500 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=5532 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=3548 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5524 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=8056 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6756 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=4296 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=3172(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=2792 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=616 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1084 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7848 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2112 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6636 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7500 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=5532 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=3548 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5524 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=8056 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6756 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=4296 rip=ntdll.dll+0xa0ad4
+  PROBE      7172 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE        47 ms server: conn=0 ACCEPT 
+  PROBE        47 ms server: conn=0 HS_BYTES 158
+  PROBE      5047 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5047 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5250 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #15 failed exit=0x1
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #16 uptime=218437 exit=0x0 child_wall=1000 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 203 ms
+  PROBE        47 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        47 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        47 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        47 ms client: HttpSendRequest begin
+  PROBE       578 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE       110 ms server: conn=0 ACCEPT 
+  PROBE       110 ms server: conn=0 HS_BYTES 158
+  PROBE       578 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       578 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49813
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       578 ms server: conn=0 BODY 
+  PROBE       578 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       578 ms server: conn=0 EOF 
+  PROBE       578 ms server: conn=0 EOF 
+  PROBE       578 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #17 uptime=219343 exit=0x0 child_wall=875 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 313 ms
+  PROBE        78 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        78 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        78 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        78 ms client: HttpSendRequest begin
+  PROBE       297 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE       156 ms server: conn=0 ACCEPT 
+  PROBE       156 ms server: conn=0 HS_BYTES 158
+  PROBE       281 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       281 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49815
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       281 ms server: conn=0 BODY 
+  PROBE       281 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE       297 ms server: conn=0 EOF 
+  PROBE       297 ms server: conn=0 EOF 
+  PROBE       297 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #18 uptime=222843 exit=0x0 child_wall=3484 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 188 ms
+  PROBE        31 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        31 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        31 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        31 ms client: HttpSendRequest begin
+  PROBE       156 ms client: HttpSendRequest -> ok=1 err=0 
+  PROBE        46 ms server: conn=0 ACCEPT 
+  PROBE        46 ms server: conn=0 HS_BYTES 158
+  PROBE       125 ms server: conn=0 TLS_DONE proto=0x400 cipher=0x6610 suite=0xc030 client_cert=0
+  PROBE       125 ms server: conn=0 HEAD GET /x HTTP/1.1
+  PROBE User-Agent: wininet_test
+  PROBE Host: 127.0.0.1:49817
+  PROBE Cache-Control: no-cache
+  PROBE 
+  PROBE 
+  PROBE       125 ms server: conn=0 BODY 
+  PROBE       125 ms server: conn=0 SENT HTTP/1.1 200 OK
+  PROBE Content-Type: text/plain
+  PROBE Content-Length: 5
+  PROBE 
+  PROBE 
+  PROBE RESULT mode=dfltsamp err=0
+  NOTE net env: ProxyEnable=0 AutoConfigURL=unset autodetect=1 SecureProtocols=0x800 CertificateRevocation=1 (tests use DIRECT)
+  PROBE dfltsamp #19 uptime=229500 exit=0x1 child_wall=6657 ms
+  PROBE mode=dfltsamp srv_start rc=0 took 266 ms
+  PROBE        78 ms client: InternetOpen -> 0000000000cc0004
+  PROBE        78 ms client: InternetConnect -> 0000000000cc0008
+  PROBE        78 ms client: HttpOpenRequest -> 0000000000cc000c
+  PROBE        78 ms client: HttpSendRequest begin
+  PROBE    SLOW request 875 ms
+  PROBE    SAMPLE 800ms tid=1144(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=2796 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2896 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6348 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=7024 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=2328 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=5976 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f crypt  PROBE 32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 800ms tid=6716 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=3672 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll+  PROBE 0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 800ms tid=2080 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=6512 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 800ms tid=5864 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 800ms tid=6380 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1b  PROBE 238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 800ms tid=6760 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=1144(main) rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=2796 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2896 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6348 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=7024 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=2328 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=5976 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce cryptnet.dll+0x3344 ntdll.dll+0x50800 crypt32.dll+0x29438 cryptnet.dll+0x23304 cryptnet.dll+0x898f crypt32.dll+0x12ed28 ntdll.dll+0x334f1 ntdll.dll+0x302c9 crypt32.dll+0xd2d60 cryptnet.dll+0x8560 crypt32.dll+0xd2d60 RPCRT4.dll+0x40731 RPCRT4.dll+0x5bfce crypt32.dll+0x11e340 RPCRT4.dll+0x49fb9 crypt32.dll+0xd5f3 crypt32.dll+0xd2d60 KERNELBASE.dll+0x3ac31 crypt32.dll+0xd2db3 cryptnet.dll+0x8560 crypt32.dll+0xd3bd0 crypt32.dll+0x5570f cryp  PROBE t32.dll+0x5942d crypt32.dll+0x140f7 crypt32.dll+0x14308 WINTRUST.dll+0xb346 WINTRUST.dll+0xde53 WINTRUST.dll+0x4bd60 WINTRUST.dll+0xce10 msvcrt.dll+0x19d40 WINTRUST.dll+0x4bd48 WINTRUST.dll+0x4bd30 WINTRUST.dll+0x4bd18 WINTRUST.dll+0x278e wininet.dll+0x48d724 WINTRUST.dll+0x4bda0 wininet.dll+0xc3a15 wininet.dll+0xc396a ntdll.dll+0x105b3
+  PROBE    SAMPLE 2500ms tid=6716 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=3672 rip=ntdll.dll+0x9e1d4 RPCRT4.dll+0x43d5f RPCRT4.dll+0x4f1a7 DNSAPI.dll+0x96f80 RPCRT4.dll+0xe02d6 RPCRT4.dll+0x5293a RPCRT4.dll+0x3050f RPCRT4.dll+0x79376 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 RPCRT4.dll+0xdd562 ntdll.dll+0x2b86b ntdll.dll+0x247b1 DNSAPI.dll+0x94090 DNSAPI.dll+0x94090 DNSAPI.dll+0x966e0 ntdll.dll+0x25ba1 DNSAPI.dll+0x1fdc0 DNSAPI.dll+0x827e0 DNSAPI.dll+0x94880 DNSAPI.dll+0x94090 DNSAPI.dll+0x947e0 RPCRT4.dll+0xe05b0 DNSAPI.dll+0x947e0 DNSAPI.dll+0x94090 DNSAPI.dll  PROBE +0x96f60 DNSAPI.dll+0x9f0de DNSAPI.dll+0x96f60 DNSAPI.dll+0x96f80 DNSAPI.dll+0x9f0da DNSAPI.dll+0x94830 RPCRT4.dll+0xdc010 RPCRT4.dll+0xe1350 RPCRT4.dll+0xdfd90 RPCRT4.dll+0xdc9e0 RPCRT4.dll+0xe17b0 RPCRT4.dll+0xe1560 DNSAPI.dll+0x94000 RPCRT4.dll+0x4ed3c DNSAPI.dll+0x8116 DNSAPI.dll+0x9cf18
+  PROBE    SAMPLE 2500ms tid=2080 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=6512 rip=ntdll.dll+0xa0ad4
+  PROBE    SAMPLE 2500ms tid=5864 rip=ntdll.dll+0x9d0e4
+  PROBE    SAMPLE 2500ms tid=6380 rip=ntdll.dll+0x9d0e4 KERNELBASE.dll+0x230ce winhttp.dll+0x6e7a winhttp.dll+0x1c039 winhttp.dll+0x21b6a ntdll.dll+0x13b9a webio.dll+0x34a00 webio.dll+0x1de8e winhttp.dll+0x396d4 ntdll.dll+0x50800 ucrtbase.dll+0xe0f6 cryptnet.dll+0x2fa5 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x2b3c7 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x21c4f profapi.dll+0x2b30 ntdll.dll+0x2b86b ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 ntdll.dll+0x2b3c7 ntdll.dll+0x11d210 ntdll.dll+0x1  PROBE b238 ntdll.dll+0x26491 ntdll.dll+0x2b86b ntdll.dll+0x1a9c3 ntdll.dll+0x25ba1 ntdll.dll+0x247b1 ntdll.dll+0x2b86b ntdll.dll+0x2b3c7 cryptnet.dll+0xddea cryptnet.dll+0x233f8 ntdll.dll+0x11d210 ntdll.dll+0x1b238
+  PROBE    SAMPLE 2500ms tid=6760 rip=ntdll.dll+0xa0ad4
+  PROBE      6156 ms client: HttpSendRequest -> ok=0 err=12030 ERROR_INTERNET_CONNECTION_ABORTED
+  PROBE       125 ms server: conn=0 ACCEPT 
+  PROBE       125 ms server: conn=0 HS_BYTES 158
+  PROBE      5156 ms server: conn=0 TIMEOUT recv timeout
+  PROBE      5156 ms server: conn=0 TLS_ABORT handshake recv=-1 round=1
+  PROBE      5359 ms server: conn=0 CLOSED 
+  PROBE RESULT mode=dfltsamp err=12030
+  NOTE dfltsamp #19 failed exit=0x1
+OK   fh_probe_first_https_fresh_processes
+SUMMARY tests=1 failed=0 skipped=0 checks_pass=0 checks_fail=0
+@@I7 END probe_first_https exit=0x0 ms=140216 timeout=0 bytes=159060
